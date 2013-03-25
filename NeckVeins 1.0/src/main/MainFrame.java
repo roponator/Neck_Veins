@@ -1551,7 +1551,7 @@ public class MainFrame extends Widget{
             
             loadSuccessful=loadSettings();
             currentDisplayMode=Display.getDesktopDisplayMode();
-            if(loadSuccessful){
+            if(false){
                 for(DisplayMode mode:displayModes){
                     if(mode.getWidth()==settings.resWidth && mode.getHeight()==settings.resHeight && mode.getBitsPerPixel()==settings.bitsPerPixel && mode.getFrequency()==settings.frequency){
                         currentDisplayMode=mode;
@@ -1579,13 +1579,14 @@ public class MainFrame extends Widget{
             //The TWL part
             renderer = new LWJGLRenderer();
             MainFrame gameUI = new MainFrame();
-            gui = new GUI(gameUI, renderer);
+            MainFrameRefactored ui = new MainFrameRefactored();
+            gui = new GUI(ui, renderer);
             themeManager = ThemeManager.createThemeManager(
-                    MainFrame.class.getResource("simple.xml"), renderer);
+                    MainFrameRefactored.class.getResource("simple.xml"), renderer);
             gui.applyTheme(themeManager);
             setupView();
             renderer.syncViewportSize();
-            gameUI.invalidateLayout();
+            ui.invalidateLayout();
         }catch(LWJGLException e){
             e.printStackTrace();
             exitProgram(1);

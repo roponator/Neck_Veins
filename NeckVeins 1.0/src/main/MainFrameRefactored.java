@@ -3,6 +3,8 @@ package main;
 import java.io.File;
 import java.io.Serializable;
 
+import main.MainFrame.NeckVeinsSettings;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -56,7 +58,28 @@ public class MainFrameRefactored extends Widget{
     	initGUI();
     }
 
+    /**
+     * TODO refactor
+     */
 	private void initGUI() {
+        try {
+			displayModes=Display.getAvailableDisplayModes();
+		} catch (LWJGLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        setTheme("mainframe");
+        displayModeStrings=new String[displayModes.length];
+        currentDisplayMode=Display.getDesktopDisplayMode();
+        settings=new NeckVeinsSettings();
+        settings.isFpsShown=false;
+        settings.fullscreen=true;
+        settings.stereoEnabled=false;
+        settings.stereoValue=0;
+        settings.resWidth=currentDisplayMode.getWidth();
+        settings.resHeight=currentDisplayMode.getHeight();
+        settings.bitsPerPixel=currentDisplayMode.getBitsPerPixel();
+        settings.frequency=currentDisplayMode.getFrequency();
 		initFileSelector();
 		initOpenButton();
 		initExitButton();
@@ -67,16 +90,19 @@ public class MainFrameRefactored extends Widget{
 		initTextArea();
 		initDisplayModesButton();
 		initVideoSettingButtons();
-		initOthers();
+		initDisplayModeListBox();
 	}
 
 
 
+	/**
+	 * 
+	 */
 	private void initFileSelector() {
 	    fileSelector = new FileSelector();
         fileSelector.setTheme("fileselector");
         fileSelector.setVisible(false);
-        de.matthiasmann.twl.model.JavaFileSystemModel fsm= JavaFileSystemModel.getInstance();
+        JavaFileSystemModel fsm= JavaFileSystemModel.getInstance();
         fileSelector.setFileSystemModel(fsm);
         Callback cb = new Callback() {
             @Override
@@ -237,108 +263,104 @@ public class MainFrameRefactored extends Widget{
            }
         });
         add(displayModesButton);
-		
-		
 	}
 	
 	/**
 	 * TODO rename
 	 */
 	private void initVideoSettingButtons() {
-		 okayVideoSetting = new Button("Okay");
-	        cancelVideoSetting = new Button("Cancel");
-	        fullscreenToggle = new ToggleButton("Toggle Fullscreen");
-	        
-	        okayVideoSetting.setVisible(false);
-	        cancelVideoSetting.setVisible(false);
-	        fullscreenToggle.setVisible(false);
-	        
-	        okayVideoSetting.setTheme("button");
-	        cancelVideoSetting.setTheme("button");
-	        fullscreenToggle.setTheme("togglebutton");
-	        okayVideoSetting.addCallback(new Runnable(){
-	            @Override
-	            public void run() {
-	            	// TODO
-	             // confirmVideoSetting();
-	            }
-	        });
-	        cancelVideoSetting.addCallback(new Runnable(){
-	            @Override
-	            public void run() {
-	                //TODO
-	            	//cancelVideoSetting();
-	            }
-	        });
-	        fullscreenToggle.addCallback(new Runnable(){
-	            @Override
-	            public void run() {
-	                if(fullscreenToggle.isActive()){
-	                    try {
-	                        Display.setFullscreen(true);
-	                        Display.setVSyncEnabled(true);
-	                        settings.fullscreen=true;
-	                    } catch(LWJGLException e) {
-	                        e.printStackTrace();
-	                    }
-	                }else{
-	                    try {
-	                        settings.fullscreen=false;
-	                        Display.setFullscreen(false);
-	                    } catch(LWJGLException e) {
-	                        e.printStackTrace();
-	                    }
-	                }
-	            }
-	        });
-	        if(settings.fullscreen){
-	            try {
-	                Display.setFullscreen(true);
-	                Display.setVSyncEnabled(true);
-	                fullscreenToggle.setActive(true);
-	            } catch(LWJGLException e) {
-	                e.printStackTrace();
-	            }
-	        }else{
-	            try {
-	                Display.setFullscreen(false);
-	                fullscreenToggle.setActive(false);
-	            } catch(LWJGLException e) {
-	                e.printStackTrace();
-	            }
-	        }
-	        add(okayVideoSetting);
-	        add(cancelVideoSetting);
-	        add(fullscreenToggle);
-	        // end add line 614;
-	        
+		okayVideoSetting = new Button("Okay");
+		cancelVideoSetting = new Button("Cancel");
+		fullscreenToggle = new ToggleButton("Toggle Fullscreen");
+		
+		okayVideoSetting.setVisible(false);
+		cancelVideoSetting.setVisible(false);
+		fullscreenToggle.setVisible(false);
+		
+		okayVideoSetting.setTheme("button");
+		cancelVideoSetting.setTheme("button");
+		fullscreenToggle.setTheme("togglebutton");
+		okayVideoSetting.addCallback(new Runnable(){
+		    @Override
+		    public void run() {
+		    	// TODO
+		 // confirmVideoSetting();
+		    }
+		});
+		cancelVideoSetting.addCallback(new Runnable(){
+		    @Override
+		    public void run() {
+		        //TODO
+			//cancelVideoSetting();
+		    }
+		});
+		fullscreenToggle.addCallback(new Runnable(){
+		    @Override
+		    public void run() {
+		        if(fullscreenToggle.isActive()){
+		            try {
+		                Display.setFullscreen(true);
+		                Display.setVSyncEnabled(true);
+		                settings.fullscreen=true;
+		            } catch(LWJGLException e) {
+		                e.printStackTrace();
+		            }
+		        }else{
+		            try {
+		                settings.fullscreen=false;
+		                Display.setFullscreen(false);
+		            } catch(LWJGLException e) {
+		                e.printStackTrace();
+		            }
+		        }
+		    }
+		});
+		if(settings.fullscreen){
+		    try {
+		        Display.setFullscreen(true);
+		        Display.setVSyncEnabled(true);
+		        fullscreenToggle.setActive(true);
+		    } catch(LWJGLException e) {
+		        e.printStackTrace();
+		    }
+		}else{
+		    try {
+		        Display.setFullscreen(false);
+		        fullscreenToggle.setActive(false);
+		    } catch(LWJGLException e) {
+		        e.printStackTrace();
+		    }
+		}
+		add(okayVideoSetting);
+		add(cancelVideoSetting);
+		add(fullscreenToggle);   
 	}
 	
 	/**
-	 * TODO
+	 * TODO rename, refactor a little bit
 	 */
-	private void initOthers() {
-		  displayModeListBox = new ListBox<String>();
-	        displayModeListBox.setTheme("listbox");
-	        displayModeListBox.setVisible(false);
-	        add(displayModeListBox);
-	        
-	        int i=0;
-	        selectedResolution=-1;
-	        for(DisplayMode displayMode:displayModes){
-	            if (displayMode.getWidth() == currentDisplayMode.getWidth() && displayMode.getHeight() == currentDisplayMode.getHeight() && displayMode.getBitsPerPixel() == currentDisplayMode.getBitsPerPixel() && displayMode.getFrequency() == currentDisplayMode.getFrequency()) {
-	                selectedResolution=i;
-	            }
-	            displayModeStrings[i++]=String.format("%1$5d x%2$5d x%3$3dbit x%4$3dHz", displayMode.getWidth(), displayMode.getHeight(),displayMode.getBitsPerPixel(),displayMode.getFrequency());
-	        }
-	        
-	        SimpleChangableListModel<String> scListModel= new SimpleChangableListModel<String>();
-	        for(String str:displayModeStrings){
-	            scListModel.addElement(str);
-	        }
-	        
-	        displayModeListBox.setModel(scListModel);
-	        if(selectedResolution!=-1)displayModeListBox.setSelected(selectedResolution);
+	private void initDisplayModeListBox() {
+		displayModeListBox = new ListBox<String>();
+		displayModeListBox.setTheme("listbox");
+		displayModeListBox.setVisible(false);
+		add(displayModeListBox);
+		
+		int i=0;
+		selectedResolution=-1;
+		for(DisplayMode displayMode:displayModes){
+		    if (displayMode.getWidth() == currentDisplayMode.getWidth() && displayMode.getHeight() == currentDisplayMode.getHeight() && displayMode.getBitsPerPixel() == currentDisplayMode.getBitsPerPixel() && displayMode.getFrequency() == currentDisplayMode.getFrequency()) {
+		        selectedResolution=i;
+		    }
+		    displayModeStrings[i++]=String.format("%1$5d x%2$5d x%3$3dbit x%4$3dHz", displayMode.getWidth(), displayMode.getHeight(),displayMode.getBitsPerPixel(),displayMode.getFrequency());
+		}
+		
+		SimpleChangableListModel<String> scListModel= new SimpleChangableListModel<String>();
+		for(String str:displayModeStrings){
+		    scListModel.addElement(str);
+		}
+		
+		displayModeListBox.setModel(scListModel);
+		if(selectedResolution!=-1)displayModeListBox.setSelected(selectedResolution);
 	}
 	
 	
@@ -390,4 +412,77 @@ public class MainFrameRefactored extends Widget{
         displayModeListBox.setSelected(selectedResolution);
     }
 	
+	/**
+     * @since 0.4
+     * @version 0.4
+     */
+	@Override
+    protected void layout(){
+	    open.adjustSize();
+	    displayModesButton.adjustSize();
+	    stereoToggleButton.adjustSize();
+	    help.adjustSize();
+	    credits.adjustSize();
+	    exit.adjustSize();
+        int openHeight=Math.max(25,settings.resHeight/18);
+        int widthBy6=settings.resWidth/6+1;
+        open.setSize(widthBy6, openHeight);
+        open.setPosition(0, 0);
+        displayModesButton.setPosition(widthBy6, 0);
+        displayModesButton.setSize(widthBy6, openHeight);
+        
+        if(settings.stereoEnabled){
+            stereoToggleButton.setPosition(widthBy6*2, 0);
+            stereoToggleButton.setSize(widthBy6, openHeight/2);
+            stereoScrollbar.setPosition(widthBy6*2, openHeight/2);
+            stereoScrollbar.setSize(widthBy6, openHeight/2);
+            //stereoScrollbar.setMinSize(settings.resWidth/36, openHeight);
+        }else{
+            stereoToggleButton.setPosition(widthBy6*2, 0);
+            stereoToggleButton.setSize(widthBy6, openHeight);
+            
+            stereoScrollbar.setPosition(widthBy6*2, openHeight);
+            stereoScrollbar.setSize(widthBy6, openHeight);
+        }
+        
+        help.setPosition(widthBy6*3, 0);
+        help.setSize(widthBy6, openHeight);
+        credits.setPosition(widthBy6*4, 0);
+        credits.setSize(widthBy6, openHeight);
+        exit.setPosition(widthBy6*5, 0);
+        exit.setSize(settings.resWidth-widthBy6*5, openHeight);
+        
+        
+        int rlWidth=settings.resWidth*8/10;
+        int rlHeight=settings.resHeight*6/10;
+        displayModeListBox.setSize(rlWidth,rlHeight);
+        displayModeListBox.setPosition(settings.resWidth/2-rlWidth/2, settings.resHeight/6);
+        
+        fullscreenToggle.adjustSize();
+        int fullToggleWidth=Math.max(fullscreenToggle.getWidth(),settings.resWidth/6);
+        fullscreenToggle.setSize(fullToggleWidth, openHeight);
+        fullscreenToggle.setPosition(settings.resWidth/2-rlWidth/2, settings.resHeight*19/24);
+        
+        cancelVideoSetting.adjustSize();
+        int cancelVideoSettingWidth=Math.max(cancelVideoSetting.getWidth(),settings.resWidth/6);
+        cancelVideoSetting.setSize(cancelVideoSettingWidth, openHeight);
+        cancelVideoSetting.setPosition(settings.resWidth/2+rlWidth/2-cancelVideoSettingWidth, settings.resHeight*19/24);
+        
+        okayVideoSetting.adjustSize();
+        int okayVideoSettingWidth=Math.max(okayVideoSetting.getWidth(),settings.resWidth/6);
+        okayVideoSetting.setSize(okayVideoSettingWidth, openHeight);
+        okayVideoSetting.setPosition(settings.resWidth/2+rlWidth/2-cancelVideoSettingWidth-okayVideoSettingWidth, settings.resHeight*19/24);
+        
+        fileSelector.adjustSize();
+        int fsHeight=settings.resHeight*19/24+openHeight-settings.resWidth/2+rlWidth/2;
+        fileSelector.setSize(rlWidth,fsHeight);
+        fileSelector.setPosition(settings.resWidth/2-rlWidth/2, settings.resHeight/6);
+        
+        helpScrollPane.setSize(rlWidth, fsHeight);
+        helpScrollPane.setPosition(settings.resWidth/2-rlWidth/2, settings.resHeight/6);
+        helpTextArea.setSize(rlWidth, fsHeight);
+        
+    }
+    
+    
 }
