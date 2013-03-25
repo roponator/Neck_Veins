@@ -240,8 +240,4 @@ public class HUD {
         glPopMatrix();
 	}
 	
-	public void enable() {}
-	
-	public void disable() {}
-	
 }

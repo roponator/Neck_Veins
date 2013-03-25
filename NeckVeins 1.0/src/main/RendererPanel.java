@@ -52,7 +52,7 @@ public class RendererPanel extends LWJGLRenderer{
 
 	private de.matthiasmann.twl.GUI gui;
 	
-	//Camera parameters
+	//Projection parameters
 	static float fovy=45;
 	static float zNear=10;
 	static float zFar=10000;
@@ -109,7 +109,7 @@ public class RendererPanel extends LWJGLRenderer{
 	 * @since 0.1
 	 * @version 0.2
 	 */
-	private void setupView(){
+	public void setupView(){
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
 		glViewport(0, 0, MainFrameRefactored.settings.resWidth, MainFrameRefactored.settings.resHeight);
@@ -124,7 +124,7 @@ public class RendererPanel extends LWJGLRenderer{
 	 * @since 0.1
 	 * @version 0.1
 	 */
-	private void resetView(){
+	public void resetView(){
 	    glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 	}
@@ -133,7 +133,7 @@ public class RendererPanel extends LWJGLRenderer{
 	 * @since 0.1
 	 * @version 0.4
 	 */
-	private void render(){
+	public void render(){
 	    if(MainFrameRefactored.settings.stereoEnabled){
 	        float offset=MainFrameRefactored.settings.stereoValue/10f;
 	        StencilMask.initStencil();
@@ -163,7 +163,7 @@ public class RendererPanel extends LWJGLRenderer{
 	 * @since 0.1
 	 * @version 0.1
 	 */
-	private static void setCameraAndLight(float offset){
+	private void setCameraAndLight(float offset){
 	    double v[]= new double[]{offset, 0, 0};
         v=cameraOrientation.rotateVector3d(v);
 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
