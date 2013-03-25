@@ -26,12 +26,17 @@ import de.matthiasmann.twl.textarea.SimpleTextAreaModel;
 
 public class MainFrameRefactored extends Widget{ 
     static class NeckVeinsSettings implements Serializable{//similar to global variables except it can be saved
-        private int resWidth, resHeight, bitsPerPixel, frequency;
-        private boolean isFpsShown, fullscreen, stereoEnabled;
-        private int stereoValue=0;
+        int resWidth;
+		int resHeight;
+		private int bitsPerPixel;
+		int frequency;
+        boolean isFpsShown;
+		private boolean fullscreen;
+		boolean stereoEnabled;
+        int stereoValue=0;
     }
     
-    private static NeckVeinsSettings settings;
+    public static NeckVeinsSettings settings;
 	private FileSelector fileSelector;
 	private boolean dialogOpened;
 	private Button open;
@@ -395,8 +400,9 @@ public class MainFrameRefactored extends Widget{
 	    gui.destroy();
 	    if(themeManager!=null)themeManager.destroy();
 	    Display.destroy();
-	    System.exit(n);
 	    */
+	    System.exit(n);
+	    
 	}
 	
 	/**
