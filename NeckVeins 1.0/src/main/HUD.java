@@ -43,6 +43,7 @@ public class HUD {
 	private Texture rotationElipse;
 	private Texture movementElipse;
 	private Texture ellipseGlow;
+	private int clickedOn;
 
 	// TODO fix check what this is
 	public static int ellipseSide = 0;
@@ -160,10 +161,9 @@ public class HUD {
 		glVertex3f(x2 + 1.5f * r, y2 - r, -1.0f);
 		glEnd();
 
-		if (VeinsWindow.clickedOn == VeinsWindow.CLICKED_ON_MOVE_ELLIPSE
-				|| VeinsWindow.clickedOn == VeinsWindow.CLICKED_ON_ROTATION_ELLIPSE) {
+		if (clickedOn == VeinsWindow.CLICKED_ON_MOVE_ELLIPSE || clickedOn == VeinsWindow.CLICKED_ON_ROTATION_ELLIPSE) {
 			float x3 = x, y3 = y;
-			if (VeinsWindow.clickedOn == VeinsWindow.CLICKED_ON_MOVE_ELLIPSE) {
+			if (clickedOn == VeinsWindow.CLICKED_ON_MOVE_ELLIPSE) {
 				x3 = x2;
 				y3 = y2;
 			}
@@ -211,9 +211,8 @@ public class HUD {
 		glTexCoord2f(1, 1);
 		glVertex3f(x2 + r, y2 - r, -0.6f);
 		glEnd();
-		if (VeinsWindow.clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE
-				|| VeinsWindow.clickedOn == VeinsWindow.CLICKED_ON_MOVE_CIRCLE) {
-			if (VeinsWindow.clickedOn == VeinsWindow.CLICKED_ON_MOVE_CIRCLE) {
+		if (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE || clickedOn == VeinsWindow.CLICKED_ON_MOVE_CIRCLE) {
+			if (clickedOn == VeinsWindow.CLICKED_ON_MOVE_CIRCLE) {
 				x = x2;
 				y = y2;
 			}
@@ -244,6 +243,15 @@ public class HUD {
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();
+	}
+
+	/**
+	 * Sets the clickedOn so the HUD "knows" if it must response
+	 * 
+	 * @param clickedOn
+	 */
+	public void setClickedOn(int clickedOn) {
+		this.clickedOn = clickedOn;
 	}
 
 }

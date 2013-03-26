@@ -13,9 +13,10 @@ import org.lwjgl.opengl.PixelFormat;
 import tools.Quaternion;
 import tools.Vector;
 import de.matthiasmann.twl.GUI;
+import de.matthiasmann.twl.input.Input;
 import de.matthiasmann.twl.theme.ThemeManager;
 
-public class VeinsWindow {
+public class VeinsWindow implements Input {
 	public final static int CLICKED_ON_NOTHING = 0;
 	public final static int CLICKED_ON_VEINS_MODEL = 1;
 	public final static int CLICKED_ON_ROTATION_CIRCLE = 2;
@@ -35,7 +36,7 @@ public class VeinsWindow {
 	private long timePastFrame;
 	private long timePastFps;
 	private int fpsToDisplay;
-	public static int clickedOn;
+	private int clickedOn;
 
 	public VeinsWindow() {
 		isRunning = true;
@@ -73,7 +74,7 @@ public class VeinsWindow {
 			frame = new MainFrameRefactored();
 			renderer = new RendererPanel();
 			hud = new HUD();
-			gui = new GUI(frame, renderer);
+			gui = new GUI(frame, renderer, this);
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 		}
@@ -109,12 +110,19 @@ public class VeinsWindow {
 		fpsToDisplay = 0;
 		renderer.setupView();
 		while (!Display.isCloseRequested() && isRunning) {
+			/* Reset view */
 			renderer.resetView();
-			// TODO
-			pollInput();
+
+			/* Handle input and inform HUD about it */
+			pollInput(gui);
+			hud.setClickedOn(clickedOn);
+
+			/* Render */
 			renderer.render();
 			hud.drawHUD();
 			setTitle();
+
+			/* Update */
 			gui.update();
 			Display.update();
 			// TODO
@@ -137,9 +145,11 @@ public class VeinsWindow {
 	 * @since 0.1
 	 * @version 0.4
 	 */
-	private void pollInput() {
+	@Override
+	public boolean pollInput(GUI gui) {
 		pollKeyboardInput();
 		pollMouseInput();
+		return true;
 	}
 
 	private void pollKeyboardInput() {
@@ -335,6 +345,7 @@ public class VeinsWindow {
 				if (clickedOn == CLICKED_ON_VEINS_MODEL) {
 					double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
 					if (veinsHeldAt != null) {
+						System.out.println(veinsGrabbedAt == null);
 						double[] rotationAxis = Vector.crossProduct(veinsGrabbedAt, veinsHeldAt);
 						if (Vector.length(rotationAxis) > 0) {
 							rotationAxis = Vector.normalize(rotationAxis);
@@ -424,4 +435,5 @@ public class VeinsWindow {
 			}
 		}
 	}
+
 }
