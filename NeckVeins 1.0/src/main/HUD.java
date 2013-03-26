@@ -37,12 +37,12 @@ import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 public class HUD {
-	private static Texture rotationCircle;
-	private static Texture circleGlow;
-	private static Texture movementCircle;
-	private static Texture rotationElipse;
-	private static Texture movementElipse;
-	private static Texture ellipseGlow;
+	private Texture rotationCircle;
+	private Texture circleGlow;
+	private Texture movementCircle;
+	private Texture rotationElipse;
+	private Texture movementElipse;
+	private Texture ellipseGlow;
 
 	// TODO fix check what this is
 	public static int ellipseSide = 0;

@@ -5,26 +5,40 @@ import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_DIFFUSE;
 import static org.lwjgl.opengl.GL11.GL_EQUAL;
+import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.lwjgl.opengl.GL11.GL_LIGHT0;
 import static org.lwjgl.opengl.GL11.GL_LIGHTING;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_POSITION;
+import static org.lwjgl.opengl.GL11.GL_SHININESS;
 import static org.lwjgl.opengl.GL11.GL_SMOOTH;
 import static org.lwjgl.opengl.GL11.GL_SPECULAR;
 import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
 import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glColor4f;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glLight;
+import static org.lwjgl.opengl.GL11.glMaterial;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glMultMatrix;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glShadeModel;
 import static org.lwjgl.opengl.GL11.glStencilFunc;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL20.glGetUniformLocation;
+import static org.lwjgl.opengl.GL20.glUniform4f;
 import static tools.Tools.allocFloats;
+
+import java.nio.FloatBuffer;
+
 import models.VeinsModel;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.GLU;
 
 import tools.Quaternion;
@@ -48,9 +62,15 @@ public class RendererPanel extends LWJGLRenderer {
 	private Quaternion addedModelOrientation;
 
 	// Projection parameters
-	private float fovy = 45;
-	private float zNear = 10;
-	private float zFar = 10000;
+	public float fovy = 45;
+	public float zNear = 10;
+	public float zFar = 10000;
+	public double veinsRadius;
+	public double[] screenPlaneInitialUpperLeft;
+	public double[] screenPlaneInitialUpperRight;
+	public double[] screenPlaneInitialLowerLeft;
+	public double[] screenPlaneInitialLowerRight;
+	private int[] shaderPrograms;
 
 	public RendererPanel() throws LWJGLException {
 		super();
@@ -105,6 +125,38 @@ public class RendererPanel extends LWJGLRenderer {
 			setCameraAndLight(0);
 			// TODO
 			// renderVeins();
+		}
+	}
+
+	/**
+	 * TODO load shaders
+	 */
+	private void renderVeins() {
+		if (veinsModel != null) {
+			glMatrixMode(GL_MODELVIEW);
+			glPushMatrix();
+			Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentModelOrientation,
+					addedModelOrientation);
+			FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
+			GL11.glMultMatrix(fb);
+
+			if (activeShaderProgram == -1) {
+				GL20.glUseProgram(0);
+			} else {
+				GL20.glUseProgram(shaderPrograms[activeShaderProgram]);
+				int myUniformLocation = glGetUniformLocation(shaderPrograms[activeShaderProgram], "bloodColor");
+				glUniform4f(myUniformLocation, 0.8f, 0.06667f, 0.0f, 1);
+			}
+
+			glEnable(GL_LIGHTING);
+			glColor4f(0.8f, 0.06667f, 0.0f, 1);
+			glMaterial(GL_FRONT, GL_AMBIENT, allocFloats(new float[] { 0.8f, 0.06667f, 0.0f, 1 }));
+			glMaterial(GL_FRONT, GL_DIFFUSE, allocFloats(new float[] { 0.8f, 0.06667f, 0.0f, 1 }));
+			glMaterial(GL_FRONT, GL_SPECULAR, allocFloats(new float[] { 0.66f, 0.66f, 0.66f, 1f }));
+			glMaterial(GL_FRONT, GL_SHININESS, allocFloats(new float[] { 100f, 256.0f, 256.0f, 256.0f }));
+			veinsModel.render();
+			GL20.glUseProgram(0);
+			glPopMatrix();
 		}
 	}
 
@@ -176,4 +228,9 @@ public class RendererPanel extends LWJGLRenderer {
 	public void setAddedModelOrientation(Quaternion q) {
 		addedModelOrientation = q;
 	}
+
+	public void setVeinsModel(VeinsModel veinsModel) {
+		this.veinsModel = veinsModel;
+	}
+
 }

@@ -5,8 +5,6 @@ import tools.Vector;
 public class RayUtil {
 
 	/**
-	 * TODO Veins radius, double[] screenPlaneInitialUpperLeft, double[]
-	 * screenPlaneInitialLowerLeft, double[] screenPlaneInitialLowerRight
 	 * 
 	 * @param x
 	 * @param y
@@ -14,12 +12,14 @@ public class RayUtil {
 	 * @param veinsRadius
 	 * @return
 	 */
-	public static double[] getRaySphereIntersection(int x, int y, Camera cam, double veinsRadius) {
+	public static double[] getRaySphereIntersection(int x, int y, RendererPanel renderer) {
 		// figure out if the click on the screen intersects the circle that
 		// surrounds the veins model
+		Camera cam = renderer.getCamera();
+		double veinsRadius = renderer.veinsRadius;
 
 		// get the direction of the "ray" cast from the camera location
-		double[] d = getRayDirection(x, y, cam, new double[1], new double[1], new double[1]);
+		double[] d = getRayDirection(x, y, renderer);
 
 		// a vector representing the camera location
 		double[] e = new double[] { cam.cameraX, cam.cameraY, cam.cameraZ };
@@ -59,11 +59,11 @@ public class RayUtil {
 	 * @param cam
 	 * @return
 	 */
-	public static double[] getRayDirection(int x, int y, Camera cam, double[] screenPlaneInitialUpperLeft,
-			double[] screenPlaneInitialLowerLeft, double[] screenPlaneInitialLowerRight) {
-		double[] tempUpperLeft = cam.cameraOrientation.rotateVector3d(screenPlaneInitialUpperLeft);
-		double[] tempLowerLeft = cam.cameraOrientation.rotateVector3d(screenPlaneInitialLowerLeft);
-		double[] tempLowerRight = cam.cameraOrientation.rotateVector3d(screenPlaneInitialLowerRight);
+	public static double[] getRayDirection(int x, int y, RendererPanel renderer) {
+		Camera cam = renderer.getCamera();
+		double[] tempUpperLeft = cam.cameraOrientation.rotateVector3d(renderer.screenPlaneInitialUpperLeft);
+		double[] tempLowerLeft = cam.cameraOrientation.rotateVector3d(renderer.screenPlaneInitialLowerLeft);
+		double[] tempLowerRight = cam.cameraOrientation.rotateVector3d(renderer.screenPlaneInitialLowerRight);
 
 		double[] leftToRight = Vector.subtraction(tempLowerRight, tempLowerLeft);
 		leftToRight = Vector.vScale(leftToRight, (0.5d + x) / (double) MainFrameRefactored.settings.resWidth);

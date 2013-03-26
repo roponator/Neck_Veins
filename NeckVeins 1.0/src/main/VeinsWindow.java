@@ -29,8 +29,8 @@ public class VeinsWindow {
 	private RendererPanel renderer;
 	private HUD hud;
 	private GUI gui;
-	private boolean isRunning = true;
-	private String title = "VeinsRefactored";
+	private boolean isRunning;
+	private String title;
 	private int fps;
 	private long timePastFrame;
 	private long timePastFps;
@@ -38,6 +38,16 @@ public class VeinsWindow {
 	public static int clickedOn;
 
 	public VeinsWindow() {
+		isRunning = true;
+		title = "Veins 3D";
+		createDisplay();
+		initWindowElements();
+		setupWindow();
+	}
+
+	public VeinsWindow(String title) {
+		isRunning = true;
+		this.title = title;
 		createDisplay();
 		initWindowElements();
 		setupWindow();
@@ -71,13 +81,16 @@ public class VeinsWindow {
 
 	private void setupWindow() {
 		try {
+			// OpenGL setup
 			GL11.glClearStencil(0);
 			renderer.setupView();
 
+			// Theme setup
 			ThemeManager themeManager = ThemeManager.createThemeManager(
 					MainFrameRefactored.class.getResource("simple.xml"), renderer);
 			gui.applyTheme(themeManager);
 
+			// Sync
 			renderer.syncViewportSize();
 			frame.invalidateLayout();
 		} catch (IOException e) {
@@ -312,8 +325,7 @@ public class VeinsWindow {
 					} else if (distanceToMoveFoci <= r * 3f) {
 						clickedOn = CLICKED_ON_MOVE_ELLIPSE;
 					} else {
-						veinsGrabbedAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(),
-								renderer.getCamera(), 1.0);
+						veinsGrabbedAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
 						renderer.setAddedModelOrientation(new Quaternion());
 						if (veinsGrabbedAt != null)
 							clickedOn = CLICKED_ON_VEINS_MODEL;
@@ -321,8 +333,7 @@ public class VeinsWindow {
 				}
 
 				if (clickedOn == CLICKED_ON_VEINS_MODEL) {
-					double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(),
-							renderer.getCamera(), 1.0);
+					double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
 					if (veinsHeldAt != null) {
 						double[] rotationAxis = Vector.crossProduct(veinsGrabbedAt, veinsHeldAt);
 						if (Vector.length(rotationAxis) > 0) {

@@ -10,6 +10,7 @@ import org.lwjgl.opengl.DisplayMode;
 import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.FileSelector;
 import de.matthiasmann.twl.FileSelector.Callback;
+import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.ListBox;
 import de.matthiasmann.twl.ScrollPane;
 import de.matthiasmann.twl.Scrollbar;
@@ -112,8 +113,8 @@ public class MainFrameRefactored extends Widget {
 				fileSelector.setVisible(false);
 				File file = (File) files[0];
 				System.out.println("\nOpening file: " + file.getAbsolutePath());
-				// TODO loadModel();
-				// loadModel(file.getAbsolutePath());
+				RendererPanel renderer = (RendererPanel) ((GUI) MainFrameRefactored.this.getRootWidget()).getRenderer();
+				ModelLoaderUtil.loadModel(file.getAbsolutePath(), renderer);
 			}
 
 			@Override
