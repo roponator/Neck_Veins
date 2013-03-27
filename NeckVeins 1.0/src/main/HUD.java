@@ -46,9 +46,9 @@ public class HUD {
 	private int clickedOn;
 
 	// TODO fix check what this is
-	public static int ellipseSide = 0;
-	public static float rotationCircleAngle = 0;
-	public static float rotationCircleDistance = 0;
+	public int ellipseSide = 0;
+	public float rotationCircleAngle = 0;
+	public float rotationCircleDistance = 0;
 
 	// *
 
@@ -115,7 +115,7 @@ public class HUD {
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
-		glOrtho(0, MainFrameRefactored.settings.resWidth, 0, MainFrameRefactored.settings.resHeight, 0.2f, 2);
+		glOrtho(0, VeinsWindow.settings.resWidth, 0, VeinsWindow.settings.resHeight, 0.2f, 2);
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glLoadIdentity();
@@ -128,8 +128,8 @@ public class HUD {
 		GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
 
 		// begin drawing
-		float w = MainFrameRefactored.settings.resWidth;
-		float h = MainFrameRefactored.settings.resHeight;
+		float w = VeinsWindow.settings.resWidth;
+		float h = VeinsWindow.settings.resHeight;
 		float r = w / 18;
 		float offset = r * 2 / 3;
 		float x = w - offset - r;

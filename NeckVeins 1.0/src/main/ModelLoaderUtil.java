@@ -41,8 +41,8 @@ public class ModelLoaderUtil {
 		// vertical ones.
 		double fovMin;
 
-		if (MainFrameRefactored.settings.resWidth < MainFrameRefactored.settings.resHeight)
-			fovMin = fovy * MainFrameRefactored.settings.resWidth / (double) MainFrameRefactored.settings.resHeight;
+		if (VeinsWindow.settings.resWidth < VeinsWindow.settings.resHeight)
+			fovMin = fovy * VeinsWindow.settings.resWidth / (double) VeinsWindow.settings.resHeight;
 		else
 			fovMin = fovy;
 		fovMin = Math.PI * fovMin / 180;// To radians.
@@ -53,8 +53,7 @@ public class ModelLoaderUtil {
 		Quaternion cameraOrientation = new Quaternion();
 
 		double yAngle = Math.PI * fovy / 360d;
-		double xAngle = yAngle * (double) MainFrameRefactored.settings.resWidth
-				/ (double) MainFrameRefactored.settings.resHeight;
+		double xAngle = yAngle * (double) VeinsWindow.settings.resWidth / (double) VeinsWindow.settings.resHeight;
 		double screenPlaneZ = -d1 / Math.tan(fovMin / 2);
 		double screenPlaneY = Math.tan(yAngle) * (-screenPlaneZ);
 		double screenPlaneX = Math.tan(xAngle) * (-screenPlaneZ);
@@ -63,7 +62,7 @@ public class ModelLoaderUtil {
 		double[] screenPlaneInitialLowerLeft = new double[] { -screenPlaneX, -screenPlaneY, screenPlaneZ };
 		double[] screenPlaneInitialLowerRight = new double[] { screenPlaneX, -screenPlaneY, screenPlaneZ };
 
-		// veinsGrabbedAt = null;
+		renderer.veinsGrabbedAt = null;
 		double angle1 = Math.PI * -90 / 180;
 		double angle2 = Math.PI * 180 / 180;
 		Quaternion currentModelOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle1, new double[] { 1, 0,

@@ -1674,7 +1674,6 @@ public class MainFrame extends Widget {
 			// The TWL part
 			renderer = new LWJGLRenderer();
 			MainFrame gameUI = new MainFrame();
-			MainFrameRefactored ui = new MainFrameRefactored();
 			gui = new GUI(gameUI, renderer);
 			themeManager = ThemeManager.createThemeManager(MainFrameRefactored.class.getResource("simple.xml"),
 					renderer);

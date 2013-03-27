@@ -1,7 +1,6 @@
 package main;
 
 import java.io.File;
-import java.io.Serializable;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
@@ -22,20 +21,6 @@ import de.matthiasmann.twl.model.SimpleChangableListModel;
 import de.matthiasmann.twl.textarea.SimpleTextAreaModel;
 
 public class MainFrameRefactored extends Widget {
-	static class NeckVeinsSettings implements Serializable {// similar to global
-															// variables except
-															// it can be saved
-		int resWidth;
-		int resHeight;
-		private int bitsPerPixel;
-		int frequency;
-		boolean isFpsShown;
-		private boolean fullscreen;
-		boolean stereoEnabled;
-		int stereoValue = 0;
-	}
-
-	public static NeckVeinsSettings settings;
 	private FileSelector fileSelector;
 	private boolean isDialogOpened;
 	private Button open;
@@ -58,31 +43,18 @@ public class MainFrameRefactored extends Widget {
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
 
-	public MainFrameRefactored() {
+	public MainFrameRefactored() throws LWJGLException {
+		getDisplayModes();
 		initGUI();
+		setTheme("mainframe");
 	}
 
-	/**
-	 * TODO refactor
-	 */
+	private void getDisplayModes() throws LWJGLException {
+		displayModes = Display.getAvailableDisplayModes();
+		currentDisplayMode = Display.getDisplayMode();
+	}
+
 	private void initGUI() {
-		try {
-			displayModes = Display.getAvailableDisplayModes();
-		} catch (LWJGLException e) {
-			e.printStackTrace();
-		}
-		setTheme("mainframe");
-		displayModeStrings = new String[displayModes.length];
-		currentDisplayMode = Display.getDesktopDisplayMode();
-		settings = new NeckVeinsSettings();
-		settings.isFpsShown = false;
-		settings.fullscreen = true;
-		settings.stereoEnabled = false;
-		settings.stereoValue = 0;
-		settings.resWidth = currentDisplayMode.getWidth();
-		settings.resHeight = currentDisplayMode.getHeight();
-		settings.bitsPerPixel = currentDisplayMode.getBitsPerPixel();
-		settings.frequency = currentDisplayMode.getFrequency();
 		initFileSelector();
 		initOpenButton();
 		initExitButton();
@@ -96,9 +68,6 @@ public class MainFrameRefactored extends Widget {
 		initDisplayModeListBox();
 	}
 
-	/**
-	 * 
-	 */
 	private void initFileSelector() {
 		fileSelector = new FileSelector();
 		fileSelector.setTheme("fileselector");
@@ -112,7 +81,7 @@ public class MainFrameRefactored extends Widget {
 				fileSelector.setVisible(false);
 				File file = (File) files[0];
 				System.out.println("\nOpening file: " + file.getAbsolutePath());
-				RendererPanel renderer = (RendererPanel) ((GUI) MainFrameRefactored.this.getRootWidget()).getRenderer();
+				RendererPanel renderer = (RendererPanel) ((GUI) MainFrameRefactored.this.getGUI()).getRenderer();
 				ModelLoaderUtil.loadModel(file.getAbsolutePath(), renderer);
 			}
 
@@ -120,7 +89,6 @@ public class MainFrameRefactored extends Widget {
 			public void canceled() {
 				setButtonsEnabled(true);
 				fileSelector.setVisible(false);
-
 			}
 		};
 		fileSelector.addCallback(cb);
@@ -146,8 +114,7 @@ public class MainFrameRefactored extends Widget {
 		exit.setTooltipContent("Terminates this program.");
 		exit.addCallback(new Runnable() {
 			public void run() {
-				// TODO exitProgram();
-				ExitHandler.exitProgram(0, MainFrameRefactored.this.getGUI());
+				((VeinsWindow) MainFrameRefactored.this.getGUI().getParent()).exitProgram(0);
 			}
 		});
 		add(exit);
@@ -158,10 +125,10 @@ public class MainFrameRefactored extends Widget {
 		stereoScrollbar.setTheme("hscrollbar");
 		stereoScrollbar.setTooltipContent("Sets the distance between eyes.");
 		stereoScrollbar.setMinMaxValue(-1000, 1000);
-		stereoScrollbar.setValue(settings.stereoValue);
+		stereoScrollbar.setValue(VeinsWindow.settings.stereoValue);
 		stereoScrollbar.addCallback(new Runnable() {
 			public void run() {
-				settings.stereoValue = stereoScrollbar.getValue();
+				VeinsWindow.settings.stereoValue = stereoScrollbar.getValue();
 			}
 		});
 		add(stereoScrollbar);
@@ -173,12 +140,12 @@ public class MainFrameRefactored extends Widget {
 		stereoToggleButton.setTooltipContent("Toggles interlaced 3D picture. Requires an appropriate display.");
 		stereoToggleButton.addCallback(new Runnable() {
 			public void run() {
-				settings.stereoEnabled = true;
+				VeinsWindow.settings.stereoEnabled = true;
 				stereoScrollbar.setVisible(true);
 				invalidateLayout();
 				if (stereoToggleButton.isActive()) {
 				} else {
-					settings.stereoEnabled = false;
+					VeinsWindow.settings.stereoEnabled = false;
 					stereoScrollbar.setVisible(false);
 					invalidateLayout();
 				}
@@ -186,7 +153,7 @@ public class MainFrameRefactored extends Widget {
 		});
 		add(stereoToggleButton);
 
-		if (settings.stereoEnabled) {
+		if (VeinsWindow.settings.stereoEnabled) {
 			stereoScrollbar.setVisible(true);
 			stereoToggleButton.setActive(true);
 		} else {
@@ -200,7 +167,6 @@ public class MainFrameRefactored extends Widget {
 		help.setTheme("togglebutton");
 		help.setTooltipContent("Shows controls.");
 		help.addCallback(new Runnable() {
-
 			public void run() {
 				if (help.isActive()) {
 					helpTextArea.setModel(stamHelp);
@@ -299,13 +265,13 @@ public class MainFrameRefactored extends Widget {
 					try {
 						Display.setFullscreen(true);
 						Display.setVSyncEnabled(true);
-						settings.fullscreen = true;
+						VeinsWindow.settings.fullscreen = true;
 					} catch (LWJGLException e) {
 						e.printStackTrace();
 					}
 				} else {
 					try {
-						settings.fullscreen = false;
+						VeinsWindow.settings.fullscreen = false;
 						Display.setFullscreen(false);
 					} catch (LWJGLException e) {
 						e.printStackTrace();
@@ -313,7 +279,7 @@ public class MainFrameRefactored extends Widget {
 				}
 			}
 		});
-		if (settings.fullscreen) {
+		if (VeinsWindow.settings.fullscreen) {
 			try {
 				Display.setFullscreen(true);
 				Display.setVSyncEnabled(true);
@@ -338,6 +304,7 @@ public class MainFrameRefactored extends Widget {
 	 * TODO rename, refactor a little bit
 	 */
 	private void initDisplayModeListBox() {
+		displayModeStrings = new String[displayModes.length];
 		displayModeListBox = new ListBox<String>();
 		displayModeListBox.setTheme("listbox");
 		displayModeListBox.setVisible(false);
@@ -383,19 +350,6 @@ public class MainFrameRefactored extends Widget {
 		setButtonsEnabled(false);
 	}
 
-	public static void exitProgram(int n) {
-		/*
-		 * TODO saveSettings(); for(int i=0;i<numberOfShaderPrograms;i++){
-		 * glDetachShader(shaderPrograms[i], vertexShaders[i]);
-		 * glDeleteShader(vertexShaders[i]); glDetachShader(shaderPrograms[i],
-		 * fragmentShaders[i]); glDeleteShader(fragmentShaders[i]);
-		 * glDeleteProgram(shaderPrograms[i]); } gui.destroy();
-		 * if(themeManager!=null)themeManager.destroy(); Display.destroy();
-		 */
-		System.exit(n);
-
-	}
-
 	/**
 	 * @since 0.4
 	 * @version 0.4
@@ -414,8 +368,10 @@ public class MainFrameRefactored extends Widget {
 	 * @version 0.4
 	 */
 	public void confirmVideoSetting() {
-		GUI gui = (GUI) this.getRootWidget();
+		GUI gui = getGUI();
 		RendererPanel renderer = (RendererPanel) gui.getRenderer();
+		DisplayMode[] displayModes = ((VeinsWindow) gui.getParent()).getDisplayModes();
+		DisplayMode currentDisplayMode = ((VeinsWindow) gui.getParent()).getCurrentDisplayMode();
 		okayVideoSetting.setVisible(false);
 		cancelVideoSetting.setVisible(false);
 		displayModeListBox.setVisible(false);
@@ -426,8 +382,8 @@ public class MainFrameRefactored extends Widget {
 			currentDisplayMode = displayModes[selectedResolution];
 			try {
 				Display.setDisplayMode(currentDisplayMode);
-				settings.resWidth = currentDisplayMode.getWidth();
-				settings.resHeight = currentDisplayMode.getHeight();
+				VeinsWindow.settings.resWidth = currentDisplayMode.getWidth();
+				VeinsWindow.settings.resHeight = currentDisplayMode.getHeight();
 			} catch (LWJGLException e) {
 				e.printStackTrace();
 			}
@@ -461,19 +417,20 @@ public class MainFrameRefactored extends Widget {
 		help.adjustSize();
 		credits.adjustSize();
 		exit.adjustSize();
-		int openHeight = Math.max(25, settings.resHeight / 18);
-		int widthBy6 = settings.resWidth / 6 + 1;
+		int openHeight = Math.max(25, VeinsWindow.settings.resHeight / 18);
+		int widthBy6 = VeinsWindow.settings.resWidth / 6 + 1;
 		open.setSize(widthBy6, openHeight);
 		open.setPosition(0, 0);
 		displayModesButton.setPosition(widthBy6, 0);
 		displayModesButton.setSize(widthBy6, openHeight);
 
-		if (settings.stereoEnabled) {
+		if (VeinsWindow.settings.stereoEnabled) {
 			stereoToggleButton.setPosition(widthBy6 * 2, 0);
 			stereoToggleButton.setSize(widthBy6, openHeight / 2);
 			stereoScrollbar.setPosition(widthBy6 * 2, openHeight / 2);
 			stereoScrollbar.setSize(widthBy6, openHeight / 2);
-			// stereoScrollbar.setMinSize(settings.resWidth/36, openHeight);
+			// stereoScrollbar.setMinSize(VeinsWindow.settings.resWidth/36,
+			// openHeight);
 		} else {
 			stereoToggleButton.setPosition(widthBy6 * 2, 0);
 			stereoToggleButton.setSize(widthBy6, openHeight);
@@ -487,37 +444,40 @@ public class MainFrameRefactored extends Widget {
 		credits.setPosition(widthBy6 * 4, 0);
 		credits.setSize(widthBy6, openHeight);
 		exit.setPosition(widthBy6 * 5, 0);
-		exit.setSize(settings.resWidth - widthBy6 * 5, openHeight);
+		exit.setSize(VeinsWindow.settings.resWidth - widthBy6 * 5, openHeight);
 
-		int rlWidth = settings.resWidth * 8 / 10;
-		int rlHeight = settings.resHeight * 6 / 10;
+		int rlWidth = VeinsWindow.settings.resWidth * 8 / 10;
+		int rlHeight = VeinsWindow.settings.resHeight * 6 / 10;
 		displayModeListBox.setSize(rlWidth, rlHeight);
-		displayModeListBox.setPosition(settings.resWidth / 2 - rlWidth / 2, settings.resHeight / 6);
+		displayModeListBox.setPosition(VeinsWindow.settings.resWidth / 2 - rlWidth / 2,
+				VeinsWindow.settings.resHeight / 6);
 
 		fullscreenToggle.adjustSize();
-		int fullToggleWidth = Math.max(fullscreenToggle.getWidth(), settings.resWidth / 6);
+		int fullToggleWidth = Math.max(fullscreenToggle.getWidth(), VeinsWindow.settings.resWidth / 6);
 		fullscreenToggle.setSize(fullToggleWidth, openHeight);
-		fullscreenToggle.setPosition(settings.resWidth / 2 - rlWidth / 2, settings.resHeight * 19 / 24);
+		fullscreenToggle.setPosition(VeinsWindow.settings.resWidth / 2 - rlWidth / 2,
+				VeinsWindow.settings.resHeight * 19 / 24);
 
 		cancelVideoSetting.adjustSize();
-		int cancelVideoSettingWidth = Math.max(cancelVideoSetting.getWidth(), settings.resWidth / 6);
+		int cancelVideoSettingWidth = Math.max(cancelVideoSetting.getWidth(), VeinsWindow.settings.resWidth / 6);
 		cancelVideoSetting.setSize(cancelVideoSettingWidth, openHeight);
-		cancelVideoSetting.setPosition(settings.resWidth / 2 + rlWidth / 2 - cancelVideoSettingWidth,
-				settings.resHeight * 19 / 24);
+		cancelVideoSetting.setPosition(VeinsWindow.settings.resWidth / 2 + rlWidth / 2 - cancelVideoSettingWidth,
+				VeinsWindow.settings.resHeight * 19 / 24);
 
 		okayVideoSetting.adjustSize();
-		int okayVideoSettingWidth = Math.max(okayVideoSetting.getWidth(), settings.resWidth / 6);
+		int okayVideoSettingWidth = Math.max(okayVideoSetting.getWidth(), VeinsWindow.settings.resWidth / 6);
 		okayVideoSetting.setSize(okayVideoSettingWidth, openHeight);
-		okayVideoSetting.setPosition(settings.resWidth / 2 + rlWidth / 2 - cancelVideoSettingWidth
-				- okayVideoSettingWidth, settings.resHeight * 19 / 24);
+		okayVideoSetting.setPosition(VeinsWindow.settings.resWidth / 2 + rlWidth / 2 - cancelVideoSettingWidth
+				- okayVideoSettingWidth, VeinsWindow.settings.resHeight * 19 / 24);
 
 		fileSelector.adjustSize();
-		int fsHeight = settings.resHeight * 19 / 24 + openHeight - settings.resWidth / 2 + rlWidth / 2;
+		int fsHeight = VeinsWindow.settings.resHeight * 19 / 24 + openHeight - VeinsWindow.settings.resWidth / 2
+				+ rlWidth / 2;
 		fileSelector.setSize(rlWidth, fsHeight);
-		fileSelector.setPosition(settings.resWidth / 2 - rlWidth / 2, settings.resHeight / 6);
+		fileSelector.setPosition(VeinsWindow.settings.resWidth / 2 - rlWidth / 2, VeinsWindow.settings.resHeight / 6);
 
 		helpScrollPane.setSize(rlWidth, fsHeight);
-		helpScrollPane.setPosition(settings.resWidth / 2 - rlWidth / 2, settings.resHeight / 6);
+		helpScrollPane.setPosition(VeinsWindow.settings.resWidth / 2 - rlWidth / 2, VeinsWindow.settings.resHeight / 6);
 		helpTextArea.setSize(rlWidth, fsHeight);
 	}
 

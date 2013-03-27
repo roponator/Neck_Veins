@@ -89,6 +89,7 @@ public class RendererPanel extends LWJGLRenderer {
 	public double[] screenPlaneInitialUpperRight;
 	public double[] screenPlaneInitialLowerLeft;
 	public double[] screenPlaneInitialLowerRight;
+	public double[] veinsGrabbedAt;
 
 	private int[] shaderPrograms;
 	private int[] vertexShaders;
@@ -99,7 +100,6 @@ public class RendererPanel extends LWJGLRenderer {
 		cam = new Camera();
 		activeShaderProgram = 0;
 		isWireframeOn = false;
-		prepareShaders();
 	}
 
 	/**
@@ -109,11 +109,10 @@ public class RendererPanel extends LWJGLRenderer {
 	public void setupView() {
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
-		glViewport(0, 0, MainFrameRefactored.settings.resWidth, MainFrameRefactored.settings.resHeight);
+		glViewport(0, 0, VeinsWindow.settings.resWidth, VeinsWindow.settings.resHeight);
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
 		GL11.glLoadIdentity();
-		GLU.gluPerspective(fovy,
-				MainFrameRefactored.settings.resWidth / (float) MainFrameRefactored.settings.resHeight, zNear, zFar);
+		GLU.gluPerspective(fovy, VeinsWindow.settings.resWidth / (float) VeinsWindow.settings.resHeight, zNear, zFar);
 		glShadeModel(GL_SMOOTH);
 		setCameraAndLight(0);
 	}
@@ -132,8 +131,8 @@ public class RendererPanel extends LWJGLRenderer {
 	 * @version 0.4
 	 */
 	public void render() {
-		if (MainFrameRefactored.settings.stereoEnabled) {
-			float offset = MainFrameRefactored.settings.stereoValue / 10f;
+		if (VeinsWindow.settings.stereoEnabled) {
+			float offset = VeinsWindow.settings.stereoValue / 10f;
 			StencilMask.initStencil();
 			glStencilFunc(GL_EQUAL, 0, 0x01);
 			setCameraAndLight(offset);
@@ -203,8 +202,10 @@ public class RendererPanel extends LWJGLRenderer {
 
 	/**
 	 * TODO exit on fail
+	 * 
+	 * @throws ShaderLoadException
 	 */
-	public void prepareShaders() {
+	public void prepareShaders() throws ShaderLoadException {
 		shaderPrograms = new int[NUMBER_OF_SHADER_PROGRAMS];
 		vertexShaders = new int[NUMBER_OF_SHADER_PROGRAMS];
 		fragmentShaders = new int[NUMBER_OF_SHADER_PROGRAMS];
@@ -225,7 +226,7 @@ public class RendererPanel extends LWJGLRenderer {
 				reader.close();
 			} catch (IOException e) {
 				System.err.println("Vertex shader" + i + " wasn't loaded properly.");
-				// exitProgram(1);
+				throw new ShaderLoadException("Vertex shader" + i + " wasn't loaded properly.");
 			}
 			try {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -237,7 +238,7 @@ public class RendererPanel extends LWJGLRenderer {
 				reader.close();
 			} catch (IOException e) {
 				System.err.println("Fragment shader" + i + " wasn't loaded properly.");
-				// exitProgram(1);
+				throw new ShaderLoadException("Fragment shader" + i + " wasn't loaded properly.");
 			}
 			glShaderSource(vertexShaders[i], vertexShaderSource);
 			glCompileShader(vertexShaders[i]);
@@ -263,7 +264,7 @@ public class RendererPanel extends LWJGLRenderer {
 	}
 
 	public void cleanShaders() {
-		for (int i = 0; i < RendererPanel.NUMBER_OF_SHADER_PROGRAMS; i++) {
+		for (int i = 0; i < NUMBER_OF_SHADER_PROGRAMS; i++) {
 			glDetachShader(shaderPrograms[i], vertexShaders[i]);
 			glDeleteShader(vertexShaders[i]);
 			glDetachShader(shaderPrograms[i], fragmentShaders[i]);

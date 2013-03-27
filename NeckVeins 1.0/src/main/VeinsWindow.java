@@ -7,15 +7,21 @@ import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 
 import tools.Quaternion;
 import tools.Vector;
+import de.matthiasmann.twl.Container;
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.theme.ThemeManager;
 
-public class VeinsWindow {
+/**
+ * This is the root pane of the program.
+ * 
+ */
+public class VeinsWindow extends Container {
 	public final static int CLICKED_ON_NOTHING = 0;
 	public final static int CLICKED_ON_VEINS_MODEL = 1;
 	public final static int CLICKED_ON_ROTATION_CIRCLE = 2;
@@ -25,11 +31,11 @@ public class VeinsWindow {
 	public final static int CLICKED_ON_BUTTONS = 6;
 	private final float ELLIPSEF = 1.1180339887498948482045868343656f;
 
+	public static NeckVeinsSettings settings;
+
 	private MainFrameRefactored frame;
 	private RendererPanel renderer;
 	private HUD hud;
-	private GUI gui;
-	private ThemeManager themeManager;
 	private boolean isRunning;
 	private String title;
 	private int fps;
@@ -37,10 +43,15 @@ public class VeinsWindow {
 	private long timePastFps;
 	private int fpsToDisplay;
 	private int clickedOn;
+	private GUI gui;
+	private ThemeManager themeManager;
+	private DisplayMode[] displayModes;
+	private DisplayMode currentDisplayMode;
 
 	public VeinsWindow() {
 		isRunning = true;
-		title = "Veins 3D";
+		title = "Veins3D";
+		loadSettings();
 		createDisplay();
 		initWindowElements();
 		setupWindow();
@@ -49,53 +60,90 @@ public class VeinsWindow {
 	public VeinsWindow(String title) {
 		isRunning = true;
 		this.title = title;
+		loadSettings();
 		createDisplay();
 		initWindowElements();
 		setupWindow();
 	}
 
+	private void loadSettings() {
+		try {
+			displayModes = Display.getAvailableDisplayModes();
+			// displayModeStrings = new String[displayModes.length];
+			currentDisplayMode = Display.getDesktopDisplayMode();
+			settings = SettingsUtil.loadSettings(title);
+			if (settings != null) {
+				for (DisplayMode mode : displayModes) {
+					if (mode.getWidth() == settings.resWidth && mode.getHeight() == settings.resHeight
+							&& mode.getBitsPerPixel() == settings.bitsPerPixel
+							&& mode.getFrequency() == settings.frequency) {
+						currentDisplayMode = mode;
+					}
+				}
+			} else {
+				settings = new NeckVeinsSettings();
+				settings.isFpsShown = false;
+				settings.fullscreen = true;
+				settings.stereoEnabled = false;
+				settings.stereoValue = 0;
+			}
+			settings.resWidth = currentDisplayMode.getWidth();
+			settings.resHeight = currentDisplayMode.getHeight();
+			settings.bitsPerPixel = currentDisplayMode.getBitsPerPixel();
+			settings.frequency = currentDisplayMode.getFrequency();
+		} catch (LWJGLException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void createDisplay() {
 		try {
 			// TODO Change
-			Display.setDisplayMode(Display.getDesktopDisplayMode());
-			// TODO Change title
+			Display.setDisplayMode(currentDisplayMode);
 			Display.setTitle(title);
 			Display.setVSyncEnabled(true);
 			Display.create(new PixelFormat().withStencilBits(1));
 			// Display.create();
 		} catch (LWJGLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			exitProgram(1);
 		}
 	}
 
 	private void initWindowElements() {
 		try {
+			hud = new HUD();
 			frame = new MainFrameRefactored();
 			renderer = new RendererPanel();
-			hud = new HUD();
 			gui = new GUI(frame, renderer);
+			add(gui);
+			setTheme("mainframe");
 		} catch (LWJGLException e) {
 			e.printStackTrace();
+			exitProgram(1);
 		}
 	}
 
 	private void setupWindow() {
 		try {
+			// Theme setup
+			themeManager = ThemeManager.createThemeManager(MainFrameRefactored.class.getResource("simple.xml"),
+					renderer);
+			gui.applyTheme(themeManager);
+
 			// OpenGL setup
 			GL11.glClearStencil(0);
 			renderer.setupView();
-
-			// Theme setup
-			ThemeManager themeManager = ThemeManager.createThemeManager(
-					MainFrameRefactored.class.getResource("simple.xml"), renderer);
-			gui.applyTheme(themeManager);
+			renderer.prepareShaders();
 
 			// Sync
 			renderer.syncViewportSize();
 			frame.invalidateLayout();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (ShaderLoadException e) {
+			e.printStackTrace();
+			exitProgram(1);
 		}
 	}
 
@@ -125,17 +173,41 @@ public class VeinsWindow {
 			/* Update */
 			gui.update();
 			Display.update();
-			// TODO
-			// logic();
-			Display.sync(MainFrameRefactored.settings.frequency);
+			logic();
+			Display.sync(settings.frequency);
 		}
+	}
+
+	/**
+	 * @since 0.1
+	 * @version 0.1
+	 */
+	private void logic() {
+		// update framerate and calculate time that passed since last frame
+		long time = (Sys.getTime() * 1000) / Sys.getTimerResolution();
+		fps++;
+		if (time - timePastFps >= 1000) {
+			fpsToDisplay = fps;
+			fps = 0;
+			timePastFps = time;
+			renderer.getCamera().cameraOrientation = Quaternion
+					.quaternionNormalization(renderer.getCamera().cameraOrientation);
+			if (renderer.getVeinsModel() != null) {
+				renderer.setAddedModelOrientation(Quaternion.quaternionNormalization(renderer
+						.getAddedModelOrientation()));
+				renderer.setCurrentModelOrientation(Quaternion.quaternionNormalization(renderer
+						.getCurrentModelOrientation()));
+			}
+		}
+		timePastFrame = time;
+
 	}
 
 	/**
 	 * Updates title if FPS are shown
 	 */
 	private void setTitle() {
-		if (MainFrameRefactored.settings.isFpsShown)
+		if (settings.isFpsShown)
 			Display.setTitle(title + " - FPS: " + fpsToDisplay);
 		else
 			Display.setTitle(title);
@@ -155,10 +227,10 @@ public class VeinsWindow {
 			// if a key was pressed (vs.// released)
 			if (Keyboard.getEventKeyState()) {
 				if (Keyboard.getEventKey() == Keyboard.KEY_TAB) {
-					if (MainFrameRefactored.settings.isFpsShown)
-						MainFrameRefactored.settings.isFpsShown = false;
+					if (settings.isFpsShown)
+						settings.isFpsShown = false;
 					else
-						MainFrameRefactored.settings.isFpsShown = true;
+						settings.isFpsShown = true;
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_1) {
 					renderer.setActiveShaderProgram(0);
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_2) {
@@ -298,11 +370,10 @@ public class VeinsWindow {
 		}
 
 		if (renderer.getVeinsModel() != null) {
-			double[] veinsGrabbedAt = null;
 			if (Mouse.isButtonDown(0)) {
 				// figure out if clicked on the HUD first
-				float w = MainFrameRefactored.settings.resWidth;
-				float h = MainFrameRefactored.settings.resHeight;
+				float w = settings.resWidth;
+				float h = settings.resHeight;
 				float r = w / 18;
 				float offset = r * 2 / 3;
 				float x = w - offset - r;
@@ -322,7 +393,7 @@ public class VeinsWindow {
 					float distanceToMoveFoci = (float) (Math.sqrt((x2 - f - Mouse.getX()) * (x2 - f - Mouse.getX())
 							+ (y2 - Mouse.getY()) * (y2 - Mouse.getY())) + Math.sqrt((x2 + f - Mouse.getX())
 							* (x2 + f - Mouse.getX()) + (y2 - Mouse.getY()) * (y2 - Mouse.getY())));
-					if (MainFrameRefactored.settings.resHeight - Mouse.getY() < MainFrameRefactored.settings.resHeight / 18) {
+					if (settings.resHeight - Mouse.getY() < settings.resHeight / 18) {
 						clickedOn = CLICKED_ON_BUTTONS;
 					} else if (distanceToRotationCircle <= r * r) {
 						clickedOn = CLICKED_ON_ROTATION_CIRCLE;
@@ -333,9 +404,10 @@ public class VeinsWindow {
 					} else if (distanceToMoveFoci <= r * 3f) {
 						clickedOn = CLICKED_ON_MOVE_ELLIPSE;
 					} else {
-						veinsGrabbedAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
+						renderer.veinsGrabbedAt = RayUtil
+								.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
 						renderer.setAddedModelOrientation(new Quaternion());
-						if (veinsGrabbedAt != null)
+						if (renderer.veinsGrabbedAt != null)
 							clickedOn = CLICKED_ON_VEINS_MODEL;
 					}
 				}
@@ -343,14 +415,13 @@ public class VeinsWindow {
 				if (clickedOn == CLICKED_ON_VEINS_MODEL) {
 					double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
 					if (veinsHeldAt != null) {
-						System.out.println(veinsGrabbedAt == null);
-						double[] rotationAxis = Vector.crossProduct(veinsGrabbedAt, veinsHeldAt);
+						double[] rotationAxis = Vector.crossProduct(renderer.veinsGrabbedAt, veinsHeldAt);
 						if (Vector.length(rotationAxis) > 0) {
 							rotationAxis = Vector.normalize(rotationAxis);
 							rotationAxis = Quaternion.quaternionReciprocal(renderer.getCurrentModelOrientation())
 									.rotateVector3d(rotationAxis);
-							double angle = Math.acos(Vector.dotProduct(veinsGrabbedAt, veinsHeldAt)
-									/ (Vector.length(veinsGrabbedAt) * Vector.length(veinsHeldAt)));
+							double angle = Math.acos(Vector.dotProduct(renderer.veinsGrabbedAt, veinsHeldAt)
+									/ (Vector.length(renderer.veinsGrabbedAt) * Vector.length(veinsHeldAt)));
 							renderer.setAddedModelOrientation(Quaternion.quaternionFromAngleAndRotationAxis(angle,
 									rotationAxis));
 						}
@@ -425,13 +496,32 @@ public class VeinsWindow {
 				}
 			} else {
 				clickedOn = CLICKED_ON_NOTHING;
-				veinsGrabbedAt = null;
+				renderer.veinsGrabbedAt = null;
 				Quaternion currentModelOrientation = Quaternion.quaternionMultiplication(
 						renderer.getCurrentModelOrientation(), renderer.getAddedModelOrientation());
 				renderer.setCurrentModelOrientation(currentModelOrientation);
 				renderer.setAddedModelOrientation(new Quaternion());
 			}
 		}
+	}
+
+	public void exitProgram(int n) {
+		SettingsUtil.saveSettings(settings, title);
+		renderer.cleanShaders();
+		gui.destroy();
+		if (themeManager != null)
+			themeManager.destroy();
+		Display.destroy();
+		System.exit(n);
+
+	}
+
+	public DisplayMode[] getDisplayModes() {
+		return displayModes;
+	}
+
+	public DisplayMode getCurrentDisplayMode() {
+		return currentDisplayMode;
 	}
 
 }

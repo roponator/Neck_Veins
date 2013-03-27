@@ -66,11 +66,11 @@ public class RayUtil {
 		double[] tempLowerRight = cam.cameraOrientation.rotateVector3d(renderer.screenPlaneInitialLowerRight);
 
 		double[] leftToRight = Vector.subtraction(tempLowerRight, tempLowerLeft);
-		leftToRight = Vector.vScale(leftToRight, (0.5d + x) / (double) MainFrameRefactored.settings.resWidth);
+		leftToRight = Vector.vScale(leftToRight, (0.5d + x) / (double) VeinsWindow.settings.resWidth);
 		double[] rayD = Vector.sum(tempLowerLeft, leftToRight);
 
 		double[] downToUp = Vector.subtraction(tempUpperLeft, tempLowerLeft);
-		downToUp = Vector.vScale(downToUp, (0.5d + y) / (double) MainFrameRefactored.settings.resHeight);
+		downToUp = Vector.vScale(downToUp, (0.5d + y) / (double) VeinsWindow.settings.resHeight);
 
 		rayD = Vector.sum(rayD, downToUp);
 
