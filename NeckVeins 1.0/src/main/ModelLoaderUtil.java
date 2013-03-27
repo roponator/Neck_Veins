@@ -9,7 +9,7 @@ public class ModelLoaderUtil {
 	 * @since 0.4
 	 * @version 0.4
 	 */
-	public static void loadModel(String fileName, RendererPanel renderer) {
+	public static void loadModel(String fileName, VeinsRenderer renderer) {
 		double fovy = renderer.fovy;
 		VeinsModel veinsModel = new VeinsModel(fileName);
 		// Calculate the appropriate camera distance:

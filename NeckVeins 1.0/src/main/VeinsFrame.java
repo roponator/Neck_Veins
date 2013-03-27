@@ -20,7 +20,7 @@ import de.matthiasmann.twl.model.JavaFileSystemModel;
 import de.matthiasmann.twl.model.SimpleChangableListModel;
 import de.matthiasmann.twl.textarea.SimpleTextAreaModel;
 
-public class MainFrameRefactored extends Widget {
+public class VeinsFrame extends Widget {
 	private FileSelector fileSelector;
 	private boolean isDialogOpened;
 	private Button open;
@@ -43,7 +43,7 @@ public class MainFrameRefactored extends Widget {
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
 
-	public MainFrameRefactored() throws LWJGLException {
+	public VeinsFrame() throws LWJGLException {
 		getDisplayModes();
 		initGUI();
 		setTheme("mainframe");
@@ -81,7 +81,7 @@ public class MainFrameRefactored extends Widget {
 				fileSelector.setVisible(false);
 				File file = (File) files[0];
 				System.out.println("\nOpening file: " + file.getAbsolutePath());
-				RendererPanel renderer = (RendererPanel) ((GUI) MainFrameRefactored.this.getGUI()).getRenderer();
+				VeinsRenderer renderer = (VeinsRenderer) ((GUI) VeinsFrame.this.getGUI()).getRenderer();
 				ModelLoaderUtil.loadModel(file.getAbsolutePath(), renderer);
 			}
 
@@ -114,7 +114,7 @@ public class MainFrameRefactored extends Widget {
 		exit.setTooltipContent("Terminates this program.");
 		exit.addCallback(new Runnable() {
 			public void run() {
-				((VeinsWindow) MainFrameRefactored.this.getGUI().getParent()).exitProgram(0);
+				((VeinsWindow) VeinsFrame.this.getGUI().getParent()).exitProgram(0);
 			}
 		});
 		add(exit);
@@ -369,7 +369,7 @@ public class MainFrameRefactored extends Widget {
 	 */
 	public void confirmVideoSetting() {
 		GUI gui = getGUI();
-		RendererPanel renderer = (RendererPanel) gui.getRenderer();
+		VeinsRenderer renderer = (VeinsRenderer) gui.getRenderer();
 		DisplayMode[] displayModes = ((VeinsWindow) gui.getParent()).getDisplayModes();
 		DisplayMode currentDisplayMode = ((VeinsWindow) gui.getParent()).getCurrentDisplayMode();
 		okayVideoSetting.setVisible(false);

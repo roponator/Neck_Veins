@@ -33,8 +33,8 @@ public class VeinsWindow extends Container {
 
 	public static NeckVeinsSettings settings;
 
-	private MainFrameRefactored frame;
-	private RendererPanel renderer;
+	private VeinsFrame frame;
+	private VeinsRenderer renderer;
 	private HUD hud;
 	private boolean isRunning;
 	private String title;
@@ -98,7 +98,6 @@ public class VeinsWindow extends Container {
 
 	private void createDisplay() {
 		try {
-			// TODO Change
 			Display.setDisplayMode(currentDisplayMode);
 			Display.setTitle(title);
 			Display.setVSyncEnabled(true);
@@ -113,8 +112,8 @@ public class VeinsWindow extends Container {
 	private void initWindowElements() {
 		try {
 			hud = new HUD();
-			frame = new MainFrameRefactored();
-			renderer = new RendererPanel();
+			frame = new VeinsFrame();
+			renderer = new VeinsRenderer();
 			gui = new GUI(frame, renderer);
 			add(gui);
 			setTheme("mainframe");
@@ -127,7 +126,7 @@ public class VeinsWindow extends Container {
 	private void setupWindow() {
 		try {
 			// Theme setup
-			themeManager = ThemeManager.createThemeManager(MainFrameRefactored.class.getResource("simple.xml"),
+			themeManager = ThemeManager.createThemeManager(VeinsFrame.class.getResource("simple.xml"),
 					renderer);
 			gui.applyTheme(themeManager);
 
@@ -162,8 +161,8 @@ public class VeinsWindow extends Container {
 			renderer.resetView();
 
 			/* Handle input and inform HUD about it */
-			pollInput();
 			hud.setClickedOn(clickedOn);
+			pollInput();
 
 			/* Render */
 			renderer.render();
@@ -387,7 +386,7 @@ public class VeinsWindow extends Container {
 							* (y - Mouse.getY());
 					float distanceToMoveCircle = (x2 - Mouse.getX()) * (x2 - Mouse.getX()) + (y2 - Mouse.getY())
 							* (y2 - Mouse.getY());
-					float distanceToRotationFoci = (float) (Math.sqrt((x - -Mouse.getX()) * (x - f - Mouse.getX())
+					float distanceToRotationFoci = (float) (Math.sqrt((x - f - Mouse.getX()) * (x - f - Mouse.getX())
 							+ (y - Mouse.getY()) * (y - Mouse.getY())) + Math.sqrt((x + f - Mouse.getX())
 							* (x + f - Mouse.getX()) + (y - Mouse.getY()) * (y - Mouse.getY())));
 					float distanceToMoveFoci = (float) (Math.sqrt((x2 - f - Mouse.getX()) * (x2 - f - Mouse.getX())
@@ -400,6 +399,7 @@ public class VeinsWindow extends Container {
 					} else if (distanceToMoveCircle <= r * r) {
 						clickedOn = CLICKED_ON_MOVE_CIRCLE;
 					} else if (distanceToRotationFoci <= r * 3f) {
+						System.out.println("lala1");
 						clickedOn = CLICKED_ON_ROTATION_ELLIPSE;
 					} else if (distanceToMoveFoci <= r * 3f) {
 						clickedOn = CLICKED_ON_MOVE_ELLIPSE;

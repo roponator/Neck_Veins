@@ -12,7 +12,7 @@ public class RayUtil {
 	 * @param veinsRadius
 	 * @return
 	 */
-	public static double[] getRaySphereIntersection(int x, int y, RendererPanel renderer) {
+	public static double[] getRaySphereIntersection(int x, int y, VeinsRenderer renderer) {
 		// figure out if the click on the screen intersects the circle that
 		// surrounds the veins model
 		Camera cam = renderer.getCamera();
@@ -59,7 +59,7 @@ public class RayUtil {
 	 * @param cam
 	 * @return
 	 */
-	public static double[] getRayDirection(int x, int y, RendererPanel renderer) {
+	public static double[] getRayDirection(int x, int y, VeinsRenderer renderer) {
 		Camera cam = renderer.getCamera();
 		double[] tempUpperLeft = cam.cameraOrientation.rotateVector3d(renderer.screenPlaneInitialUpperLeft);
 		double[] tempLowerLeft = cam.cameraOrientation.rotateVector3d(renderer.screenPlaneInitialLowerLeft);

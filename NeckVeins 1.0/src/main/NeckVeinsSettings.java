@@ -11,5 +11,5 @@ public class NeckVeinsSettings implements Serializable {
 	boolean isFpsShown;
 	boolean fullscreen;
 	boolean stereoEnabled;
-	int stereoValue = 0;
+	int stereoValue;
 }

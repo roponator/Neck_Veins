@@ -62,7 +62,7 @@ import org.lwjgl.util.glu.GLU;
 import tools.Quaternion;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 
-public class RendererPanel extends LWJGLRenderer {
+public class VeinsRenderer extends LWJGLRenderer {
 	public static final int FIXED_PIPLINE = 0;
 	public static final int SIMPLE_SHADER = 1;
 	public static final int SIMPLE_SHADER_INTERPOLATED = 2;
@@ -89,17 +89,18 @@ public class RendererPanel extends LWJGLRenderer {
 	public double[] screenPlaneInitialUpperRight;
 	public double[] screenPlaneInitialLowerLeft;
 	public double[] screenPlaneInitialLowerRight;
-	public double[] veinsGrabbedAt;
+	public double[] veinsGrabbedAt = null;
 
 	private int[] shaderPrograms;
 	private int[] vertexShaders;
 	private int[] fragmentShaders;
 
-	public RendererPanel() throws LWJGLException {
+	public VeinsRenderer() throws LWJGLException {
 		super();
 		cam = new Camera();
-		activeShaderProgram = 0;
+		activeShaderProgram = 4;
 		isWireframeOn = false;
+		isAAEnabled = false;
 	}
 
 	/**
