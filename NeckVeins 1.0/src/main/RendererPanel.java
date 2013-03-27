@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_DIFFUSE;
 import static org.lwjgl.opengl.GL11.GL_EQUAL;
+import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.lwjgl.opengl.GL11.GL_LIGHT0;
 import static org.lwjgl.opengl.GL11.GL_LIGHTING;
@@ -28,10 +29,27 @@ import static org.lwjgl.opengl.GL11.glShadeModel;
 import static org.lwjgl.opengl.GL11.glStencilFunc;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
+import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
+import static org.lwjgl.opengl.GL20.glAttachShader;
+import static org.lwjgl.opengl.GL20.glCompileShader;
+import static org.lwjgl.opengl.GL20.glCreateShader;
+import static org.lwjgl.opengl.GL20.glDeleteProgram;
+import static org.lwjgl.opengl.GL20.glDeleteShader;
+import static org.lwjgl.opengl.GL20.glDetachShader;
+import static org.lwjgl.opengl.GL20.glGetShader;
+import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
 import static org.lwjgl.opengl.GL20.glGetUniformLocation;
+import static org.lwjgl.opengl.GL20.glLinkProgram;
+import static org.lwjgl.opengl.GL20.glShaderSource;
 import static org.lwjgl.opengl.GL20.glUniform4f;
+import static org.lwjgl.opengl.GL20.glValidateProgram;
 import static tools.Tools.allocFloats;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
 
 import models.VeinsModel;
@@ -51,6 +69,7 @@ public class RendererPanel extends LWJGLRenderer {
 	public static final int SIMPLE_SHADER_BLINN_PHONG = 3;
 	public static final int SIMPLE_SHADER_PHONG = 4;
 	public static final int WIREFRAME = 0;
+	public static final int NUMBER_OF_SHADER_PROGRAMS = 8;
 
 	private int activeShaderProgram;
 	private boolean isWireframeOn;
@@ -70,13 +89,17 @@ public class RendererPanel extends LWJGLRenderer {
 	public double[] screenPlaneInitialUpperRight;
 	public double[] screenPlaneInitialLowerLeft;
 	public double[] screenPlaneInitialLowerRight;
+
 	private int[] shaderPrograms;
+	private int[] vertexShaders;
+	private int[] fragmentShaders;
 
 	public RendererPanel() throws LWJGLException {
 		super();
 		cam = new Camera();
 		activeShaderProgram = 0;
 		isWireframeOn = false;
+		prepareShaders();
 	}
 
 	/**
@@ -114,17 +137,14 @@ public class RendererPanel extends LWJGLRenderer {
 			StencilMask.initStencil();
 			glStencilFunc(GL_EQUAL, 0, 0x01);
 			setCameraAndLight(offset);
-			// TODO
-			// renderVeins();
+			renderVeins();
 			glStencilFunc(GL_EQUAL, 1, 0x01);
 			setCameraAndLight(-offset);
-			// TODO
-			// renderVeins();
+			renderVeins();
 			glDisable(GL_STENCIL_TEST);
 		} else {
 			setCameraAndLight(0);
-			// TODO
-			// renderVeins();
+			renderVeins();
 		}
 	}
 
@@ -181,8 +201,83 @@ public class RendererPanel extends LWJGLRenderer {
 		glLight(GL_LIGHT0, GL_SPECULAR, allocFloats(new float[] { 1.0f, 1.0f, 1.0f, 1.0f }));
 	}
 
+	/**
+	 * TODO exit on fail
+	 */
+	public void prepareShaders() {
+		shaderPrograms = new int[NUMBER_OF_SHADER_PROGRAMS];
+		vertexShaders = new int[NUMBER_OF_SHADER_PROGRAMS];
+		fragmentShaders = new int[NUMBER_OF_SHADER_PROGRAMS];
+		String path = "/main/";
+		for (int i = 0; i < NUMBER_OF_SHADER_PROGRAMS; i++) {
+			shaderPrograms[i] = GL20.glCreateProgram();
+			vertexShaders[i] = glCreateShader(GL_VERTEX_SHADER);
+			fragmentShaders[i] = glCreateShader(GL_FRAGMENT_SHADER);
+			StringBuilder vertexShaderSource = new StringBuilder();
+			StringBuilder fragmentShaderSource = new StringBuilder();
+			try {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(
+						InputStreamReader.class.getResourceAsStream(path + "shader" + i + ".vert")));
+				String line;
+				while ((line = reader.readLine()) != null) {
+					vertexShaderSource.append(line).append("\n");
+				}
+				reader.close();
+			} catch (IOException e) {
+				System.err.println("Vertex shader" + i + " wasn't loaded properly.");
+				// exitProgram(1);
+			}
+			try {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(
+						InputStreamReader.class.getResourceAsStream(path + "shader" + i + ".frag")));
+				String line;
+				while ((line = reader.readLine()) != null) {
+					fragmentShaderSource.append(line).append("\n");
+				}
+				reader.close();
+			} catch (IOException e) {
+				System.err.println("Fragment shader" + i + " wasn't loaded properly.");
+				// exitProgram(1);
+			}
+			glShaderSource(vertexShaders[i], vertexShaderSource);
+			glCompileShader(vertexShaders[i]);
+			if (glGetShader(vertexShaders[i], GL_COMPILE_STATUS) == GL_FALSE) {
+				System.err.println("Vertex shader" + i + " not compiled correctly");
+			}
+
+			glShaderSource(fragmentShaders[i], fragmentShaderSource);
+			glCompileShader(fragmentShaders[i]);
+			if (glGetShader(fragmentShaders[i], GL_COMPILE_STATUS) == GL_FALSE) {
+				System.err.println("Fragment shader" + i + " not compiled correctly");
+			}
+
+			glAttachShader(shaderPrograms[i], vertexShaders[i]);
+			glAttachShader(shaderPrograms[i], fragmentShaders[i]);
+			glLinkProgram(shaderPrograms[i]);
+			glValidateProgram(shaderPrograms[i]);
+
+			System.out.println("Vertex shader" + i + " info: " + glGetShaderInfoLog(vertexShaders[i], 999));
+			System.out.println("Fragment shader" + i + " info: " + glGetShaderInfoLog(fragmentShaders[i], 999));
+			System.out.println("Shader program" + i + " info: " + glGetShaderInfoLog(shaderPrograms[i], 999));
+		}
+	}
+
+	public void cleanShaders() {
+		for (int i = 0; i < RendererPanel.NUMBER_OF_SHADER_PROGRAMS; i++) {
+			glDetachShader(shaderPrograms[i], vertexShaders[i]);
+			glDeleteShader(vertexShaders[i]);
+			glDetachShader(shaderPrograms[i], fragmentShaders[i]);
+			glDeleteShader(fragmentShaders[i]);
+			glDeleteProgram(shaderPrograms[i]);
+		}
+	}
+
 	public Camera getCamera() {
 		return cam;
+	}
+
+	public void setVeinsModel(VeinsModel veinsModel) {
+		this.veinsModel = veinsModel;
 	}
 
 	public VeinsModel getVeinsModel() {
@@ -227,10 +322,6 @@ public class RendererPanel extends LWJGLRenderer {
 
 	public void setAddedModelOrientation(Quaternion q) {
 		addedModelOrientation = q;
-	}
-
-	public void setVeinsModel(VeinsModel veinsModel) {
-		this.veinsModel = veinsModel;
 	}
 
 }

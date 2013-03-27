@@ -36,9 +36,11 @@ public class ModelLoaderUtil {
 		d2 = Math.max(d3, d4);
 		d3 = Math.max(d5, d6);
 		d1 = Math.sqrt(Math.max(Math.max(d1 + d2, d2 + d3), d1 + d3));
-		//
-		double fovMin;// The smaller angle of view of the horizontal and
-						// vertical ones.
+
+		// The smaller angle of view of the horizontal and
+		// vertical ones.
+		double fovMin;
+
 		if (MainFrameRefactored.settings.resWidth < MainFrameRefactored.settings.resHeight)
 			fovMin = fovy * MainFrameRefactored.settings.resWidth / (double) MainFrameRefactored.settings.resHeight;
 		else

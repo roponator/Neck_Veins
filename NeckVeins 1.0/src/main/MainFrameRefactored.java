@@ -53,7 +53,7 @@ public class MainFrameRefactored extends Widget {
 	private Button okayVideoSetting;
 	private Button cancelVideoSetting;
 	private ToggleButton fullscreenToggle;
-	private ListBox displayModeListBox;
+	private ListBox<String> displayModeListBox;
 	private String[] displayModeStrings;
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
@@ -69,7 +69,6 @@ public class MainFrameRefactored extends Widget {
 		try {
 			displayModes = Display.getAvailableDisplayModes();
 		} catch (LWJGLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		setTheme("mainframe");
@@ -93,7 +92,7 @@ public class MainFrameRefactored extends Widget {
 		initCreditsToggleButton();
 		initTextArea();
 		initDisplayModesButton();
-		initVideoSettingButtons();
+		initVideoSettingsButtons();
 		initDisplayModeListBox();
 	}
 
@@ -148,7 +147,7 @@ public class MainFrameRefactored extends Widget {
 		exit.addCallback(new Runnable() {
 			public void run() {
 				// TODO exitProgram();
-				exitProgram(0);
+				ExitHandler.exitProgram(0, MainFrameRefactored.this.getGUI());
 			}
 		});
 		add(exit);
@@ -269,7 +268,7 @@ public class MainFrameRefactored extends Widget {
 	/**
 	 * TODO rename
 	 */
-	private void initVideoSettingButtons() {
+	private void initVideoSettingsButtons() {
 		okayVideoSetting = new Button("Okay");
 		cancelVideoSetting = new Button("Cancel");
 		fullscreenToggle = new ToggleButton("Toggle Fullscreen");
@@ -284,15 +283,13 @@ public class MainFrameRefactored extends Widget {
 		okayVideoSetting.addCallback(new Runnable() {
 			@Override
 			public void run() {
-				// TODO
-				// confirmVideoSetting();
+				confirmVideoSetting();
 			}
 		});
 		cancelVideoSetting.addCallback(new Runnable() {
 			@Override
 			public void run() {
-				// TODO
-				// cancelVideoSetting();
+				cancelVideoSetting();
 			}
 		});
 		fullscreenToggle.addCallback(new Runnable() {
@@ -410,6 +407,46 @@ public class MainFrameRefactored extends Widget {
 		fullscreenToggle.setVisible(true);
 		setButtonsEnabled(false);
 		displayModeListBox.setSelected(selectedResolution);
+	}
+
+	/**
+	 * @since 0.4
+	 * @version 0.4
+	 */
+	public void confirmVideoSetting() {
+		GUI gui = (GUI) this.getRootWidget();
+		RendererPanel renderer = (RendererPanel) gui.getRenderer();
+		okayVideoSetting.setVisible(false);
+		cancelVideoSetting.setVisible(false);
+		displayModeListBox.setVisible(false);
+		fullscreenToggle.setVisible(false);
+		setButtonsEnabled(true);
+		if (selectedResolution != displayModeListBox.getSelected()) {
+			selectedResolution = displayModeListBox.getSelected();
+			currentDisplayMode = displayModes[selectedResolution];
+			try {
+				Display.setDisplayMode(currentDisplayMode);
+				settings.resWidth = currentDisplayMode.getWidth();
+				settings.resHeight = currentDisplayMode.getHeight();
+			} catch (LWJGLException e) {
+				e.printStackTrace();
+			}
+			renderer.setupView();
+			renderer.syncViewportSize();
+			invalidateLayout();
+		}
+	}
+
+	/**
+	 * @since 0.4
+	 * @version 0.4
+	 */
+	public void cancelVideoSetting() {
+		okayVideoSetting.setVisible(false);
+		cancelVideoSetting.setVisible(false);
+		displayModeListBox.setVisible(false);
+		fullscreenToggle.setVisible(false);
+		setButtonsEnabled(true);
 	}
 
 	/**

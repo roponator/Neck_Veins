@@ -13,10 +13,9 @@ import org.lwjgl.opengl.PixelFormat;
 import tools.Quaternion;
 import tools.Vector;
 import de.matthiasmann.twl.GUI;
-import de.matthiasmann.twl.input.Input;
 import de.matthiasmann.twl.theme.ThemeManager;
 
-public class VeinsWindow implements Input {
+public class VeinsWindow {
 	public final static int CLICKED_ON_NOTHING = 0;
 	public final static int CLICKED_ON_VEINS_MODEL = 1;
 	public final static int CLICKED_ON_ROTATION_CIRCLE = 2;
@@ -30,6 +29,7 @@ public class VeinsWindow implements Input {
 	private RendererPanel renderer;
 	private HUD hud;
 	private GUI gui;
+	private ThemeManager themeManager;
 	private boolean isRunning;
 	private String title;
 	private int fps;
@@ -74,7 +74,7 @@ public class VeinsWindow implements Input {
 			frame = new MainFrameRefactored();
 			renderer = new RendererPanel();
 			hud = new HUD();
-			gui = new GUI(frame, renderer, this);
+			gui = new GUI(frame, renderer);
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 		}
@@ -114,7 +114,7 @@ public class VeinsWindow implements Input {
 			renderer.resetView();
 
 			/* Handle input and inform HUD about it */
-			pollInput(gui);
+			pollInput();
 			hud.setClickedOn(clickedOn);
 
 			/* Render */
@@ -145,11 +145,9 @@ public class VeinsWindow implements Input {
 	 * @since 0.1
 	 * @version 0.4
 	 */
-	@Override
-	public boolean pollInput(GUI gui) {
+	public void pollInput() {
 		pollKeyboardInput();
 		pollMouseInput();
-		return true;
 	}
 
 	private void pollKeyboardInput() {
