@@ -1,4 +1,4 @@
-package main;
+package si.uni_lj.fri.veins3D.gui;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_LIGHTING;
@@ -31,12 +31,15 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 
 import java.io.IOException;
 
+
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 public class HUD {
+	private final String PATH = "res/imgs/";
+
 	private Texture rotationCircle;
 	private Texture circleGlow;
 	private Texture movementCircle;
@@ -45,12 +48,9 @@ public class HUD {
 	private Texture ellipseGlow;
 	private int clickedOn;
 
-	// TODO fix check what this is
 	public int ellipseSide = 0;
 	public float rotationCircleAngle = 0;
 	public float rotationCircleDistance = 0;
-
-	// *
 
 	public HUD() {
 		initHUDTextures();
@@ -64,42 +64,42 @@ public class HUD {
 		// load textures
 		try {
 			rotationCircle = TextureLoader.getTexture("PNG",
-					ResourceLoader.getResourceAsStream("main/rotationCircle.png"));
+					ResourceLoader.getResourceAsStream(PATH + "rotationCircle.png"));
 		} catch (IOException e) {
-			System.err.println("Loading texture main/rotationCircle.png unsuccessful");
+			System.err.println("Loading texture " + PATH + "rotationCircle.png unsuccessful");
 			e.printStackTrace();
 		}
 		try {
-			circleGlow = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("main/circleGlow.png"));
+			circleGlow = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream(PATH + "circleGlow.png"));
 		} catch (IOException e) {
-			System.err.println("Loading texture main/circleGlow.png unsuccessful");
+			System.err.println("Loading texture " + PATH + "circleGlow.png unsuccessful");
 			e.printStackTrace();
 		}
 		try {
 			movementCircle = TextureLoader.getTexture("PNG",
-					ResourceLoader.getResourceAsStream("main/movementCircle.png"));
+					ResourceLoader.getResourceAsStream(PATH + "movementCircle.png"));
 		} catch (IOException e) {
-			System.err.println("Loading texture main/movementCircle.png unsuccessful");
+			System.err.println("Loading texture " + PATH + "movementCircle.png unsuccessful");
 			e.printStackTrace();
 		}
 		try {
 			rotationElipse = TextureLoader.getTexture("PNG",
-					ResourceLoader.getResourceAsStream("main/rotationElipse.png"));
+					ResourceLoader.getResourceAsStream(PATH + "rotationElipse.png"));
 		} catch (IOException e) {
-			System.err.println("Loading texture main/rotationElipse.png unsuccessful");
+			System.err.println("Loading texture " + PATH + "rotationElipse.png unsuccessful");
 			e.printStackTrace();
 		}
 		try {
 			movementElipse = TextureLoader.getTexture("PNG",
-					ResourceLoader.getResourceAsStream("main/movementElipse.png"));
+					ResourceLoader.getResourceAsStream(PATH + "movementElipse.png"));
 		} catch (IOException e) {
-			System.err.println("Loading texture main/movementElipse.png unsuccessful");
+			System.err.println("Loading texture " + PATH + "movementElipse.png unsuccessful");
 			e.printStackTrace();
 		}
 		try {
-			ellipseGlow = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("main/ellipseGlow.png"));
+			ellipseGlow = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream(PATH + "ellipseGlow.png"));
 		} catch (IOException e) {
-			System.err.println("Loading texture main/ellipseGlow.png unsuccessful");
+			System.err.println("Loading texture " + PATH + "ellipseGlow.png unsuccessful");
 			e.printStackTrace();
 		}
 	}
@@ -186,6 +186,7 @@ public class HUD {
 			glEnd();
 			glPopMatrix();
 		}
+
 		glColor4f(1, 1, 1, 1);
 		GL11.glBindTexture(GL_TEXTURE_2D, rotationCircle.getTextureID());
 		glBegin(GL_QUADS);
@@ -211,6 +212,7 @@ public class HUD {
 		glTexCoord2f(1, 1);
 		glVertex3f(x2 + r, y2 - r, -0.6f);
 		glEnd();
+
 		if (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE || clickedOn == VeinsWindow.CLICKED_ON_MOVE_CIRCLE) {
 			if (clickedOn == VeinsWindow.CLICKED_ON_MOVE_CIRCLE) {
 				x = x2;

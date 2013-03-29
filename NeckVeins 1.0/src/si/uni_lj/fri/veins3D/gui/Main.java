@@ -1,4 +1,5 @@
-package main;
+package si.uni_lj.fri.veins3D.gui;
+
 
 public class Main {
 

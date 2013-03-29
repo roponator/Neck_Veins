@@ -1,6 +1,6 @@
-package main;
+package si.uni_lj.fri.veins3D.gui.render;
 
-import tools.Quaternion;
+import si.uni_lj.fri.veins3D.math.Quaternion;
 
 public class Camera {
 	public static final float CAMERA_MOVE_SPEED = 1.667f;

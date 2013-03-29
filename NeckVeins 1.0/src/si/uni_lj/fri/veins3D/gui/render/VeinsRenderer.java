@@ -1,4 +1,4 @@
-package main;
+package si.uni_lj.fri.veins3D.gui.render;
 
 import static org.lwjgl.opengl.GL11.GL_AMBIENT;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
@@ -45,21 +45,22 @@ import static org.lwjgl.opengl.GL20.glLinkProgram;
 import static org.lwjgl.opengl.GL20.glShaderSource;
 import static org.lwjgl.opengl.GL20.glUniform4f;
 import static org.lwjgl.opengl.GL20.glValidateProgram;
-import static tools.Tools.allocFloats;
+import static si.uni_lj.fri.veins3D.utils.Tools.allocFloats;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
 
-import models.VeinsModel;
-
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.GLU;
 
-import tools.Quaternion;
+import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
+import si.uni_lj.fri.veins3D.gui.VeinsWindow;
+import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
+import si.uni_lj.fri.veins3D.math.Quaternion;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 
 public class VeinsRenderer extends LWJGLRenderer {
@@ -210,7 +211,8 @@ public class VeinsRenderer extends LWJGLRenderer {
 		shaderPrograms = new int[NUMBER_OF_SHADER_PROGRAMS];
 		vertexShaders = new int[NUMBER_OF_SHADER_PROGRAMS];
 		fragmentShaders = new int[NUMBER_OF_SHADER_PROGRAMS];
-		String path = "/main/";
+
+		String path = "/shaders/";
 		for (int i = 0; i < NUMBER_OF_SHADER_PROGRAMS; i++) {
 			shaderPrograms[i] = GL20.glCreateProgram();
 			vertexShaders[i] = glCreateShader(GL_VERTEX_SHADER);
@@ -219,7 +221,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 			StringBuilder fragmentShaderSource = new StringBuilder();
 			try {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(
-						InputStreamReader.class.getResourceAsStream(path + "shader" + i + ".vert")));
+						VeinsWindow.class.getResourceAsStream(path + "shader" + i + ".vert")));
 				String line;
 				while ((line = reader.readLine()) != null) {
 					vertexShaderSource.append(line).append("\n");
@@ -231,7 +233,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 			}
 			try {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(
-						InputStreamReader.class.getResourceAsStream(path + "shader" + i + ".frag")));
+						VeinsRenderer.class.getResourceAsStream(path + "shader" + i + ".frag")));
 				String line;
 				while ((line = reader.readLine()) != null) {
 					fragmentShaderSource.append(line).append("\n");

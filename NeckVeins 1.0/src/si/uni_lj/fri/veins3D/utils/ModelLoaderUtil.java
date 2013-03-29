@@ -1,7 +1,9 @@
-package main;
+package si.uni_lj.fri.veins3D.utils;
 
-import models.VeinsModel;
-import tools.Quaternion;
+import si.uni_lj.fri.veins3D.gui.VeinsWindow;
+import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
+import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
+import si.uni_lj.fri.veins3D.math.Quaternion;
 
 public class ModelLoaderUtil {
 

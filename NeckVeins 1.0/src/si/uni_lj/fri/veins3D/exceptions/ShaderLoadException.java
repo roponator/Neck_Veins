@@ -1,4 +1,4 @@
-package main;
+package si.uni_lj.fri.veins3D.exceptions;
 
 public class ShaderLoadException extends Exception {
 	private static final long serialVersionUID = 1L;

@@ -1,4 +1,4 @@
-package main;
+package si.uni_lj.fri.veins3D.gui.render;
 
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_KEEP;
@@ -27,7 +27,10 @@ import static org.lwjgl.opengl.GL11.glStencilOp;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 
+
 import org.lwjgl.opengl.GL11;
+
+import si.uni_lj.fri.veins3D.gui.VeinsWindow;
 
 public class StencilMask {
 

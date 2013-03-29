@@ -1,4 +1,4 @@
-package main;
+package tmp;
 
 public class CreditsAndHelpTMP {
 	public static String helpString="The Q, W, E, A, S and D keyboard buttons are used to look arround (rotate the camera):\n" +

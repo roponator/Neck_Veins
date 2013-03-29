@@ -37,7 +37,7 @@
         This is a very simple looking theme using a fake 3d look and shades of gray.
         It can be used as a base for new applications / projects.
 --><themes>
-    <images file="simple.png" format="COLOR">
+    <images file="../imgs/simple.png" format="COLOR">
         <area name="-borderA" border="3" xywh="0,0,9,9" splitx="L3,R3" splity="T3,B3"/>
         <area name="-borderB" border="3" xywh="10,0,9,9" splitx="L3,R3" splity="T3,B3"/>
         <area name="-borderC" border="3" xywh="20,0,9,9" splitx="L3,R3" splity="T3,B3"/>

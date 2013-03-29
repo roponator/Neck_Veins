@@ -1,10 +1,15 @@
-package main;
+package si.uni_lj.fri.veins3D.gui;
 
 import java.io.File;
+
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+
+import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
+import si.uni_lj.fri.veins3D.utils.ModelLoaderUtil;
+import tmp.CreditsAndHelpTMP;
 
 import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.FileSelector;
@@ -81,7 +86,7 @@ public class VeinsFrame extends Widget {
 				fileSelector.setVisible(false);
 				File file = (File) files[0];
 				System.out.println("\nOpening file: " + file.getAbsolutePath());
-				VeinsRenderer renderer = (VeinsRenderer) ((GUI) VeinsFrame.this.getGUI()).getRenderer();
+				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
 				ModelLoaderUtil.loadModel(file.getAbsolutePath(), renderer);
 			}
 

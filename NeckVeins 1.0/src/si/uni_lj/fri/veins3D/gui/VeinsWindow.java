@@ -1,4 +1,4 @@
-package main;
+package si.uni_lj.fri.veins3D.gui;
 
 import java.io.IOException;
 
@@ -11,8 +11,14 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 
-import tools.Quaternion;
-import tools.Vector;
+import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
+import si.uni_lj.fri.veins3D.gui.render.Camera;
+import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
+import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
+import si.uni_lj.fri.veins3D.math.Quaternion;
+import si.uni_lj.fri.veins3D.math.Vector;
+import si.uni_lj.fri.veins3D.utils.RayUtil;
+import si.uni_lj.fri.veins3D.utils.SettingsUtil;
 import de.matthiasmann.twl.Container;
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.theme.ThemeManager;
@@ -60,7 +66,7 @@ public class VeinsWindow extends Container {
 	public VeinsWindow(String title) {
 		isRunning = true;
 		this.title = title;
-		loadSettings();
+		// loadSettings();
 		createDisplay();
 		initWindowElements();
 		setupWindow();
@@ -112,8 +118,8 @@ public class VeinsWindow extends Container {
 	private void initWindowElements() {
 		try {
 			hud = new HUD();
-			frame = new VeinsFrame();
 			renderer = new VeinsRenderer();
+			frame = new VeinsFrame();
 			gui = new GUI(frame, renderer);
 			add(gui);
 			setTheme("mainframe");
@@ -126,7 +132,7 @@ public class VeinsWindow extends Container {
 	private void setupWindow() {
 		try {
 			// Theme setup
-			themeManager = ThemeManager.createThemeManager(VeinsFrame.class.getResource("simple.xml"), renderer);
+			themeManager = ThemeManager.createThemeManager(VeinsFrame.class.getResource("/xml/simple.xml"), renderer);
 			gui.applyTheme(themeManager);
 
 			// OpenGL setup
@@ -160,8 +166,8 @@ public class VeinsWindow extends Container {
 			renderer.resetView();
 
 			/* Handle input and inform HUD about it */
-			hud.setClickedOn(clickedOn);
 			pollInput();
+			hud.setClickedOn(clickedOn);
 
 			/* Render */
 			renderer.render();

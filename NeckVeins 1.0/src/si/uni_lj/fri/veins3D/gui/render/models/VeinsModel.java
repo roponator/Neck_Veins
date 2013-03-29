@@ -3,7 +3,7 @@
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
  * or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  */
-package models;
+package si.uni_lj.fri.veins3D.gui.render.models;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,7 +20,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 import org.lwjgl.BufferUtils;
 
-import tools.Vector;
+import si.uni_lj.fri.veins3D.math.Vector;
 
 
 /**

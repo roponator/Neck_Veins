@@ -1,4 +1,4 @@
-package main;
+package si.uni_lj.fri.veins3D.utils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
+import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
 
 public class SettingsUtil {
 

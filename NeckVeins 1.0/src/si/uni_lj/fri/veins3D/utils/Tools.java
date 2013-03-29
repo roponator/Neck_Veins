@@ -3,7 +3,7 @@
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
  * or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  */
-package tools;
+package si.uni_lj.fri.veins3D.utils;
 
 
 import java.nio.ByteBuffer;
