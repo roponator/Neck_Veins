@@ -126,8 +126,7 @@ public class VeinsWindow extends Container {
 	private void setupWindow() {
 		try {
 			// Theme setup
-			themeManager = ThemeManager.createThemeManager(VeinsFrame.class.getResource("simple.xml"),
-					renderer);
+			themeManager = ThemeManager.createThemeManager(VeinsFrame.class.getResource("simple.xml"), renderer);
 			gui.applyTheme(themeManager);
 
 			// OpenGL setup
@@ -269,83 +268,40 @@ public class VeinsWindow extends Container {
 
 		// moving the camera
 		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-			// create a vector representing the rotation axis
-			Quaternion addRotation = Quaternion.quaternionFromAngleAndRotationAxis(Camera.CAMERA_ROTATION_SPEED,
-					new double[] { 1, 0, 0 });
-			renderer.getCamera().cameraOrientation = Quaternion.quaternionMultiplication(
-					renderer.getCamera().cameraOrientation, addRotation);
+			renderer.getCamera().lookUp();
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-			Quaternion addRotation = Quaternion.quaternionFromAngleAndRotationAxis(Camera.CAMERA_ROTATION_SPEED,
-					new double[] { -1, 0, 0 });
-			renderer.getCamera().cameraOrientation = Quaternion.quaternionMultiplication(
-					renderer.getCamera().cameraOrientation, addRotation);
+			renderer.getCamera().lookDown();
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
-			Quaternion addRotation = Quaternion.quaternionFromAngleAndRotationAxis(Camera.CAMERA_ROTATION_SPEED,
-					new double[] { 0, 1, 0 });
-			renderer.getCamera().cameraOrientation = Quaternion.quaternionMultiplication(
-					renderer.getCamera().cameraOrientation, addRotation);
+			renderer.getCamera().lookRight();
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-			Quaternion addRotation = Quaternion.quaternionFromAngleAndRotationAxis(Camera.CAMERA_ROTATION_SPEED,
-					new double[] { 0, -1, 0 });
-			renderer.getCamera().cameraOrientation = Quaternion.quaternionMultiplication(
-					renderer.getCamera().cameraOrientation, addRotation);
+			renderer.getCamera().lookLeft();
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
-			Quaternion addRotation = Quaternion.quaternionFromAngleAndRotationAxis(Camera.CAMERA_ROTATION_SPEED,
-					new double[] { 0, 0, 1 });
-			renderer.getCamera().cameraOrientation = Quaternion.quaternionMultiplication(
-					renderer.getCamera().cameraOrientation, addRotation);
+			renderer.getCamera().rotateCounterClockwise();
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
-			Quaternion addRotation = Quaternion.quaternionFromAngleAndRotationAxis(Camera.CAMERA_ROTATION_SPEED,
-					new double[] { 0, 0, -1 });
-			renderer.getCamera().cameraOrientation = Quaternion.quaternionMultiplication(
-					renderer.getCamera().cameraOrientation, addRotation);
+			renderer.getCamera().rotateClockwise();
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
-			double v[] = new double[] { 0, 0, -1 };
-			v = renderer.getCamera().cameraOrientation.rotateVector3d(v);
-			renderer.getCamera().cameraX += (float) v[0];
-			renderer.getCamera().cameraY += (float) v[1];
-			renderer.getCamera().cameraZ += (float) v[2];
+			renderer.getCamera().moveForward();
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
-			double v[] = new double[] { 0, 0, 1 };
-			v = renderer.getCamera().cameraOrientation.rotateVector3d(v);
-			renderer.getCamera().cameraX += (float) v[0];
-			renderer.getCamera().cameraY += (float) v[1];
-			renderer.getCamera().cameraZ += (float) v[2];
+			renderer.getCamera().moveBackwards();
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
-			double v[] = new double[] { 1, 0, 0 };
-			v = renderer.getCamera().cameraOrientation.rotateVector3d(v);
-			renderer.getCamera().cameraX += (float) v[0];
-			renderer.getCamera().cameraY += (float) v[1];
-			renderer.getCamera().cameraZ += (float) v[2];
+			renderer.getCamera().moveRight();
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
-			double v[] = new double[] { -1, 0, 0 };
-			v = renderer.getCamera().cameraOrientation.rotateVector3d(v);
-			renderer.getCamera().cameraX += (float) v[0];
-			renderer.getCamera().cameraY += (float) v[1];
-			renderer.getCamera().cameraZ += (float) v[2];
+			renderer.getCamera().moveLeft();
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
-			double v[] = new double[] { 0, 1, 0 };
-			v = renderer.getCamera().cameraOrientation.rotateVector3d(v);
-			renderer.getCamera().cameraX += (float) v[0];
-			renderer.getCamera().cameraY += (float) v[1];
-			renderer.getCamera().cameraZ += (float) v[2];
+			renderer.getCamera().moveUp();
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_F)) {
-			double v[] = new double[] { 0, -1, 0 };
-			v = renderer.getCamera().cameraOrientation.rotateVector3d(v);
-			renderer.getCamera().cameraX += (float) v[0];
-			renderer.getCamera().cameraY += (float) v[1];
-			renderer.getCamera().cameraZ += (float) v[2];
+			renderer.getCamera().moveDown();
 		}
 
 	}
@@ -359,13 +315,9 @@ public class VeinsWindow extends Container {
 
 		int z = Mouse.getDWheel();
 		if (z > 0) {
-			renderer.getCamera().cameraX *= 0.8;
-			renderer.getCamera().cameraY *= 0.8;
-			renderer.getCamera().cameraZ *= 0.8;
+			renderer.getCamera().zoomIn();
 		} else if (z < 0) {
-			renderer.getCamera().cameraX *= 1.25;
-			renderer.getCamera().cameraY *= 1.25;
-			renderer.getCamera().cameraZ *= 1.25;
+			renderer.getCamera().zoomOut();
 		}
 
 		if (renderer.getVeinsModel() != null) {
@@ -399,7 +351,6 @@ public class VeinsWindow extends Container {
 					} else if (distanceToMoveCircle <= r * r) {
 						clickedOn = CLICKED_ON_MOVE_CIRCLE;
 					} else if (distanceToRotationFoci <= r * 3f) {
-						System.out.println("lala1");
 						clickedOn = CLICKED_ON_ROTATION_ELLIPSE;
 					} else if (distanceToMoveFoci <= r * 3f) {
 						clickedOn = CLICKED_ON_MOVE_ELLIPSE;

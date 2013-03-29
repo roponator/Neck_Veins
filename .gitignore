@@ -1,3 +1,8 @@
 #Eclipse
+
 .metadata
+
 .settings/
+
+*.save
+*.class
