@@ -51,6 +51,9 @@ public class VeinsWindow extends Container {
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
 
+	/**
+	 * 
+	 */
 	public VeinsWindow() {
 		isRunning = true;
 		title = "Veins3D";
@@ -60,6 +63,9 @@ public class VeinsWindow extends Container {
 		setupWindow();
 	}
 
+	/**
+	 * @param title
+	 */
 	public VeinsWindow(String title) {
 		isRunning = true;
 		this.title = title;
@@ -69,6 +75,9 @@ public class VeinsWindow extends Container {
 		setupWindow();
 	}
 
+	/**
+	 * 
+	 */
 	private void loadSettings() {
 		try {
 			displayModes = Display.getAvailableDisplayModes();
@@ -99,6 +108,9 @@ public class VeinsWindow extends Container {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private void createDisplay() {
 		try {
 			Display.setDisplayMode(currentDisplayMode);
@@ -112,6 +124,9 @@ public class VeinsWindow extends Container {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private void initWindowElements() {
 		try {
 			hud = new HUD();
@@ -126,6 +141,9 @@ public class VeinsWindow extends Container {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private void setupWindow() {
 		try {
 			// Theme setup
@@ -149,8 +167,7 @@ public class VeinsWindow extends Container {
 	}
 
 	/**
-	 * @since 0.1
-	 * @version 0.4
+	 * 
 	 */
 	public void mainLoop() {
 		fps = 0;
@@ -180,8 +197,7 @@ public class VeinsWindow extends Container {
 	}
 
 	/**
-	 * @since 0.1
-	 * @version 0.1
+	 * 
 	 */
 	private void logic() {
 		// update framerate and calculate time that passed since last frame
@@ -191,21 +207,17 @@ public class VeinsWindow extends Container {
 			fpsToDisplay = fps;
 			fps = 0;
 			timePastFps = time;
-			renderer.getCamera().cameraOrientation = Quaternion
-					.quaternionNormalization(renderer.getCamera().cameraOrientation);
+			renderer.getCamera().normalizeCameraOrientation();
 			if (renderer.getVeinsModel() != null) {
-				renderer.setAddedModelOrientation(Quaternion.quaternionNormalization(renderer
-						.getAddedModelOrientation()));
-				renderer.setCurrentModelOrientation(Quaternion.quaternionNormalization(renderer
-						.getCurrentModelOrientation()));
+				renderer.normalizeAddedModelOrientation();
+				renderer.normalizeCurrentModelOrientation();
 			}
 		}
 		timePastFrame = time;
-
 	}
 
 	/**
-	 * Updates title if FPS are shown
+	 * 
 	 */
 	private void setTitle() {
 		if (settings.isFpsShown)
@@ -215,47 +227,42 @@ public class VeinsWindow extends Container {
 	}
 
 	/**
-	 * @since 0.1
-	 * @version 0.4
+	 * 
 	 */
 	public void pollInput() {
 		pollKeyboardInput();
 		pollMouseInput();
 	}
 
+	/**
+	 * 
+	 */
 	private void pollKeyboardInput() {
 		while (Keyboard.next()) {
 			// if a key was pressed (vs.// released)
 			if (Keyboard.getEventKeyState()) {
 				if (Keyboard.getEventKey() == Keyboard.KEY_TAB) {
-					if (settings.isFpsShown)
-						settings.isFpsShown = false;
-					else
-						settings.isFpsShown = true;
+					settings.isFpsShown = !settings.isFpsShown;
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_1) {
-					renderer.setActiveShaderProgram(0);
+					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER);
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_2) {
-					renderer.setActiveShaderProgram(1);
+					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP);
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_3) {
-					renderer.setActiveShaderProgram(2);
+					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP_AMBIENT_L);
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_4) {
-					renderer.setActiveShaderProgram(3);
+					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP_AMBIENT_L_SPEC_BLINN_PHONG);
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_5) {
-					renderer.setActiveShaderProgram(4);
+					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP_AMBIENT_L_SPEC_PHONG);
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_6) {
-					renderer.setActiveShaderProgram(5);
+					renderer.setActiveShaderProgram(VeinsRenderer.SHADER_6);
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_7) {
-					renderer.setActiveShaderProgram(6);
+					renderer.setActiveShaderProgram(VeinsRenderer.SHADER_7);
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_8) {
-					renderer.setActiveShaderProgram(7);
+					renderer.setActiveShaderProgram(VeinsRenderer.SHADER_8);
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_0) {
-					renderer.setActiveShaderProgram(-1);
+					renderer.setActiveShaderProgram(VeinsRenderer.FIXED_PIPELINE);
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_9) {
 					renderer.switchWireframe();
-					if (renderer.isWireframeOn())
-						GL11.glPolygonMode(GL11.GL_FRONT, GL11.GL_FILL);
-					else
-						GL11.glPolygonMode(GL11.GL_FRONT, GL11.GL_LINE);
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_ADD) {
 					renderer.getVeinsModel().increaseSubdivisionDepth();
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_SUBTRACT) {
@@ -309,9 +316,6 @@ public class VeinsWindow extends Container {
 
 	}
 
-	/**
-	 * TODO re-think clickOn implementation
-	 */
 	private void pollMouseInput() {
 		if (!frame.isDialogOpened() || renderer.getVeinsModel() == null)
 			return;
@@ -327,7 +331,7 @@ public class VeinsWindow extends Container {
 			calculateClickedOn();
 
 			if (clickedOn == CLICKED_ON_VEINS_MODEL) {
-				renderer.rotateVeins();
+				renderer.addModelOrientation();
 			}
 
 			if (clickedOn == CLICKED_ON_ROTATION_CIRCLE || clickedOn == CLICKED_ON_MOVE_CIRCLE) {
@@ -349,6 +353,7 @@ public class VeinsWindow extends Container {
 				} else {
 					renderer.getCamera().move(upRotation, rightRotation);
 				}
+
 			}
 
 			if (clickedOn == CLICKED_ON_ROTATION_ELLIPSE) {
@@ -374,14 +379,15 @@ public class VeinsWindow extends Container {
 		} else {
 			clickedOn = CLICKED_ON_NOTHING;
 			renderer.veinsGrabbedAt = null;
-			Quaternion currentModelOrientation = Quaternion.quaternionMultiplication(
-					renderer.getCurrentModelOrientation(), renderer.getAddedModelOrientation());
-			renderer.setCurrentModelOrientation(currentModelOrientation);
+			renderer.saveCurrentModelOrientation();
 			renderer.setAddedModelOrientation(new Quaternion());
 		}
 
 	}
 
+	/**
+	 * 
+	 */
 	private void calculateClickedOn() {
 		float distanceToRotationCircle = (hud.x1 - Mouse.getX()) * (hud.x1 - Mouse.getX()) + (hud.y1 - Mouse.getY())
 				* (hud.y1 - Mouse.getY());
@@ -423,6 +429,9 @@ public class VeinsWindow extends Container {
 		}
 	}
 
+	/**
+	 * @param n
+	 */
 	public void exitProgram(int n) {
 		SettingsUtil.saveSettings(settings, title);
 		renderer.cleanShaders();
@@ -434,14 +443,23 @@ public class VeinsWindow extends Container {
 
 	}
 
+	/**
+	 * @return
+	 */
 	public DisplayMode[] getDisplayModes() {
 		return displayModes;
 	}
 
+	/**
+	 * @return
+	 */
 	public DisplayMode getCurrentDisplayMode() {
 		return currentDisplayMode;
 	}
 
+	/**
+	 * @return
+	 */
 	public HUD getHUD() {
 		return hud;
 	}

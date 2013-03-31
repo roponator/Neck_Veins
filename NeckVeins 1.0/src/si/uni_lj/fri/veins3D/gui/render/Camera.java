@@ -138,4 +138,8 @@ public class Camera {
 		cameraZ += (float) rotateVector[2];
 	}
 
+	public void normalizeCameraOrientation() {
+		cameraOrientation = Quaternion.quaternionNormalization(cameraOrientation);
+	}
+
 }

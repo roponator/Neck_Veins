@@ -67,12 +67,15 @@ import si.uni_lj.fri.veins3D.utils.RayUtil;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 
 public class VeinsRenderer extends LWJGLRenderer {
-	public static final int FIXED_PIPLINE = 0;
-	public static final int SIMPLE_SHADER = 1;
-	public static final int SIMPLE_SHADER_INTERPOLATED = 2;
-	public static final int SIMPLE_SHADER_BLINN_PHONG = 3;
-	public static final int SIMPLE_SHADER_PHONG = 4;
-	public static final int WIREFRAME = 0;
+	public static final int FIXED_PIPELINE = -1;
+	public static final int SIMPLE_SHADER = 0;
+	public static final int SIMPLE_SHADER_NORM_INTERP = 1;
+	public static final int SIMPLE_SHADER_NORM_INTERP_AMBIENT_L = 2;
+	public static final int SIMPLE_SHADER_NORM_INTERP_AMBIENT_L_SPEC_BLINN_PHONG = 3;
+	public static final int SIMPLE_SHADER_NORM_INTERP_AMBIENT_L_SPEC_PHONG = 4;
+	public static final int SHADER_6 = 5;
+	public static final int SHADER_7 = 6;
+	public static final int SHADER_8 = 7;
 	public static final int NUMBER_OF_SHADER_PROGRAMS = 8;
 	public static final float FOV_Y = 45;
 	public static final float Z_NEAR = 10;
@@ -218,6 +221,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 			fragmentShaders[i] = glCreateShader(GL_FRAGMENT_SHADER);
 			StringBuilder vertexShaderSource = new StringBuilder();
 			StringBuilder fragmentShaderSource = new StringBuilder();
+
 			try {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(
 						VeinsWindow.class.getResourceAsStream(path + "shader" + i + ".vert")));
@@ -230,6 +234,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 				System.err.println("Vertex shader" + i + " wasn't loaded properly.");
 				throw new ShaderLoadException("Vertex shader" + i + " wasn't loaded properly.");
 			}
+
 			try {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(
 						VeinsRenderer.class.getResourceAsStream(path + "shader" + i + ".frag")));
@@ -242,6 +247,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 				System.err.println("Fragment shader" + i + " wasn't loaded properly.");
 				throw new ShaderLoadException("Fragment shader" + i + " wasn't loaded properly.");
 			}
+
 			glShaderSource(vertexShaders[i], vertexShaderSource);
 			glCompileShader(vertexShaders[i]);
 			if (glGetShader(vertexShaders[i], GL_COMPILE_STATUS) == GL_FALSE) {
@@ -300,6 +306,11 @@ public class VeinsRenderer extends LWJGLRenderer {
 	}
 
 	public void switchWireframe() {
+		if (isWireframeOn)
+			GL11.glPolygonMode(GL11.GL_FRONT, GL11.GL_FILL);
+		else
+			GL11.glPolygonMode(GL11.GL_FRONT, GL11.GL_LINE);
+
 		isWireframeOn = !isWireframeOn;
 	}
 
@@ -307,7 +318,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 		isAAEnabled = !isAAEnabled;
 	}
 
-	public boolean isAAEnables() {
+	public boolean isAAEnabled() {
 		return isAAEnabled;
 	}
 
@@ -327,10 +338,18 @@ public class VeinsRenderer extends LWJGLRenderer {
 		addedModelOrientation = q;
 	}
 
+	public void normalizeCurrentModelOrientation() {
+		currentModelOrientation = Quaternion.quaternionNormalization(currentModelOrientation);
+	}
+
+	public void normalizeAddedModelOrientation() {
+		addedModelOrientation = Quaternion.quaternionNormalization(addedModelOrientation);
+	}
+
 	/**
 	 * 
 	 */
-	public void rotateVeins() {
+	public void addModelOrientation() {
 		double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), this);
 		if (veinsHeldAt != null) {
 			double[] rotationAxis = Vector.crossProduct(veinsGrabbedAt, veinsHeldAt);
@@ -342,6 +361,10 @@ public class VeinsRenderer extends LWJGLRenderer {
 				addedModelOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle, rotationAxis);
 			}
 		}
+	}
+
+	public void saveCurrentModelOrientation() {
+		currentModelOrientation = Quaternion.quaternionMultiplication(currentModelOrientation, addedModelOrientation);
 	}
 
 }
