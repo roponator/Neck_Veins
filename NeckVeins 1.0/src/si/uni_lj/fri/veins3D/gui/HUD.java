@@ -31,7 +31,6 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 
 import java.io.IOException;
 
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -296,19 +295,4 @@ public class HUD {
 		this.clickedOn = clickedOn;
 	}
 
-	public void calculateClickToRotationCircleDistance(float clickedOn) {
-		float x = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? x1 : x2;
-		float y = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? y1 : y2;
-
-		rotationCircleDistance = (x - Mouse.getX()) * (x - Mouse.getX()) + (y - Mouse.getY()) * (y - Mouse.getY());
-		rotationCircleDistance = (float) Math.sqrt(rotationCircleDistance);
-
-	}
-
-	public void calculateClickCircleAngle(int clickedOn) {
-		float x = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? x1 : x2;
-		float y = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? y1 : y2;
-
-		rotationCircleAngle = (float) Math.atan2(Mouse.getY() - y, Mouse.getX() - x);
-	}
 }

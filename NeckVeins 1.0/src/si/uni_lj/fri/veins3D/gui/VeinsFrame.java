@@ -2,7 +2,6 @@ package si.uni_lj.fri.veins3D.gui;
 
 import java.io.File;
 
-
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -10,7 +9,6 @@ import org.lwjgl.opengl.DisplayMode;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.utils.ModelLoaderUtil;
 import tmp.CreditsAndHelpTMP;
-
 import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.FileSelector;
 import de.matthiasmann.twl.FileSelector.Callback;
@@ -28,21 +26,21 @@ import de.matthiasmann.twl.textarea.SimpleTextAreaModel;
 public class VeinsFrame extends Widget {
 	private FileSelector fileSelector;
 	private boolean isDialogOpened;
-	private Button open;
-	private Button exit;
+	private Button openButton;
+	private Button exitButton;
 	private Scrollbar stereoScrollbar;
 	private ToggleButton stereoToggleButton;
-	private ToggleButton help;
+	private ToggleButton helpButton;
 	private TextArea helpTextArea;
 	private ScrollPane helpScrollPane;
 	private SimpleTextAreaModel stamHelp;
-	private ToggleButton credits;
+	private ToggleButton creditsButton;
 	private SimpleTextAreaModel stamCredits;
 	private Button displayModesButton;
 	private int selectedResolution;
-	private Button okayVideoSetting;
-	private Button cancelVideoSetting;
-	private ToggleButton fullscreenToggle;
+	private Button okayVideoSettingButton;
+	private Button cancelVideoSettingButton;
+	private ToggleButton fullscreenToggleButton;
 	private ListBox<String> displayModeListBox;
 	private String[] displayModeStrings;
 	private DisplayMode[] displayModes;
@@ -101,28 +99,28 @@ public class VeinsFrame extends Widget {
 	}
 
 	private void initOpenButton() {
-		open = new Button("Open...");
-		open.setTheme("button");
-		open.setTooltipContent("Open the dialog with the file chooser to select an .obj file.");
-		open.addCallback(new Runnable() {
+		openButton = new Button("Open...");
+		openButton.setTheme("button");
+		openButton.setTooltipContent("Open the dialog with the file chooser to select an .obj file.");
+		openButton.addCallback(new Runnable() {
 			public void run() {
 				openAFile();
 			}
 		});
-		add(open);
+		add(openButton);
 
 	}
 
 	private void initExitButton() {
-		exit = new Button("Exit");
-		exit.setTheme("button");
-		exit.setTooltipContent("Terminates this program.");
-		exit.addCallback(new Runnable() {
+		exitButton = new Button("Exit");
+		exitButton.setTheme("button");
+		exitButton.setTooltipContent("Terminates this program.");
+		exitButton.addCallback(new Runnable() {
 			public void run() {
 				((VeinsWindow) VeinsFrame.this.getGUI().getParent()).exitProgram(0);
 			}
 		});
-		add(exit);
+		add(exitButton);
 	}
 
 	private void initStereoScrollBar() {
@@ -168,43 +166,43 @@ public class VeinsFrame extends Widget {
 	}
 
 	private void initHelpToggleButton() {
-		help = new ToggleButton("Help");
-		help.setTheme("togglebutton");
-		help.setTooltipContent("Shows controls.");
-		help.addCallback(new Runnable() {
+		helpButton = new ToggleButton("Help");
+		helpButton.setTheme("togglebutton");
+		helpButton.setTooltipContent("Shows controls.");
+		helpButton.addCallback(new Runnable() {
 			public void run() {
-				if (help.isActive()) {
+				if (helpButton.isActive()) {
 					helpTextArea.setModel(stamHelp);
 					helpScrollPane.setVisible(true);
 					setButtonsEnabled(false);
-					help.setEnabled(true);
+					helpButton.setEnabled(true);
 				} else {
 					helpScrollPane.setVisible(false);
 					setButtonsEnabled(true);
 				}
 			}
 		});
-		add(help);
+		add(helpButton);
 	}
 
 	private void initCreditsToggleButton() {
-		credits = new ToggleButton("Licensing");
-		credits.setTheme("togglebutton");
-		credits.setTooltipContent("Shows authorship and licensing information.");
-		credits.addCallback(new Runnable() {
+		creditsButton = new ToggleButton("Licensing");
+		creditsButton.setTheme("togglebutton");
+		creditsButton.setTooltipContent("Shows authorship and licensing information.");
+		creditsButton.addCallback(new Runnable() {
 			public void run() {
-				if (credits.isActive()) {
+				if (creditsButton.isActive()) {
 					helpTextArea.setModel(stamCredits);
 					helpScrollPane.setVisible(true);
 					setButtonsEnabled(false);
-					credits.setEnabled(true);
+					creditsButton.setEnabled(true);
 				} else {
 					helpScrollPane.setVisible(false);
 					setButtonsEnabled(true);
 				}
 			}
 		});
-		add(credits);
+		add(creditsButton);
 	}
 
 	private void initTextArea() {
@@ -240,33 +238,33 @@ public class VeinsFrame extends Widget {
 	 * TODO rename
 	 */
 	private void initVideoSettingsButtons() {
-		okayVideoSetting = new Button("Okay");
-		cancelVideoSetting = new Button("Cancel");
-		fullscreenToggle = new ToggleButton("Toggle Fullscreen");
+		okayVideoSettingButton = new Button("Okay");
+		cancelVideoSettingButton = new Button("Cancel");
+		fullscreenToggleButton = new ToggleButton("Toggle Fullscreen");
 
-		okayVideoSetting.setVisible(false);
-		cancelVideoSetting.setVisible(false);
-		fullscreenToggle.setVisible(false);
+		okayVideoSettingButton.setVisible(false);
+		cancelVideoSettingButton.setVisible(false);
+		fullscreenToggleButton.setVisible(false);
 
-		okayVideoSetting.setTheme("button");
-		cancelVideoSetting.setTheme("button");
-		fullscreenToggle.setTheme("togglebutton");
-		okayVideoSetting.addCallback(new Runnable() {
+		okayVideoSettingButton.setTheme("button");
+		cancelVideoSettingButton.setTheme("button");
+		fullscreenToggleButton.setTheme("togglebutton");
+		okayVideoSettingButton.addCallback(new Runnable() {
 			@Override
 			public void run() {
 				confirmVideoSetting();
 			}
 		});
-		cancelVideoSetting.addCallback(new Runnable() {
+		cancelVideoSettingButton.addCallback(new Runnable() {
 			@Override
 			public void run() {
 				cancelVideoSetting();
 			}
 		});
-		fullscreenToggle.addCallback(new Runnable() {
+		fullscreenToggleButton.addCallback(new Runnable() {
 			@Override
 			public void run() {
-				if (fullscreenToggle.isActive()) {
+				if (fullscreenToggleButton.isActive()) {
 					try {
 						Display.setFullscreen(true);
 						Display.setVSyncEnabled(true);
@@ -288,21 +286,21 @@ public class VeinsFrame extends Widget {
 			try {
 				Display.setFullscreen(true);
 				Display.setVSyncEnabled(true);
-				fullscreenToggle.setActive(true);
+				fullscreenToggleButton.setActive(true);
 			} catch (LWJGLException e) {
 				e.printStackTrace();
 			}
 		} else {
 			try {
 				Display.setFullscreen(false);
-				fullscreenToggle.setActive(false);
+				fullscreenToggleButton.setActive(false);
 			} catch (LWJGLException e) {
 				e.printStackTrace();
 			}
 		}
-		add(okayVideoSetting);
-		add(cancelVideoSetting);
-		add(fullscreenToggle);
+		add(okayVideoSettingButton);
+		add(cancelVideoSettingButton);
+		add(fullscreenToggleButton);
 	}
 
 	/**
@@ -340,10 +338,10 @@ public class VeinsFrame extends Widget {
 
 	public void setButtonsEnabled(boolean enabled) {
 		isDialogOpened = enabled;
-		open.setEnabled(enabled);
+		openButton.setEnabled(enabled);
 		displayModesButton.setEnabled(enabled);
-		help.setEnabled(enabled);
-		credits.setEnabled(enabled);
+		helpButton.setEnabled(enabled);
+		creditsButton.setEnabled(enabled);
 	}
 
 	/**
@@ -360,10 +358,10 @@ public class VeinsFrame extends Widget {
 	 * @version 0.4
 	 */
 	public void listDisplayModes() {
-		okayVideoSetting.setVisible(true);
-		cancelVideoSetting.setVisible(true);
+		okayVideoSettingButton.setVisible(true);
+		cancelVideoSettingButton.setVisible(true);
 		displayModeListBox.setVisible(true);
-		fullscreenToggle.setVisible(true);
+		fullscreenToggleButton.setVisible(true);
 		setButtonsEnabled(false);
 		displayModeListBox.setSelected(selectedResolution);
 	}
@@ -377,10 +375,10 @@ public class VeinsFrame extends Widget {
 		VeinsRenderer renderer = (VeinsRenderer) gui.getRenderer();
 		DisplayMode[] displayModes = ((VeinsWindow) gui.getParent()).getDisplayModes();
 		DisplayMode currentDisplayMode = ((VeinsWindow) gui.getParent()).getCurrentDisplayMode();
-		okayVideoSetting.setVisible(false);
-		cancelVideoSetting.setVisible(false);
+		okayVideoSettingButton.setVisible(false);
+		cancelVideoSettingButton.setVisible(false);
 		displayModeListBox.setVisible(false);
-		fullscreenToggle.setVisible(false);
+		fullscreenToggleButton.setVisible(false);
 		setButtonsEnabled(true);
 		if (selectedResolution != displayModeListBox.getSelected()) {
 			selectedResolution = displayModeListBox.getSelected();
@@ -403,10 +401,10 @@ public class VeinsFrame extends Widget {
 	 * @version 0.4
 	 */
 	public void cancelVideoSetting() {
-		okayVideoSetting.setVisible(false);
-		cancelVideoSetting.setVisible(false);
+		okayVideoSettingButton.setVisible(false);
+		cancelVideoSettingButton.setVisible(false);
 		displayModeListBox.setVisible(false);
-		fullscreenToggle.setVisible(false);
+		fullscreenToggleButton.setVisible(false);
 		setButtonsEnabled(true);
 	}
 
@@ -416,16 +414,16 @@ public class VeinsFrame extends Widget {
 	 */
 	@Override
 	protected void layout() {
-		open.adjustSize();
+		openButton.adjustSize();
 		displayModesButton.adjustSize();
 		stereoToggleButton.adjustSize();
-		help.adjustSize();
-		credits.adjustSize();
-		exit.adjustSize();
+		helpButton.adjustSize();
+		creditsButton.adjustSize();
+		exitButton.adjustSize();
 		int openHeight = Math.max(25, VeinsWindow.settings.resHeight / 18);
 		int widthBy6 = VeinsWindow.settings.resWidth / 6 + 1;
-		open.setSize(widthBy6, openHeight);
-		open.setPosition(0, 0);
+		openButton.setSize(widthBy6, openHeight);
+		openButton.setPosition(0, 0);
 		displayModesButton.setPosition(widthBy6, 0);
 		displayModesButton.setSize(widthBy6, openHeight);
 
@@ -444,12 +442,12 @@ public class VeinsFrame extends Widget {
 			stereoScrollbar.setSize(widthBy6, openHeight);
 		}
 
-		help.setPosition(widthBy6 * 3, 0);
-		help.setSize(widthBy6, openHeight);
-		credits.setPosition(widthBy6 * 4, 0);
-		credits.setSize(widthBy6, openHeight);
-		exit.setPosition(widthBy6 * 5, 0);
-		exit.setSize(VeinsWindow.settings.resWidth - widthBy6 * 5, openHeight);
+		helpButton.setPosition(widthBy6 * 3, 0);
+		helpButton.setSize(widthBy6, openHeight);
+		creditsButton.setPosition(widthBy6 * 4, 0);
+		creditsButton.setSize(widthBy6, openHeight);
+		exitButton.setPosition(widthBy6 * 5, 0);
+		exitButton.setSize(VeinsWindow.settings.resWidth - widthBy6 * 5, openHeight);
 
 		int rlWidth = VeinsWindow.settings.resWidth * 8 / 10;
 		int rlHeight = VeinsWindow.settings.resHeight * 6 / 10;
@@ -457,22 +455,22 @@ public class VeinsFrame extends Widget {
 		displayModeListBox.setPosition(VeinsWindow.settings.resWidth / 2 - rlWidth / 2,
 				VeinsWindow.settings.resHeight / 6);
 
-		fullscreenToggle.adjustSize();
-		int fullToggleWidth = Math.max(fullscreenToggle.getWidth(), VeinsWindow.settings.resWidth / 6);
-		fullscreenToggle.setSize(fullToggleWidth, openHeight);
-		fullscreenToggle.setPosition(VeinsWindow.settings.resWidth / 2 - rlWidth / 2,
+		fullscreenToggleButton.adjustSize();
+		int fullToggleWidth = Math.max(fullscreenToggleButton.getWidth(), VeinsWindow.settings.resWidth / 6);
+		fullscreenToggleButton.setSize(fullToggleWidth, openHeight);
+		fullscreenToggleButton.setPosition(VeinsWindow.settings.resWidth / 2 - rlWidth / 2,
 				VeinsWindow.settings.resHeight * 19 / 24);
 
-		cancelVideoSetting.adjustSize();
-		int cancelVideoSettingWidth = Math.max(cancelVideoSetting.getWidth(), VeinsWindow.settings.resWidth / 6);
-		cancelVideoSetting.setSize(cancelVideoSettingWidth, openHeight);
-		cancelVideoSetting.setPosition(VeinsWindow.settings.resWidth / 2 + rlWidth / 2 - cancelVideoSettingWidth,
+		cancelVideoSettingButton.adjustSize();
+		int cancelVideoSettingWidth = Math.max(cancelVideoSettingButton.getWidth(), VeinsWindow.settings.resWidth / 6);
+		cancelVideoSettingButton.setSize(cancelVideoSettingWidth, openHeight);
+		cancelVideoSettingButton.setPosition(VeinsWindow.settings.resWidth / 2 + rlWidth / 2 - cancelVideoSettingWidth,
 				VeinsWindow.settings.resHeight * 19 / 24);
 
-		okayVideoSetting.adjustSize();
-		int okayVideoSettingWidth = Math.max(okayVideoSetting.getWidth(), VeinsWindow.settings.resWidth / 6);
-		okayVideoSetting.setSize(okayVideoSettingWidth, openHeight);
-		okayVideoSetting.setPosition(VeinsWindow.settings.resWidth / 2 + rlWidth / 2 - cancelVideoSettingWidth
+		okayVideoSettingButton.adjustSize();
+		int okayVideoSettingWidth = Math.max(okayVideoSettingButton.getWidth(), VeinsWindow.settings.resWidth / 6);
+		okayVideoSettingButton.setSize(okayVideoSettingWidth, openHeight);
+		okayVideoSettingButton.setPosition(VeinsWindow.settings.resWidth / 2 + rlWidth / 2 - cancelVideoSettingWidth
 				- okayVideoSettingWidth, VeinsWindow.settings.resHeight * 19 / 24);
 
 		fileSelector.adjustSize();
