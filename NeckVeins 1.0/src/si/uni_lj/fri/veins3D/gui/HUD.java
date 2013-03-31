@@ -31,7 +31,6 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 
 import java.io.IOException;
 
-
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -39,6 +38,7 @@ import org.newdawn.slick.util.ResourceLoader;
 
 public class HUD {
 	private final String PATH = "res/imgs/";
+	private final float ELLIPSEF = 1.1180339887498948482045868343656f;
 
 	private Texture rotationCircle;
 	private Texture circleGlow;
@@ -52,8 +52,32 @@ public class HUD {
 	public float rotationCircleAngle = 0;
 	public float rotationCircleDistance = 0;
 
+	/* Position and size */
+	private float windowWidth;
+	private float windowHeight;
+	public float r;
+	public float x1;
+	public float y1;
+	public float x2;
+	public float y2;
+	public float f;
+	public float offset;
+
 	public HUD() {
+		setHUDPositionAndSize();
 		initHUDTextures();
+	}
+
+	public void setHUDPositionAndSize() {
+		windowWidth = VeinsWindow.settings.resWidth;
+		windowHeight = VeinsWindow.settings.resHeight;
+		r = windowWidth / 18;
+		offset = r * 2 / 3;
+		x1 = windowWidth - offset - r;
+		y1 = windowHeight - windowHeight / 18 - offset - r;
+		x2 = windowWidth - offset - r;
+		y2 = windowHeight - windowHeight / 18 - 2 * offset - 3 * r;
+		f = ELLIPSEF * r;
 	}
 
 	/**
@@ -110,7 +134,28 @@ public class HUD {
 	 * @version 0.1
 	 */
 	public void drawHUD() {
-		// prepare
+		// check if window size has been changed
+		if (windowWidth != VeinsWindow.settings.resWidth || windowHeight != VeinsWindow.settings.resHeight)
+			setHUDPositionAndSize();
+
+		startHUD();
+
+		glColor4f(1, 1, 1, 1);
+		drawRotationEllipse();
+		drawMovementEllipse();
+		if (clickedOn == VeinsWindow.CLICKED_ON_MOVE_ELLIPSE || clickedOn == VeinsWindow.CLICKED_ON_ROTATION_ELLIPSE)
+			drawEllipseGlow();
+
+		glColor4f(1, 1, 1, 1);
+		drawRotationCircle();
+		drawMovementCircle();
+		if (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE || clickedOn == VeinsWindow.CLICKED_ON_MOVE_CIRCLE)
+			drawCircleGlow();
+
+		endHUD();
+	}
+
+	private void startHUD() {
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
@@ -124,31 +169,24 @@ public class HUD {
 		glClearColor(0f, 0f, 0f, 0f);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		// ADDED, was in render before
 		GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+	}
 
-		// begin drawing
-		float w = VeinsWindow.settings.resWidth;
-		float h = VeinsWindow.settings.resHeight;
-		float r = w / 18;
-		float offset = r * 2 / 3;
-		float x = w - offset - r;
-		float y = h - h / 18 - offset - r;
-		float x2 = w - offset - r;
-		float y2 = h - h / 18 - 2 * offset - 3 * r;
-
-		glColor4f(1, 1, 1, 1);
+	private void drawRotationEllipse() {
 		GL11.glBindTexture(GL_TEXTURE_2D, rotationElipse.getTextureID());
 		glBegin(GL_QUADS);
 		glTexCoord2f(1, 0);
-		glVertex3f(x + 1.5f * r, y + r, -1.0f);
+		glVertex3f(x1 + 1.5f * r, y1 + r, -1.0f);
 		glTexCoord2f(0, 0);
-		glVertex3f(x - 1.5f * r, y + r, -1.0f);
+		glVertex3f(x1 - 1.5f * r, y1 + r, -1.0f);
 		glTexCoord2f(0, 1);
-		glVertex3f(x - 1.5f * r, y - r, -1.0f);
+		glVertex3f(x1 - 1.5f * r, y1 - r, -1.0f);
 		glTexCoord2f(1, 1);
-		glVertex3f(x + 1.5f * r, y - r, -1.0f);
+		glVertex3f(x1 + 1.5f * r, y1 - r, -1.0f);
 		glEnd();
+	}
+
+	private void drawMovementEllipse() {
 		GL11.glBindTexture(GL_TEXTURE_2D, movementElipse.getTextureID());
 		glBegin(GL_QUADS);
 		glTexCoord2f(1, 0);
@@ -160,47 +198,48 @@ public class HUD {
 		glTexCoord2f(1, 1);
 		glVertex3f(x2 + 1.5f * r, y2 - r, -1.0f);
 		glEnd();
+	}
 
-		if (clickedOn == VeinsWindow.CLICKED_ON_MOVE_ELLIPSE || clickedOn == VeinsWindow.CLICKED_ON_ROTATION_ELLIPSE) {
-			float x3 = x, y3 = y;
-			if (clickedOn == VeinsWindow.CLICKED_ON_MOVE_ELLIPSE) {
-				x3 = x2;
-				y3 = y2;
-			}
-			glPushMatrix();
-			glTranslatef(x3, y3, 0);
-			if (ellipseSide == 0)
-				glRotatef((float) (180), 0, 0, 1);
-			glTranslatef(-x3, -y3, 0);
-			GL11.glBindTexture(GL_TEXTURE_2D, ellipseGlow.getTextureID());
-			glColor4f(1, 1, 1, 0.5f);
-			glBegin(GL_QUADS);
-			glTexCoord2f(1, 0);
-			glVertex3f(x3 + 1.5f * r, y3 + r, -0.8f);
-			glTexCoord2f(0, 0);
-			glVertex3f(x3 - 1.5f * r, y3 + r, -0.8f);
-			glTexCoord2f(0, 1);
-			glVertex3f(x3 - 1.5f * r, y3 - r, -0.8f);
-			glTexCoord2f(1, 1);
-			glVertex3f(x3 + 1.5f * r, y3 - r, -0.8f);
-			glEnd();
-			glPopMatrix();
-		}
+	private void drawEllipseGlow() {
+		float x = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_ELLIPSE) ? x1 : x2;
+		float y = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_ELLIPSE) ? y1 : y2;
 
+		glPushMatrix();
+		glTranslatef(x, y, 0);
+		if (ellipseSide == 0)
+			glRotatef((float) (180), 0, 0, 1);
+		glTranslatef(-x, -y, 0);
+		GL11.glBindTexture(GL_TEXTURE_2D, ellipseGlow.getTextureID());
+		glColor4f(1, 1, 1, 0.5f);
+		glBegin(GL_QUADS);
+		glTexCoord2f(1, 0);
+		glVertex3f(x + 1.5f * r, y + r, -0.8f);
+		glTexCoord2f(0, 0);
+		glVertex3f(x - 1.5f * r, y + r, -0.8f);
+		glTexCoord2f(0, 1);
+		glVertex3f(x - 1.5f * r, y - r, -0.8f);
+		glTexCoord2f(1, 1);
+		glVertex3f(x + 1.5f * r, y - r, -0.8f);
+		glEnd();
+		glPopMatrix();
+	}
+
+	private void drawRotationCircle() {
 		glColor4f(1, 1, 1, 1);
 		GL11.glBindTexture(GL_TEXTURE_2D, rotationCircle.getTextureID());
 		glBegin(GL_QUADS);
 		glTexCoord2f(1, 0);
-		glVertex3f(x + r, y + r, -0.6f);
+		glVertex3f(x1 + r, y1 + r, -0.6f);
 		glTexCoord2f(0, 0);
-		glVertex3f(x - r, y + r, -0.6f);
+		glVertex3f(x1 - r, y1 + r, -0.6f);
 		glTexCoord2f(0, 1);
-		glVertex3f(x - r, y - r, -0.6f);
+		glVertex3f(x1 - r, y1 - r, -0.6f);
 		glTexCoord2f(1, 1);
-		glVertex3f(x + r, y - r, -0.6f);
+		glVertex3f(x1 + r, y1 - r, -0.6f);
 		glEnd();
+	}
 
-		// begin drawing
+	private void drawMovementCircle() {
 		GL11.glBindTexture(GL_TEXTURE_2D, movementCircle.getTextureID());
 		glBegin(GL_QUADS);
 		glTexCoord2f(1, 0);
@@ -212,32 +251,32 @@ public class HUD {
 		glTexCoord2f(1, 1);
 		glVertex3f(x2 + r, y2 - r, -0.6f);
 		glEnd();
+	}
 
-		if (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE || clickedOn == VeinsWindow.CLICKED_ON_MOVE_CIRCLE) {
-			if (clickedOn == VeinsWindow.CLICKED_ON_MOVE_CIRCLE) {
-				x = x2;
-				y = y2;
-			}
-			glPushMatrix();
-			glTranslatef(x, y, 0);
-			glRotatef((float) (180 * rotationCircleAngle / Math.PI), 0, 0, 1);
-			glTranslatef(-x, -y, 0);
-			GL11.glBindTexture(GL_TEXTURE_2D, circleGlow.getTextureID());
-			glColor4f(1, 1, 1, (float) rotationCircleDistance);
-			glBegin(GL_QUADS);
-			glTexCoord2f(1, 0);
-			glVertex3f(x + r, y + r, -0.4f);
-			glTexCoord2f(0, 0);
-			glVertex3f(x - r, y + r, -0.4f);
-			glTexCoord2f(0, 1);
-			glVertex3f(x - r, y - r, -0.4f);
-			glTexCoord2f(1, 1);
-			glVertex3f(x + r, y - r, -0.4f);
-			glEnd();
-			glPopMatrix();
-		}
+	private void drawCircleGlow() {
+		float x = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? x1 : x2;
+		float y = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? y1 : y2;
 
-		// exit "HUD" mode
+		glPushMatrix();
+		glTranslatef(x, y, 0);
+		glRotatef((float) (180 * rotationCircleAngle / Math.PI), 0, 0, 1);
+		glTranslatef(-x, -y, 0);
+		GL11.glBindTexture(GL_TEXTURE_2D, circleGlow.getTextureID());
+		glColor4f(1, 1, 1, (float) rotationCircleDistance);
+		glBegin(GL_QUADS);
+		glTexCoord2f(1, 0);
+		glVertex3f(x + r, y + r, -0.4f);
+		glTexCoord2f(0, 0);
+		glVertex3f(x - r, y + r, -0.4f);
+		glTexCoord2f(0, 1);
+		glVertex3f(x - r, y - r, -0.4f);
+		glTexCoord2f(1, 1);
+		glVertex3f(x + r, y - r, -0.4f);
+		glEnd();
+		glPopMatrix();
+	}
+
+	private void endHUD() {
 		glDisable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
 		glEnable(GL_LIGHTING);

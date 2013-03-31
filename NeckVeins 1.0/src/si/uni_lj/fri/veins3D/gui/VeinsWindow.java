@@ -328,7 +328,6 @@ public class VeinsWindow extends Container {
 
 		if (renderer.getVeinsModel() != null) {
 			if (Mouse.isButtonDown(0)) {
-				// figure out if clicked on the HUD first
 				float w = settings.resWidth;
 				float h = settings.resHeight;
 				float r = w / 18;
@@ -339,35 +338,7 @@ public class VeinsWindow extends Container {
 				float y2 = h - h / 18 - 2 * offset - 3 * r;
 				float f = ELLIPSEF * r;
 
-				if (clickedOn == CLICKED_ON_NOTHING) {
-					float distanceToRotationCircle = (x - Mouse.getX()) * (x - Mouse.getX()) + (y - Mouse.getY())
-							* (y - Mouse.getY());
-					float distanceToMoveCircle = (x2 - Mouse.getX()) * (x2 - Mouse.getX()) + (y2 - Mouse.getY())
-							* (y2 - Mouse.getY());
-					float distanceToRotationFoci = (float) (Math.sqrt((x - f - Mouse.getX()) * (x - f - Mouse.getX())
-							+ (y - Mouse.getY()) * (y - Mouse.getY())) + Math.sqrt((x + f - Mouse.getX())
-							* (x + f - Mouse.getX()) + (y - Mouse.getY()) * (y - Mouse.getY())));
-					float distanceToMoveFoci = (float) (Math.sqrt((x2 - f - Mouse.getX()) * (x2 - f - Mouse.getX())
-							+ (y2 - Mouse.getY()) * (y2 - Mouse.getY())) + Math.sqrt((x2 + f - Mouse.getX())
-							* (x2 + f - Mouse.getX()) + (y2 - Mouse.getY()) * (y2 - Mouse.getY())));
-					if (settings.resHeight - Mouse.getY() < settings.resHeight / 18) {
-						clickedOn = CLICKED_ON_BUTTONS;
-					} else if (distanceToRotationCircle <= r * r) {
-						clickedOn = CLICKED_ON_ROTATION_CIRCLE;
-					} else if (distanceToMoveCircle <= r * r) {
-						clickedOn = CLICKED_ON_MOVE_CIRCLE;
-					} else if (distanceToRotationFoci <= r * 3f) {
-						clickedOn = CLICKED_ON_ROTATION_ELLIPSE;
-					} else if (distanceToMoveFoci <= r * 3f) {
-						clickedOn = CLICKED_ON_MOVE_ELLIPSE;
-					} else {
-						renderer.veinsGrabbedAt = RayUtil
-								.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
-						renderer.setAddedModelOrientation(new Quaternion());
-						if (renderer.veinsGrabbedAt != null)
-							clickedOn = CLICKED_ON_VEINS_MODEL;
-					}
-				}
+				calcClickedOn(x, y, x2, y2, f, r);
 
 				if (clickedOn == CLICKED_ON_VEINS_MODEL) {
 					double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
@@ -462,6 +433,47 @@ public class VeinsWindow extends Container {
 		}
 	}
 
+	private int calcClickedOn(float x, float y, float x2, float y2, float f, float r) {
+
+		if (clickedOn == CLICKED_ON_NOTHING) {
+			float distanceToRotationCircle = (x - Mouse.getX()) * (x - Mouse.getX()) + (y - Mouse.getY())
+					* (y - Mouse.getY());
+			float distanceToMoveCircle = (x2 - Mouse.getX()) * (x2 - Mouse.getX()) + (y2 - Mouse.getY())
+					* (y2 - Mouse.getY());
+			float distanceToRotationFoci = (float) (Math.sqrt((x - f - Mouse.getX()) * (x - f - Mouse.getX())
+					+ (y - Mouse.getY()) * (y - Mouse.getY())) + Math.sqrt((x + f - Mouse.getX())
+					* (x + f - Mouse.getX()) + (y - Mouse.getY()) * (y - Mouse.getY())));
+			float distanceToMoveFoci = (float) (Math.sqrt((x2 - f - Mouse.getX()) * (x2 - f - Mouse.getX())
+					+ (y2 - Mouse.getY()) * (y2 - Mouse.getY())) + Math.sqrt((x2 + f - Mouse.getX())
+					* (x2 + f - Mouse.getX()) + (y2 - Mouse.getY()) * (y2 - Mouse.getY())));
+
+			if (settings.resHeight - Mouse.getY() < settings.resHeight / 18) {
+				clickedOn = CLICKED_ON_BUTTONS;
+
+			} else if (distanceToRotationCircle <= r * r) {
+				clickedOn = CLICKED_ON_ROTATION_CIRCLE;
+
+			} else if (distanceToMoveCircle <= r * r) {
+				clickedOn = CLICKED_ON_MOVE_CIRCLE;
+
+			} else if (distanceToRotationFoci <= r * 3f) {
+				clickedOn = CLICKED_ON_ROTATION_ELLIPSE;
+
+			} else if (distanceToMoveFoci <= r * 3f) {
+				clickedOn = CLICKED_ON_MOVE_ELLIPSE;
+
+			} else {
+				renderer.veinsGrabbedAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
+				renderer.setAddedModelOrientation(new Quaternion());
+
+				if (renderer.veinsGrabbedAt != null)
+					clickedOn = CLICKED_ON_VEINS_MODEL;
+			}
+		}
+
+		return clickedOn;
+	}
+
 	public void exitProgram(int n) {
 		SettingsUtil.saveSettings(settings, title);
 		renderer.cleanShaders();
@@ -479,6 +491,10 @@ public class VeinsWindow extends Container {
 
 	public DisplayMode getCurrentDisplayMode() {
 		return currentDisplayMode;
+	}
+
+	public HUD getHUD() {
+		return hud;
 	}
 
 }
