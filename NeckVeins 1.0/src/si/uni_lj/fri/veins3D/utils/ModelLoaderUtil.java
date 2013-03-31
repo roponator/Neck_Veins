@@ -12,7 +12,7 @@ public class ModelLoaderUtil {
 	 * @version 0.4
 	 */
 	public static void loadModel(String fileName, VeinsRenderer renderer) {
-		double fovy = renderer.fovy;
+		double fovy = VeinsRenderer.FOV_Y;
 		VeinsModel veinsModel = new VeinsModel(fileName);
 		// Calculate the appropriate camera distance:
 		// The following code takes the most extreme values on each coordinate

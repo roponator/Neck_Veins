@@ -73,6 +73,28 @@ public class Camera {
 		cameraOrientation = Quaternion.quaternionMultiplication(cameraOrientation, addRotation);
 	}
 
+	public void rotate(float upRotation, float rightRotation) {
+		// add rotation up
+		Quaternion addRotation = Quaternion.quaternionFromAngleAndRotationAxis(Camera.CAMERA_ROTATION_SPEED
+				* upRotation, X_POSITIVE_AXIS);
+		cameraOrientation = Quaternion.quaternionMultiplication(cameraOrientation, addRotation);
+
+		// add rotation in right
+		addRotation = Quaternion.quaternionFromAngleAndRotationAxis(Camera.CAMERA_ROTATION_SPEED * rightRotation,
+				Y_NEGATIVE_AXIS);
+		cameraOrientation = Quaternion.quaternionMultiplication(cameraOrientation, addRotation);
+	}
+
+	public void move(float moveUp, float moveRight) {
+		double up[] = new double[] { 0, 0, -moveUp };
+		up = cameraOrientation.rotateVector3d(up);
+		double right[] = new double[] { moveRight, 0, 0 };
+		right = cameraOrientation.rotateVector3d(right);
+		cameraX += (float) (up[0] + right[0]);
+		cameraY += (float) (up[1] + right[1]);
+		cameraZ += (float) (up[2] + right[2]);
+	}
+
 	public void moveForward() {
 		double rotateVector[] = cameraOrientation.rotateVector3d(Z_NEGATIVE_AXIS);
 		cameraX += (float) rotateVector[0];

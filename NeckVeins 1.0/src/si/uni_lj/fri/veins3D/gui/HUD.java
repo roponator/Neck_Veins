@@ -31,6 +31,7 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 
 import java.io.IOException;
 
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -53,8 +54,8 @@ public class HUD {
 	public float rotationCircleDistance = 0;
 
 	/* Position and size */
-	private float windowWidth;
-	private float windowHeight;
+	private float lastWindowWidth;
+	private float lastWindowHeight;
 	public float r;
 	public float x1;
 	public float y1;
@@ -69,14 +70,14 @@ public class HUD {
 	}
 
 	public void setHUDPositionAndSize() {
-		windowWidth = VeinsWindow.settings.resWidth;
-		windowHeight = VeinsWindow.settings.resHeight;
-		r = windowWidth / 18;
+		lastWindowWidth = VeinsWindow.settings.resWidth;
+		lastWindowHeight = VeinsWindow.settings.resHeight;
+		r = lastWindowWidth / 18;
 		offset = r * 2 / 3;
-		x1 = windowWidth - offset - r;
-		y1 = windowHeight - windowHeight / 18 - offset - r;
-		x2 = windowWidth - offset - r;
-		y2 = windowHeight - windowHeight / 18 - 2 * offset - 3 * r;
+		x1 = lastWindowWidth - offset - r;
+		y1 = lastWindowHeight - lastWindowHeight / 18 - offset - r;
+		x2 = lastWindowWidth - offset - r;
+		y2 = lastWindowHeight - lastWindowHeight / 18 - 2 * offset - 3 * r;
 		f = ELLIPSEF * r;
 	}
 
@@ -134,8 +135,8 @@ public class HUD {
 	 * @version 0.1
 	 */
 	public void drawHUD() {
-		// check if window size has been changed
-		if (windowWidth != VeinsWindow.settings.resWidth || windowHeight != VeinsWindow.settings.resHeight)
+		// check if window size has changed
+		if (lastWindowWidth != VeinsWindow.settings.resWidth && lastWindowHeight != VeinsWindow.settings.resHeight)
 			setHUDPositionAndSize();
 
 		startHUD();
@@ -295,4 +296,19 @@ public class HUD {
 		this.clickedOn = clickedOn;
 	}
 
+	public void calculateClickToRotationCircleDistance(float clickedOn) {
+		float x = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? x1 : x2;
+		float y = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? y1 : y2;
+
+		rotationCircleDistance = (x - Mouse.getX()) * (x - Mouse.getX()) + (y - Mouse.getY()) * (y - Mouse.getY());
+		rotationCircleDistance = (float) Math.sqrt(rotationCircleDistance);
+
+	}
+
+	public void calculateClickCircleAngle(int clickedOn) {
+		float x = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? x1 : x2;
+		float y = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? y1 : y2;
+
+		rotationCircleAngle = (float) Math.atan2(Mouse.getY() - y, Mouse.getX() - x);
+	}
 }

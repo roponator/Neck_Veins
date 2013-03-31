@@ -53,6 +53,7 @@ import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.GLU;
@@ -61,6 +62,8 @@ import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.VeinsWindow;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
 import si.uni_lj.fri.veins3D.math.Quaternion;
+import si.uni_lj.fri.veins3D.math.Vector;
+import si.uni_lj.fri.veins3D.utils.RayUtil;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 
 public class VeinsRenderer extends LWJGLRenderer {
@@ -71,6 +74,9 @@ public class VeinsRenderer extends LWJGLRenderer {
 	public static final int SIMPLE_SHADER_PHONG = 4;
 	public static final int WIREFRAME = 0;
 	public static final int NUMBER_OF_SHADER_PROGRAMS = 8;
+	public static final float FOV_Y = 45;
+	public static final float Z_NEAR = 10;
+	public static final float Z_FAR = 10000;
 
 	private int activeShaderProgram;
 	private boolean isWireframeOn;
@@ -82,9 +88,6 @@ public class VeinsRenderer extends LWJGLRenderer {
 	private Quaternion addedModelOrientation;
 
 	// Projection parameters
-	public float fovy = 45;
-	public float zNear = 10;
-	public float zFar = 10000;
 	public double veinsRadius;
 	public double[] screenPlaneInitialUpperLeft;
 	public double[] screenPlaneInitialUpperRight;
@@ -114,7 +117,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 		glViewport(0, 0, VeinsWindow.settings.resWidth, VeinsWindow.settings.resHeight);
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
 		GL11.glLoadIdentity();
-		GLU.gluPerspective(fovy, VeinsWindow.settings.resWidth / (float) VeinsWindow.settings.resHeight, zNear, zFar);
+		GLU.gluPerspective(FOV_Y, VeinsWindow.settings.resWidth / (float) VeinsWindow.settings.resHeight, Z_NEAR, Z_FAR);
 		glShadeModel(GL_SMOOTH);
 		setCameraAndLight(0);
 	}
@@ -149,9 +152,6 @@ public class VeinsRenderer extends LWJGLRenderer {
 		}
 	}
 
-	/**
-	 * TODO load shaders
-	 */
 	private void renderVeins() {
 		if (veinsModel != null) {
 			glMatrixMode(GL_MODELVIEW);
@@ -203,7 +203,6 @@ public class VeinsRenderer extends LWJGLRenderer {
 	}
 
 	/**
-	 * TODO exit on fail
 	 * 
 	 * @throws ShaderLoadException
 	 */
@@ -326,6 +325,23 @@ public class VeinsRenderer extends LWJGLRenderer {
 
 	public void setAddedModelOrientation(Quaternion q) {
 		addedModelOrientation = q;
+	}
+
+	/**
+	 * 
+	 */
+	public void rotateVeins() {
+		double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), this);
+		if (veinsHeldAt != null) {
+			double[] rotationAxis = Vector.crossProduct(veinsGrabbedAt, veinsHeldAt);
+			if (Vector.length(rotationAxis) > 0) {
+				rotationAxis = Vector.normalize(rotationAxis);
+				rotationAxis = Quaternion.quaternionReciprocal(currentModelOrientation).rotateVector3d(rotationAxis);
+				double angle = Math.acos(Vector.dotProduct(veinsGrabbedAt, veinsHeldAt)
+						/ (Vector.length(veinsGrabbedAt) * Vector.length(veinsHeldAt)));
+				addedModelOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle, rotationAxis);
+			}
+		}
 	}
 
 }

@@ -12,11 +12,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
-import si.uni_lj.fri.veins3D.gui.render.Camera;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
 import si.uni_lj.fri.veins3D.math.Quaternion;
-import si.uni_lj.fri.veins3D.math.Vector;
 import si.uni_lj.fri.veins3D.utils.RayUtil;
 import si.uni_lj.fri.veins3D.utils.SettingsUtil;
 import de.matthiasmann.twl.Container;
@@ -35,7 +33,6 @@ public class VeinsWindow extends Container {
 	public final static int CLICKED_ON_ROTATION_ELLIPSE = 4;
 	public final static int CLICKED_ON_MOVE_ELLIPSE = 5;
 	public final static int CLICKED_ON_BUTTONS = 6;
-	private final float ELLIPSEF = 1.1180339887498948482045868343656f;
 
 	public static NeckVeinsSettings settings;
 
@@ -316,7 +313,7 @@ public class VeinsWindow extends Container {
 	 * TODO re-think clickOn implementation
 	 */
 	private void pollMouseInput() {
-		if (!frame.isDialogOpened())
+		if (!frame.isDialogOpened() || renderer.getVeinsModel() == null)
 			return;
 
 		int z = Mouse.getDWheel();
@@ -326,152 +323,104 @@ public class VeinsWindow extends Container {
 			renderer.getCamera().zoomOut();
 		}
 
-		if (renderer.getVeinsModel() != null) {
-			if (Mouse.isButtonDown(0)) {
-				float w = settings.resWidth;
-				float h = settings.resHeight;
-				float r = w / 18;
-				float offset = r * 2 / 3;
-				float x = w - offset - r;
-				float y = h - h / 18 - offset - r;
-				float x2 = w - offset - r;
-				float y2 = h - h / 18 - 2 * offset - 3 * r;
-				float f = ELLIPSEF * r;
+		if (Mouse.isButtonDown(0)) {
+			calculateClickedOn();
 
-				calcClickedOn(x, y, x2, y2, f, r);
-
-				if (clickedOn == CLICKED_ON_VEINS_MODEL) {
-					double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
-					if (veinsHeldAt != null) {
-						double[] rotationAxis = Vector.crossProduct(renderer.veinsGrabbedAt, veinsHeldAt);
-						if (Vector.length(rotationAxis) > 0) {
-							rotationAxis = Vector.normalize(rotationAxis);
-							rotationAxis = Quaternion.quaternionReciprocal(renderer.getCurrentModelOrientation())
-									.rotateVector3d(rotationAxis);
-							double angle = Math.acos(Vector.dotProduct(renderer.veinsGrabbedAt, veinsHeldAt)
-									/ (Vector.length(renderer.veinsGrabbedAt) * Vector.length(veinsHeldAt)));
-							renderer.setAddedModelOrientation(Quaternion.quaternionFromAngleAndRotationAxis(angle,
-									rotationAxis));
-						}
-					}
-				}
-				if (clickedOn == CLICKED_ON_ROTATION_CIRCLE || clickedOn == CLICKED_ON_MOVE_CIRCLE) {
-					if (clickedOn == CLICKED_ON_MOVE_CIRCLE) {
-						x = x2;
-						y = y2;
-					}
-					hud.rotationCircleDistance = (x - Mouse.getX()) * (x - Mouse.getX()) + (y - Mouse.getY())
-							* (y - Mouse.getY());
-					hud.rotationCircleAngle = (float) Math.atan2(Mouse.getY() - y, Mouse.getX() - x);
-					hud.rotationCircleDistance = (float) Math.sqrt(hud.rotationCircleDistance);
-					float upRotation = (Mouse.getY() - y);
-					float rightRotation = (Mouse.getX() - x);
-					if (hud.rotationCircleDistance > r) {
-						upRotation /= hud.rotationCircleDistance;
-						rightRotation /= hud.rotationCircleDistance;
-					} else {
-						upRotation /= r;
-						rightRotation /= r;
-					}
-					hud.rotationCircleDistance = Math.min(hud.rotationCircleDistance, r) / r;
-					if (clickedOn == CLICKED_ON_ROTATION_CIRCLE) {
-						Quaternion addRotation = Quaternion.quaternionFromAngleAndRotationAxis(
-								Camera.CAMERA_ROTATION_SPEED * upRotation, new double[] { 1, 0, 0 });
-						renderer.getCamera().cameraOrientation = Quaternion.quaternionMultiplication(
-								renderer.getCamera().cameraOrientation, addRotation);
-						addRotation = Quaternion.quaternionFromAngleAndRotationAxis(Camera.CAMERA_ROTATION_SPEED
-								* rightRotation, new double[] { 0, -1, 0 });
-						renderer.getCamera().cameraOrientation = Quaternion.quaternionMultiplication(
-								renderer.getCamera().cameraOrientation, addRotation);
-					} else {
-						double up[] = new double[] { 0, 0, -upRotation };
-						up = renderer.getCamera().cameraOrientation.rotateVector3d(up);
-						double right[] = new double[] { rightRotation, 0, 0 };
-						right = renderer.getCamera().cameraOrientation.rotateVector3d(right);
-						renderer.getCamera().cameraX += (float) (up[0] + right[0]);
-						renderer.getCamera().cameraY += (float) (up[1] + right[1]);
-						renderer.getCamera().cameraZ += (float) (up[2] + right[2]);
-					}
-				}
-				if (clickedOn == CLICKED_ON_ROTATION_ELLIPSE) {
-					if (x - Mouse.getX() <= 0) {
-						hud.ellipseSide = 0;
-						Quaternion addRotation = Quaternion.quaternionFromAngleAndRotationAxis(
-								Camera.CAMERA_ROTATION_SPEED, new double[] { 0, 0, -1 });
-						renderer.getCamera().cameraOrientation = Quaternion.quaternionMultiplication(
-								renderer.getCamera().cameraOrientation, addRotation);
-					} else {
-						hud.ellipseSide = 1;
-						Quaternion addRotation = Quaternion.quaternionFromAngleAndRotationAxis(
-								Camera.CAMERA_ROTATION_SPEED, new double[] { 0, 0, 1 });
-						renderer.getCamera().cameraOrientation = Quaternion.quaternionMultiplication(
-								renderer.getCamera().cameraOrientation, addRotation);
-					}
-				}
-				if (clickedOn == CLICKED_ON_MOVE_ELLIPSE) {
-					double v[];
-					if (x2 - Mouse.getX() <= 0) {
-						hud.ellipseSide = 0;
-						v = new double[] { 0, 1, 0 };
-					} else {
-						hud.ellipseSide = 1;
-						v = new double[] { 0, -1, 0 };
-					}
-					v = renderer.getCamera().cameraOrientation.rotateVector3d(v);
-					renderer.getCamera().cameraX += (float) v[0];
-					renderer.getCamera().cameraY += (float) v[1];
-					renderer.getCamera().cameraZ += (float) v[2];
-				}
-			} else {
-				clickedOn = CLICKED_ON_NOTHING;
-				renderer.veinsGrabbedAt = null;
-				Quaternion currentModelOrientation = Quaternion.quaternionMultiplication(
-						renderer.getCurrentModelOrientation(), renderer.getAddedModelOrientation());
-				renderer.setCurrentModelOrientation(currentModelOrientation);
-				renderer.setAddedModelOrientation(new Quaternion());
+			if (clickedOn == CLICKED_ON_VEINS_MODEL) {
+				renderer.rotateVeins();
 			}
+
+			if (clickedOn == CLICKED_ON_ROTATION_CIRCLE || clickedOn == CLICKED_ON_MOVE_CIRCLE) {
+				float x = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? hud.x1 : hud.x2;
+				float y = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? hud.y1 : hud.y2;
+
+				float clickToCircleDistance = (float) Math.sqrt((x - Mouse.getX()) * (x - Mouse.getX())
+						+ (y - Mouse.getY()) * (y - Mouse.getY()));
+				float upRotation = (Mouse.getY() - y)
+						/ ((clickToCircleDistance > hud.r) ? clickToCircleDistance : hud.r);
+				float rightRotation = (Mouse.getX() - x)
+						/ ((clickToCircleDistance > hud.r) ? clickToCircleDistance : hud.r);
+
+				hud.rotationCircleDistance = Math.min(clickToCircleDistance, hud.r) / hud.r;
+				hud.rotationCircleAngle = (float) Math.atan2(Mouse.getY() - y, Mouse.getX() - x);
+
+				if (clickedOn == CLICKED_ON_ROTATION_CIRCLE) {
+					renderer.getCamera().rotate(upRotation, rightRotation);
+				} else {
+					renderer.getCamera().move(upRotation, rightRotation);
+				}
+			}
+
+			if (clickedOn == CLICKED_ON_ROTATION_ELLIPSE) {
+				if (hud.x1 - Mouse.getX() <= 0) {
+					hud.ellipseSide = 0;
+					renderer.getCamera().rotateClockwise();
+				} else {
+					hud.ellipseSide = 1;
+					renderer.getCamera().rotateCounterClockwise();
+				}
+			}
+
+			if (clickedOn == CLICKED_ON_MOVE_ELLIPSE) {
+				if (hud.x2 - Mouse.getX() <= 0) {
+					hud.ellipseSide = 0;
+					renderer.getCamera().moveDown();
+				} else {
+					hud.ellipseSide = 1;
+					renderer.getCamera().moveUp();
+				}
+			}
+
+		} else {
+			clickedOn = CLICKED_ON_NOTHING;
+			renderer.veinsGrabbedAt = null;
+			Quaternion currentModelOrientation = Quaternion.quaternionMultiplication(
+					renderer.getCurrentModelOrientation(), renderer.getAddedModelOrientation());
+			renderer.setCurrentModelOrientation(currentModelOrientation);
+			renderer.setAddedModelOrientation(new Quaternion());
 		}
+
 	}
 
-	private int calcClickedOn(float x, float y, float x2, float y2, float f, float r) {
+	private void calculateClickedOn() {
+		float distanceToRotationCircle = (hud.x1 - Mouse.getX()) * (hud.x1 - Mouse.getX()) + (hud.y1 - Mouse.getY())
+				* (hud.y1 - Mouse.getY());
+
+		float distanceToMoveCircle = (hud.x2 - Mouse.getX()) * (hud.x2 - Mouse.getX()) + (hud.y2 - Mouse.getY())
+				* (hud.y2 - Mouse.getY());
+
+		float distanceToRotationFoci = (float) (Math.sqrt((hud.x1 - hud.f - Mouse.getX())
+				* (hud.x1 - hud.f - Mouse.getX()) + (hud.y1 - Mouse.getY()) * (hud.y1 - Mouse.getY())) + Math
+				.sqrt((hud.x1 + hud.f - Mouse.getX()) * (hud.x1 + hud.f - Mouse.getX()) + (hud.y1 - Mouse.getY())
+						* (hud.y1 - Mouse.getY())));
+
+		float distanceToMoveFoci = (float) (Math.sqrt((hud.x2 - hud.f - Mouse.getX()) * (hud.x2 - hud.f - Mouse.getX())
+				+ (hud.y2 - Mouse.getY()) * (hud.y2 - Mouse.getY())) + Math.sqrt((hud.x2 + hud.f - Mouse.getX())
+				* (hud.x2 + hud.f - Mouse.getX()) + (hud.y2 - Mouse.getY()) * (hud.y2 - Mouse.getY())));
 
 		if (clickedOn == CLICKED_ON_NOTHING) {
-			float distanceToRotationCircle = (x - Mouse.getX()) * (x - Mouse.getX()) + (y - Mouse.getY())
-					* (y - Mouse.getY());
-			float distanceToMoveCircle = (x2 - Mouse.getX()) * (x2 - Mouse.getX()) + (y2 - Mouse.getY())
-					* (y2 - Mouse.getY());
-			float distanceToRotationFoci = (float) (Math.sqrt((x - f - Mouse.getX()) * (x - f - Mouse.getX())
-					+ (y - Mouse.getY()) * (y - Mouse.getY())) + Math.sqrt((x + f - Mouse.getX())
-					* (x + f - Mouse.getX()) + (y - Mouse.getY()) * (y - Mouse.getY())));
-			float distanceToMoveFoci = (float) (Math.sqrt((x2 - f - Mouse.getX()) * (x2 - f - Mouse.getX())
-					+ (y2 - Mouse.getY()) * (y2 - Mouse.getY())) + Math.sqrt((x2 + f - Mouse.getX())
-					* (x2 + f - Mouse.getX()) + (y2 - Mouse.getY()) * (y2 - Mouse.getY())));
-
 			if (settings.resHeight - Mouse.getY() < settings.resHeight / 18) {
 				clickedOn = CLICKED_ON_BUTTONS;
 
-			} else if (distanceToRotationCircle <= r * r) {
+			} else if (distanceToRotationCircle <= hud.r * hud.r) {
 				clickedOn = CLICKED_ON_ROTATION_CIRCLE;
 
-			} else if (distanceToMoveCircle <= r * r) {
+			} else if (distanceToMoveCircle <= hud.r * hud.r) {
 				clickedOn = CLICKED_ON_MOVE_CIRCLE;
 
-			} else if (distanceToRotationFoci <= r * 3f) {
+			} else if (distanceToRotationFoci <= hud.r * 3f) {
 				clickedOn = CLICKED_ON_ROTATION_ELLIPSE;
 
-			} else if (distanceToMoveFoci <= r * 3f) {
+			} else if (distanceToMoveFoci <= hud.r * 3f) {
 				clickedOn = CLICKED_ON_MOVE_ELLIPSE;
 
 			} else {
 				renderer.veinsGrabbedAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
-				renderer.setAddedModelOrientation(new Quaternion());
-
+				// renderer.setAddedModelOrientation(new Quaternion());
 				if (renderer.veinsGrabbedAt != null)
 					clickedOn = CLICKED_ON_VEINS_MODEL;
 			}
 		}
-
-		return clickedOn;
 	}
 
 	public void exitProgram(int n) {
