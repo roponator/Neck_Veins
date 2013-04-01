@@ -66,6 +66,10 @@ import si.uni_lj.fri.veins3D.math.Vector;
 import si.uni_lj.fri.veins3D.utils.RayUtil;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 
+/**
+ * @author Anze
+ * 
+ */
 public class VeinsRenderer extends LWJGLRenderer {
 	public static final int FIXED_PIPELINE = -1;
 	public static final int SIMPLE_SHADER = 0;
@@ -159,6 +163,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 		if (veinsModel != null) {
 			glMatrixMode(GL_MODELVIEW);
 			glPushMatrix();
+
 			Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentModelOrientation,
 					addedModelOrientation);
 			FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
@@ -178,7 +183,9 @@ public class VeinsRenderer extends LWJGLRenderer {
 			glMaterial(GL_FRONT, GL_DIFFUSE, allocFloats(new float[] { 0.8f, 0.06667f, 0.0f, 1 }));
 			glMaterial(GL_FRONT, GL_SPECULAR, allocFloats(new float[] { 0.66f, 0.66f, 0.66f, 1f }));
 			glMaterial(GL_FRONT, GL_SHININESS, allocFloats(new float[] { 100f, 256.0f, 256.0f, 256.0f }));
+
 			veinsModel.render();
+
 			GL20.glUseProgram(0);
 			glPopMatrix();
 		}
@@ -285,24 +292,12 @@ public class VeinsRenderer extends LWJGLRenderer {
 		return cam;
 	}
 
-	public void setVeinsModel(VeinsModel veinsModel) {
-		this.veinsModel = veinsModel;
-	}
-
 	public VeinsModel getVeinsModel() {
 		return veinsModel;
 	}
 
 	public void setActiveShaderProgram(int shaderProgram) {
 		activeShaderProgram = shaderProgram;
-	}
-
-	public int getActiveShaderProgram() {
-		return activeShaderProgram;
-	}
-
-	public boolean isWireframeOn() {
-		return isWireframeOn;
 	}
 
 	public void switchWireframe() {
@@ -316,22 +311,6 @@ public class VeinsRenderer extends LWJGLRenderer {
 
 	public void switchAA() {
 		isAAEnabled = !isAAEnabled;
-	}
-
-	public boolean isAAEnabled() {
-		return isAAEnabled;
-	}
-
-	public Quaternion getCurrentModelOrientation() {
-		return currentModelOrientation;
-	}
-
-	public Quaternion getAddedModelOrientation() {
-		return addedModelOrientation;
-	}
-
-	public void setCurrentModelOrientation(Quaternion q) {
-		currentModelOrientation = q;
 	}
 
 	public void setAddedModelOrientation(Quaternion q) {
@@ -365,6 +344,93 @@ public class VeinsRenderer extends LWJGLRenderer {
 
 	public void saveCurrentModelOrientation() {
 		currentModelOrientation = Quaternion.quaternionMultiplication(currentModelOrientation, addedModelOrientation);
+	}
+
+	/**
+	 * Loads the model and sets model orientation, camera position and screen
+	 * planes
+	 * 
+	 * @param fileName
+	 */
+	public void loadModel(String fileName) {
+		// The smaller angle of view of the horizontal and vertical ones.
+		double fovMin = (VeinsWindow.settings.resWidth < VeinsWindow.settings.resHeight) ? FOV_Y
+				* VeinsWindow.settings.resWidth / (double) VeinsWindow.settings.resHeight : FOV_Y;
+		fovMin = Math.toRadians(fovMin); // Math.PI * fovMin / 180
+
+		veinsModel = new VeinsModel(fileName);
+		double d1 = calculateCameraDistance(veinsModel);
+
+		setCameraPositionAndOrientation(d1, fovMin);
+		setScreenPlanes(d1, fovMin);
+		setModelOrientation();
+
+		veinsRadius = d1 / Math.sqrt(2);
+		veinsGrabbedAt = null;
+
+	}
+
+	/**
+	 * Calculate the appropriate camera distance: The following code takes the
+	 * most extreme values on each coordinate of all the specified vertices in
+	 * the VeinsModel (from .obj file). It uses the bigger distance (of two)
+	 * from the average location on each axis to calculate the radius of a
+	 * circle that would surely enclose every vertex, although allowing the
+	 * radius to be slightly bigger than necessary.
+	 * 
+	 * @param veinsModel
+	 * @return
+	 */
+	private double calculateCameraDistance(VeinsModel veinsModel) {
+		double d1 = veinsModel.minX - veinsModel.centerx;
+		double d2 = veinsModel.maxX - veinsModel.centerx;
+		double d3 = veinsModel.minY - veinsModel.centery;
+		double d4 = veinsModel.maxY - veinsModel.centery;
+		double d5 = veinsModel.minZ - veinsModel.centerz;
+		double d6 = veinsModel.maxZ - veinsModel.centerz;
+		d1 *= d1;
+		d2 *= d2;
+		d3 *= d3;
+		d4 *= d4;
+		d5 *= d5;
+		d6 *= d6;
+		d1 = Math.max(d1, d2);
+		d2 = Math.max(d3, d4);
+		d3 = Math.max(d5, d6);
+		d1 = Math.sqrt(Math.max(Math.max(d1 + d2, d2 + d3), d1 + d3));
+
+		return d1;
+	}
+
+	private void setCameraPositionAndOrientation(double d1, double fovMin) {
+		cam.cameraZ = (float) (d1 / Math.tan(fovMin / 2));
+		cam.cameraX = 0;
+		cam.cameraY = 0;
+		cam.cameraOrientation = new Quaternion();
+	}
+
+	private void setScreenPlanes(double d1, double fovMin) {
+		double yAngle = Math.PI * FOV_Y / 360d;
+		double xAngle = yAngle * (double) VeinsWindow.settings.resWidth / (double) VeinsWindow.settings.resHeight;
+		double screenPlaneZ = -d1 / Math.tan(fovMin / 2);
+		double screenPlaneY = Math.tan(yAngle) * (-screenPlaneZ);
+		double screenPlaneX = Math.tan(xAngle) * (-screenPlaneZ);
+
+		screenPlaneInitialUpperLeft = new double[] { -screenPlaneX, screenPlaneY, screenPlaneZ };
+		screenPlaneInitialUpperRight = new double[] { screenPlaneX, screenPlaneY, screenPlaneZ };
+		screenPlaneInitialLowerLeft = new double[] { -screenPlaneX, -screenPlaneY, screenPlaneZ };
+		screenPlaneInitialLowerRight = new double[] { screenPlaneX, -screenPlaneY, screenPlaneZ };
+
+	}
+
+	private void setModelOrientation() {
+		double angle1 = Math.PI * -90 / 180;
+		double angle2 = Math.PI * 180 / 180;
+		currentModelOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle1, new double[] { 1, 0, 0 });
+		double[] v = Quaternion.quaternionReciprocal(currentModelOrientation).rotateVector3d(new double[] { 0, 1, 0 });
+		currentModelOrientation = Quaternion.quaternionMultiplication(currentModelOrientation,
+				Quaternion.quaternionFromAngleAndRotationAxis(angle2, v));
+		addedModelOrientation = new Quaternion();
 	}
 
 }
