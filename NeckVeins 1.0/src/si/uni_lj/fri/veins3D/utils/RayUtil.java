@@ -8,18 +8,16 @@ import si.uni_lj.fri.veins3D.math.Vector;
 public class RayUtil {
 
 	/**
-	 * 
 	 * @param x
 	 * @param y
-	 * @param cam
-	 * @param veinsRadius
+	 * @param renderer
 	 * @return
 	 */
 	public static double[] getRaySphereIntersection(int x, int y, VeinsRenderer renderer) {
 		// figure out if the click on the screen intersects the circle that
 		// surrounds the veins model
 		Camera cam = renderer.getCamera();
-		double veinsRadius = renderer.veinsRadius;
+		double veinsRadius = renderer.getVeinsModel().veinsGrabRadius;
 
 		// get the direction of the "ray" cast from the camera location
 		double[] d = getRayDirection(x, y, renderer);
@@ -55,14 +53,12 @@ public class RayUtil {
 	}
 
 	/**
-	 * TODO screenPlane
-	 * 
 	 * @param x
 	 * @param y
-	 * @param cam
+	 * @param renderer
 	 * @return
 	 */
-	public static double[] getRayDirection(int x, int y, VeinsRenderer renderer) {
+	private static double[] getRayDirection(int x, int y, VeinsRenderer renderer) {
 		Camera cam = renderer.getCamera();
 		double[] tempUpperLeft = cam.cameraOrientation.rotateVector3d(renderer.screenPlaneInitialUpperLeft);
 		double[] tempLowerLeft = cam.cameraOrientation.rotateVector3d(renderer.screenPlaneInitialLowerLeft);

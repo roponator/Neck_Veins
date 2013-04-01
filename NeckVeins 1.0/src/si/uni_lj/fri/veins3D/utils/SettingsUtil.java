@@ -11,9 +11,9 @@ import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
 
 public class SettingsUtil {
 
-	public static void saveSettings(NeckVeinsSettings settings, String title) {
+	public static void writeSettingsFile(NeckVeinsSettings settings, String fileName) {
 		boolean saveSuccesful = false;
-		String saveFileName = title + ".save";
+		String saveFileName = fileName + ".save";
 		try {
 			FileOutputStream fos = new FileOutputStream(saveFileName, false);
 			try {
@@ -31,10 +31,10 @@ public class SettingsUtil {
 	}
 
 	@SuppressWarnings("resource")
-	public static NeckVeinsSettings loadSettings(String title) {
+	public static NeckVeinsSettings readSettingsFile(String fileName) {
 		NeckVeinsSettings settings = null;
 		boolean loadSuccesful = false;
-		String saveFileName = title + ".save";
+		String saveFileName = fileName + ".save";
 		try {
 			FileInputStream fis = new FileInputStream(saveFileName);
 			ObjectInputStream saveInStream = new ObjectInputStream(fis);

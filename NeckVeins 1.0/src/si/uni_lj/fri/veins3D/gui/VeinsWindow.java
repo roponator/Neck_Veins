@@ -57,7 +57,7 @@ public class VeinsWindow extends Container {
 	public VeinsWindow() {
 		isRunning = true;
 		title = "Veins3D";
-		loadSettings();
+		loadSettings(title);
 		createDisplay();
 		initWindowElements();
 		setupWindow();
@@ -66,10 +66,10 @@ public class VeinsWindow extends Container {
 	/**
 	 * @param title
 	 */
-	public VeinsWindow(String title) {
+	public VeinsWindow(String title, String fileName) {
 		isRunning = true;
 		this.title = title;
-		// loadSettings();
+		loadSettings(fileName);
 		createDisplay();
 		initWindowElements();
 		setupWindow();
@@ -78,12 +78,12 @@ public class VeinsWindow extends Container {
 	/**
 	 * 
 	 */
-	private void loadSettings() {
+	private void loadSettings(String fileName) {
 		try {
 			displayModes = Display.getAvailableDisplayModes();
 			// displayModeStrings = new String[displayModes.length];
 			currentDisplayMode = Display.getDesktopDisplayMode();
-			settings = SettingsUtil.loadSettings(title);
+			settings = SettingsUtil.readSettingsFile(fileName);
 			if (settings != null) {
 				for (DisplayMode mode : displayModes) {
 					if (mode.getWidth() == settings.resWidth && mode.getHeight() == settings.resHeight
@@ -209,8 +209,8 @@ public class VeinsWindow extends Container {
 			timePastFps = time;
 			renderer.getCamera().normalizeCameraOrientation();
 			if (renderer.getVeinsModel() != null) {
-				renderer.normalizeAddedModelOrientation();
-				renderer.normalizeCurrentModelOrientation();
+				renderer.getVeinsModel().normalizeAddedOrientation();
+				renderer.getVeinsModel().normalizeCurrentOrientation();
 			}
 		}
 		timePastFrame = time;
@@ -263,9 +263,9 @@ public class VeinsWindow extends Container {
 					renderer.setActiveShaderProgram(VeinsRenderer.FIXED_PIPELINE);
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_9) {
 					renderer.switchWireframe();
-				} else if (Keyboard.getEventKey() == Keyboard.KEY_ADD) {
+				} else if (Keyboard.getEventKey() == Keyboard.KEY_ADD && renderer.getVeinsModel() != null) {
 					renderer.getVeinsModel().increaseSubdivisionDepth();
-				} else if (Keyboard.getEventKey() == Keyboard.KEY_SUBTRACT) {
+				} else if (Keyboard.getEventKey() == Keyboard.KEY_SUBTRACT && renderer.getVeinsModel() != null) {
 					renderer.getVeinsModel().decreaseSubdivisionDepth();
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_9) {
 					renderer.switchAA();
@@ -331,7 +331,7 @@ public class VeinsWindow extends Container {
 			calculateClickedOn();
 
 			if (clickedOn == CLICKED_ON_VEINS_MODEL) {
-				renderer.addModelOrientation();
+				renderer.getVeinsModel().changeAddedOrientation(renderer);
 			}
 
 			if (clickedOn == CLICKED_ON_ROTATION_CIRCLE || clickedOn == CLICKED_ON_MOVE_CIRCLE) {
@@ -378,15 +378,16 @@ public class VeinsWindow extends Container {
 
 		} else {
 			clickedOn = CLICKED_ON_NOTHING;
-			renderer.veinsGrabbedAt = null;
-			renderer.saveCurrentModelOrientation();
-			renderer.setAddedModelOrientation(new Quaternion());
+			renderer.getVeinsModel().veinsGrabbedAt = null;
+			renderer.getVeinsModel().saveCurrentOrientation();
+			renderer.getVeinsModel().setAddedOrientation(new Quaternion());
 		}
 
 	}
 
 	/**
-	 * 
+	 * Calculates on which element mouse click was performed - on HUD element or
+	 * on veins model
 	 */
 	private void calculateClickedOn() {
 		float distanceToRotationCircle = (hud.x1 - Mouse.getX()) * (hud.x1 - Mouse.getX()) + (hud.y1 - Mouse.getY())
@@ -421,9 +422,11 @@ public class VeinsWindow extends Container {
 				clickedOn = CLICKED_ON_MOVE_ELLIPSE;
 
 			} else {
-				renderer.veinsGrabbedAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
-				// renderer.setAddedModelOrientation(new Quaternion());
-				if (renderer.veinsGrabbedAt != null)
+				renderer.getVeinsModel().veinsGrabbedAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(),
+						renderer);
+				// renderer.getVeinsModel().setAddedOrientation(new
+				// Quaternion());
+				if (renderer.getVeinsModel().veinsGrabbedAt != null)
 					clickedOn = CLICKED_ON_VEINS_MODEL;
 			}
 		}
@@ -433,7 +436,7 @@ public class VeinsWindow extends Container {
 	 * @param n
 	 */
 	public void exitProgram(int n) {
-		SettingsUtil.saveSettings(settings, title);
+		SettingsUtil.writeSettingsFile(settings, title);
 		renderer.cleanShaders();
 		gui.destroy();
 		if (themeManager != null)

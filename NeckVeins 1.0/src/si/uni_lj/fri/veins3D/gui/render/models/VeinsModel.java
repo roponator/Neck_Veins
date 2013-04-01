@@ -13,9 +13,18 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+
+import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
+import si.uni_lj.fri.veins3D.math.Quaternion;
+import si.uni_lj.fri.veins3D.math.Vector;
+import si.uni_lj.fri.veins3D.utils.RayUtil;
 
 /**
  * @author Simon Žagar
@@ -24,7 +33,7 @@ import java.util.StringTokenizer;
  */
 public class VeinsModel {
 	private final int APLICATION_SUBDIVISION_LIMIT = 3;
-	
+
 	protected ArrayList<Float> vertices;
 	protected ArrayList<Mesh> meshes;
 	public double centerx, centery, centerz;
@@ -32,14 +41,18 @@ public class VeinsModel {
 	public float minX, minY, minZ;
 	private int numberOfSubdivisions = 0;
 	private int maxSubDepth = 0;
-	
-	
+
+	private Quaternion currentOrientation;
+	private Quaternion addedOrientation;
+
+	public double[] veinsGrabbedAt;
+	public double veinsGrabRadius;
+
 	public VeinsModel(String filepath) {
 		constructVBOFromFile(filepath);
+		setDefaultOrientation();
 	}
 
-	
-	
 	public void constructVBOFromFile(String filepath) {
 		vertices = new ArrayList<Float>();
 		centerx = 0;
@@ -51,9 +64,9 @@ public class VeinsModel {
 		minX = Float.MAX_VALUE;
 		minY = Float.MAX_VALUE;
 		minZ = Float.MAX_VALUE;
-		
+
 		float x, y, z;
-		
+
 		// meshes variables
 		meshes = new ArrayList<Mesh>();
 		ArrayList<Integer> tempFaces = new ArrayList<Integer>();
@@ -141,7 +154,7 @@ public class VeinsModel {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		
+
 		// The file has been read.
 		centerx /= (vertices.size() / 3);
 		centery /= (vertices.size() / 3);
@@ -151,7 +164,7 @@ public class VeinsModel {
 			mesh.constructVBO();
 		}
 	}
-	
+
 	public void increaseSubdivisionDepth() {
 		numberOfSubdivisions = Math.min(APLICATION_SUBDIVISION_LIMIT, numberOfSubdivisions + 1);
 		if (maxSubDepth < numberOfSubdivisions) {
@@ -172,14 +185,69 @@ public class VeinsModel {
 	public void render() {
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
-		
+
+		/* Calculate orientation (add rotations) */
+		Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
+		FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
+		GL11.glMultMatrix(fb);
+
 		/* Translate and render */
 		glTranslatef(-(float) centerx, -(float) centery, -(float) centerz);
 		for (Mesh vbo : meshes) {
 			vbo.render(numberOfSubdivisions);
 		}
-		
+
 		glPopMatrix();
+	}
+
+	/**
+	 * Change added orientation (rotations) of the model
+	 */
+	public void changeAddedOrientation(VeinsRenderer renderer) {
+		double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
+		if (veinsHeldAt != null) {
+			double[] rotationAxis = Vector.crossProduct(veinsGrabbedAt, veinsHeldAt);
+			if (Vector.length(rotationAxis) > 0) {
+				rotationAxis = Vector.normalize(rotationAxis);
+				rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
+				double angle = Math.acos(Vector.dotProduct(veinsGrabbedAt, veinsHeldAt)
+						/ (Vector.length(veinsGrabbedAt) * Vector.length(veinsHeldAt)));
+				addedOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle, rotationAxis);
+			}
+		}
+	}
+
+	private void setDefaultOrientation() {
+		double angle1 = Math.toRadians(-90); // Math.PI * -90 / 180;
+		double angle2 = Math.toRadians(180); // Math.PI * 180 / 180;
+		currentOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle1, new double[] { 1, 0, 0 });
+		double[] v = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(new double[] { 0, 1, 0 });
+		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation,
+				Quaternion.quaternionFromAngleAndRotationAxis(angle2, v));
+		addedOrientation = new Quaternion();
+	}
+
+	public void normalizeCurrentOrientation() {
+		currentOrientation = Quaternion.quaternionNormalization(currentOrientation);
+	}
+
+	public void normalizeAddedOrientation() {
+		addedOrientation = Quaternion.quaternionNormalization(addedOrientation);
+	}
+
+	/**
+	 * Saves the current orientation of the model in currenOrientation
+	 */
+	public void saveCurrentOrientation() {
+		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
+	}
+
+	public void setCurrentOrientation(Quaternion q) {
+		currentOrientation = q;
+	}
+
+	public void setAddedOrientation(Quaternion q) {
+		addedOrientation = q;
 	}
 
 }
