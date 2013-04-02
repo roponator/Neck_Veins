@@ -49,8 +49,8 @@ public class HUD {
 	private int clickedOn;
 
 	public int ellipseSide = 0;
-	public float rotationCircleAngle = 0;
-	public float rotationCircleDistance = 0;
+	public float clickOnCircleAngle = 0;
+	public float clickToCircleDistance = 0;
 
 	/* Position and size */
 	private float lastWindowWidth;
@@ -259,10 +259,10 @@ public class HUD {
 
 		glPushMatrix();
 		glTranslatef(x, y, 0);
-		glRotatef((float) (180 * rotationCircleAngle / Math.PI), 0, 0, 1);
+		glRotatef((float) (180 * clickOnCircleAngle / Math.PI), 0, 0, 1);
 		glTranslatef(-x, -y, 0);
 		GL11.glBindTexture(GL_TEXTURE_2D, circleGlow.getTextureID());
-		glColor4f(1, 1, 1, (float) rotationCircleDistance);
+		glColor4f(1, 1, 1, (float) clickToCircleDistance);
 		glBegin(GL_QUADS);
 		glTexCoord2f(1, 0);
 		glVertex3f(x + r, y + r, -0.4f);

@@ -1,6 +1,7 @@
 package si.uni_lj.fri.veins3D.gui;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
@@ -98,6 +99,7 @@ public class VeinsWindow extends Container {
 				settings.fullscreen = true;
 				settings.stereoEnabled = false;
 				settings.stereoValue = 0;
+				settings.locale = Locale.getDefault();
 			}
 			settings.resWidth = currentDisplayMode.getWidth();
 			settings.resHeight = currentDisplayMode.getHeight();
@@ -269,6 +271,12 @@ public class VeinsWindow extends Container {
 					renderer.getVeinsModel().decreaseSubdivisionDepth();
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_9) {
 					renderer.switchAA();
+				} else if (Keyboard.getEventKey() == Keyboard.KEY_L) {
+					if (settings.locale.getLanguage().equals("sl"))
+						settings.locale = new Locale("en", "US");
+					else
+						settings.locale = new Locale("sl", "SI");
+					frame.setLanguageSpecific();
 				}
 			}
 		}
@@ -345,8 +353,8 @@ public class VeinsWindow extends Container {
 				float rightRotation = (Mouse.getX() - x)
 						/ ((clickToCircleDistance > hud.r) ? clickToCircleDistance : hud.r);
 
-				hud.rotationCircleDistance = Math.min(clickToCircleDistance, hud.r) / hud.r;
-				hud.rotationCircleAngle = (float) Math.atan2(Mouse.getY() - y, Mouse.getX() - x);
+				hud.clickToCircleDistance = Math.min(clickToCircleDistance, hud.r) / hud.r;
+				hud.clickOnCircleAngle = (float) Math.atan2(Mouse.getY() - y, Mouse.getX() - x);
 
 				if (clickedOn == CLICKED_ON_ROTATION_CIRCLE) {
 					renderer.getCamera().rotate(upRotation, rightRotation);

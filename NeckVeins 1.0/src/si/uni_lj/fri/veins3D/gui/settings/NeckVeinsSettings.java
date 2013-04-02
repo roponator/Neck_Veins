@@ -1,6 +1,7 @@
 package si.uni_lj.fri.veins3D.gui.settings;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 public class NeckVeinsSettings implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -12,4 +13,5 @@ public class NeckVeinsSettings implements Serializable {
 	public boolean fullscreen;
 	public boolean stereoEnabled;
 	public int stereoValue;
+	public Locale locale;
 }

@@ -178,15 +178,11 @@ public class VeinsModel {
 		numberOfSubdivisions = Math.max(0, numberOfSubdivisions - 1);
 	}
 
-	/**
-	 * @since 0.2
-	 * @version 0.4
-	 */
 	public void render() {
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 
-		/* Calculate orientation (add rotations) */
+		/* Apply orientation (add rotations) */
 		Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
 		FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
 		GL11.glMultMatrix(fb);

@@ -1,13 +1,13 @@
 package si.uni_lj.fri.veins3D.gui;
 
 import java.io.File;
+import java.util.ResourceBundle;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
-import tmp.CreditsAndHelpTMP;
 import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.FileSelector;
 import de.matthiasmann.twl.FileSelector.Callback;
@@ -48,6 +48,7 @@ public class VeinsFrame extends Widget {
 	public VeinsFrame() throws LWJGLException {
 		getDisplayModes();
 		initGUI();
+		setLanguageSpecific();
 		setTheme("mainframe");
 	}
 
@@ -207,8 +208,8 @@ public class VeinsFrame extends Widget {
 	private void initTextArea() {
 		helpTextArea = new TextArea();
 		helpTextArea.setTheme("textarea");
-		stamHelp = new SimpleTextAreaModel(CreditsAndHelpTMP.helpString);
-		stamCredits = new SimpleTextAreaModel(CreditsAndHelpTMP.creditsString);
+		stamHelp = new SimpleTextAreaModel();
+		stamCredits = new SimpleTextAreaModel();
 		helpTextArea.setModel(stamHelp);
 
 		helpScrollPane = new ScrollPane();
@@ -475,6 +476,40 @@ public class VeinsFrame extends Widget {
 		helpScrollPane.setSize(rlWidth, fsHeight);
 		helpScrollPane.setPosition(VeinsWindow.settings.resWidth / 2 - rlWidth / 2, VeinsWindow.settings.resHeight / 6);
 		helpTextArea.setSize(rlWidth, fsHeight);
+	}
+
+	public void setLanguageSpecific() {
+		ResourceBundle labels = ResourceBundle.getBundle("inter/LabelsBundle", VeinsWindow.settings.locale);
+
+		openButton.setText(labels.getString("openBtnLabel"));
+		openButton.setTooltipContent(labels.getString("openBtnTooltip"));
+
+		exitButton.setText(labels.getString("exitBtnLabel"));
+		exitButton.setTooltipContent(labels.getString("exitBtnTooltip"));
+
+		stereoScrollbar.setTooltipContent(labels.getString("stereoScrollbarTooltip"));
+		stereoToggleButton.setText(labels.getString("stereoBtnLabel"));
+		stereoToggleButton.setTooltipContent(labels.getString("stereoBtnTooltip"));
+
+		helpButton.setText(labels.getString("helpBtnLabel"));
+		helpButton.setTooltipContent(labels.getString("helpBtnTooltip"));
+		creditsButton.setText(labels.getString("creditsBtnLabel"));
+		creditsButton.setTooltipContent(labels.getString("creditsBtnTooltip"));
+
+		displayModesButton.setText(labels.getString("displayModesBtnLabel"));
+		displayModesButton.setTooltipContent(labels.getString("displayModesBtnTooltip"));
+
+		okayVideoSettingButton.setText(labels.getString("okayBtnLabel"));
+		cancelVideoSettingButton.setText(labels.getString("cancelBtnLabel"));
+		fullscreenToggleButton.setText(labels.getString("fullscreenBtnLabel"));
+
+		ResourceBundle credits = ResourceBundle.getBundle("inter/Credits", VeinsWindow.settings.locale);
+		ResourceBundle help = ResourceBundle.getBundle("inter/Help", VeinsWindow.settings.locale);
+
+		stamHelp.setText(help.getString("help"));
+		stamCredits.setText(credits.getString("credits"));
+
+		ResourceBundle.clearCache();
 	}
 
 	public boolean isDialogOpened() {
