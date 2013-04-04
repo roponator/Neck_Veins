@@ -137,9 +137,22 @@ public class Camera {
 		cameraY += (float) rotateVector[1];
 		cameraZ += (float) rotateVector[2];
 	}
-
+	public void moveCamera3D(double[] axis, double[] rot){
+		axis=cameraOrientation.rotateVector3d(axis);
+        cameraX+=(float)axis[0];
+        cameraY-=(float)axis[2];
+        cameraZ+=(float)axis[1];
+		
+        Quaternion addRotation = Quaternion.quaternionFromAngleAndRotationAxis(rot[0], X_POSITIVE_AXIS);
+		cameraOrientation = Quaternion.quaternionMultiplication(cameraOrientation, addRotation);
+		addRotation = Quaternion.quaternionFromAngleAndRotationAxis(rot[2], Y_NEGATIVE_AXIS);
+		cameraOrientation = Quaternion.quaternionMultiplication(cameraOrientation, addRotation);
+		/* REMOVE IF LEANING OF CAMERA NEEDED
+		addRotation = Quaternion.quaternionFromAngleAndRotationAxis(rot[1], Z_POSITIVE_AXIS);
+		cameraOrientation = Quaternion.quaternionMultiplication(cameraOrientation, addRotation);
+		*/
+	}
 	public void normalizeCameraOrientation() {
 		cameraOrientation = Quaternion.quaternionNormalization(cameraOrientation);
 	}
-
 }

@@ -16,6 +16,7 @@ import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
 import si.uni_lj.fri.veins3D.math.Quaternion;
+import si.uni_lj.fri.veins3D.utils.Mouse3D;
 import si.uni_lj.fri.veins3D.utils.RayUtil;
 import si.uni_lj.fri.veins3D.utils.SettingsUtil;
 import de.matthiasmann.twl.Container;
@@ -51,7 +52,7 @@ public class VeinsWindow extends Container {
 	private ThemeManager themeManager;
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
-
+	private Mouse3D joystick;
 	/**
 	 * 
 	 */
@@ -177,6 +178,7 @@ public class VeinsWindow extends Container {
 		timePastFps = timePastFrame;
 		fpsToDisplay = 0;
 		renderer.setupView();
+		joystick=new Mouse3D();
 		while (!Display.isCloseRequested() && isRunning) {
 			/* Reset view */
 			renderer.resetView();
@@ -234,6 +236,7 @@ public class VeinsWindow extends Container {
 	public void pollInput() {
 		pollKeyboardInput();
 		pollMouseInput();
+		poll3DMouseInput();
 	}
 
 	/**
@@ -392,7 +395,17 @@ public class VeinsWindow extends Container {
 		}
 
 	}
-
+	private void poll3DMouseInput(){
+		joystick.pollMouse();
+		if(joystick.connected()&&renderer.getVeinsModel()!=null){
+			if(joystick.selected)
+				renderer.getCamera().moveCamera3D(joystick.getAxis(), joystick.getRot());
+			else{
+				renderer.getCamera().moveCamera3D(new double[] {-joystick.getAxisX(),-joystick.getAxisY(),-joystick.getAxisZ()}, new double[]{0,0,0});
+				renderer.getVeinsModel().rotateModel3D(joystick.getRot());
+			}
+		}
+	}
 	/**
 	 * Calculates on which element mouse click was performed - on HUD element or
 	 * on veins model

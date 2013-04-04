@@ -10,7 +10,7 @@ public class Mouse3D {
         private int sensitivity=100; // 1-200
         private double[] axis=new double[3];
         private double[] rotate=new double[3];
-        public boolean connected,axisLock,rotLock,strong,selected=true;//CAMERA OR OBJECT
+        public boolean connected,axisLock,rotLock,strong,selected;//CAMERA OR OBJECT
         
         public Mouse3D(){
             for (Controller c : ControllerEnvironment.getDefaultEnvironment().getControllers()) {
@@ -85,7 +85,32 @@ public class Mouse3D {
         	rotate[2]=rotZ/(sensitivity*100);
         	return rotate;
         }
-        public String getName(){
+        
+        public float getAxisX() {
+			return axisX/(sensitivity);
+		}
+
+		public float getAxisY() {
+			return axisY/(sensitivity);
+		}
+
+		public float getAxisZ() {
+			return axisZ/(sensitivity);
+		}
+
+		public float getRotX() {
+			return rotX/(sensitivity*100);
+		}
+
+		public float getRotY() {
+			return rotY/(sensitivity*100);
+		}
+
+		public float getRotZ() {
+			return rotZ/(sensitivity*100);
+		}
+
+		public String getName(){
             return controller.getName();
         }
         public String toString(){
@@ -97,5 +122,4 @@ public class Mouse3D {
         public void setSensitivity(int sensitivity) {
             this.sensitivity=201-sensitivity;
         }
-
 }
