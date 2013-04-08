@@ -14,4 +14,9 @@ public class NeckVeinsSettings implements Serializable {
 	public boolean stereoEnabled;
 	public int stereoValue;
 	public Locale locale;
+	public boolean mTrans;
+	public boolean mRot;
+	public boolean mSelected;
+	public boolean mStrong;
+    public int sensitivity=100;
 }

@@ -52,7 +52,7 @@ public class VeinsWindow extends Container {
 	private ThemeManager themeManager;
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
-	private Mouse3D joystick;
+	public static Mouse3D joystick;
 	/**
 	 * 
 	 */
@@ -76,7 +76,17 @@ public class VeinsWindow extends Container {
 		initWindowElements();
 		setupWindow();
 	}
-
+	/**
+	 * 
+	 */
+	/*private void setMouseSettings(NeckVeinsSettings settings){
+			joystick.rotLock=settings.mRot;
+	        joystick.axisLock=settings.mTrans;
+	        joystick.strong=settings.mStrong;
+	        joystick.selected=settings.mSelected;
+	        joystick.setSensitivity(settings.sensitivity);
+    }*/
+	
 	/**
 	 * 
 	 */
@@ -94,6 +104,7 @@ public class VeinsWindow extends Container {
 						currentDisplayMode = mode;
 					}
 				}
+				//setMouseSettings(settings);
 			} else {
 				settings = new NeckVeinsSettings();
 				settings.isFpsShown = false;
@@ -138,6 +149,7 @@ public class VeinsWindow extends Container {
 			gui = new GUI(frame, renderer);
 			add(gui);
 			setTheme("mainframe");
+			joystick=new Mouse3D(settings);
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 			exitProgram(1);
@@ -178,7 +190,6 @@ public class VeinsWindow extends Container {
 		timePastFps = timePastFrame;
 		fpsToDisplay = 0;
 		renderer.setupView();
-		joystick=new Mouse3D();
 		while (!Display.isCloseRequested() && isRunning) {
 			/* Reset view */
 			renderer.resetView();
@@ -396,9 +407,10 @@ public class VeinsWindow extends Container {
 
 	}
 	private void poll3DMouseInput(){
-		joystick.pollMouse();
+		
 		if(joystick.connected()&&renderer.getVeinsModel()!=null){
-			if(joystick.selected)
+			joystick.pollMouse();
+			if(settings.mSelected)
 				renderer.getCamera().moveCamera3D(joystick.getAxis(), joystick.getRot());
 			else{
 				renderer.getCamera().moveCamera3D(new double[] {-joystick.getAxisX(),-joystick.getAxisY(),-joystick.getAxisZ()}, new double[]{0,0,0});

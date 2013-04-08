@@ -44,6 +44,14 @@ public class VeinsFrame extends Widget {
 	private String[] displayModeStrings;
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
+	//3Dmouse
+    private static ToggleButton mouse3d;
+    private Scrollbar sensitivityScrollbar;
+    private ToggleButton strong;
+    private ToggleButton lockRot;
+    private ToggleButton lockTrans;
+    private Button camObj;
+	
 
 	public VeinsFrame() throws LWJGLException {
 		getDisplayModes();
@@ -69,6 +77,7 @@ public class VeinsFrame extends Widget {
 		initDisplayModesButton();
 		initVideoSettingsButtons();
 		initDisplayModeListBox();
+		init3DmouseButtons();
 	}
 
 	private void initFileSelector() {
@@ -329,6 +338,84 @@ public class VeinsFrame extends Widget {
 		if (selectedResolution != -1)
 			displayModeListBox.setSelected(selectedResolution);
 	}
+	
+	private void init3DmouseButtons() {
+        mouse3d = new ToggleButton("3d Mouse");
+        mouse3d.setTheme("togglebutton");
+        mouse3d.setTooltipContent("3d Mouse settings");
+        mouse3d.addCallback(new Runnable(){
+           public void run(){
+        	   mouse3d.setEnabled(VeinsWindow.joystick.connected());
+               mouseSettingsVisible(mouse3d.isActive()&&mouse3d.isEnabled());
+           }
+        });
+        add(mouse3d);
+		
+		sensitivityScrollbar = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
+        sensitivityScrollbar.setTheme("hscrollbar");
+        sensitivityScrollbar.setTooltipContent("Sets the sensitivity of the mouse.");
+        sensitivityScrollbar.setMinMaxValue(1, 200);
+        sensitivityScrollbar.setValue(201-VeinsWindow.settings.sensitivity);
+        sensitivityScrollbar.addCallback(new Runnable(){
+            public void run(){
+            	VeinsWindow.settings.sensitivity=(201-sensitivityScrollbar.getValue());
+            }
+        });
+        add(sensitivityScrollbar);
+        
+        
+        
+        if(VeinsWindow.settings.mSelected) camObj = new Button("Camera active");
+        else  camObj = new Button("Object active");
+        camObj.setTheme("button");
+        camObj.setTooltipContent("Toggle between camera or object");
+        camObj.addCallback(new Runnable(){
+           public void run(){
+               if(VeinsWindow.settings.mSelected){
+            	   VeinsWindow.settings.mSelected=false;
+                   camObj.setText("Object active");
+               }else{
+            	   VeinsWindow.settings.mSelected=true;
+                   camObj.setText("Camera active");
+               }
+           }
+        });
+        add(camObj);
+        
+        strong = new ToggleButton("Strong axis");
+        strong.setActive(VeinsWindow.settings.mStrong);
+        strong.setTheme("togglebutton");
+        strong.setTooltipContent("React only on strong axis of the mouse");
+        strong.addCallback(new Runnable(){
+           public void run(){
+        	   VeinsWindow.settings.mStrong=strong.isActive();
+           }
+        });
+        add(strong);
+        
+        lockRot = new ToggleButton("Rotations");
+        lockRot.setActive(VeinsWindow.settings.mRot);
+        lockRot.setTheme("togglebutton");
+        lockRot.setTooltipContent("Locks rotational axis");
+        lockRot.addCallback(new Runnable(){
+           public void run(){
+        	   VeinsWindow.settings.mRot=lockRot.isActive();
+           }
+        });
+        add(lockRot);
+        
+        lockTrans = new ToggleButton("Translations");
+        lockTrans.setActive(VeinsWindow.settings.mTrans);
+        lockTrans.setTheme("togglebutton");
+        lockTrans.setTooltipContent("Locks translationals axis");
+        lockTrans.addCallback(new Runnable(){
+           public void run(){
+        	   VeinsWindow.settings.mTrans=lockTrans.isActive();
+           }
+        });
+        add(lockTrans);
+		
+	}
 
 	public void setButtonsEnabled(boolean enabled) {
 		isDialogOpened = enabled;
@@ -337,7 +424,13 @@ public class VeinsFrame extends Widget {
 		helpButton.setEnabled(enabled);
 		creditsButton.setEnabled(enabled);
 	}
-
+	public void mouseSettingsVisible(boolean visible){
+	    strong.setVisible(visible);
+	    lockRot.setVisible(visible);
+	    lockTrans.setVisible(visible);
+	    camObj.setVisible(visible);
+	    sensitivityScrollbar.setVisible(visible);
+	}
 	/**
 	 * @since 0.4
 	 * @version 0.4
@@ -414,35 +507,56 @@ public class VeinsFrame extends Widget {
 		helpButton.adjustSize();
 		creditsButton.adjustSize();
 		exitButton.adjustSize();
+	    mouse3d.adjustSize();
+        strong.adjustSize();
+        lockRot.adjustSize();
+        lockTrans.adjustSize();
+        
 		int openHeight = Math.max(25, VeinsWindow.settings.resHeight / 18);
-		int widthBy6 = VeinsWindow.settings.resWidth / 6 + 1;
-		openButton.setSize(widthBy6, openHeight);
+		int widthBy7 = VeinsWindow.settings.resWidth / 7 + 1;
+		openButton.setSize(widthBy7, openHeight);
 		openButton.setPosition(0, 0);
-		displayModesButton.setPosition(widthBy6, 0);
-		displayModesButton.setSize(widthBy6, openHeight);
+		displayModesButton.setPosition(widthBy7, 0);
+		displayModesButton.setSize(widthBy7, openHeight);
 
 		if (VeinsWindow.settings.stereoEnabled) {
-			stereoToggleButton.setPosition(widthBy6 * 2, 0);
-			stereoToggleButton.setSize(widthBy6, openHeight / 2);
-			stereoScrollbar.setPosition(widthBy6 * 2, openHeight / 2);
-			stereoScrollbar.setSize(widthBy6, openHeight / 2);
+			stereoToggleButton.setPosition(widthBy7 * 2, 0);
+			stereoToggleButton.setSize(widthBy7, openHeight / 2);
+			stereoScrollbar.setPosition(widthBy7 * 2, openHeight / 2);
+			stereoScrollbar.setSize(widthBy7, openHeight / 2);
 			// stereoScrollbar.setMinSize(VeinsWindow.settings.resWidth/36,
 			// openHeight);
 		} else {
-			stereoToggleButton.setPosition(widthBy6 * 2, 0);
-			stereoToggleButton.setSize(widthBy6, openHeight);
+			stereoToggleButton.setPosition(widthBy7 * 2, 0);
+			stereoToggleButton.setSize(widthBy7, openHeight);
 
-			stereoScrollbar.setPosition(widthBy6 * 2, openHeight);
-			stereoScrollbar.setSize(widthBy6, openHeight);
+			stereoScrollbar.setPosition(widthBy7 * 2, openHeight);
+			stereoScrollbar.setSize(widthBy7, openHeight);
 		}
 
-		helpButton.setPosition(widthBy6 * 3, 0);
-		helpButton.setSize(widthBy6, openHeight);
-		creditsButton.setPosition(widthBy6 * 4, 0);
-		creditsButton.setSize(widthBy6, openHeight);
-		exitButton.setPosition(widthBy6 * 5, 0);
-		exitButton.setSize(VeinsWindow.settings.resWidth - widthBy6 * 5, openHeight);
+		helpButton.setPosition(widthBy7 * 3, 0);
+		helpButton.setSize(widthBy7, openHeight);
+		creditsButton.setPosition(widthBy7 * 4, 0);
+		creditsButton.setSize(widthBy7, openHeight);
+		mouse3d.setPosition(widthBy7*5, 0);
+        mouse3d.setSize(widthBy7, openHeight);
+		exitButton.setPosition(widthBy7 * 6, 0);
+		exitButton.setSize(VeinsWindow.settings.resWidth - widthBy7 * 6, openHeight);
 
+		strong.setPosition(0,openHeight);
+        strong.setSize(widthBy7*2,openHeight);
+        lockRot.setPosition(0,openHeight*2);
+        lockRot.setSize(widthBy7,openHeight);
+        lockTrans.setPosition(widthBy7,openHeight*2);
+        lockTrans.setSize(widthBy7,openHeight);
+        camObj.setPosition(0,openHeight*3);
+        camObj.setSize(widthBy7*2,openHeight);
+        sensitivityScrollbar.setPosition(0,openHeight*4);
+        sensitivityScrollbar.setSize(widthBy7*2,openHeight/2);
+        
+        mouseSettingsVisible(mouse3d.isActive());
+        mouse3d.setEnabled(VeinsWindow.joystick.connected());
+		
 		int rlWidth = VeinsWindow.settings.resWidth * 8 / 10;
 		int rlHeight = VeinsWindow.settings.resHeight * 6 / 10;
 		displayModeListBox.setSize(rlWidth, rlHeight);
@@ -502,6 +616,14 @@ public class VeinsFrame extends Widget {
 		okayVideoSettingButton.setText(labels.getString("okayBtnLabel"));
 		cancelVideoSettingButton.setText(labels.getString("cancelBtnLabel"));
 		fullscreenToggleButton.setText(labels.getString("fullscreenBtnLabel"));
+		
+		// TODO: Translate 3dMouse buttons
+		mouse3d.setText(labels.getString("mouse3dBtnLabel"));
+		mouse3d.setTooltipContent(labels.getString("mouse3dBtnTooltip"));
+		
+		strong.setText(labels.getString("strongBtnLabel"));
+		lockRot.setText(labels.getString("lockRotBtnLabel"));
+		lockTrans.setText(labels.getString("lockTransBtnLabel"));
 
 		ResourceBundle credits = ResourceBundle.getBundle("inter/Credits", VeinsWindow.settings.locale);
 		ResourceBundle help = ResourceBundle.getBundle("inter/Help", VeinsWindow.settings.locale);

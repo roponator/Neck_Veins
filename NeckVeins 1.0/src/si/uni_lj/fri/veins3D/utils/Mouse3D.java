@@ -1,18 +1,20 @@
 package si.uni_lj.fri.veins3D.utils;
 
+import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 
 public class Mouse3D {
 	    private Controller controller = null;
+	    private NeckVeinsSettings settings;
         private float axisX,axisY,axisZ,rotX,rotY,rotZ;
-        private int sensitivity=100; // 1-200
         private double[] axis=new double[3];
         private double[] rotate=new double[3];
-        public boolean connected,axisLock,rotLock,strong,selected;//CAMERA OR OBJECT
+        private boolean connected;
         
-        public Mouse3D(){
+        public Mouse3D(NeckVeinsSettings settings){
+        	this.settings=settings;
             for (Controller c : ControllerEnvironment.getDefaultEnvironment().getControllers()) {
                 if (c.getType() == Controller.Type.STICK) {
                     controller = c;
@@ -20,7 +22,7 @@ public class Mouse3D {
                 }
             }
             if (controller == null) {
-                System.err.println("No joystick was found.");
+                System.err.println("No SpaceNavigator was found.");
                 connected=false;
             }
         }
@@ -35,15 +37,15 @@ public class Mouse3D {
                     if (c.getName().equals("X Rotation")) rotX=c.getPollData();
                     if (c.getName().equals("Y Rotation")) rotY=c.getPollData();
                     if (c.getName().equals("Z Rotation")) rotZ=c.getPollData();
-                    if (c.getName().equals("Button 1")&&c.getPollData()==1) selected=true;
-                    if (c.getName().equals("Button 0")&&c.getPollData()==1) selected=false;
+                    if (c.getName().equals("Button 1")&&c.getPollData()==1) settings.mSelected=true;
+                    if (c.getName().equals("Button 0")&&c.getPollData()==1) settings.mSelected=false;
                 }
                 
-                if(axisLock)axisX=axisY=axisZ=0;
-                if(rotLock)rotX=rotY=rotZ=0;
+                if(settings.mTrans)axisX=axisY=axisZ=0;
+                if(settings.mRot)rotX=rotY=rotZ=0;
                 
                 // If strong axis is selected
-                if(strong){
+                if(settings.mStrong){
                     float[] tmp={axisX,axisY,axisZ,rotX,rotY,rotZ};
                     int indx=0;
                     float max=Math.abs(tmp[indx]);
@@ -74,40 +76,40 @@ public class Mouse3D {
         }
         
         public double[] getAxis(){
-        	axis[0]=axisX/(sensitivity);
-        	axis[1]=axisY/(sensitivity);
-        	axis[2]=axisZ/(sensitivity);
+        	axis[0]=axisX/(settings.sensitivity);
+        	axis[1]=axisY/(settings.sensitivity);
+        	axis[2]=axisZ/(settings.sensitivity);
         	return axis;
         }
         public double[] getRot(){
-        	rotate[0]=rotX/(sensitivity*100);
-        	rotate[1]=rotY/(sensitivity*100);
-        	rotate[2]=rotZ/(sensitivity*100);
+        	rotate[0]=rotX/(settings.sensitivity*100);
+        	rotate[1]=rotY/(settings.sensitivity*100);
+        	rotate[2]=rotZ/(settings.sensitivity*100);
         	return rotate;
         }
         
         public float getAxisX() {
-			return axisX/(sensitivity);
+			return axisX/(settings.sensitivity);
 		}
 
 		public float getAxisY() {
-			return axisY/(sensitivity);
+			return axisY/(settings.sensitivity);
 		}
 
 		public float getAxisZ() {
-			return axisZ/(sensitivity);
+			return axisZ/(settings.sensitivity);
 		}
 
 		public float getRotX() {
-			return rotX/(sensitivity*100);
+			return rotX/(settings.sensitivity*100);
 		}
 
 		public float getRotY() {
-			return rotY/(sensitivity*100);
+			return rotY/(settings.sensitivity*100);
 		}
 
 		public float getRotZ() {
-			return rotZ/(sensitivity*100);
+			return rotZ/(settings.sensitivity*100);
 		}
 
 		public String getName(){
@@ -115,11 +117,5 @@ public class Mouse3D {
         }
         public String toString(){
             return controller.getName()+": ("+axisX+","+axisY+","+axisZ+")|("+rotX+","+rotY+","+rotZ+")";
-        }
-        public int getSensitivity() {
-            return sensitivity;
-        }
-        public void setSensitivity(int sensitivity) {
-            this.sensitivity=201-sensitivity;
         }
 }
