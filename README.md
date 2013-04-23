@@ -4,8 +4,9 @@ Software was primarily developed for visualization of 3D medical data in form of
 
 Software is developed in Java using OpenGL (via [LWJGL](http://www.lwjgl.org/)). Software also uses opensource library for GUI ([TWL](http://l33tlabs.org/)).
 
+
 ##Repository
-This repository holds the Eclipse project
+This repository holds the Eclipse project of application. Just import the project into your workspace and update the links to native libraries for LWJGL (check LWJGL web-site for details).
 
 
 ##Credits
@@ -14,6 +15,7 @@ Application was originally developed as part of BSc Thesis of a student Simon Ž
 Since then several other students extendex different parts of application:
 * Anže Sodja 
 * Peter Škrlj
+
 
 ##Licencing
 This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
