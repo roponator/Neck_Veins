@@ -252,6 +252,9 @@ public class VeinsModel {
 		//old method
 		//addedOrientation=Quaternion.quaternionSum(addedOrientation,new Quaternion(0, -rot[0], rot[1], -rot[2]));
 		
+		//double[] camVec=new double[3];
+		//camVec=Vector.subtraction(new double[] {centerx,centery,centerz}, new double[] {camera.cameraX,camera.cameraY,camera.cameraZ});
+		//System.out.printf("%.4f %.4f %.4f \n",camVec[0],camVec[1],camVec[2]);
 		
 		double[] vector=new double[3];
 		Quaternion temp=new Quaternion();
