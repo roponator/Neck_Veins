@@ -414,7 +414,7 @@ public class VeinsWindow extends Container {
 				renderer.getCamera().moveCamera3D(joystick.getAxis(), joystick.getRot());
 			else{
 				renderer.getCamera().moveCamera3D(new double[] {-joystick.getAxisX(),-joystick.getAxisY(),-joystick.getAxisZ()}, new double[]{0,0,0});
-				renderer.getVeinsModel().rotateModel3D(joystick.getRot());
+				renderer.getVeinsModel().rotateModel3D(joystick.getRot(),renderer.getCamera());
 			}
 		}
 	}
