@@ -186,7 +186,7 @@ public class VeinsModel {
 		Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
 		FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
 		GL11.glMultMatrix(fb);
-
+		
 		/* Translate and render */
 		glTranslatef(-(float) centerx, -(float) centery, -(float) centerz);
 		for (Mesh vbo : meshes) {
@@ -247,12 +247,18 @@ public class VeinsModel {
 	}
 
 	public void rotateModel3D(double[] rot) {
-		addedOrientation= Quaternion.quaternionFromAngleAndRotationAxis(-rot[0], new double[]{1,0,0});
-		currentOrientation=Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
-        addedOrientation= Quaternion.quaternionFromAngleAndRotationAxis(-rot[1], new double[]{0,1,0});
-        currentOrientation=Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
-        addedOrientation= Quaternion.quaternionFromAngleAndRotationAxis(-rot[2], new double[]{0,0,1});
-        currentOrientation=Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
+		
+		//addedOrientation=Quaternion.quaternionSum(addedOrientation,new Quaternion(0, -rot[0], rot[1], -rot[2]));
+		
+		//currentOrientation=Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
+		double[] d=currentOrientation.rotateVector3d(new double[] {1,0,0});
+		System.out.println(d[0]+" "+d[1]+" "+d[2]+" ");
+		addedOrientation = Quaternion.quaternionFromAngleAndRotationAxis(rot[0], currentOrientation.rotateVector3d(new double[] {1,0,0}));
+		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
+		//addedOrientation = Quaternion.quaternionFromAngleAndRotationAxis(-rot[2], currentOrientation.rotateVector3d(new double[] {0,1,0}));
+		//currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
+		//addedOrientation = Quaternion.quaternionFromAngleAndRotationAxis(rot[1], currentOrientation.rotateVector3d(new double[] {0,0,1}));
+		//currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
 	}
 
 }
