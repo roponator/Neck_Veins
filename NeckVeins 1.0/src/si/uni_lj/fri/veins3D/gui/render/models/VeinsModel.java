@@ -206,7 +206,6 @@ public class VeinsModel {
 			double[] rotationAxis = Vector.crossProduct(veinsGrabbedAt, veinsHeldAt);
 			if (Vector.length(rotationAxis) > 0) {
 				rotationAxis = Vector.normalize(rotationAxis);
-				System.out.printf("=%.4f %.4f %.4f \n",rotationAxis[0],rotationAxis[1],rotationAxis[2]);
 				rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
 				double angle = Math.acos(Vector.dotProduct(veinsGrabbedAt, veinsHeldAt)
 						/ (Vector.length(veinsGrabbedAt) * Vector.length(veinsHeldAt)));
