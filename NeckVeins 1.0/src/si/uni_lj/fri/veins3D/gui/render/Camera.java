@@ -138,8 +138,8 @@ public class Camera {
 		cameraZ += (float) rotateVector[2];
 	}
 	public void moveCamera3D(double[] axis, double[] rot){
-		double[] right=new double[]{axis[0],0,0};
-		right=cameraOrientation.rotateVector3d(right);
+		double[] x=new double[]{axis[0],0,0};
+		x=cameraOrientation.rotateVector3d(x);
 		
 		double[] y=new double[]{0,0,axis[1]};
 		y=cameraOrientation.rotateVector3d(y);
@@ -147,15 +147,10 @@ public class Camera {
 		double[] z=new double[]{0,-axis[2],0};
 		z=cameraOrientation.rotateVector3d(z);
 		
-		System.out.printf("right %.4f %.4f %.4f \n",right[0],right[1],right[2]);
-		System.out.printf("Y %.4f %.4f %.4f \n",y[0],y[1],y[2]);
-		System.out.printf("Z %.4f %.4f %.4f \n",z[0],z[1],z[2]);
-		
-        cameraX+=(float)(right[0]+y[0]+z[0]);
-        cameraY+=(float)(right[1]+y[1]+z[1]);
-        cameraZ+=(float)(right[2]+y[2]+z[2]);
-        System.out.printf("CAMERA %.4f %.4f %.4f \n",cameraX,cameraY,cameraZ);
-        
+        cameraX+=(float)(x[0]+y[0]+z[0]);
+        cameraY+=(float)(x[1]+y[1]+z[1]);
+        cameraZ+=(float)(x[2]+y[2]+z[2]);
+    
         
         Quaternion addRotation = Quaternion.quaternionFromAngleAndRotationAxis(rot[0], X_POSITIVE_AXIS);
 		cameraOrientation = Quaternion.quaternionMultiplication(cameraOrientation, addRotation);
