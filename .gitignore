@@ -6,3 +6,4 @@
 
 *.save
 *.class
+.DS_Store
