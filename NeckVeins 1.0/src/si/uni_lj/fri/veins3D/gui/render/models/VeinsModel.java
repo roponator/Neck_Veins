@@ -21,6 +21,7 @@ import java.util.StringTokenizer;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import si.uni_lj.fri.veins3D.gui.VeinsWindow;
 import si.uni_lj.fri.veins3D.gui.render.Camera;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.math.Quaternion;
@@ -202,6 +203,7 @@ public class VeinsModel {
 	 */
 	public void changeAddedOrientation(VeinsRenderer renderer) {
 		double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
+		
 		if (veinsHeldAt != null) {
 			double[] rotationAxis = Vector.crossProduct(veinsGrabbedAt, veinsHeldAt);
 			if (Vector.length(rotationAxis) > 0) {
@@ -247,28 +249,34 @@ public class VeinsModel {
 		addedOrientation = q;
 	}
 
-	public void rotateModel3D(double[] rot, Camera camera) {
-		//old method
-		//addedOrientation=Quaternion.quaternionSum(addedOrientation,new Quaternion(0, -rot[0], rot[1], -rot[2]));
+	public void rotateModel3D(double[] rot, VeinsRenderer renderer) {
 		
-		//double[] camVec=new double[3];
-		//camVec=Vector.subtraction(new double[] {centerx,centery,centerz}, new double[] {camera.cameraX,camera.cameraY,camera.cameraZ});
-		//System.out.printf("%.4f %.4f %.4f \n",camVec[0],camVec[1],camVec[2]);
-		
-		double[] vector=new double[3];
+		double[] centerVector=RayUtil.getRayDirection((int)VeinsWindow.settings.resWidth/2,(int)VeinsWindow.settings.resHeight/2,renderer);
+						
 		Quaternion temp=new Quaternion();
+		double[] rotationAxis;
 		
-		vector = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(new double[] {1,0,0});
-		temp = Quaternion.quaternionFromAngleAndRotationAxis(rot[0], vector);
+		rotationAxis = Vector.crossProduct(centerVector, new double[] {0,1,0});
+		rotationAxis = Vector.normalize(rotationAxis);
+		rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
+		
+		temp = Quaternion.quaternionFromAngleAndRotationAxis(rot[0], rotationAxis);
 		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, temp);
 		
-		vector = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(new double[] {0,1,0});
-		temp = Quaternion.quaternionFromAngleAndRotationAxis(-rot[2], vector);
+		rotationAxis = Vector.crossProduct(centerVector, new double[] {1,0,0});
+		rotationAxis = Vector.normalize(rotationAxis);
+		rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
+		
+		temp = Quaternion.quaternionFromAngleAndRotationAxis(rot[2], rotationAxis);
 		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, temp);
 		
-		vector = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(new double[] {0,0,1});
-		temp = Quaternion.quaternionFromAngleAndRotationAxis(rot[1], vector);
+		rotationAxis = Vector.crossProduct(centerVector, new double[] {0,0,1});
+		rotationAxis = Vector.normalize(centerVector);
+		rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
+		
+		temp = Quaternion.quaternionFromAngleAndRotationAxis(-rot[1], rotationAxis);
 		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, temp);
+		
 	}
 
 }
