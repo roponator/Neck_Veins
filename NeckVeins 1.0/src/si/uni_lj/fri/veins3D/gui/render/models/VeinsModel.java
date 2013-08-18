@@ -18,9 +18,11 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import si.uni_lj.fri.mhdreader.ModelCreator;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import si.uni_lj.fri.veins3D.math.Vector;
@@ -54,6 +56,23 @@ public class VeinsModel {
 	}
 
 	public void constructVBOFromFile(String filepath) {
+		String[] tokens = filepath.split("\\.(?=[^\\.]+$)");
+		if (tokens[tokens.length - 1].equals("mhd")) {
+			System.out.println("RAW!!!");
+			constructVBOFromRawFile(filepath);
+		} else
+			constructVBOFromObjFile(filepath);
+	}
+
+	public void constructVBOFromRawFile(String filepath) {
+		try {
+			ModelCreator.createModel(filepath);
+		} catch (LWJGLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void constructVBOFromObjFile(String filepath) {
 		vertices = new ArrayList<Float>();
 		centerx = 0;
 		centery = 0;
