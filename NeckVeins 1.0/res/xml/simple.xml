@@ -429,6 +429,12 @@
         <param name="border"><border>background.border</border></param>
         <theme name="label" ref="label"/>
     </theme>
+    <theme name="value-label" ref="-defaults">
+        <param name="background"><image>-borderG</image></param>
+        <param name="border"><border>background.border</border></param>
+         <param name="textAlignment"><enum type="alignment">center</enum></param>
+        <theme name="label" ref="label"/>
+    </theme>
 
     <theme name="tooltipwindow" ref="-defaults">
         <param name="background"><image>-borderG</image></param>

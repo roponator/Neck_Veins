@@ -247,12 +247,12 @@ public class VeinsModel {
 	}
 
 	public void rotateModel3D(double[] rot) {
-		addedOrientation= Quaternion.quaternionFromAngleAndRotationAxis(-rot[0], new double[]{1,0,0});
-		currentOrientation=Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
-        addedOrientation= Quaternion.quaternionFromAngleAndRotationAxis(-rot[1], new double[]{0,1,0});
-        currentOrientation=Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
-        addedOrientation= Quaternion.quaternionFromAngleAndRotationAxis(-rot[2], new double[]{0,0,1});
-        currentOrientation=Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
+		addedOrientation = Quaternion.quaternionFromAngleAndRotationAxis(-rot[0], new double[] { 1, 0, 0 });
+		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
+		addedOrientation = Quaternion.quaternionFromAngleAndRotationAxis(-rot[1], new double[] { 0, 1, 0 });
+		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
+		addedOrientation = Quaternion.quaternionFromAngleAndRotationAxis(-rot[2], new double[] { 0, 0, 1 });
+		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
 	}
 
 }
