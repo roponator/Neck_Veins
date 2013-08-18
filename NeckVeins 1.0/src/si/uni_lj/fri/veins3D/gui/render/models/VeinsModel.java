@@ -14,6 +14,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -65,10 +66,85 @@ public class VeinsModel {
 	}
 
 	public void constructVBOFromRawFile(String filepath) {
+		Object[] output = null;
 		try {
-			ModelCreator.createModel(filepath);
+			output = ModelCreator.createModel(filepath);
 		} catch (LWJGLException e) {
 			e.printStackTrace();
+		}
+		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
+		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
+		FloatBuffer normalsBuff = (FloatBuffer) output[2];
+
+		vertices = new ArrayList<Float>();
+		centerx = 0;
+		centery = 0;
+		centerz = 0;
+		maxX = Float.MIN_VALUE;
+		maxY = Float.MIN_VALUE;
+		maxZ = Float.MIN_VALUE;
+		minX = Float.MAX_VALUE;
+		minY = Float.MAX_VALUE;
+		minZ = Float.MAX_VALUE;
+
+		float x, y, z;
+
+		// meshes variables
+		meshes = new ArrayList<Mesh>();
+		ArrayList<Integer> tempFaces = new ArrayList<Integer>();
+		ArrayList<String> groups = new ArrayList<String>();
+		boolean newG = false;
+		int tempFaceCount = 0;
+
+		for (int i = 0; i < nTrianglesBuff.get(0) * 3; i += 3) {
+			/* Vertices */
+			vertices.add(x = trianglesBuff.get(i));
+			vertices.add(y = trianglesBuff.get(i + 1));
+			vertices.add(z = trianglesBuff.get(i + 2));
+			centerx += x;
+			centery += y;
+			centerz += z;
+			if (x < minX)
+				minX = x;
+			if (y < minY)
+				minY = y;
+			if (z < minZ)
+				minZ = z;
+			if (x > maxX)
+				maxX = x;
+			if (y > maxY)
+				maxY = y;
+			if (z > maxZ)
+				maxZ = z;
+
+			/* Faces */
+			tempFaces.add(i + 1);
+			tempFaces.add(i + 2);
+			tempFaces.add(i + 3);
+
+			tempFaceCount++;
+
+		}
+		if (tempFaceCount > 0) {
+			// It seems that since last starting a new group, there have
+			// been faces stored
+			// Here I create a new mesh
+			Mesh mesh = new Mesh(groups, tempFaces, vertices);
+			meshes.add(mesh);
+			// After the whole file will be read, each mesh object's faces
+			// will be stored as VBOs (Vertex Buffer Objects).
+			System.out.println("Created a new mesh java object that will have it's own VBO.");
+		} else {
+			System.out.println("One \"g\" holding 0 elements discarted.");
+		}
+
+		// The file has been read.
+		centerx /= (vertices.size() / 3);
+		centery /= (vertices.size() / 3);
+		centerz /= (vertices.size() / 3);
+
+		for (Mesh mesh : meshes) {
+			mesh.constructVBO();
 		}
 	}
 

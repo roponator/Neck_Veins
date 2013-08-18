@@ -61,14 +61,9 @@ public class ModelCreator {
 		Util.checkCLError(error);
 	}
 
-	public static void createModel(String fileName) throws LWJGLException {
+	public static Object[] createModel(String fileName) throws LWJGLException {
 		initializeCL();
-		try {
-			createProgram("/opencl/segmentation.cls");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
-		}
+		createProgram("/opencl/segmentation.cls");
 
 		long startTime = System.currentTimeMillis();
 		float[] floatCTMatrix = FileUtils.readFile(fileName);
@@ -94,10 +89,11 @@ public class ModelCreator {
 
 		System.out.println("GPU full time: " + (System.currentTimeMillis() - startTime) / 1000.0f + "s");
 
-		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
-		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
-		FloatBuffer normalsBuff = (FloatBuffer) output[2];
-		writeFile(fileName, nTrianglesBuff, trianglesBuff, normalsBuff);
+		return output;
+		// IntBuffer nTrianglesBuff = (IntBuffer) output[0];
+		// FloatBuffer trianglesBuff = (FloatBuffer) output[1];
+		// FloatBuffer normalsBuff = (FloatBuffer) output[2];
+		// writeFile(fileName, nTrianglesBuff, trianglesBuff, normalsBuff);
 	}
 
 	private static void execGauss3D(IntBuffer errorBuff, CLMem[] staticMemory, float[] floatCTMatrix, double sigma,
