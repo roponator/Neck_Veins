@@ -93,37 +93,34 @@ public class VeinsModel {
 		meshes = new ArrayList<Mesh>();
 		ArrayList<Integer> tempFaces = new ArrayList<Integer>();
 		ArrayList<String> groups = new ArrayList<String>();
-		boolean newG = false;
 		int tempFaceCount = 0;
 
-		for (int i = 0; i < nTrianglesBuff.get(0) * 3; i += 3) {
+		for (int i = 0; i < nTrianglesBuff.get(0); i++) {
 			/* Vertices */
-			vertices.add(x = trianglesBuff.get(i));
-			vertices.add(y = trianglesBuff.get(i + 1));
-			vertices.add(z = trianglesBuff.get(i + 2));
-			centerx += x;
-			centery += y;
-			centerz += z;
-			if (x < minX)
-				minX = x;
-			if (y < minY)
-				minY = y;
-			if (z < minZ)
-				minZ = z;
-			if (x > maxX)
-				maxX = x;
-			if (y > maxY)
-				maxY = y;
-			if (z > maxZ)
-				maxZ = z;
+			for (int j = 0; j < 3; j++) {
+				vertices.add(x = trianglesBuff.get(i * 9 + j * 3));
+				vertices.add(y = trianglesBuff.get(i * 9 + j * 3 + 1));
+				vertices.add(z = trianglesBuff.get(i * 9 + j * 3 + 2));
+				centerx += x;
+				centery += y;
+				centerz += z;
+				if (x < minX)
+					minX = x;
+				if (y < minY)
+					minY = y;
+				if (z < minZ)
+					minZ = z;
+				if (x > maxX)
+					maxX = x;
+				if (y > maxY)
+					maxY = y;
+				if (z > maxZ)
+					maxZ = z;
 
-			/* Faces */
-			tempFaces.add(i + 1);
-			tempFaces.add(i + 2);
-			tempFaces.add(i + 3);
+				tempFaces.add(i * 3 + (3 - j));
+			}
 
 			tempFaceCount++;
-
 		}
 		if (tempFaceCount > 0) {
 			// It seems that since last starting a new group, there have
