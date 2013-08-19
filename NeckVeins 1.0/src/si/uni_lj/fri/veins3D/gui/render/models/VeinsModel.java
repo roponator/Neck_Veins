@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -24,6 +25,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import si.uni_lj.fri.mhdreader.ModelCreator;
+import si.uni_lj.fri.mhdreader.utils.obj.Coordinates;
+import si.uni_lj.fri.mhdreader.utils.obj.Vertex;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import si.uni_lj.fri.veins3D.math.Vector;
@@ -95,31 +98,40 @@ public class VeinsModel {
 		ArrayList<String> groups = new ArrayList<String>();
 		int tempFaceCount = 0;
 
+		LinkedHashMap<Coordinates, Vertex> uniqueVertices = new LinkedHashMap<Coordinates, Vertex>(
+				nTrianglesBuff.get(0) / 10);
+		int index = 1;
 		for (int i = 0; i < nTrianglesBuff.get(0); i++) {
 			/* Vertices */
-			for (int j = 0; j < 3; j++) {
-				vertices.add(x = trianglesBuff.get(i * 9 + j * 3));
-				vertices.add(y = trianglesBuff.get(i * 9 + j * 3 + 1));
-				vertices.add(z = trianglesBuff.get(i * 9 + j * 3 + 2));
-				centerx += x;
-				centery += y;
-				centerz += z;
-				if (x < minX)
-					minX = x;
-				if (y < minY)
-					minY = y;
-				if (z < minZ)
-					minZ = z;
-				if (x > maxX)
-					maxX = x;
-				if (y > maxY)
-					maxY = y;
-				if (z > maxZ)
-					maxZ = z;
+			for (int j = 2; j >= 0; j--) {
+				x = trianglesBuff.get(i * 9 + j * 3);
+				y = trianglesBuff.get(i * 9 + j * 3 + 1);
+				z = trianglesBuff.get(i * 9 + j * 3 + 2);
 
-				tempFaces.add(i * 3 + (3 - j));
+				Coordinates key = new Coordinates(x, y, z);
+				if (!uniqueVertices.containsKey(key)) {
+					vertices.add(x);
+					vertices.add(y);
+					vertices.add(z);
+					centerx += x;
+					centery += y;
+					centerz += z;
+					if (x < minX)
+						minX = x;
+					if (y < minY)
+						minY = y;
+					if (z < minZ)
+						minZ = z;
+					if (x > maxX)
+						maxX = x;
+					if (y > maxY)
+						maxY = y;
+					if (z > maxZ)
+						maxZ = z;
+					uniqueVertices.put(key, new Vertex(x, y, z, index++));
+				}
+				tempFaces.add(uniqueVertices.get(key).index);
 			}
-
 			tempFaceCount++;
 		}
 		if (tempFaceCount > 0) {
