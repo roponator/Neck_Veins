@@ -291,6 +291,20 @@ public class VeinsRenderer extends LWJGLRenderer {
 		setScreenPlanes(d, fovMin);
 	}
 
+	public void changeModel(double threshold) {
+		// The smaller angle of view of the horizontal and vertical ones.
+		double fovMin = (VeinsWindow.settings.resWidth < VeinsWindow.settings.resHeight) ? FOV_Y
+				* VeinsWindow.settings.resWidth / (double) VeinsWindow.settings.resHeight : FOV_Y;
+		fovMin = Math.toRadians(fovMin); // Math.PI * fovMin / 180
+
+		veinsModel = new VeinsModel(threshold);
+		double d = calculateCameraDistance(veinsModel);
+		veinsModel.veinsGrabRadius = d / Math.sqrt(2);
+
+		setCameraPositionAndOrientation(d, fovMin);
+		setScreenPlanes(d, fovMin);
+	}
+
 	/**
 	 * Calculate the appropriate camera distance: The following code takes the
 	 * most extreme values on each coordinate of all the specified vertices in

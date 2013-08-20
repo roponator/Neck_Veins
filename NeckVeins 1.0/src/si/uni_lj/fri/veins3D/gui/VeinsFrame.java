@@ -79,6 +79,31 @@ public class VeinsFrame extends Widget {
 		initVideoSettingsButtons();
 		initDisplayModeListBox();
 		init3DmouseButtons();
+		initThresholdScroll();
+	}
+
+	private void initThresholdScroll() {
+		final Scrollbar gaussScrollbar = new Scrollbar(Scrollbar.Orientation.VERTICAL);
+		gaussScrollbar.setTheme("vscrollbar");
+		gaussScrollbar.setTooltipContent("Sets the sigma value.");
+		gaussScrollbar.setMinMaxValue(1, 100);
+		gaussScrollbar.setValue(50);
+		gaussScrollbar.adjustSize();
+		gaussScrollbar.setSize(20, 200);
+		gaussScrollbar.setPosition(720, 300);
+		final Button apply = new Button("apply");
+		apply.setSize(30, 30);
+		apply.setPosition(720, 510);
+		apply.addCallback(new Runnable() {
+			@Override
+			public void run() {
+				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+				renderer.changeModel(gaussScrollbar.getValue() / 100.0f);
+
+			}
+		});
+		this.add(gaussScrollbar);
+		this.add(apply);
 	}
 
 	private void initFileSelector() {
@@ -168,7 +193,7 @@ public class VeinsFrame extends Widget {
 		final Scrollbar threshScrollbar = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
 		threshScrollbar.setTheme("hscrollbar");
 		threshScrollbar.setTooltipContent("Sets the sigma value.");
-		threshScrollbar.setMinMaxValue(10, 100);
+		threshScrollbar.setMinMaxValue(1, 100);
 		threshScrollbar.setValue(50);
 		threshScrollbar.adjustSize();
 		threshScrollbar.setSize(500, 20);

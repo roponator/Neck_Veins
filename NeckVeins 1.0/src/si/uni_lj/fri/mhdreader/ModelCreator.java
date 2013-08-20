@@ -43,6 +43,7 @@ public class ModelCreator {
 	public static List<CLDevice> devices;
 	public static CLCommandQueue queue;
 	public static CLProgram program;
+	private static CLMem[] staticMemory;
 
 	public ModelCreator() {
 	}
@@ -65,6 +66,10 @@ public class ModelCreator {
 	}
 
 	public static Object[] createModel(String fileName, double sigma, double threshold) throws LWJGLException {
+		if (staticMemory != null) {
+			cleanCLResources(staticMemory, new CLKernel[] {}, new CLProgram[] { program }, true);
+		}
+
 		initializeCL();
 		createProgram("/opencl/segmentation.cls");
 
@@ -83,19 +88,32 @@ public class ModelCreator {
 		int[] dimensions = new int[] { MHDReader.Nx, MHDReader.Ny, MHDReader.Nz, size };
 		CLMem dimensionsMemory = locateMemory(dimensions, errorBuff, CL10.CL_MEM_READ_ONLY);
 		CLMem matrixMemory = locateMemory(floatCTMatrix.length * 4, errorBuff, CL10.CL_MEM_READ_WRITE);
-		CLMem[] staticMemory = { matrixMemory, dimensionsMemory };
+		staticMemory = new CLMem[] { matrixMemory, dimensionsMemory };
 
-		System.out.println(threshold);
 		if (sigma > 0)
 			execGauss3D(errorBuff, staticMemory, floatCTMatrix, sigma, size);
 		else
 			staticMemory[MATRIX_DATA] = locateMemory(floatCTMatrix, errorBuff, CL10.CL_MEM_READ_WRITE);
 
-		float max = execFindMax(staticMemory, floatCTMatrix, errorBuff);
+		float max = execFindMax(staticMemory, errorBuff);
 		if (threshold < 0)
 			threshold = execOtsuThreshold(staticMemory, floatCTMatrix, max, errorBuff);
 
 		Object[] output = execMarchingCubes(staticMemory, floatCTMatrix, max, (float) threshold, errorBuff);
+
+		System.out.println("GPU full time: " + (System.currentTimeMillis() - startTime) / 1000.0f + "s");
+
+		return output;
+	}
+
+	public static Object[] changeModel(double threshold) throws LWJGLException {
+		// GPU part
+		long startTime = System.currentTimeMillis();
+		System.out.println("Marching cubes on GPU...");
+		IntBuffer errorBuff = BufferUtils.createIntBuffer(1);
+
+		Object[] output = execMarchingCubes(staticMemory, new float[512 * 512 * 390], 3071.00002f, (float) threshold,
+				errorBuff);
 
 		System.out.println("GPU full time: " + (System.currentTimeMillis() - startTime) / 1000.0f + "s");
 
@@ -142,7 +160,7 @@ public class ModelCreator {
 
 	}
 
-	private static float execFindMax(CLMem[] staticMemory, float[] floatCTMatrix, IntBuffer errorBuff) {
+	private static float execFindMax(CLMem[] staticMemory, IntBuffer errorBuff) {
 		ByteBuffer deviceInfoBuff = BufferUtils.createByteBuffer(8);
 		CL10.clGetDeviceInfo(devices.get(0), CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE, deviceInfoBuff, null);
 		int maxWorkGroupSize = (int) deviceInfoBuff.getLong(0);
@@ -252,11 +270,10 @@ public class ModelCreator {
 		CL10.clEnqueueReadBuffer(queue, trianglesMemory, CL10.CL_TRUE, 0, trianglesBuff, null, null);
 		CL10.clEnqueueReadBuffer(queue, normalsMemory, CL10.CL_TRUE, 0, normalsBuff, null, null);
 
-		CLMem[] memObj = { staticMemory[MATRIX_DATA], staticMemory[DIMENSIONS_DATA], maxThreshMemory, trianglesMemory,
-				normalsMemory, nTrianglesMemory };
+		CLMem[] memObj = { maxThreshMemory, trianglesMemory, normalsMemory, nTrianglesMemory };
 		CLKernel[] kernelObj = { marchingKernel };
-		CLProgram[] programObj = { program };
-		cleanCLResources(memObj, kernelObj, programObj, true);
+		CLProgram[] programObj = {};
+		cleanCLResources(memObj, kernelObj, programObj, false);
 
 		return new Object[] { nTrianglesBuff, trianglesBuff, normalsBuff };
 
@@ -340,6 +357,14 @@ public class ModelCreator {
 	private static CLMem locateMemory(float[] data, IntBuffer errorBuff, int flags) {
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
 		buffer.put(data);
+		buffer.rewind();
+		CLMem memory = CL10.clCreateBuffer(context, flags, buffer, errorBuff);
+		CL10.clEnqueueWriteBuffer(queue, memory, flags, 0, buffer, null, null);
+		Util.checkCLError(errorBuff.get(0));
+		return memory;
+	}
+
+	private static CLMem locateMemory(FloatBuffer buffer, IntBuffer errorBuff, int flags) {
 		buffer.rewind();
 		CLMem memory = CL10.clCreateBuffer(context, flags, buffer, errorBuff);
 		CL10.clEnqueueWriteBuffer(queue, memory, flags, 0, buffer, null, null);
