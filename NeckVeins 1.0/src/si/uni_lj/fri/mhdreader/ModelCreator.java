@@ -61,7 +61,7 @@ public class ModelCreator {
 		Util.checkCLError(error);
 	}
 
-	public static Object[] createModel(String fileName) throws LWJGLException {
+	public static Object[] createModel(String fileName, double sigma, double threshold) throws LWJGLException {
 		initializeCL();
 		createProgram("/opencl/segmentation.cls");
 
@@ -75,7 +75,6 @@ public class ModelCreator {
 		System.out.println("Marching cubes on GPU...");
 		IntBuffer errorBuff = BufferUtils.createIntBuffer(1);
 
-		double sigma = .2;
 		int size = (int) (2 * Math.ceil(3 * sigma / MHDReader.dx) + 1);
 		sigma = (float) (sigma / MHDReader.dx);
 		CLMem dimensionsMemory = locateMemory(new int[] { MHDReader.Nx, MHDReader.Ny, MHDReader.Nz, size }, errorBuff,
@@ -83,8 +82,11 @@ public class ModelCreator {
 		CLMem matrixMemory = locateMemory(floatCTMatrix.length * 4, errorBuff, CL10.CL_MEM_READ_WRITE);
 		CLMem[] staticMemory = { matrixMemory, dimensionsMemory };
 
-		execGauss3D(errorBuff, staticMemory, floatCTMatrix, sigma, size);
-		execOtsuThreshold(staticMemory, floatCTMatrix, errorBuff);
+		if (sigma > 0)
+			execGauss3D(errorBuff, staticMemory, floatCTMatrix, sigma, size);
+
+		if (threshold < 0)
+			execOtsuThreshold(staticMemory, floatCTMatrix, errorBuff);
 		Object[] output = execMarchingCubes(staticMemory, floatCTMatrix, errorBuff);
 
 		System.out.println("GPU full time: " + (System.currentTimeMillis() - startTime) / 1000.0f + "s");

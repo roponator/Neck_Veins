@@ -432,7 +432,7 @@
     <theme name="value-label" ref="-defaults">
         <param name="background"><image>-borderG</image></param>
         <param name="border"><border>background.border</border></param>
-         <param name="textAlignment"><enum type="alignment">center</enum></param>
+        <param name="textAlignment"><enum type="alignment">center</enum></param>
         <theme name="label" ref="label"/>
     </theme>
 

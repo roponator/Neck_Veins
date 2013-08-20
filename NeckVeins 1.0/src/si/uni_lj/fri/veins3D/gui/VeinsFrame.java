@@ -97,8 +97,17 @@ public class VeinsFrame extends Widget {
 				fileSelector.setVisible(false);
 				File file = (File) files[0];
 				System.out.println("\nOpening file: " + file.getAbsolutePath());
+
+				Widget userWidgetBottom = fileSelector.getUserWidgetBottom();
+				Scrollbar gaussScrollbar = (Scrollbar) userWidgetBottom.getChild(0);
+				Scrollbar threshScrollbar = (Scrollbar) userWidgetBottom.getChild(3);
+				double sigma = (gaussScrollbar.isEnabled()) ? gaussScrollbar.getValue()
+						/ (double) gaussScrollbar.getMaxValue() : -1;
+				double threshold = (threshScrollbar.isEnabled()) ? threshScrollbar.getValue()
+						/ (double) threshScrollbar.getMaxValue() : -1;
+
 				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
-				renderer.loadModel(file.getAbsolutePath());
+				renderer.loadModel(file.getAbsolutePath(), sigma, threshold);
 			}
 
 			@Override
@@ -134,9 +143,8 @@ public class VeinsFrame extends Widget {
 		gaussScrollbar.adjustSize();
 		gaussScrollbar.setSize(500, 20);
 
-		final Label sigmaValue = new Label("50");
+		final Label sigmaValue = new Label("0.50");
 		sigmaValue.setTheme("value-label");
-		sigmaValue.setEnabled(false);
 		sigmaValue.adjustSize();
 		sigmaValue.setSize(40, 15);
 		sigmaValue.setPosition(500, -1);
@@ -147,14 +155,12 @@ public class VeinsFrame extends Widget {
 
 		gaussScrollbar.addCallback(new Runnable() {
 			public void run() {
-				sigmaValue.setText(Integer.toString(gaussScrollbar.getValue()));
+				sigmaValue.setText(Float.toString(gaussScrollbar.getValue() / 100.0f));
 			}
 		});
 		enableBtn.addCallback(new Runnable() {
 			public void run() {
-				gaussScrollbar.setValue(50);
 				gaussScrollbar.setEnabled(enableBtn.getText().equals("Enable"));
-				sigmaValue.setText(Integer.toString(gaussScrollbar.getValue()));
 				enableBtn.setText(enableBtn.getText().equals("Enable") ? "Disable" : "Enable");
 			}
 		});
@@ -168,27 +174,24 @@ public class VeinsFrame extends Widget {
 		threshScrollbar.setSize(500, 20);
 		threshScrollbar.setPosition(0, 25);
 
-		final Label threshValue = new Label("50");
+		final Label threshValue = new Label("0.50");
 		threshValue.setTheme("value-label");
-		threshValue.setEnabled(false);
 		threshValue.adjustSize();
 		threshValue.setSize(40, 15);
 		threshValue.setPosition(500, 24);
 		threshScrollbar.addCallback(new Runnable() {
 			public void run() {
-				threshValue.setText(Integer.toString(threshScrollbar.getValue()));
+				threshValue.setText(Float.toString(threshScrollbar.getValue() / 100.0f));
 			}
 		});
 
-		final Button autoThreshBtn = new Button("Disable");
+		final Button autoThreshBtn = new Button("Auto");
 		autoThreshBtn.setSize(80, 15);
 		autoThreshBtn.setPosition(550, 24);
 		autoThreshBtn.addCallback(new Runnable() {
 			public void run() {
-				threshScrollbar.setValue(50);
-				threshScrollbar.setEnabled(autoThreshBtn.getText().equals("Auto thresh"));
-				sigmaValue.setText(Integer.toString(threshScrollbar.getValue()));
-				autoThreshBtn.setText(autoThreshBtn.getText().equals("Auto thresh") ? "Manual thresh" : "Auto thresh");
+				threshScrollbar.setEnabled(autoThreshBtn.getText().equals("Manual"));
+				autoThreshBtn.setText(autoThreshBtn.getText().equals("Auto") ? "Manual" : "Auto");
 			}
 		});
 

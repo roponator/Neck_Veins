@@ -277,13 +277,13 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 * 
 	 * @param fileName
 	 */
-	public void loadModel(String fileName) {
+	public void loadModel(String fileName, double sigma, double threshold) {
 		// The smaller angle of view of the horizontal and vertical ones.
 		double fovMin = (VeinsWindow.settings.resWidth < VeinsWindow.settings.resHeight) ? FOV_Y
 				* VeinsWindow.settings.resWidth / (double) VeinsWindow.settings.resHeight : FOV_Y;
 		fovMin = Math.toRadians(fovMin); // Math.PI * fovMin / 180
 
-		veinsModel = new VeinsModel(fileName);
+		veinsModel = new VeinsModel(fileName, sigma, threshold);
 		double d = calculateCameraDistance(veinsModel);
 		veinsModel.veinsGrabRadius = d / Math.sqrt(2);
 

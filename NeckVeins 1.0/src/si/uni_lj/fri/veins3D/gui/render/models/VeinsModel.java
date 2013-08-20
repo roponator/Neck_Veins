@@ -54,27 +54,33 @@ public class VeinsModel {
 	public double[] veinsGrabbedAt;
 	public double veinsGrabRadius;
 
-	public VeinsModel(String filepath) {
-		constructVBOFromFile(filepath);
+	public VeinsModel(String filepath, double sigma, double threshold) {
+		constructVBOFromFile(filepath, sigma, threshold);
 		setDefaultOrientation();
 	}
 
-	public void constructVBOFromFile(String filepath) {
+	public void constructVBOFromFile(String filepath, double sigma, double threshold) {
 		String[] tokens = filepath.split("\\.(?=[^\\.]+$)");
 		if (tokens[tokens.length - 1].equals("mhd")) {
-			System.out.println("RAW!!!");
-			constructVBOFromRawFile(filepath);
+			constructVBOFromRawFile(filepath, sigma, threshold);
 		} else
 			constructVBOFromObjFile(filepath);
 	}
 
-	public void constructVBOFromRawFile(String filepath) {
+	/**
+	 * Normals calculated on GPU, are currently not used, instead Normals
+	 * calculated in constructVBO are used.
+	 * 
+	 * @param filepath
+	 */
+	public void constructVBOFromRawFile(String filepath, double sigma, double threshold) {
 		Object[] output = null;
 		try {
-			output = ModelCreator.createModel(filepath);
+			output = ModelCreator.createModel(filepath, sigma, threshold);
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 		}
+
 		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
 		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
 		FloatBuffer normalsBuff = (FloatBuffer) output[2];
