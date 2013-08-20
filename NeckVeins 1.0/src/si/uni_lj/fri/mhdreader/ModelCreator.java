@@ -85,8 +85,11 @@ public class ModelCreator {
 		CLMem matrixMemory = locateMemory(floatCTMatrix.length * 4, errorBuff, CL10.CL_MEM_READ_WRITE);
 		CLMem[] staticMemory = { matrixMemory, dimensionsMemory };
 
+		System.out.println(threshold);
 		if (sigma > 0)
 			execGauss3D(errorBuff, staticMemory, floatCTMatrix, sigma, size);
+		else
+			staticMemory[MATRIX_DATA] = locateMemory(floatCTMatrix, errorBuff, CL10.CL_MEM_READ_WRITE);
 
 		float max = execFindMax(staticMemory, floatCTMatrix, errorBuff);
 		if (threshold < 0)

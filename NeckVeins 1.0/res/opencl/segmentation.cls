@@ -317,13 +317,15 @@ __constant float nTriangles[256] = {
 		
 		
 float4 linearInterpolate(float4 first, float4 second, float thresh) {
-	 if (fabs(thresh - first.w) <= 0.00001)
-		 return first;
-	 if (fabs(thresh - second.w) <= 0.00001)
-		 return second;
-	 if (fabs(first.w - second.w) <= 0.00001)
-		 return first;
-	float4 newVertex = first + (second - first) / (second.w - first.w) * (thresh - first.w);
+	float4 newVertex;
+	if (fabs(thresh - first.w) <= 0.00001)
+		newVertex = first;
+	else if (fabs(thresh - second.w) <= 0.00001)
+		newVertex = second;
+	else if (fabs(first.w - second.w) <= 0.00001)
+		newVertex = first;
+	else
+		newVertex = first + (second - first) / (second.w - first.w) * (thresh - first.w);
 	return newVertex;
 }
 
