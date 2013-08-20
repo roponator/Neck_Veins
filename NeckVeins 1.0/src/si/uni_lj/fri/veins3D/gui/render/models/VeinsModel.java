@@ -83,7 +83,7 @@ public class VeinsModel {
 
 		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
 		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
-		FloatBuffer normalsBuff = (FloatBuffer) output[2];
+		// FloatBuffer normalsBuff = (FloatBuffer) output[2];
 
 		vertices = new ArrayList<Float>();
 		centerx = 0;

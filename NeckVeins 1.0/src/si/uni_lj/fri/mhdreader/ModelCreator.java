@@ -34,6 +34,9 @@ public class ModelCreator {
 	private static final int MATRIX_DATA = 0;
 	private static final int DIMENSIONS_DATA = 1;
 
+	private static final int FIND_MAX_LOCAL_SIZE = 64;
+	private static final int HISTOGRAM_LOCAL_SIZE = 64;
+
 	// OpenCL variables
 	public static CLContext context;
 	public static CLPlatform platform;
@@ -77,25 +80,23 @@ public class ModelCreator {
 
 		int size = (int) (2 * Math.ceil(3 * sigma / MHDReader.dx) + 1);
 		sigma = (float) (sigma / MHDReader.dx);
-		CLMem dimensionsMemory = locateMemory(new int[] { MHDReader.Nx, MHDReader.Ny, MHDReader.Nz, size }, errorBuff,
-				CL10.CL_MEM_READ_ONLY);
+		int[] dimensions = new int[] { MHDReader.Nx, MHDReader.Ny, MHDReader.Nz, size };
+		CLMem dimensionsMemory = locateMemory(dimensions, errorBuff, CL10.CL_MEM_READ_ONLY);
 		CLMem matrixMemory = locateMemory(floatCTMatrix.length * 4, errorBuff, CL10.CL_MEM_READ_WRITE);
 		CLMem[] staticMemory = { matrixMemory, dimensionsMemory };
 
 		if (sigma > 0)
 			execGauss3D(errorBuff, staticMemory, floatCTMatrix, sigma, size);
 
+		float max = execFindMax(staticMemory, floatCTMatrix, errorBuff);
 		if (threshold < 0)
-			execOtsuThreshold(staticMemory, floatCTMatrix, errorBuff);
-		Object[] output = execMarchingCubes(staticMemory, floatCTMatrix, errorBuff);
+			threshold = execOtsuThreshold(staticMemory, floatCTMatrix, max, errorBuff);
+
+		Object[] output = execMarchingCubes(staticMemory, floatCTMatrix, max, (float) threshold, errorBuff);
 
 		System.out.println("GPU full time: " + (System.currentTimeMillis() - startTime) / 1000.0f + "s");
 
 		return output;
-		// IntBuffer nTrianglesBuff = (IntBuffer) output[0];
-		// FloatBuffer trianglesBuff = (FloatBuffer) output[1];
-		// FloatBuffer normalsBuff = (FloatBuffer) output[2];
-		// writeFile(fileName, nTrianglesBuff, trianglesBuff, normalsBuff);
 	}
 
 	private static void execGauss3D(IntBuffer errorBuff, CLMem[] staticMemory, float[] floatCTMatrix, double sigma,
@@ -131,37 +132,22 @@ public class ModelCreator {
 		enqueueKernel(gaussZ, new int[] { MHDReader.Nx, MHDReader.Ny, MHDReader.Nz });
 		Util.checkCLError(CL10.clFinish(queue));
 
-		/* CLEANING AFTER FIRST ROUND */
 		cleanCLResources(new CLMem[] { srcMatrixMemory, kernel }, new CLKernel[] { gaussX, gaussY, gaussZ },
 				new CLProgram[] {}, false);
 		Util.checkCLError(CL10.clFinish(queue));
-		/* END OF CLEANUP */
 		measureTime(gaussTime, "Gauss");
 
 	}
 
-	private static void execOtsuThreshold(CLMem[] staticMemory, float[] floatCTMatrix, IntBuffer errorBuff) {
+	private static float execFindMax(CLMem[] staticMemory, float[] floatCTMatrix, IntBuffer errorBuff) {
 		ByteBuffer deviceInfoBuff = BufferUtils.createByteBuffer(8);
 		CL10.clGetDeviceInfo(devices.get(0), CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE, deviceInfoBuff, null);
 		int maxWorkGroupSize = (int) deviceInfoBuff.getLong(0);
 		int nWorkGroups = (int) (Math.ceil((float) (MHDReader.Nx * MHDReader.Ny * MHDReader.Nz)
 				/ (float) maxWorkGroupSize));
+		int localGroupSize = FIND_MAX_LOCAL_SIZE;
 
-		float max = execFindMax(staticMemory, floatCTMatrix, nWorkGroups, maxWorkGroupSize, errorBuff);
-		IntBuffer histogram = execOtsuHistogram(staticMemory, floatCTMatrix, max, nWorkGroups, 64, errorBuff);
-		double threshold = Graytresh.thresholdFromHistogram(histogram, MHDReader.Nx * MHDReader.Ny * MHDReader.Nz);
-		System.out.println(threshold);
-		System.out.println(max);
-
-		// execBinarization(staticMemory, floatCTMatrix, (float) (threshold *
-		// max), errorBuff);
-	}
-
-	private static float execFindMax(CLMem[] staticMemory, float[] floatCTMatrix, int nWorkGroups, int localGroupSize,
-			IntBuffer errorBuff) {
 		CLKernel findMax = CL10.clCreateKernel(program, "findMax", null);
-		ByteBuffer deviceInfoBuff = BufferUtils.createByteBuffer(8);
-		CL10.clGetDeviceInfo(devices.get(0), CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE, deviceInfoBuff, null);
 		CLMem maxMemory = locateMemory(nWorkGroups * 4, errorBuff, CL10.CL_MEM_WRITE_ONLY);
 
 		findMax.setArg(0, staticMemory[MATRIX_DATA]);
@@ -187,13 +173,21 @@ public class ModelCreator {
 		return max;
 	}
 
-	private static IntBuffer execOtsuHistogram(CLMem[] staticMemory, float[] floatCTMatrix, float max, int nWorkGroups,
-			int localGroupSize, IntBuffer errorBuff) {
+	private static float execOtsuThreshold(CLMem[] staticMemory, float[] floatCTMatrix, float max, IntBuffer errorBuff) {
+		IntBuffer histogram = execOtsuHistogram(staticMemory, floatCTMatrix, max, errorBuff);
 		long start = measureTime(-1, "");
+		double threshold = Graytresh.thresholdFromHistogram(histogram, MHDReader.Nx * MHDReader.Ny * MHDReader.Nz);
+		measureTime(start, "Histogram");
+		return (float) threshold;
+	}
+
+	private static IntBuffer execOtsuHistogram(CLMem[] staticMemory, float[] floatCTMatrix, float max,
+			IntBuffer errorBuff) {
+		int localGroupSize = HISTOGRAM_LOCAL_SIZE;
 
 		CLKernel otsuHistogram = CL10.clCreateKernel(program, "otsuHistogram", null);
 		CLMem maxValueMemory = locateMemory(new float[] { max }, errorBuff, CL10.CL_MEM_READ_ONLY);
-		CLMem otsuHistogramMemory = locateMemory(new int[10000 * 256], errorBuff, CL10.CL_MEM_READ_WRITE);
+		CLMem otsuHistogramMemory = locateMemory(new int[256], errorBuff, CL10.CL_MEM_READ_WRITE);
 		Util.checkCLError(CL10.clFinish(queue));
 
 		otsuHistogram.setArg(0, staticMemory[MATRIX_DATA]);
@@ -201,7 +195,7 @@ public class ModelCreator {
 		otsuHistogram.setArg(2, maxValueMemory);
 		otsuHistogram.setArg(3, otsuHistogramMemory);
 
-		enqueueKernel(otsuHistogram, new int[] { 64 * 10000 }, new int[] { 64 });
+		enqueueKernel(otsuHistogram, new int[] { localGroupSize * 10000 }, new int[] { localGroupSize });
 		Util.checkCLError(CL10.clFinish(queue));
 
 		IntBuffer histogram = BufferUtils.createIntBuffer(256);
@@ -211,8 +205,6 @@ public class ModelCreator {
 		Util.checkCLError(CL10.clReleaseMemObject(otsuHistogramMemory));
 		Util.checkCLError(CL10.clFinish(queue));
 
-		measureTime(start, "Histogram");
-		// System.exit(0);
 		return histogram;
 	}
 
@@ -231,8 +223,10 @@ public class ModelCreator {
 		Util.checkCLError(CL10.clFinish(queue));
 	}
 
-	private static Object[] execMarchingCubes(CLMem[] staticMemory, float[] floatCTMatrix, IntBuffer errorBuff) {
+	private static Object[] execMarchingCubes(CLMem[] staticMemory, float[] floatCTMatrix, float max, float threshold,
+			IntBuffer errorBuff) {
 		CLKernel marchingKernel = CL10.clCreateKernel(program, "marchingCubes", null);
+		CLMem maxThreshMemory = locateMemory(new float[] { max, threshold }, errorBuff, CL10.CL_MEM_READ_WRITE);
 		CLMem trianglesMemory = locateMemory(floatCTMatrix.length / 2, errorBuff, CL10.CL_MEM_WRITE_ONLY);
 		CLMem normalsMemory = locateMemory(floatCTMatrix.length / 2, errorBuff, CL10.CL_MEM_WRITE_ONLY);
 		CLMem nTrianglesMemory = locateMemory(new int[1], errorBuff, CL10.CL_MEM_READ_WRITE);
@@ -241,9 +235,10 @@ public class ModelCreator {
 		// Set the kernel parameters
 		marchingKernel.setArg(0, staticMemory[MATRIX_DATA]);
 		marchingKernel.setArg(1, staticMemory[DIMENSIONS_DATA]);
-		marchingKernel.setArg(2, trianglesMemory);
-		marchingKernel.setArg(3, normalsMemory);
-		marchingKernel.setArg(4, nTrianglesMemory);
+		marchingKernel.setArg(2, maxThreshMemory);
+		marchingKernel.setArg(3, trianglesMemory);
+		marchingKernel.setArg(4, normalsMemory);
+		marchingKernel.setArg(5, nTrianglesMemory);
 		enqueueKernel(marchingKernel, new int[] { MHDReader.Nx, MHDReader.Ny, MHDReader.Nz });
 		Util.checkCLError(CL10.clFinish(queue));
 
@@ -254,8 +249,8 @@ public class ModelCreator {
 		CL10.clEnqueueReadBuffer(queue, trianglesMemory, CL10.CL_TRUE, 0, trianglesBuff, null, null);
 		CL10.clEnqueueReadBuffer(queue, normalsMemory, CL10.CL_TRUE, 0, normalsBuff, null, null);
 
-		CLMem[] memObj = { staticMemory[MATRIX_DATA], staticMemory[DIMENSIONS_DATA], trianglesMemory, normalsMemory,
-				nTrianglesMemory };
+		CLMem[] memObj = { staticMemory[MATRIX_DATA], staticMemory[DIMENSIONS_DATA], maxThreshMemory, trianglesMemory,
+				normalsMemory, nTrianglesMemory };
 		CLKernel[] kernelObj = { marchingKernel };
 		CLProgram[] programObj = { program };
 		cleanCLResources(memObj, kernelObj, programObj, true);

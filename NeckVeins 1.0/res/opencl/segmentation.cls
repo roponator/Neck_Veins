@@ -316,20 +316,21 @@ __constant float nTriangles[256] = {
 		};
 		
 		
-float4 linearInterpolate(float4 first, float4 second) {
-	 if (fabs(0.65 - first.w) < 0.1)
+float4 linearInterpolate(float4 first, float4 second, float thresh) {
+	 if (fabs(thresh - first.w) < 0.1)
 		 return first;
-	 if (fabs(0.65 - second.w) < 0.1)
+	 if (fabs(thresh - second.w) < 0.1)
 		 return second;
 	 if (fabs(first.w - second.w) < 0.1)
 		 return first;
-	float4 newVertex = first + (second - first) / (second.w - first.w) * (0.65 - first.w);
+	float4 newVertex = first + (second - first) / (second.w - first.w) * (thresh - first.w);
 	return newVertex;
 }
 
 // reference http://paulbourke.net/geometry/polygonise/
-__kernel void marchingCubes(global float* matrix, 
+__kernel void marchingCubes(global const float* matrix, 
 							global const int* dimensions, 
+							global const float* maxThresh,
 							global float* result, 
 							global float* normals,
 							global int* counter) {
@@ -341,6 +342,9 @@ __kernel void marchingCubes(global float* matrix,
 	const int Nx = dimensions[0];
    	const int Ny = dimensions[1];
    	const int Nz = dimensions[2];
+   	const float max = maxThresh[0];
+   	const float thresh = maxThresh[1];
+   	const float thresholdLevel = max * thresh;
    	
    	
    	// check if not on edge
@@ -386,12 +390,11 @@ __kernel void marchingCubes(global float* matrix,
 		
    		float values[8] = { leftBottomBack, rightBottomBack, rightBottomFront,  leftBottomFront,
 							leftTopBack, rightTopBack, rightTopFront, leftTopFront };
-		float4 gradients[8];
 		for (int i = 0; i < 8; i++) {
-			if (values[i] > 2300) {
+			if (values[i] > thresholdLevel) {
 				cubeIndex += 1 << i;
 			}
-			values[i] /= 3072.0002f;
+			values[i] /= max;
 		}
 
 		if (nTriangles[cubeIndex] > 0) {
@@ -407,40 +410,40 @@ __kernel void marchingCubes(global float* matrix,
 			
 			float4 vertices[12];
 			if ((edgeTable[cubeIndex] & 1) == 1) {
-				vertices[0] = linearInterpolate(vLeftBottomBack, vRightBottomBack);
+				vertices[0] = linearInterpolate(vLeftBottomBack, vRightBottomBack, thresh);
 			}
 			if ((edgeTable[cubeIndex] & 2) == 2){
-				vertices[1] = linearInterpolate(vRightBottomBack, vRightBottomFront);
+				vertices[1] = linearInterpolate(vRightBottomBack, vRightBottomFront, thresh);
 			}
 			if ((edgeTable[cubeIndex] & 4) == 4) {
-				vertices[2] = linearInterpolate(vRightBottomFront, vLeftBottomFront);
+				vertices[2] = linearInterpolate(vRightBottomFront, vLeftBottomFront, thresh);
 			}
 			if ((edgeTable[cubeIndex] & 8) == 8) {
-				vertices[3] = linearInterpolate(vLeftBottomFront, vLeftBottomBack);
+				vertices[3] = linearInterpolate(vLeftBottomFront, vLeftBottomBack, thresh);
 			}
 			if ((edgeTable[cubeIndex] & 16) == 16) {
-				vertices[4] = linearInterpolate(vLeftTopBack, vRightTopBack);
+				vertices[4] = linearInterpolate(vLeftTopBack, vRightTopBack, thresh);
 			}
 			if ((edgeTable[cubeIndex] & 32) == 32) {
-				vertices[5] = linearInterpolate(vRightTopBack, vRightTopFront);
+				vertices[5] = linearInterpolate(vRightTopBack, vRightTopFront, thresh);
 			}
 			if ((edgeTable[cubeIndex] & 64) == 64) {
-				vertices[6] = linearInterpolate(vRightTopFront, vLeftTopFront);
+				vertices[6] = linearInterpolate(vRightTopFront, vLeftTopFront, thresh);
 			}
 			if ((edgeTable[cubeIndex] & 128) == 128) {
-				vertices[7] = linearInterpolate(vLeftTopFront, vLeftTopBack);
+				vertices[7] = linearInterpolate(vLeftTopFront, vLeftTopBack, thresh);
 			}
 			if ((edgeTable[cubeIndex] & 256) == 256) {
-				vertices[8] = linearInterpolate(vLeftBottomBack, vLeftTopBack);
+				vertices[8] = linearInterpolate(vLeftBottomBack, vLeftTopBack, thresh);
 			}
 			if ((edgeTable[cubeIndex] & 512) == 512) {
-				vertices[9] = linearInterpolate(vRightBottomBack, vRightTopBack);
+				vertices[9] = linearInterpolate(vRightBottomBack, vRightTopBack, thresh);
 			}
 			if ((edgeTable[cubeIndex] & 1024) == 1024) {
-				vertices[10] = linearInterpolate(vRightBottomFront, vRightTopFront);
+				vertices[10] = linearInterpolate(vRightBottomFront, vRightTopFront, thresh);
 			}
 			if ((edgeTable[cubeIndex] & 2048) == 2048) {
-				vertices[11] = linearInterpolate(vLeftBottomFront, vLeftTopFront);
+				vertices[11] = linearInterpolate(vLeftBottomFront, vLeftTopFront, thresh);
 			}
 		
 			float4 normal;
