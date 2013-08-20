@@ -138,7 +138,7 @@ public class VeinsFrame extends Widget {
 		final Scrollbar gaussScrollbar = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
 		gaussScrollbar.setTheme("hscrollbar");
 		gaussScrollbar.setTooltipContent("Sets the sigma value.");
-		gaussScrollbar.setMinMaxValue(0, 100);
+		gaussScrollbar.setMinMaxValue(1, 100);
 		gaussScrollbar.setValue(50);
 		gaussScrollbar.adjustSize();
 		gaussScrollbar.setSize(500, 20);
@@ -168,7 +168,7 @@ public class VeinsFrame extends Widget {
 		final Scrollbar threshScrollbar = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
 		threshScrollbar.setTheme("hscrollbar");
 		threshScrollbar.setTooltipContent("Sets the sigma value.");
-		threshScrollbar.setMinMaxValue(0, 100);
+		threshScrollbar.setMinMaxValue(10, 100);
 		threshScrollbar.setValue(50);
 		threshScrollbar.adjustSize();
 		threshScrollbar.setSize(500, 20);
