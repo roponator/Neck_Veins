@@ -49,7 +49,7 @@ public class VeinsWindow extends Container {
 	private int fpsToDisplay;
 	private int clickedOn;
 	private GUI gui;
-	private ThemeManager themeManager;
+	public static ThemeManager themeManager;
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
 	public static Mouse3D joystick;
@@ -164,11 +164,7 @@ public class VeinsWindow extends Container {
 		try {
 			// Theme setup
 			themeManager = ThemeManager.createThemeManager(VeinsFrame.class.getResource("/xml/simple.xml"), renderer);
-			themeManager.getCursor("cursor.text");
-
 			gui.applyTheme(themeManager);
-			// renderer.setCursor((MouseCursor)
-			// themeManager.getCursor("arrow"));
 
 			// OpenGL setup
 			GL11.glClearStencil(0);

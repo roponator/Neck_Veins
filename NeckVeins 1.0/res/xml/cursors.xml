@@ -15,4 +15,7 @@
         <cursor name="cursor.resizerow" hotSpotX="7" hotSpotY="10" xywh="22,22,15,21"/>
         <cursor name="cursor.finger" hotSpotX="5" hotSpotY="1" xywh="47,0,17,22"/>
     </images>
+    <images file="../imgs/cursor-wait.png" format="RGBA">
+        <cursor name="cursor.wait" hotSpotX="12" hotSpotY="12" xywh="0,0,25,25"/>
+    </images>
 </themes>

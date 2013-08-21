@@ -24,6 +24,7 @@ import de.matthiasmann.twl.ToggleButton;
 import de.matthiasmann.twl.Widget;
 import de.matthiasmann.twl.model.JavaFileSystemModel;
 import de.matthiasmann.twl.model.SimpleChangableListModel;
+import de.matthiasmann.twl.renderer.MouseCursor;
 import de.matthiasmann.twl.textarea.SimpleTextAreaModel;
 
 public class VeinsFrame extends Widget {
@@ -115,8 +116,8 @@ public class VeinsFrame extends Widget {
 			@Override
 			public void run() {
 				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+				renderer.setCursor((MouseCursor) VeinsWindow.themeManager.getCursor("cursor.wait"));
 				renderer.changeModel(thresholdScrollbar.getValue() / 100.0f);
-
 			}
 		});
 		exportObjBtn = new Button("Export");
@@ -146,6 +147,7 @@ public class VeinsFrame extends Widget {
 		Callback2 cb = new Callback2() {
 			@Override
 			public void filesSelected(Object[] files) {
+
 				setButtonsEnabled(true);
 				fileSelector.setVisible(false);
 				File file = (File) files[0];
@@ -159,6 +161,7 @@ public class VeinsFrame extends Widget {
 						/ (double) threshFileOptionsScroll.getMaxValue() : -1;
 
 				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+				renderer.setCursor((MouseCursor) VeinsWindow.themeManager.getCursor("cursor.wait"));
 				renderer.loadModel(file.getAbsolutePath(), sigma, threshold);
 
 				thresholdScrollbar.setValue((int) (renderer.getVeinsModel().threshold * 100));
