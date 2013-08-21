@@ -8,6 +8,8 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
+import de.matthiasmann.twl.BorderLayout;
+import de.matthiasmann.twl.BorderLayout.Location;
 import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.FileSelector;
 import de.matthiasmann.twl.FileSelector.Callback2;
@@ -54,6 +56,14 @@ public class VeinsFrame extends Widget {
 	private ToggleButton lockTrans;
 	private Button camObj;
 
+	// Threshold scroll
+	private BorderLayout thresholdLayout;
+	private Label thresholdLabel;
+	private Scrollbar thresholdScrollbar;
+	private Label thresholdLevel;
+	private Button applyThreshBtn;
+	private Button exportObjBtn;
+
 	public VeinsFrame() throws LWJGLException {
 		getDisplayModes();
 		initGUI();
@@ -67,6 +77,7 @@ public class VeinsFrame extends Widget {
 	}
 
 	private void initGUI() {
+		initThresholdScroll();
 		initFileSelector();
 		initOpenButton();
 		initExitButton();
@@ -79,31 +90,45 @@ public class VeinsFrame extends Widget {
 		initVideoSettingsButtons();
 		initDisplayModeListBox();
 		init3DmouseButtons();
-		initThresholdScroll();
 	}
 
 	private void initThresholdScroll() {
-		final Scrollbar gaussScrollbar = new Scrollbar(Scrollbar.Orientation.VERTICAL);
-		gaussScrollbar.setTheme("vscrollbar");
-		gaussScrollbar.setTooltipContent("Sets the sigma value.");
-		gaussScrollbar.setMinMaxValue(1, 100);
-		gaussScrollbar.setValue(50);
-		gaussScrollbar.adjustSize();
-		gaussScrollbar.setSize(20, 200);
-		gaussScrollbar.setPosition(720, 300);
-		final Button apply = new Button("apply");
-		apply.setSize(30, 30);
-		apply.setPosition(720, 510);
-		apply.addCallback(new Runnable() {
+		thresholdLayout = new BorderLayout();
+
+		thresholdLabel = new Label("Threshold");
+		thresholdScrollbar = new Scrollbar(Scrollbar.Orientation.VERTICAL);
+		thresholdScrollbar.setTheme("vscrollbar");
+		thresholdScrollbar.setTooltipContent("Change threshold value.");
+		thresholdScrollbar.setMinMaxValue(1, 100);
+		thresholdScrollbar.setValue(50);
+		thresholdScrollbar.addCallback(new Runnable() {
+			@Override
+			public void run() {
+				thresholdLevel.setText(Float.toString(thresholdScrollbar.getValue() / 100.0f));
+			}
+		});
+		applyThreshBtn = new Button("Apply");
+		applyThreshBtn.addCallback(new Runnable() {
 			@Override
 			public void run() {
 				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
-				renderer.changeModel(gaussScrollbar.getValue() / 100.0f);
+				renderer.changeModel(thresholdScrollbar.getValue() / 100.0f);
 
 			}
 		});
-		this.add(gaussScrollbar);
-		this.add(apply);
+		exportObjBtn = new Button("Export");
+		thresholdLevel = new Label("0.5");
+		thresholdLevel.setTheme("value-label");
+
+		BorderLayout buttonHolder = new BorderLayout();
+		buttonHolder.add(thresholdLevel, Location.NORTH);
+		buttonHolder.add(exportObjBtn, Location.SOUTH);
+		buttonHolder.add(applyThreshBtn, Location.CENTER);
+		thresholdLayout.add(thresholdLabel, Location.NORTH);
+		thresholdLayout.add(buttonHolder, Location.WEST);
+		thresholdLayout.add(thresholdScrollbar, Location.EAST);
+		thresholdLayout.setVisible(false);
+		this.add(thresholdLayout);
 	}
 
 	private void initFileSelector() {
@@ -123,6 +148,8 @@ public class VeinsFrame extends Widget {
 				File file = (File) files[0];
 				System.out.println("\nOpening file: " + file.getAbsolutePath());
 
+				String[] tokens = file.getAbsolutePath().split("\\.(?=[^\\.]+$)");
+				thresholdLayout.setVisible(tokens[tokens.length - 1].equals("mhd"));
 				Widget userWidgetBottom = fileSelector.getUserWidgetBottom();
 				Scrollbar gaussScrollbar = (Scrollbar) userWidgetBottom.getChild(0);
 				Scrollbar threshScrollbar = (Scrollbar) userWidgetBottom.getChild(3);
@@ -130,6 +157,7 @@ public class VeinsFrame extends Widget {
 						/ (double) gaussScrollbar.getMaxValue() : -1;
 				double threshold = (threshScrollbar.isEnabled()) ? threshScrollbar.getValue()
 						/ (double) threshScrollbar.getMaxValue() : -1;
+				thresholdScrollbar.setValue(threshScrollbar.isEnabled() ? threshScrollbar.getValue() : 50);
 
 				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
 				renderer.loadModel(file.getAbsolutePath(), sigma, threshold);
@@ -547,6 +575,7 @@ public class VeinsFrame extends Widget {
 		displayModesButton.setEnabled(enabled);
 		helpButton.setEnabled(enabled);
 		creditsButton.setEnabled(enabled);
+		thresholdLayout.setEnabled(enabled);
 	}
 
 	public void mouseSettingsVisible(boolean visible) {
@@ -716,6 +745,13 @@ public class VeinsFrame extends Widget {
 		helpScrollPane.setSize(rlWidth, fsHeight);
 		helpScrollPane.setPosition(VeinsWindow.settings.resWidth / 2 - rlWidth / 2, VeinsWindow.settings.resHeight / 6);
 		helpTextArea.setSize(rlWidth, fsHeight);
+
+		thresholdLayout.setSize(exportObjBtn.getWidth() + thresholdScrollbar.getWidth(),
+				VeinsWindow.settings.resHeight / 4);
+		int positionX = VeinsWindow.settings.resWidth - thresholdLayout.getWidth() - VeinsWindow.settings.resWidth / 30;
+		int positionY = VeinsWindow.settings.resHeight - thresholdLayout.getHeight() - VeinsWindow.settings.resHeight
+				/ 30;
+		thresholdLayout.setPosition(positionX, positionY);
 	}
 
 	public void setLanguageSpecific() {

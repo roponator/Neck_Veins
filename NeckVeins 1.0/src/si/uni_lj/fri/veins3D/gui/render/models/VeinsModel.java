@@ -48,7 +48,7 @@ public class VeinsModel {
 	private int numberOfSubdivisions = 0;
 	private int maxSubDepth = 0;
 
-	private Quaternion currentOrientation;
+	public Quaternion currentOrientation;
 	private Quaternion addedOrientation;
 
 	public double[] veinsGrabbedAt;
@@ -59,9 +59,10 @@ public class VeinsModel {
 		setDefaultOrientation();
 	}
 
-	public VeinsModel(double threshold) {
+	public VeinsModel(double threshold, Quaternion currentQuaternion) {
 		constructVBOFromBuffer(threshold);
-		setDefaultOrientation();
+		this.currentOrientation = currentQuaternion;
+		this.addedOrientation = new Quaternion();
 	}
 
 	public void constructVBOFromBuffer(double threshold) {

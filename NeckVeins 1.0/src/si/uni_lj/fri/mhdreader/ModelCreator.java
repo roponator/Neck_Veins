@@ -100,6 +100,7 @@ public class ModelCreator {
 			threshold = execOtsuThreshold(staticMemory, floatCTMatrix, max, errorBuff);
 
 		Object[] output = execMarchingCubes(staticMemory, floatCTMatrix, max, (float) threshold, errorBuff);
+		output = execMarchingCubes(staticMemory, floatCTMatrix, max, (float) threshold, errorBuff);
 
 		System.out.println("GPU full time: " + (System.currentTimeMillis() - startTime) / 1000.0f + "s");
 
