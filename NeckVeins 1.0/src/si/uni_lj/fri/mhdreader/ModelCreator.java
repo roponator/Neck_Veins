@@ -34,7 +34,7 @@ public class ModelCreator {
 	private static final int MATRIX_DATA = 0;
 	private static final int DIMENSIONS_DATA = 1;
 
-	private static final int FIND_MAX_LOCAL_SIZE = 64;
+	private static final int FIND_MAX_LOCAL_SIZE = 512;
 	private static final int HISTOGRAM_LOCAL_SIZE = 64;
 
 	// OpenCL variables
@@ -89,9 +89,10 @@ public class ModelCreator {
 		CLMem dimensionsMemory = locateMemory(dimensions, errorBuff, CL10.CL_MEM_READ_ONLY);
 		CLMem matrixMemory = locateMemory(floatCTMatrix.length * 4, errorBuff, CL10.CL_MEM_READ_WRITE);
 		staticMemory = new CLMem[] { matrixMemory, dimensionsMemory };
+		Util.checkCLError(CL10.clFinish(queue));
 
 		if (sigma > 0)
-			execGauss3D(errorBuff, staticMemory, floatCTMatrix, sigma, size);
+			execGauss3D(errorBuff, floatCTMatrix, sigma, size);
 		else
 			staticMemory[MATRIX_DATA] = locateMemory(floatCTMatrix, errorBuff, CL10.CL_MEM_READ_WRITE);
 
@@ -121,8 +122,7 @@ public class ModelCreator {
 		return output;
 	}
 
-	private static void execGauss3D(IntBuffer errorBuff, CLMem[] staticMemory, float[] floatCTMatrix, double sigma,
-			int size) {
+	private static void execGauss3D(IntBuffer errorBuff, float[] floatCTMatrix, double sigma, int size) {
 		// Init kernels
 		CLKernel gaussX = CL10.clCreateKernel(program, "gaussX", null);
 		CLKernel gaussY = CL10.clCreateKernel(program, "gaussY", null);
@@ -196,8 +196,8 @@ public class ModelCreator {
 	}
 
 	private static float execOtsuThreshold(CLMem[] staticMemory, float[] floatCTMatrix, float max, IntBuffer errorBuff) {
-		IntBuffer histogram = execOtsuHistogram(staticMemory, floatCTMatrix, max, errorBuff);
 		long start = measureTime(-1, "");
+		IntBuffer histogram = execOtsuHistogram(staticMemory, floatCTMatrix, max, errorBuff);
 		double threshold = Graytresh.thresholdFromHistogram(histogram, MHDReader.Nx * MHDReader.Ny * MHDReader.Nz);
 		measureTime(start, "Histogram");
 		return (float) threshold;
@@ -276,7 +276,7 @@ public class ModelCreator {
 		CLProgram[] programObj = {};
 		cleanCLResources(memObj, kernelObj, programObj, false);
 
-		return new Object[] { nTrianglesBuff, trianglesBuff, normalsBuff };
+		return new Object[] { nTrianglesBuff, trianglesBuff, normalsBuff, threshold };
 
 	}
 

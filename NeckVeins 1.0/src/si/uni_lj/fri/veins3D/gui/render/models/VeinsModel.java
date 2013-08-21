@@ -45,6 +45,7 @@ public class VeinsModel {
 	public double centerx, centery, centerz;
 	public float maxX, maxY, maxZ;
 	public float minX, minY, minZ;
+	public float threshold = 0;
 	private int numberOfSubdivisions = 0;
 	private int maxSubDepth = 0;
 
@@ -180,6 +181,7 @@ public class VeinsModel {
 		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
 		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
 		// FloatBuffer normalsBuff = (FloatBuffer) output[2];
+		this.threshold = (Float) output[3];
 
 		vertices = new ArrayList<Float>();
 		centerx = 0;

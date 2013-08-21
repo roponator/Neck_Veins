@@ -53,6 +53,7 @@ public class VeinsWindow extends Container {
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
 	public static Mouse3D joystick;
+
 	/**
 	 * 
 	 */
@@ -76,17 +77,17 @@ public class VeinsWindow extends Container {
 		initWindowElements();
 		setupWindow();
 	}
+
 	/**
 	 * 
 	 */
-	/*private void setMouseSettings(NeckVeinsSettings settings){
-			joystick.rotLock=settings.mRot;
-	        joystick.axisLock=settings.mTrans;
-	        joystick.strong=settings.mStrong;
-	        joystick.selected=settings.mSelected;
-	        joystick.setSensitivity(settings.sensitivity);
-    }*/
-	
+	/*
+	 * private void setMouseSettings(NeckVeinsSettings settings){
+	 * joystick.rotLock=settings.mRot; joystick.axisLock=settings.mTrans;
+	 * joystick.strong=settings.mStrong; joystick.selected=settings.mSelected;
+	 * joystick.setSensitivity(settings.sensitivity); }
+	 */
+
 	/**
 	 * 
 	 */
@@ -104,7 +105,7 @@ public class VeinsWindow extends Container {
 						currentDisplayMode = mode;
 					}
 				}
-				//setMouseSettings(settings);
+				// setMouseSettings(settings);
 			} else {
 				settings = new NeckVeinsSettings();
 				settings.isFpsShown = false;
@@ -149,7 +150,7 @@ public class VeinsWindow extends Container {
 			gui = new GUI(frame, renderer);
 			add(gui);
 			setTheme("mainframe");
-			joystick=new Mouse3D(settings);
+			joystick = new Mouse3D(settings);
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 			exitProgram(1);
@@ -163,7 +164,11 @@ public class VeinsWindow extends Container {
 		try {
 			// Theme setup
 			themeManager = ThemeManager.createThemeManager(VeinsFrame.class.getResource("/xml/simple.xml"), renderer);
+			themeManager.getCursor("cursor.text");
+
 			gui.applyTheme(themeManager);
+			// renderer.setCursor((MouseCursor)
+			// themeManager.getCursor("arrow"));
 
 			// OpenGL setup
 			GL11.glClearStencil(0);
@@ -406,18 +411,22 @@ public class VeinsWindow extends Container {
 		}
 
 	}
-	private void poll3DMouseInput(){
-		
-		if(joystick.connected()&&renderer.getVeinsModel()!=null){
+
+	private void poll3DMouseInput() {
+
+		if (joystick.connected() && renderer.getVeinsModel() != null) {
 			joystick.pollMouse();
-			if(settings.mSelected)
+			if (settings.mSelected)
 				renderer.getCamera().moveCamera3D(joystick.getAxis(), joystick.getRot());
-			else{
-				renderer.getCamera().moveCamera3D(new double[] {-joystick.getAxisX(),-joystick.getAxisY(),-joystick.getAxisZ()}, new double[]{0,0,0});
+			else {
+				renderer.getCamera().moveCamera3D(
+						new double[] { -joystick.getAxisX(), -joystick.getAxisY(), -joystick.getAxisZ() },
+						new double[] { 0, 0, 0 });
 				renderer.getVeinsModel().rotateModel3D(joystick.getRot());
 			}
 		}
 	}
+
 	/**
 	 * Calculates on which element mouse click was performed - on HUD element or
 	 * on veins model

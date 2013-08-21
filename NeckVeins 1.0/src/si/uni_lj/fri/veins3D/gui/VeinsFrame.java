@@ -28,6 +28,8 @@ import de.matthiasmann.twl.textarea.SimpleTextAreaModel;
 
 public class VeinsFrame extends Widget {
 	private FileSelector fileSelector;
+	private Scrollbar gaussFileOptionsScroll;
+	private Scrollbar threshFileOptionsScroll;
 	private boolean isDialogOpened;
 	private Button openButton;
 	private Button exitButton;
@@ -94,6 +96,7 @@ public class VeinsFrame extends Widget {
 
 	private void initThresholdScroll() {
 		thresholdLayout = new BorderLayout();
+		thresholdLayout.setTheme("borderlayout");
 
 		thresholdLabel = new Label("Threshold");
 		thresholdScrollbar = new Scrollbar(Scrollbar.Orientation.VERTICAL);
@@ -150,17 +153,15 @@ public class VeinsFrame extends Widget {
 
 				String[] tokens = file.getAbsolutePath().split("\\.(?=[^\\.]+$)");
 				thresholdLayout.setVisible(tokens[tokens.length - 1].equals("mhd"));
-				Widget userWidgetBottom = fileSelector.getUserWidgetBottom();
-				Scrollbar gaussScrollbar = (Scrollbar) userWidgetBottom.getChild(0);
-				Scrollbar threshScrollbar = (Scrollbar) userWidgetBottom.getChild(3);
-				double sigma = (gaussScrollbar.isEnabled()) ? gaussScrollbar.getValue()
-						/ (double) gaussScrollbar.getMaxValue() : -1;
-				double threshold = (threshScrollbar.isEnabled()) ? threshScrollbar.getValue()
-						/ (double) threshScrollbar.getMaxValue() : -1;
-				thresholdScrollbar.setValue(threshScrollbar.isEnabled() ? threshScrollbar.getValue() : 50);
+				double sigma = (gaussFileOptionsScroll.isEnabled()) ? gaussFileOptionsScroll.getValue()
+						/ (double) gaussFileOptionsScroll.getMaxValue() : -1;
+				double threshold = (threshFileOptionsScroll.isEnabled()) ? threshFileOptionsScroll.getValue()
+						/ (double) threshFileOptionsScroll.getMaxValue() : -1;
 
 				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
 				renderer.loadModel(file.getAbsolutePath(), sigma, threshold);
+
+				thresholdScrollbar.setValue((int) (renderer.getVeinsModel().threshold * 100));
 			}
 
 			@Override
@@ -188,75 +189,66 @@ public class VeinsFrame extends Widget {
 
 	private Widget initSegmentationOptions() {
 		/* Gauss Options */
-		final Scrollbar gaussScrollbar = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
-		gaussScrollbar.setTheme("hscrollbar");
-		gaussScrollbar.setTooltipContent("Sets the sigma value.");
-		gaussScrollbar.setMinMaxValue(1, 100);
-		gaussScrollbar.setValue(50);
-		gaussScrollbar.adjustSize();
-		gaussScrollbar.setSize(500, 20);
-
 		final Label sigmaValue = new Label("0.50");
 		sigmaValue.setTheme("value-label");
-		sigmaValue.adjustSize();
-		sigmaValue.setSize(40, 15);
-		sigmaValue.setPosition(500, -1);
-
-		final Button enableBtn = new Button("Disable");
-		enableBtn.setSize(80, 15);
-		enableBtn.setPosition(550, -1);
-
-		gaussScrollbar.addCallback(new Runnable() {
+		gaussFileOptionsScroll = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
+		gaussFileOptionsScroll.setTheme("hscrollbar");
+		gaussFileOptionsScroll.setTooltipContent("Sets Gaussian filter sigma.");
+		gaussFileOptionsScroll.setMinMaxValue(1, 100);
+		gaussFileOptionsScroll.setValue(50);
+		gaussFileOptionsScroll.addCallback(new Runnable() {
 			public void run() {
-				sigmaValue.setText(Float.toString(gaussScrollbar.getValue() / 100.0f));
+				sigmaValue.setText(Float.toString(gaussFileOptionsScroll.getValue() / 100.0f));
 			}
 		});
-		enableBtn.addCallback(new Runnable() {
+		final Button gaussEnableBtn = new Button("Disable");
+		gaussEnableBtn.addCallback(new Runnable() {
 			public void run() {
-				gaussScrollbar.setEnabled(enableBtn.getText().equals("Enable"));
-				enableBtn.setText(enableBtn.getText().equals("Enable") ? "Disable" : "Enable");
+				gaussFileOptionsScroll.setEnabled(gaussEnableBtn.getText().equals("Enable"));
+				gaussEnableBtn.setText(gaussEnableBtn.getText().equals("Enable") ? "Disable" : "Enable");
 			}
 		});
+		Label gaussLabel = new Label("Sets Gaussian filter sigma.");
+		gaussLabel.setTheme("title-label");
+		BorderLayout gaussOptions = new BorderLayout();
+		gaussOptions.add(gaussFileOptionsScroll, Location.WEST);
+		gaussOptions.add(sigmaValue, Location.CENTER);
+		gaussOptions.add(gaussEnableBtn, Location.EAST);
+		gaussOptions.add(gaussLabel, Location.NORTH);
 
-		final Scrollbar threshScrollbar = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
-		threshScrollbar.setTheme("hscrollbar");
-		threshScrollbar.setTooltipContent("Sets the sigma value.");
-		threshScrollbar.setMinMaxValue(1, 100);
-		threshScrollbar.setValue(50);
-		threshScrollbar.adjustSize();
-		threshScrollbar.setSize(500, 20);
-		threshScrollbar.setPosition(0, 25);
-
+		/* Threshold options */
 		final Label threshValue = new Label("0.50");
 		threshValue.setTheme("value-label");
-		threshValue.adjustSize();
-		threshValue.setSize(40, 15);
-		threshValue.setPosition(500, 24);
-		threshScrollbar.addCallback(new Runnable() {
+		threshFileOptionsScroll = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
+		threshFileOptionsScroll.setTheme("hscrollbar");
+		threshFileOptionsScroll.setTooltipContent("Sets the sigma value.");
+		threshFileOptionsScroll.setMinMaxValue(1, 100);
+		threshFileOptionsScroll.setValue(50);
+		threshFileOptionsScroll.addCallback(new Runnable() {
 			public void run() {
-				threshValue.setText(Float.toString(threshScrollbar.getValue() / 100.0f));
+				threshValue.setText(Float.toString(threshFileOptionsScroll.getValue() / 100.0f));
 			}
 		});
-
 		final Button autoThreshBtn = new Button("Auto");
-		autoThreshBtn.setSize(80, 15);
-		autoThreshBtn.setPosition(550, 24);
 		autoThreshBtn.addCallback(new Runnable() {
 			public void run() {
-				threshScrollbar.setEnabled(autoThreshBtn.getText().equals("Manual"));
+				threshFileOptionsScroll.setEnabled(autoThreshBtn.getText().equals("Manual"));
 				autoThreshBtn.setText(autoThreshBtn.getText().equals("Auto") ? "Manual" : "Auto");
 			}
 		});
+		Label thresholdLabel = new Label("Set threshold level:");
+		thresholdLabel.setTheme("title-label");
+		BorderLayout thresholdOptions = new BorderLayout();
+		thresholdOptions.add(threshFileOptionsScroll, Location.WEST);
+		thresholdOptions.add(threshValue, Location.CENTER);
+		thresholdOptions.add(autoThreshBtn, Location.EAST);
+		thresholdOptions.add(thresholdLabel, Location.NORTH);
 
-		Widget fileOptions = new Widget();
-		fileOptions.add(gaussScrollbar);
-		fileOptions.add(sigmaValue);
-		fileOptions.add(enableBtn);
-		fileOptions.add(threshScrollbar);
-		fileOptions.add(threshValue);
-		fileOptions.add(autoThreshBtn);
+		BorderLayout userBottomWidget = new BorderLayout();
+		userBottomWidget.add(gaussOptions, Location.NORTH);
+		userBottomWidget.add(thresholdOptions, Location.SOUTH);
 
-		return fileOptions;
+		return userBottomWidget;
 	}
 
 	private void initOpenButton() {
@@ -741,6 +733,16 @@ public class VeinsFrame extends Widget {
 				+ rlWidth / 2;
 		fileSelector.setSize(rlWidth, fsHeight);
 		fileSelector.setPosition(VeinsWindow.settings.resWidth / 2 - rlWidth / 2, VeinsWindow.settings.resHeight / 6);
+		for (int i = 0; i < fileSelector.getUserWidgetBottom().getNumChildren(); i++) {
+			BorderLayout options = (BorderLayout) fileSelector.getUserWidgetBottom().getChild(i);
+			Widget west = options.getChild(Location.WEST);
+			west.setMinSize((int) (VeinsWindow.settings.resWidth / 1.6f), 20);
+			Widget center = options.getChild(Location.CENTER);
+			center.setMinSize(VeinsWindow.settings.resWidth / 10, 20);
+			Widget east = options.getChild(Location.EAST);
+			east.setMinSize(VeinsWindow.settings.resWidth / 10, 20);
+			options.adjustSize();
+		}
 
 		helpScrollPane.setSize(rlWidth, fsHeight);
 		helpScrollPane.setPosition(VeinsWindow.settings.resWidth / 2 - rlWidth / 2, VeinsWindow.settings.resHeight / 6);

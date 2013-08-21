@@ -508,7 +508,7 @@ __kernel void binarize(__global float* matrix,__global const int* dimensions, __
    		matrix[index] = 0;
 }
 
-__kernel void gaussX(__global float* matrix, __global const int* dimensions, __global const float* gaussKernel, __global float* result ) {
+__kernel void gaussX(__global const float* matrix, __global const int* dimensions, __global const float* gaussKernel, __global float* result ) {
 	// dimensions
 	const int Nx = dimensions[0];
    	const int Ny = dimensions[1];
@@ -518,7 +518,7 @@ __kernel void gaussX(__global float* matrix, __global const int* dimensions, __g
    	const int y = get_global_id(1);
    	const int z = get_global_id(2);
    	
-	float value = 0;
+   	private float value = 0;
 	for (int i = 0; i < size; i++) {
 		value += matrix[(x + i - size / 2) + y * Nx + z * Nx * Ny] * gaussKernel[size - i - 1];
 	}
@@ -527,7 +527,7 @@ __kernel void gaussX(__global float* matrix, __global const int* dimensions, __g
 
 }
 
-kernel void gaussY(global float* matrix, global const int* dimensions, global const float* gaussKernel, __global float* result ) {
+kernel void gaussY(global const float* matrix, global const int* dimensions, global const float* gaussKernel, __global float* result ) {
 	// dimensions
 	const int Nx = dimensions[0];
    	const int Ny = dimensions[1];
@@ -537,7 +537,7 @@ kernel void gaussY(global float* matrix, global const int* dimensions, global co
    	const int y = get_global_id(1);
    	const int z = get_global_id(2);
    	
-	float value = 0;
+   	private float value = 0;
 	for (int i = 0; i < size; i++) {
 		if ((y + i - size / 2) < 0 || (y + i - size / 2) >= Ny)
 			continue;
@@ -547,7 +547,7 @@ kernel void gaussY(global float* matrix, global const int* dimensions, global co
 
 }
 
-kernel void gaussZ(global float* matrix, global const int* dimensions, global const float* gaussKernel, __global float* result ) {
+kernel void gaussZ(global const float* matrix, global const int* dimensions, global const float* gaussKernel, __global float* result ) {
 	// dimensions
 	const int Nx = dimensions[0];
    	const int Ny = dimensions[1];
@@ -557,7 +557,7 @@ kernel void gaussZ(global float* matrix, global const int* dimensions, global co
    	const int y = get_global_id(1);
    	const int z = get_global_id(2);
    	
-	float value = 0;
+	private float value = 0;
 	for (int i = 0; i < size; i++) {
 		if ((z + i - size / 2) < 0 || (z + i - size / 2) >= Nz)
 			continue;
@@ -567,7 +567,7 @@ kernel void gaussZ(global float* matrix, global const int* dimensions, global co
    	
 }
 
-kernel void findMax(global float* matrix, global const int* dimensions, local float* scratch, global float* max) {
+kernel void findMax(global const float* matrix, global const int* dimensions, local float* scratch, global float* max) {
 	int globalIndex = get_global_id(0);
 	int length = dimensions[0] * dimensions[1] * dimensions[2];
 	float accumulator = 0;
@@ -596,10 +596,10 @@ kernel void findMax(global float* matrix, global const int* dimensions, local fl
     }
 }
 
-kernel void otsuHistogram(global float* matrix, global const int* dimensions,global const float* max, global int* otsuValues) {
+kernel void otsuHistogram(global const float* matrix, global const int* dimensions,global const float* max, global int* otsuValues) {
 	local int otsuLocal[256];
 	
-	int length = dimensions[0] * dimensions[1] * dimensions[2];
+	const int length = dimensions[0] * dimensions[1] * dimensions[2];
 	int localBuffSize = 256; 
 	int globalIndex = get_global_id(0);
 	int localIndex = get_local_id(0);
