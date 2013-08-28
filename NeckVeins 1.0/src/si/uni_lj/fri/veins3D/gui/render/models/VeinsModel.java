@@ -25,7 +25,10 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import si.uni_lj.fri.mhdreader.ModelCreator;
+import si.uni_lj.fri.mhdreader.utils.LabelUtil;
+import si.uni_lj.fri.mhdreader.utils.TrianglesLabelHelper;
 import si.uni_lj.fri.mhdreader.utils.obj.Coordinates;
+import si.uni_lj.fri.mhdreader.utils.obj.Triangle;
 import si.uni_lj.fri.mhdreader.utils.obj.Vertex;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.math.Quaternion;
@@ -40,6 +43,7 @@ import si.uni_lj.fri.veins3D.utils.RayUtil;
 public class VeinsModel {
 	private final int APLICATION_SUBDIVISION_LIMIT = 3;
 
+	private TrianglesLabelHelper labelHelper;
 	protected ArrayList<Float> vertices;
 	protected ArrayList<Mesh> meshes;
 	public double centerx, centery, centerz;
@@ -92,11 +96,11 @@ public class VeinsModel {
 		float x, y, z;
 
 		// meshes variables
+		long start = System.currentTimeMillis();
 		meshes = new ArrayList<Mesh>();
 		ArrayList<Integer> tempFaces = new ArrayList<Integer>();
 		ArrayList<String> groups = new ArrayList<String>();
 		int tempFaceCount = 0;
-
 		LinkedHashMap<Coordinates, Vertex> uniqueVertices = new LinkedHashMap<Coordinates, Vertex>(
 				nTrianglesBuff.get(0) / 10);
 		int index = 1;
@@ -154,6 +158,7 @@ public class VeinsModel {
 		for (Mesh mesh : meshes) {
 			mesh.constructVBO();
 		}
+		System.out.println("time: " + (System.currentTimeMillis() - start) / 1000.0f);
 	}
 
 	public void constructVBOFromFile(String filepath, double sigma, double threshold) {
@@ -177,11 +182,15 @@ public class VeinsModel {
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 		}
-
+		long start = System.currentTimeMillis();
 		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
 		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
 		// FloatBuffer normalsBuff = (FloatBuffer) output[2];
 		this.threshold = (Float) output[3];
+		labelHelper = new TrianglesLabelHelper(nTrianglesBuff.get(0));
+		LabelUtil.createVertexList(nTrianglesBuff.get(0), trianglesBuff, labelHelper);
+		// boolean[] labels = LabelUtil.getValidLabels(nTrianglesBuff.get(0),
+		// 10000, labelHelper);
 
 		vertices = new ArrayList<Float>();
 		centerx = 0;
@@ -201,43 +210,36 @@ public class VeinsModel {
 		ArrayList<Integer> tempFaces = new ArrayList<Integer>();
 		ArrayList<String> groups = new ArrayList<String>();
 		int tempFaceCount = 0;
-
-		LinkedHashMap<Coordinates, Vertex> uniqueVertices = new LinkedHashMap<Coordinates, Vertex>(
-				nTrianglesBuff.get(0) / 10);
-		int index = 1;
-		for (int i = 0; i < nTrianglesBuff.get(0); i++) {
-			/* Vertices */
-			for (int j = 2; j >= 0; j--) {
-				x = trianglesBuff.get(i * 9 + j * 3);
-				y = trianglesBuff.get(i * 9 + j * 3 + 1);
-				z = trianglesBuff.get(i * 9 + j * 3 + 2);
-
-				Coordinates key = new Coordinates(x, y, z);
-				if (!uniqueVertices.containsKey(key)) {
-					vertices.add(x);
-					vertices.add(y);
-					vertices.add(z);
-					centerx += x;
-					centery += y;
-					centerz += z;
-					if (x < minX)
-						minX = x;
-					if (y < minY)
-						minY = y;
-					if (z < minZ)
-						minZ = z;
-					if (x > maxX)
-						maxX = x;
-					if (y > maxY)
-						maxY = y;
-					if (z > maxZ)
-						maxZ = z;
-					uniqueVertices.put(key, new Vertex(x, y, z, index++));
-				}
-				tempFaces.add(uniqueVertices.get(key).index);
-			}
-			tempFaceCount++;
+		System.out.println(labelHelper.getUniqueVerts().size());
+		for (Vertex v : labelHelper.getUniqueVerts().keySet()) {
+			vertices.add(x = v.x);
+			vertices.add(y = v.y);
+			vertices.add(z = v.z);
+			centerx += x;
+			centery += y;
+			centerz += z;
+			if (x < minX)
+				minX = x;
+			if (y < minY)
+				minY = y;
+			if (z < minZ)
+				minZ = z;
+			if (x > maxX)
+				maxX = x;
+			if (y > maxY)
+				maxY = y;
+			if (z > maxZ)
+				maxZ = z;
 		}
+		for (Triangle t : labelHelper.getTriangles()) {
+
+			tempFaces.add(t.v3.index);
+			tempFaces.add(t.v2.index);
+			tempFaces.add(t.v1.index);
+			tempFaceCount++;
+
+		}
+
 		if (tempFaceCount > 0) {
 			// It seems that since last starting a new group, there have
 			// been faces stored
@@ -259,6 +261,7 @@ public class VeinsModel {
 		for (Mesh mesh : meshes) {
 			mesh.constructVBO();
 		}
+		System.out.println("time: " + (System.currentTimeMillis() - start) / 1000.0f);
 	}
 
 	public void constructVBOFromObjFile(String filepath) {

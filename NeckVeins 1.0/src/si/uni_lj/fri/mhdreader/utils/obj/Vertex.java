@@ -26,4 +26,24 @@ public class Vertex {
 	public String toString() {
 		return "v " + x + " " + y + " " + z;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (this.getClass() != obj.getClass())
+			return false;
+
+		Vertex other = (Vertex) obj;
+		if (this.x != other.x || this.y != other.y || this.z != other.z)
+			return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = (new Float(x).hashCode() >> 17) ^ (new Float(y).hashCode() ^ new Float(z).hashCode());
+		return hashCode;
+	}
 }

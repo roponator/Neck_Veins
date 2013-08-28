@@ -1,12 +1,12 @@
 package si.uni_lj.fri.mhdreader.utils.obj;
 
-
 public class Triangle {
 	public Vertex v1;
 	public Vertex v2;
 	public Vertex v3;
 	public double[] normal;
 	public int normalIndex;
+	public int label;
 
 	public Triangle(Vertex v1, Vertex v2, Vertex v3) {
 		this.v1 = v1;
@@ -25,5 +25,9 @@ public class Triangle {
 
 	public String normal() {
 		return "vn " + normal[0] + " " + normal[1] + " " + normal[2] + "\n";
+	}
+
+	public boolean isLabeled() {
+		return label != 0;
 	}
 }

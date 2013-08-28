@@ -67,6 +67,10 @@ public class VeinsFrame extends Widget {
 	private Button applyThreshBtn;
 	private Button exportObjBtn;
 
+	// Min Triangles Scroll
+	BorderLayout minTriangelsLayout;
+	Scrollbar minTrianglesScrollbar;
+
 	public VeinsFrame() throws LWJGLException {
 		getDisplayModes();
 		initGUI();
@@ -80,6 +84,7 @@ public class VeinsFrame extends Widget {
 	}
 
 	private void initGUI() {
+		initMinTrianglesScroll();
 		initThresholdScroll();
 		initFileSelector();
 		initOpenButton();
@@ -93,6 +98,29 @@ public class VeinsFrame extends Widget {
 		initVideoSettingsButtons();
 		initDisplayModeListBox();
 		init3DmouseButtons();
+	}
+
+	private void initMinTrianglesScroll() {
+		minTrianglesScrollbar = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
+		minTrianglesScrollbar.setMinMaxValue(0, 5);
+		minTrianglesScrollbar.setValue(0);
+		minTrianglesScrollbar.addCallback(new Runnable() {
+			@Override
+			public void run() {
+				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+
+			}
+		});
+		Label minTriangelsLabel = new Label("Min triangels per component:");
+		Label minTriangelsValue = new Label("0");
+		minTriangelsValue.setTheme("value-label");
+
+		minTriangelsLayout = new BorderLayout();
+		minTriangelsLayout.add(minTrianglesScrollbar, Location.WEST);
+		minTriangelsLayout.add(minTriangelsValue, Location.EAST);
+		minTriangelsLayout.add(minTriangelsLabel, Location.NORTH);
+		minTriangelsLayout.setVisible(false);
+		add(minTriangelsLayout);
 	}
 
 	private void initThresholdScroll() {
@@ -147,7 +175,6 @@ public class VeinsFrame extends Widget {
 		Callback2 cb = new Callback2() {
 			@Override
 			public void filesSelected(Object[] files) {
-
 				setButtonsEnabled(true);
 				fileSelector.setVisible(false);
 				File file = (File) files[0];
@@ -155,6 +182,7 @@ public class VeinsFrame extends Widget {
 
 				String[] tokens = file.getAbsolutePath().split("\\.(?=[^\\.]+$)");
 				thresholdLayout.setVisible(tokens[tokens.length - 1].equals("mhd"));
+				minTriangelsLayout.setVisible(tokens[tokens.length - 1].equals("mhd"));
 				double sigma = (gaussFileOptionsScroll.isEnabled()) ? gaussFileOptionsScroll.getValue()
 						/ (double) gaussFileOptionsScroll.getMaxValue() : -1;
 				double threshold = (threshFileOptionsScroll.isEnabled()) ? threshFileOptionsScroll.getValue()
@@ -571,6 +599,7 @@ public class VeinsFrame extends Widget {
 		helpButton.setEnabled(enabled);
 		creditsButton.setEnabled(enabled);
 		thresholdLayout.setEnabled(enabled);
+		minTriangelsLayout.setEnabled(enabled);
 	}
 
 	public void mouseSettingsVisible(boolean visible) {
@@ -757,6 +786,11 @@ public class VeinsFrame extends Widget {
 		int positionY = VeinsWindow.settings.resHeight - thresholdLayout.getHeight() - VeinsWindow.settings.resHeight
 				/ 30;
 		thresholdLayout.setPosition(positionX, positionY);
+
+		minTrianglesScrollbar.setMinSize((int) (VeinsWindow.settings.resWidth / 5), 20);
+		minTriangelsLayout.getChild(Location.EAST).setMinSize(VeinsWindow.settings.resWidth / 10, 20);
+		minTriangelsLayout.adjustSize();
+		minTriangelsLayout.setPosition(20, positionY + thresholdLayout.getHeight() - minTriangelsLayout.getHeight());
 	}
 
 	public void setLanguageSpecific() {
