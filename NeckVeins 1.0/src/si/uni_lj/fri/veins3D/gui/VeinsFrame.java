@@ -111,7 +111,7 @@ public class VeinsFrame extends Widget {
 
 			}
 		});
-		Label minTriangelsLabel = new Label("Min triangels per component:");
+		Label minTriangelsLabel = new Label("Min triangles per component:");
 		Label minTriangelsValue = new Label("0");
 		minTriangelsValue.setTheme("value-label");
 

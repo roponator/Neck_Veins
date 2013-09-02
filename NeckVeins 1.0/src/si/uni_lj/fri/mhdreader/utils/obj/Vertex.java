@@ -1,5 +1,7 @@
 package si.uni_lj.fri.mhdreader.utils.obj;
 
+import java.util.ArrayList;
+
 public class Vertex {
 	public float x;
 	public float y;
@@ -7,6 +9,8 @@ public class Vertex {
 	public int index;
 	public int normalIndex;
 	public double value;
+	public boolean isLabeled = false;
+	public ArrayList<Integer> triangles;
 
 	public Vertex(float x, float y, float z, int index) {
 		this.x = x;
@@ -25,6 +29,10 @@ public class Vertex {
 
 	public String toString() {
 		return "v " + x + " " + y + " " + z;
+	}
+
+	public boolean isLabeled() {
+		return isLabeled;
 	}
 
 	@Override

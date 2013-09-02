@@ -2,7 +2,6 @@ package si.uni_lj.fri.mhdreader.utils;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
@@ -49,26 +48,18 @@ public class LabelUtil {
 
 	private static void labelTriangels(int nTriangles, TrianglesLabelHelper helper) {
 		Triangle[] tris = helper.getTriangles();
-		HashMap<Vertex, ArrayList<Integer>> map = helper.getVertTriMap();
-		LinkedHashMap<Vertex, Boolean> vertLabeled = helper.getUniqueVerts();
 		LinkedList<Integer> trianglesFIFO = new LinkedList<Integer>();
-		Vertex[] tVrts = new Vertex[3];
 		int label = 1;
-		for (Vertex v : map.keySet()) {
-			if (!vertLabeled.put(v, true)) {
-				trianglesFIFO.addAll(map.get(v));
+		for (int i = 0; i < nTriangles; i++) {
+			Triangle t = tris[i];
+			if (!t.isLabeled()) {
+				t.label = label;
+				updateFIFO(t, trianglesFIFO);
 				while (!trianglesFIFO.isEmpty()) {
-					Triangle t = tris[trianglesFIFO.pop()];
+					t = tris[trianglesFIFO.pop()];
 					if (!t.isLabeled()) {
 						t.label = label;
-						tVrts[0] = t.v1;
-						tVrts[1] = t.v2;
-						tVrts[2] = t.v3;
-						for (Vertex tV : tVrts) {
-							if (!vertLabeled.put(tV, true)) {
-								trianglesFIFO.addAll(map.get(tV));
-							}
-						}
+						updateFIFO(t, trianglesFIFO);
 					}
 				}
 				label++;
@@ -76,12 +67,25 @@ public class LabelUtil {
 		}
 	}
 
+	private static void updateFIFO(Triangle t, LinkedList<Integer> trianglesFIFO) {
+		if (!t.v1.isLabeled) {
+			t.v1.isLabeled = true;
+			trianglesFIFO.addAll(t.v1.triangles);
+		}
+		if (!t.v2.isLabeled) {
+			t.v2.isLabeled = true;
+			trianglesFIFO.addAll(t.v2.triangles);
+		}
+		if (!t.v3.isLabeled) {
+			t.v3.isLabeled = true;
+			trianglesFIFO.addAll(t.v3.triangles);
+		}
+	}
+
 	public static void createVertexList(int nTriangles, FloatBuffer trianglesBuff, TrianglesLabelHelper helper) {
 		helper.flagLabeled();
 		Triangle[] tris = helper.getTriangles();
-		HashMap<Vertex, ArrayList<Integer>> map = helper.getVertTriMap();
-		LinkedHashMap<Vertex, Boolean> vertLabeled = helper.getUniqueVerts();
-		HashMap<Vertex, Integer> vertIndexes = new HashMap<Vertex, Integer>(nTriangles);
+		LinkedHashMap<Vertex, Vertex> map = helper.getVertTriMap();
 		Vertex[] verts = new Vertex[3];
 		int vertIndex = 1;
 		for (int i = 0; i < nTriangles; i++) {
@@ -90,19 +94,17 @@ public class LabelUtil {
 				float y = trianglesBuff.get(i * 9 + j * 3 + 1);
 				float z = trianglesBuff.get(i * 9 + j * 3 + 2);
 				Vertex v = new Vertex(x, y, z, vertIndex);
-				verts[j] = v;
-				if (map.containsKey(v)) {
-					map.get(v).add(i);
-					verts[j].normalIndex = 1;
-					verts[j].index = vertIndexes.get(v);
+				Vertex vert = map.get(v);
+				if (vert != null) {
+					vert.triangles.add(i);
+					verts[j] = vert;
 				} else {
-					ArrayList<Integer> list = new ArrayList<Integer>();
-					list.add(i);
+					v.triangles = new ArrayList<Integer>();
+					v.triangles.add(i);
 					v.normalIndex = 1;
-					v.index = vertIndex;
-					map.put(v, list);
-					vertLabeled.put(v, false);
-					vertIndexes.put(v, vertIndex++);
+					map.put(v, v);
+					vertIndex++;
+					verts[j] = v;
 				}
 			}
 			tris[i] = new Triangle(verts[0], verts[1], verts[2]);

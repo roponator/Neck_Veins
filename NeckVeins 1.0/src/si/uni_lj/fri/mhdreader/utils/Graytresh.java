@@ -193,16 +193,16 @@ public class Graytresh {
 	}
 
 	public static double thresholdFromHistogram(IntBuffer buffer, int nValues) {
-		double[] nh = new double[256];
-		double[] ch = new double[256];
+		double[] frequences = new double[256];
+		double[] w = new double[256];
 		double[] m = new double[256];
-		for (int i = 0; i < nh.length; i++) {
-			nh[i] = (float) buffer.get(i) / (float) nValues;
+		for (int i = 0; i < frequences.length; i++) {
+			frequences[i] = (float) buffer.get(i) / (float) nValues;
 		}
-		ch[0] = nh[0];
+		w[0] = frequences[0];
 		for (int i = 1; i < m.length; i++) {
-			ch[i] = ch[i - 1] + nh[i];
-			m[i] = m[i - 1] + i * nh[i];
+			w[i] = w[i - 1] + frequences[i];
+			m[i] = m[i - 1] + i * frequences[i];
 		}
 
 		double mean = m[255];
@@ -211,8 +211,8 @@ public class Graytresh {
 		double threshold = 0;
 		double threshold2 = 0;
 		for (int i = 0; i < 256; i++) {
-			double bcv = mean * ch[i] - m[i];
-			bcv *= bcv / (ch[i] * (1 - ch[i]));
+			double bcv = mean * w[i] - m[i];
+			bcv *= bcv / (w[i] * (1 - w[i]));
 			if (tmpMax < bcv) {
 				tmpMax = bcv;
 				threshold = i;
