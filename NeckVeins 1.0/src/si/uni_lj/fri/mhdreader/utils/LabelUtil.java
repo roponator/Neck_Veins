@@ -11,7 +11,8 @@ import si.uni_lj.fri.mhdreader.utils.obj.Vertex;
 public class LabelUtil {
 
 	public static boolean[] getValidLabels(int nTriangles, int minTriangles, TrianglesLabelHelper helper) {
-		labelTriangels(nTriangles, helper);
+		if (!helper.areLabeled())
+			labelTriangels(nTriangles, helper);
 		int nLabels = findNumLabels(helper);
 		int[] hist = createLabelHistogram(nLabels, helper);
 		return findValidLabels(hist, minTriangles);
@@ -47,6 +48,7 @@ public class LabelUtil {
 	}
 
 	private static void labelTriangels(int nTriangles, TrianglesLabelHelper helper) {
+		helper.flagLabeled();
 		Triangle[] tris = helper.getTriangles();
 		LinkedList<Integer> trianglesFIFO = new LinkedList<Integer>();
 		int label = 1;
@@ -83,7 +85,7 @@ public class LabelUtil {
 	}
 
 	public static void createVertexList(int nTriangles, FloatBuffer trianglesBuff, TrianglesLabelHelper helper) {
-		helper.flagLabeled();
+		helper.resetLabels();
 		Triangle[] tris = helper.getTriangles();
 		LinkedHashMap<Vertex, Vertex> map = helper.getVertTriMap();
 		Vertex[] verts = new Vertex[3];
@@ -111,5 +113,4 @@ public class LabelUtil {
 			tris[i].normalIndex = 1;
 		}
 	}
-
 }

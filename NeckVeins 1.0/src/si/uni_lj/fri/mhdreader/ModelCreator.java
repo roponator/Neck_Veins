@@ -43,6 +43,8 @@ public class ModelCreator {
 	public static List<CLDevice> devices;
 	public static CLCommandQueue queue;
 	public static CLProgram program;
+	private static int matrixSize = 0;
+	private static float max = 0;
 	private static CLMem[] staticMemory;
 
 	public ModelCreator() {
@@ -75,6 +77,7 @@ public class ModelCreator {
 
 		long startTime = System.currentTimeMillis();
 		float[] floatCTMatrix = FileUtils.readFile(fileName);
+		matrixSize = floatCTMatrix.length;
 		System.out.println("Reading matrix done! Time: " + (System.currentTimeMillis() - startTime) / 1000.0f + "s");
 		System.out.println("Size of matrix - " + MHDReader.Nx + "x" + MHDReader.Ny + "x" + MHDReader.Nz);
 
@@ -96,12 +99,11 @@ public class ModelCreator {
 		else
 			staticMemory[MATRIX_DATA] = locateMemory(floatCTMatrix, errorBuff, CL10.CL_MEM_READ_WRITE);
 
-		float max = execFindMax(staticMemory, errorBuff);
+		max = execFindMax(staticMemory, errorBuff);
 		if (threshold < 0)
 			threshold = execOtsuThreshold(staticMemory, floatCTMatrix, max, errorBuff);
 
-		Object[] output = execMarchingCubes(staticMemory, floatCTMatrix, max, (float) threshold, errorBuff);
-		output = execMarchingCubes(staticMemory, floatCTMatrix, max, (float) threshold, errorBuff);
+		Object[] output = execMarchingCubes(staticMemory, matrixSize, max, (float) threshold, errorBuff);
 
 		System.out.println("GPU full time: " + (System.currentTimeMillis() - startTime) / 1000.0f + "s");
 
@@ -114,8 +116,7 @@ public class ModelCreator {
 		System.out.println("Marching cubes on GPU...");
 		IntBuffer errorBuff = BufferUtils.createIntBuffer(1);
 
-		Object[] output = execMarchingCubes(staticMemory, new float[512 * 512 * 390], 3071.00002f, (float) threshold,
-				errorBuff);
+		Object[] output = execMarchingCubes(staticMemory, matrixSize, max, (float) threshold, errorBuff);
 
 		System.out.println("GPU full time: " + (System.currentTimeMillis() - startTime) / 1000.0f + "s");
 
@@ -245,12 +246,12 @@ public class ModelCreator {
 		Util.checkCLError(CL10.clFinish(queue));
 	}
 
-	private static Object[] execMarchingCubes(CLMem[] staticMemory, float[] floatCTMatrix, float max, float threshold,
+	private static Object[] execMarchingCubes(CLMem[] staticMemory, int totalSize, float max, float threshold,
 			IntBuffer errorBuff) {
 		CLKernel marchingKernel = CL10.clCreateKernel(program, "marchingCubes", null);
 		CLMem maxThreshMemory = locateMemory(new float[] { max, threshold }, errorBuff, CL10.CL_MEM_READ_WRITE);
-		CLMem trianglesMemory = locateMemory(floatCTMatrix.length / 2, errorBuff, CL10.CL_MEM_WRITE_ONLY);
-		CLMem normalsMemory = locateMemory(floatCTMatrix.length / 2, errorBuff, CL10.CL_MEM_WRITE_ONLY);
+		CLMem trianglesMemory = locateMemory((int) (totalSize / 1.25f), errorBuff, CL10.CL_MEM_WRITE_ONLY);
+		CLMem normalsMemory = locateMemory((int) (totalSize / 1.25f), errorBuff, CL10.CL_MEM_WRITE_ONLY);
 		CLMem nTrianglesMemory = locateMemory(new int[1], errorBuff, CL10.CL_MEM_READ_WRITE);
 		Util.checkCLError(CL10.clFinish(queue));
 

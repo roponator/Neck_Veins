@@ -16,7 +16,6 @@ import java.io.FileNotFoundException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -27,7 +26,6 @@ import org.lwjgl.opengl.GL11;
 import si.uni_lj.fri.mhdreader.ModelCreator;
 import si.uni_lj.fri.mhdreader.utils.LabelUtil;
 import si.uni_lj.fri.mhdreader.utils.TrianglesLabelHelper;
-import si.uni_lj.fri.mhdreader.utils.obj.Coordinates;
 import si.uni_lj.fri.mhdreader.utils.obj.Triangle;
 import si.uni_lj.fri.mhdreader.utils.obj.Vertex;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
@@ -66,108 +64,19 @@ public class VeinsModel {
 	}
 
 	public VeinsModel(double threshold, Quaternion currentQuaternion) {
-		constructVBOFromBuffer(threshold);
+		changeThreshold(threshold);
 		this.currentOrientation = currentQuaternion;
 		this.addedOrientation = new Quaternion();
 	}
 
-	public void constructVBOFromBuffer(double threshold) {
+	public void changeThreshold(double threshold) {
 		Object[] output = null;
 		try {
 			output = ModelCreator.changeModel(threshold);
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 		}
-
-		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
-		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
-		// FloatBuffer normalsBuff = (FloatBuffer) output[2];
-
-		vertices = new ArrayList<Float>();
-		centerx = 0;
-		centery = 0;
-		centerz = 0;
-		maxX = Float.MIN_VALUE;
-		maxY = Float.MIN_VALUE;
-		maxZ = Float.MIN_VALUE;
-		minX = Float.MAX_VALUE;
-		minY = Float.MAX_VALUE;
-		minZ = Float.MAX_VALUE;
-
-		float x, y, z;
-
-		// meshes variables
-		long start = System.currentTimeMillis();
-		meshes = new ArrayList<Mesh>();
-		ArrayList<Integer> tempFaces = new ArrayList<Integer>();
-		ArrayList<String> groups = new ArrayList<String>();
-		int tempFaceCount = 0;
-		LinkedHashMap<Coordinates, Vertex> uniqueVertices = new LinkedHashMap<Coordinates, Vertex>(
-				nTrianglesBuff.get(0) / 10);
-		int index = 1;
-		for (int i = 0; i < nTrianglesBuff.get(0); i++) {
-			/* Vertices */
-			for (int j = 2; j >= 0; j--) {
-				x = trianglesBuff.get(i * 9 + j * 3);
-				y = trianglesBuff.get(i * 9 + j * 3 + 1);
-				z = trianglesBuff.get(i * 9 + j * 3 + 2);
-
-				Coordinates key = new Coordinates(x, y, z);
-				if (!uniqueVertices.containsKey(key)) {
-					vertices.add(x);
-					vertices.add(y);
-					vertices.add(z);
-					centerx += x;
-					centery += y;
-					centerz += z;
-					if (x < minX)
-						minX = x;
-					if (y < minY)
-						minY = y;
-					if (z < minZ)
-						minZ = z;
-					if (x > maxX)
-						maxX = x;
-					if (y > maxY)
-						maxY = y;
-					if (z > maxZ)
-						maxZ = z;
-					uniqueVertices.put(key, new Vertex(x, y, z, index++));
-				}
-				tempFaces.add(uniqueVertices.get(key).index);
-			}
-			tempFaceCount++;
-		}
-		if (tempFaceCount > 0) {
-			// It seems that since last starting a new group, there have
-			// been faces stored
-			// Here I create a new mesh
-			Mesh mesh = new Mesh(groups, tempFaces, vertices);
-			meshes.add(mesh);
-			// After the whole file will be read, each mesh object's faces
-			// will be stored as VBOs (Vertex Buffer Objects).
-			System.out.println("Created a new mesh java object that will have it's own VBO.");
-		} else {
-			System.out.println("One \"g\" holding 0 elements discarted.");
-		}
-
-		// The file has been read.
-		centerx /= (vertices.size() / 3);
-		centery /= (vertices.size() / 3);
-		centerz /= (vertices.size() / 3);
-
-		for (Mesh mesh : meshes) {
-			mesh.constructVBO();
-		}
-		System.out.println("time: " + (System.currentTimeMillis() - start) / 1000.0f);
-	}
-
-	public void constructVBOFromFile(String filepath, double sigma, double threshold) {
-		String[] tokens = filepath.split("\\.(?=[^\\.]+$)");
-		if (tokens[tokens.length - 1].equals("mhd")) {
-			constructVBOFromRawFile(filepath, sigma, threshold);
-		} else
-			constructVBOFromObjFile(filepath);
+		constructVBO(output);
 	}
 
 	public void changeMinTriangles(int min) {
@@ -185,8 +94,7 @@ public class VeinsModel {
 		}
 
 		if (tempFaceCount > 0) {
-			@SuppressWarnings("unchecked")
-			Mesh mesh = new Mesh(new ArrayList(), tempFaces, vertices);
+			Mesh mesh = new Mesh(new ArrayList<String>(), tempFaces, vertices);
 			meshes.add(mesh);
 			System.out.println("Created a new mesh java object that will have it's own VBO.");
 		}
@@ -194,6 +102,14 @@ public class VeinsModel {
 		for (Mesh mesh : meshes) {
 			mesh.constructVBO();
 		}
+	}
+
+	public void constructVBOFromFile(String filepath, double sigma, double threshold) {
+		String[] tokens = filepath.split("\\.(?=[^\\.]+$)");
+		if (tokens[tokens.length - 1].equals("mhd")) {
+			constructVBOFromRawFile(filepath, sigma, threshold);
+		} else
+			constructVBOFromObjFile(filepath);
 	}
 
 	/**
@@ -209,7 +125,11 @@ public class VeinsModel {
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 		}
-		long start = System.currentTimeMillis();
+
+		constructVBO(output);
+	}
+
+	public void constructVBO(Object[] output) {
 		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
 		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
 		// FloatBuffer normalsBuff = (FloatBuffer) output[2];
@@ -217,8 +137,6 @@ public class VeinsModel {
 		LabelUtil.createVertexList(nTrianglesBuff.get(0), trianglesBuff, labelHelper);
 		this.threshold = (Float) output[3];
 		this.maxTriangels = nTrianglesBuff.get(0);
-		// boolean[] labels = LabelUtil.getValidLabels(nTrianglesBuff.get(0),
-		// 10000, labelHelper);
 
 		vertices = new ArrayList<Float>();
 		centerx = 0;
@@ -269,19 +187,13 @@ public class VeinsModel {
 		}
 
 		if (tempFaceCount > 0) {
-			// It seems that since last starting a new group, there have
-			// been faces stored
-			// Here I create a new mesh
 			Mesh mesh = new Mesh(groups, tempFaces, vertices);
 			meshes.add(mesh);
-			// After the whole file will be read, each mesh object's faces
-			// will be stored as VBOs (Vertex Buffer Objects).
 			System.out.println("Created a new mesh java object that will have it's own VBO.");
 		} else {
 			System.out.println("One \"g\" holding 0 elements discarted.");
 		}
 
-		// The file has been read.
 		centerx /= (vertices.size() / 3);
 		centery /= (vertices.size() / 3);
 		centerz /= (vertices.size() / 3);
@@ -289,7 +201,6 @@ public class VeinsModel {
 		for (Mesh mesh : meshes) {
 			mesh.constructVBO();
 		}
-		System.out.println("time: " + (System.currentTimeMillis() - start) / 1000.0f);
 	}
 
 	public void constructVBOFromObjFile(String filepath) {

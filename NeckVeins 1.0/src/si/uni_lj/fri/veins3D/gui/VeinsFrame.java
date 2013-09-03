@@ -155,6 +155,7 @@ public class VeinsFrame extends Widget {
 				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
 				renderer.setCursor((MouseCursor) VeinsWindow.themeManager.getCursor("cursor.wait"));
 				renderer.changeModel(thresholdScrollbar.getValue() / 100.0f);
+				minTrianglesScrollbar.setValue(0);
 			}
 		});
 		exportObjBtn = new Button("Export");

@@ -24,18 +24,22 @@ public class TrianglesLabelHelper {
 		return vertTriMap;
 	}
 
-	private void resetLabels() {
+	public void resetLabels() {
 		if (areLabeled) {
 			for (Triangle t : triangles)
 				t.label = 0;
 			for (Vertex v : vertTriMap.values())
 				v.isLabeled = false;
+			areLabeled = false;
 		}
 	}
 
 	public void flagLabeled() {
-		resetLabels();
 		areLabeled = true;
+	}
+
+	public boolean areLabeled() {
+		return areLabeled;
 	}
 
 }
