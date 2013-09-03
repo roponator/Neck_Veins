@@ -10,7 +10,6 @@ import org.lwjgl.opencl.CLMem;
 
 public class Utils {
 	public static float[] getGauss1DKernel(int size, double sigma) {
-		System.out.println(size);
 		float[] kernel = new float[size];
 		double sum = 0;
 		for (int i = 0; i < size; i++) {

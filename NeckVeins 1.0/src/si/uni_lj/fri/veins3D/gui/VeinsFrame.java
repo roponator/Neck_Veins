@@ -114,6 +114,7 @@ public class VeinsFrame extends Widget {
 			public void run() {
 				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
 				VeinsModel model = renderer.getVeinsModel();
+				renderer.setCursor((MouseCursor) VeinsWindow.themeManager.getCursor("cursor.wait"));
 
 				int scrollMaxValue = minTrianglesScrollbar.getMaxValue();
 				int scrollCurrentValue = minTrianglesScrollbar.getValue();

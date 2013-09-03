@@ -360,16 +360,16 @@ public class ModelCreator {
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
 		buffer.put(data);
 		buffer.rewind();
-		CLMem memory = CL10.clCreateBuffer(context, flags, buffer, errorBuff);
-		CL10.clEnqueueWriteBuffer(queue, memory, flags, 0, buffer, null, null);
+		CLMem memory = CL10.clCreateBuffer(context, flags, buffer.capacity() * 4, errorBuff);
+		CL10.clEnqueueWriteBuffer(queue, memory, CL10.CL_TRUE, 0, buffer, null, null);
 		Util.checkCLError(errorBuff.get(0));
 		return memory;
 	}
 
 	private static CLMem locateMemory(FloatBuffer buffer, IntBuffer errorBuff, int flags) {
 		buffer.rewind();
-		CLMem memory = CL10.clCreateBuffer(context, flags, buffer, errorBuff);
-		CL10.clEnqueueWriteBuffer(queue, memory, flags, 0, buffer, null, null);
+		CLMem memory = CL10.clCreateBuffer(context, flags, buffer.capacity() * 4, errorBuff);
+		CL10.clEnqueueWriteBuffer(queue, memory, CL10.CL_TRUE, 0, buffer, null, null);
 		Util.checkCLError(errorBuff.get(0));
 		return memory;
 	}
@@ -378,7 +378,8 @@ public class ModelCreator {
 		ShortBuffer buffer = BufferUtils.createShortBuffer(data.length);
 		buffer.put(data);
 		buffer.rewind();
-		CLMem memory = CL10.clCreateBuffer(context, flags, buffer, errorBuff);
+		CLMem memory = CL10.clCreateBuffer(context, flags, buffer.capacity() * 2, errorBuff);
+		CL10.clEnqueueWriteBuffer(queue, memory, CL10.CL_TRUE, 0, buffer, null, null);
 		Util.checkCLError(errorBuff.get(0));
 		return memory;
 	}
@@ -387,8 +388,8 @@ public class ModelCreator {
 		IntBuffer buffer = BufferUtils.createIntBuffer(data.length);
 		buffer.put(data);
 		buffer.rewind();
-		CLMem memory = CL10.clCreateBuffer(context, flags, buffer, errorBuff);
-		CL10.clEnqueueWriteBuffer(queue, memory, flags, 0, buffer, null, null);
+		CLMem memory = CL10.clCreateBuffer(context, flags, buffer.capacity() * 4, errorBuff);
+		CL10.clEnqueueWriteBuffer(queue, memory, CL10.CL_TRUE, 0, buffer, null, null);
 		Util.checkCLError(errorBuff.get(0));
 		return memory;
 	}

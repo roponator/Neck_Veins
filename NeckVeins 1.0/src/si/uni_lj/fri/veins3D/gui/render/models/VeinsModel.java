@@ -156,7 +156,7 @@ public class VeinsModel {
 		ArrayList<Integer> tempFaces = new ArrayList<Integer>();
 		ArrayList<String> groups = new ArrayList<String>();
 		int tempFaceCount = 0;
-		System.out.println(labelHelper.getVertTriMap().size());
+
 		for (Vertex v : labelHelper.getVertTriMap().keySet()) {
 			vertices.add(x = v.x);
 			vertices.add(y = v.y);
