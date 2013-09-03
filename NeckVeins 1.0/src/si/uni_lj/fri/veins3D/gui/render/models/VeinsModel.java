@@ -50,6 +50,7 @@ public class VeinsModel {
 	public float maxX, maxY, maxZ;
 	public float minX, minY, minZ;
 	public float threshold = 0;
+	public int maxTriangels = 0;
 	private int numberOfSubdivisions = 0;
 	private int maxSubDepth = 0;
 
@@ -169,6 +170,32 @@ public class VeinsModel {
 			constructVBOFromObjFile(filepath);
 	}
 
+	public void changeMinTriangles(int min) {
+		boolean[] labels = LabelUtil.getValidLabels(maxTriangels, min, labelHelper);
+		meshes = new ArrayList<Mesh>();
+		ArrayList<Integer> tempFaces = new ArrayList<Integer>();
+		int tempFaceCount = 0;
+		for (Triangle t : labelHelper.getTriangles()) {
+			if (labels[t.label]) {
+				tempFaces.add(t.v3.index);
+				tempFaces.add(t.v2.index);
+				tempFaces.add(t.v1.index);
+				tempFaceCount++;
+			}
+		}
+
+		if (tempFaceCount > 0) {
+			@SuppressWarnings("unchecked")
+			Mesh mesh = new Mesh(new ArrayList(), tempFaces, vertices);
+			meshes.add(mesh);
+			System.out.println("Created a new mesh java object that will have it's own VBO.");
+		}
+
+		for (Mesh mesh : meshes) {
+			mesh.constructVBO();
+		}
+	}
+
 	/**
 	 * Normals calculated on GPU, are currently not used, instead Normals
 	 * calculated in constructVBO are used.
@@ -186,9 +213,10 @@ public class VeinsModel {
 		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
 		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
 		// FloatBuffer normalsBuff = (FloatBuffer) output[2];
-		this.threshold = (Float) output[3];
 		labelHelper = new TrianglesLabelHelper(nTrianglesBuff.get(0));
 		LabelUtil.createVertexList(nTrianglesBuff.get(0), trianglesBuff, labelHelper);
+		this.threshold = (Float) output[3];
+		this.maxTriangels = nTrianglesBuff.get(0);
 		// boolean[] labels = LabelUtil.getValidLabels(nTrianglesBuff.get(0),
 		// 10000, labelHelper);
 
@@ -210,8 +238,8 @@ public class VeinsModel {
 		ArrayList<Integer> tempFaces = new ArrayList<Integer>();
 		ArrayList<String> groups = new ArrayList<String>();
 		int tempFaceCount = 0;
-		System.out.println(labelHelper.getUniqueVerts().size());
-		for (Vertex v : labelHelper.getUniqueVerts().keySet()) {
+		System.out.println(labelHelper.getVertTriMap().size());
+		for (Vertex v : labelHelper.getVertTriMap().keySet()) {
 			vertices.add(x = v.x);
 			vertices.add(y = v.y);
 			vertices.add(z = v.z);

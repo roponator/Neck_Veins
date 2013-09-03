@@ -8,6 +8,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
+import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
 import de.matthiasmann.twl.BorderLayout;
 import de.matthiasmann.twl.BorderLayout.Location;
 import de.matthiasmann.twl.Button;
@@ -101,19 +102,27 @@ public class VeinsFrame extends Widget {
 	}
 
 	private void initMinTrianglesScroll() {
+		Label minTriangelsLabel = new Label("Min triangles per component:");
+		final Label minTriangelsValue = new Label("0");
+		minTriangelsValue.setTheme("value-label");
+
 		minTrianglesScrollbar = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
-		minTrianglesScrollbar.setMinMaxValue(0, 5);
+		minTrianglesScrollbar.setMinMaxValue(0, 1000);
 		minTrianglesScrollbar.setValue(0);
 		minTrianglesScrollbar.addCallback(new Runnable() {
 			@Override
 			public void run() {
 				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+				VeinsModel model = renderer.getVeinsModel();
 
+				int scrollMaxValue = minTrianglesScrollbar.getMaxValue();
+				int scrollCurrentValue = minTrianglesScrollbar.getValue();
+				int minTriangels = (int) (model.maxTriangels * ((float) scrollCurrentValue / (float) (scrollMaxValue)));
+
+				minTriangelsValue.setText(Integer.toString(minTriangels));
+				model.changeMinTriangles(minTriangels);
 			}
 		});
-		Label minTriangelsLabel = new Label("Min triangles per component:");
-		Label minTriangelsValue = new Label("0");
-		minTriangelsValue.setTheme("value-label");
 
 		minTriangelsLayout = new BorderLayout();
 		minTriangelsLayout.add(minTrianglesScrollbar, Location.WEST);
