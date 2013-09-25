@@ -1,4 +1,4 @@
-package si.uni_lj.fri.mhdreader.utils.obj;
+package si.uni_lj.fri.segmentation.utils.obj;
 
 import java.util.ArrayList;
 

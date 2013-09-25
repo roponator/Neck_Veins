@@ -1,4 +1,4 @@
-package si.uni_lj.fri.mhdreader.utils;
+package si.uni_lj.fri.segmentation.utils;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;

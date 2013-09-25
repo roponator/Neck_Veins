@@ -23,11 +23,11 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import si.uni_lj.fri.mhdreader.ModelCreator;
-import si.uni_lj.fri.mhdreader.utils.LabelUtil;
-import si.uni_lj.fri.mhdreader.utils.TrianglesLabelHelper;
-import si.uni_lj.fri.mhdreader.utils.obj.Triangle;
-import si.uni_lj.fri.mhdreader.utils.obj.Vertex;
+import si.uni_lj.fri.segmentation.ModelCreator;
+import si.uni_lj.fri.segmentation.utils.LabelUtil;
+import si.uni_lj.fri.segmentation.utils.TrianglesLabelHelper;
+import si.uni_lj.fri.segmentation.utils.obj.Triangle;
+import si.uni_lj.fri.segmentation.utils.obj.Vertex;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import si.uni_lj.fri.veins3D.math.Vector;

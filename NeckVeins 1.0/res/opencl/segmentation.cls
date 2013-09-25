@@ -472,41 +472,6 @@ __kernel void marchingCubes(global const float* matrix,
 
 }
 
-__kernel void gauss3D(__global float* matrix, __global const int* dimensions, __global const float* gauss, __global float* result) {
-	// dimensions
-	int Nx = dimensions[0];
-   	int Ny = dimensions[1];
-   	int Nz = dimensions[2];
-   	int size = dimensions[3];
-	int x = get_global_id(0);
-   	int y = get_global_id(1);
-   	int z = get_global_id(2);
-   	if (x < Nx && y < Ny && z < Nz) {
-   		float value = 0;
-   		int xx;
-   		int index;
-	   	for (int i = 0; i < size; i++) {
-			index = xx + i - size / 2 + 1 * Ny + 1 * Ny * Nx;
-			if (index >= 0)
-				value += matrix[index] * gauss[i];
-	   	}
-	   	result[x + y * Nx + z * Nx * Ny] = value;
-   	}
-
-}
-
-__kernel void binarize(__global float* matrix,__global const int* dimensions, __global const float* threshold) {
-	const int Nx = dimensions[0];
-   	const int Ny = dimensions[1];
-	const int x = get_global_id(0);
-   	const int y = get_global_id(1);
-   	const int z = get_global_id(2);
-   	const int index = x + y * Nx +  z * Nx * Ny;
-   	if (matrix[index] >= threshold[0])
-   		matrix[index] = 1;
-   	else
-   		matrix[index] = 0;
-}
 
 __kernel void gaussX(__global const float* matrix, __global const int* dimensions, __global const float* gaussKernel, __global float* result ) {
 	// dimensions
@@ -519,8 +484,12 @@ __kernel void gaussX(__global const float* matrix, __global const int* dimension
    	const int z = get_global_id(2);
    	
    	private float value = 0;
+   	private int xVar = 0;
 	for (int i = 0; i < size; i++) {
-		value += matrix[(x + i - size / 2) + y * Nx + z * Nx * Ny] * gaussKernel[size - i - 1];
+		xVar = x + i - size / 2;
+		if (xVar < 0 || xVar >= Nx)
+			continue;
+		value += matrix[xVar + y * Nx + z * Nx * Ny] * gaussKernel[size - i - 1];
 	}
 	result[x + y * Nx + z * Nx * Ny] = value;
   
@@ -538,10 +507,12 @@ kernel void gaussY(global const float* matrix, global const int* dimensions, glo
    	const int z = get_global_id(2);
    	
    	private float value = 0;
+   	private int yVar = 0;
 	for (int i = 0; i < size; i++) {
-		if ((y + i - size / 2) < 0 || (y + i - size / 2) >= Ny)
+		yVar = y + i - size / 2;
+		if (yVar < 0 || yVar >= Ny)
 			continue;
-		value += matrix[x + (y + i - size / 2) * Nx + z * Nx * Ny] * gaussKernel[size - i - 1];
+		value += matrix[x + yVar * Nx + z * Nx * Ny] * gaussKernel[size - i - 1];
 	}
 	result[x + y * Nx + z * Nx * Ny] = value;
 
@@ -558,10 +529,12 @@ kernel void gaussZ(global const float* matrix, global const int* dimensions, glo
    	const int z = get_global_id(2);
    	
 	private float value = 0;
+	private int zVar = 0;
 	for (int i = 0; i < size; i++) {
-		if ((z + i - size / 2) < 0 || (z + i - size / 2) >= Nz)
+		zVar = z + i - size / 2;
+		if (zVar < 0 || zVar >= Nz)
 			continue;
-		value += matrix[x  + y * Nx + (z + i - size / 2) * Nx * Ny] * gaussKernel[size - i - 1];
+		value += matrix[x  + y * Nx + zVar * Nx * Ny] * gaussKernel[size - i - 1];
 	}
 	result[x + y * Nx + z * Nx * Ny] = value;
    	

@@ -1,12 +1,12 @@
-package si.uni_lj.fri.mhdreader.utils;
+package si.uni_lj.fri.segmentation.utils;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
-import si.uni_lj.fri.mhdreader.utils.obj.Triangle;
-import si.uni_lj.fri.mhdreader.utils.obj.Vertex;
+import si.uni_lj.fri.segmentation.utils.obj.Triangle;
+import si.uni_lj.fri.segmentation.utils.obj.Vertex;
 
 public class LabelUtil {
 

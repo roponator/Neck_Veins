@@ -1,4 +1,4 @@
-package si.uni_lj.fri.mhdreader.utils.obj;
+package si.uni_lj.fri.segmentation.utils.obj;
 
 public class Triangle {
 	public Vertex v1;

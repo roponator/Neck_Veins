@@ -1,11 +1,8 @@
-package si.uni_lj.fri.mhdreader;
+package si.uni_lj.fri.segmentation;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.lwjgl.BufferUtils;
@@ -22,14 +19,14 @@ import org.lwjgl.opencl.CLPlatform;
 import org.lwjgl.opencl.CLProgram;
 import org.lwjgl.opencl.Util;
 
-import si.uni_lj.fri.mhdreader.utils.FileUtils;
-import si.uni_lj.fri.mhdreader.utils.Graytresh;
-import si.uni_lj.fri.mhdreader.utils.Utils;
-import si.uni_lj.fri.mhdreader.utils.obj.Coordinates;
-import si.uni_lj.fri.mhdreader.utils.obj.Normal;
-import si.uni_lj.fri.mhdreader.utils.obj.Triangle;
-import si.uni_lj.fri.mhdreader.utils.obj.Vertex;
+import si.uni_lj.fri.segmentation.utils.FileUtils;
+import si.uni_lj.fri.segmentation.utils.Graytresh;
+import si.uni_lj.fri.segmentation.utils.Utils;
 
+/**
+ * TODO RENAME, REFACTOR - move OpenCL utils methods to some Utils class
+ * 
+ */
 public class ModelCreator {
 	private static final int MATRIX_DATA = 0;
 	private static final int DIMENSIONS_DATA = 1;
@@ -67,6 +64,15 @@ public class ModelCreator {
 		Util.checkCLError(error);
 	}
 
+	/**
+	 * Called when loading from file
+	 * 
+	 * @param fileName
+	 * @param sigma
+	 * @param threshold
+	 * @return
+	 * @throws LWJGLException
+	 */
 	public static Object[] createModel(String fileName, double sigma, double threshold) throws LWJGLException {
 		if (staticMemory != null) {
 			cleanCLResources(staticMemory, new CLKernel[] {}, new CLProgram[] { program }, true);
@@ -110,6 +116,13 @@ public class ModelCreator {
 		return output;
 	}
 
+	/**
+	 * Called when changing threshold in main window
+	 * 
+	 * @param threshold
+	 * @return
+	 * @throws LWJGLException
+	 */
 	public static Object[] changeModel(double threshold) throws LWJGLException {
 		// GPU part
 		long startTime = System.currentTimeMillis();
@@ -166,9 +179,10 @@ public class ModelCreator {
 		ByteBuffer deviceInfoBuff = BufferUtils.createByteBuffer(8);
 		CL10.clGetDeviceInfo(devices.get(0), CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE, deviceInfoBuff, null);
 		int maxWorkGroupSize = (int) deviceInfoBuff.getLong(0);
-		int nWorkGroups = (int) (Math.ceil((float) (MHDReader.Nx * MHDReader.Ny * MHDReader.Nz)
-				/ (float) maxWorkGroupSize));
+		int nWorkItems = (int) (Math.ceil((MHDReader.Nx * MHDReader.Ny * MHDReader.Nz) / maxWorkGroupSize
+				/ (double) FIND_MAX_LOCAL_SIZE) * FIND_MAX_LOCAL_SIZE);
 		int localGroupSize = FIND_MAX_LOCAL_SIZE;
+		int nWorkGroups = nWorkItems / localGroupSize + 1;
 
 		CLKernel findMax = CL10.clCreateKernel(program, "findMax", null);
 		CLMem maxMemory = locateMemory(nWorkGroups * 4, errorBuff, CL10.CL_MEM_WRITE_ONLY);
@@ -178,7 +192,7 @@ public class ModelCreator {
 		CL10.clSetKernelArg(findMax, 2, localGroupSize * 4);
 		findMax.setArg(3, maxMemory);
 
-		enqueueKernel(findMax, new int[] { nWorkGroups }, new int[] { localGroupSize });
+		enqueueKernel(findMax, new int[] { nWorkItems }, new int[] { localGroupSize });
 		Util.checkCLError(CL10.clFinish(queue));
 
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(nWorkGroups);
@@ -229,21 +243,6 @@ public class ModelCreator {
 		Util.checkCLError(CL10.clFinish(queue));
 
 		return histogram;
-	}
-
-	private static void execBinarization(CLMem[] staticMemory, float[] floatCTMatrix, float threshold,
-			IntBuffer errorBuff) {
-		CLKernel binarization = CL10.clCreateKernel(program, "binarize", null);
-		CLMem thresholdMemory = locateMemory(new float[] { threshold }, errorBuff, CL10.CL_MEM_READ_ONLY);
-		binarization.setArg(0, staticMemory[MATRIX_DATA]);
-		binarization.setArg(1, staticMemory[DIMENSIONS_DATA]);
-		binarization.setArg(2, thresholdMemory);
-		enqueueKernel(binarization, new int[] { MHDReader.Nx, MHDReader.Ny, MHDReader.Nz });
-		Util.checkCLError(CL10.clFinish(queue));
-
-		Util.checkCLError(CL10.clReleaseKernel(binarization));
-		Util.checkCLError(CL10.clReleaseMemObject(thresholdMemory));
-		Util.checkCLError(CL10.clFinish(queue));
 	}
 
 	private static Object[] execMarchingCubes(CLMem[] staticMemory, int totalSize, float max, float threshold,
@@ -301,8 +300,10 @@ public class ModelCreator {
 		for (int i = 0; i < programObj.length; i++) {
 			CL10.clReleaseProgram(programObj[i]);
 		}
-		if (destroyCL)
+		if (destroyCL) {
+			staticMemory = null;
 			destroyCL();
+		}
 	}
 
 	public static void destroyCL() {
@@ -311,74 +312,11 @@ public class ModelCreator {
 		CL.destroy();
 	}
 
-	private static void writeFile(String fileName, IntBuffer nTrianglesBuff, FloatBuffer trianglesBuff,
-			FloatBuffer normalsBuff) {
-		long startTime = System.currentTimeMillis();
-		ArrayList<Triangle> triangles = new ArrayList<Triangle>();
-		System.out.println("Number of triagles: " + nTrianglesBuff.get(0));
-
-		System.out.println("Packing for writing to file...");
-		int index = 1;
-		int normalIndex = 1;
-		LinkedHashMap<Coordinates, Vertex> vertices = new LinkedHashMap<Coordinates, Vertex>(nTrianglesBuff.get(0) / 10);
-		LinkedHashMap<Coordinates, Normal> normals = new LinkedHashMap<Coordinates, Normal>(nTrianglesBuff.get(0) / 10);
-		Vertex[] triangleVertices = new Vertex[3];
-		for (int i = 0; i < nTrianglesBuff.get(0) * 9; i += 9) {
-			for (int j = 0; j < 3; j++) {
-				float x = trianglesBuff.get(i + j * 3);
-				float y = trianglesBuff.get(i + j * 3 + 1);
-				float z = trianglesBuff.get(i + j * 3 + 2);
-				Coordinates key = new Coordinates(x, y, z);
-				if (!vertices.containsKey(key)) {
-					triangleVertices[j] = new Vertex(x, y, z, index++);
-					vertices.put(key, triangleVertices[j]);
-				} else {
-					triangleVertices[j] = vertices.get(key);
-				}
-
-				float nx = normalsBuff.get(i + j * 3);
-				float ny = normalsBuff.get(i + j * 3 + 1);
-				float nz = normalsBuff.get(i + j * 3 + 2);
-				key = new Coordinates(x, y, z);
-				if (!normals.containsKey(key)) {
-					normals.put(key, new Normal(nx, ny, nz, normalIndex));
-					triangleVertices[j].normalIndex = normalIndex++;
-				} else {
-					triangleVertices[j].normalIndex = normalIndex;
-				}
-			}
-			triangles.add(new Triangle(triangleVertices[0], triangleVertices[1], triangleVertices[2]));
-		}
-		System.out.println("Packing time: " + (System.currentTimeMillis() - startTime) / 1000.0f + "s");
-
-		System.out.println("All triagles: " + nTrianglesBuff.get(0) + ". Packed triangles: " + triangles.size());
-
-		MHDReader.writeToFile(triangles, vertices, normals, fileName);
-	}
-
 	private static CLMem locateMemory(float[] data, IntBuffer errorBuff, int flags) {
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
 		buffer.put(data);
 		buffer.rewind();
 		CLMem memory = CL10.clCreateBuffer(context, flags, buffer.capacity() * 4, errorBuff);
-		CL10.clEnqueueWriteBuffer(queue, memory, CL10.CL_TRUE, 0, buffer, null, null);
-		Util.checkCLError(errorBuff.get(0));
-		return memory;
-	}
-
-	private static CLMem locateMemory(FloatBuffer buffer, IntBuffer errorBuff, int flags) {
-		buffer.rewind();
-		CLMem memory = CL10.clCreateBuffer(context, flags, buffer.capacity() * 4, errorBuff);
-		CL10.clEnqueueWriteBuffer(queue, memory, CL10.CL_TRUE, 0, buffer, null, null);
-		Util.checkCLError(errorBuff.get(0));
-		return memory;
-	}
-
-	private static CLMem locateMemory(short[] data, IntBuffer errorBuff, int flags) {
-		ShortBuffer buffer = BufferUtils.createShortBuffer(data.length);
-		buffer.put(data);
-		buffer.rewind();
-		CLMem memory = CL10.clCreateBuffer(context, flags, buffer.capacity() * 2, errorBuff);
 		CL10.clEnqueueWriteBuffer(queue, memory, CL10.CL_TRUE, 0, buffer, null, null);
 		Util.checkCLError(errorBuff.get(0));
 		return memory;

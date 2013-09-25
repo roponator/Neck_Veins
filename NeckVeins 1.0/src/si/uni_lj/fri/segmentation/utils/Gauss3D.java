@@ -1,4 +1,4 @@
-package si.uni_lj.fri.mhdreader.utils;
+package si.uni_lj.fri.segmentation.utils;
 public class Gauss3D {
 	private final static int AXIS_X = 0;
 	private final static int AXIS_Y = 1;
