@@ -829,7 +829,6 @@ public class VeinsFrame extends Widget {
 		cancelVideoSettingButton.setText(labels.getString("cancelBtnLabel"));
 		fullscreenToggleButton.setText(labels.getString("fullscreenBtnLabel"));
 
-		// TODO: Translate 3dMouse buttons
 		mouse3d.setText(labels.getString("mouse3dBtnLabel"));
 		mouse3d.setTooltipContent(labels.getString("mouse3dBtnTooltip"));
 

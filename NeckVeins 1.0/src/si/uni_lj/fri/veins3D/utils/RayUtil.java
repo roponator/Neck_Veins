@@ -58,7 +58,7 @@ public class RayUtil {
 	 * @param renderer
 	 * @return
 	 */
-	private static double[] getRayDirection(int x, int y, VeinsRenderer renderer) {
+	public static double[] getRayDirection(int x, int y, VeinsRenderer renderer) {
 		Camera cam = renderer.getCamera();
 		double[] tempUpperLeft = cam.cameraOrientation.rotateVector3d(renderer.screenPlaneInitialUpperLeft);
 		double[] tempLowerLeft = cam.cameraOrientation.rotateVector3d(renderer.screenPlaneInitialLowerLeft);
