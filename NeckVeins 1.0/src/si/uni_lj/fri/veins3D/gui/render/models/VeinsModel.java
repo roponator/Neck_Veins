@@ -337,7 +337,7 @@ public class VeinsModel {
 		Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
 		FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
 		GL11.glMultMatrix(fb);
-
+		
 		/* Translate and render */
 		glTranslatef(-(float) centerx, -(float) centery, -(float) centerz);
 		for (Mesh vbo : meshes) {
@@ -352,6 +352,7 @@ public class VeinsModel {
 	 */
 	public void changeAddedOrientation(VeinsRenderer renderer) {
 		double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
+		
 		if (veinsHeldAt != null) {
 			double[] rotationAxis = Vector.crossProduct(veinsGrabbedAt, veinsHeldAt);
 			if (Vector.length(rotationAxis) > 0) {

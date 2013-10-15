@@ -72,7 +72,7 @@ public class RayUtil {
 		downToUp = Vector.vScale(downToUp, (0.5d + y) / (double) VeinsWindow.settings.resHeight);
 
 		rayD = Vector.sum(rayD, downToUp);
-
+		
 		return rayD;
 	}
 
