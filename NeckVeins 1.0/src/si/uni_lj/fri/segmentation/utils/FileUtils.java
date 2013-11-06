@@ -15,6 +15,12 @@ import si.uni_lj.fri.veins3D.gui.VeinsWindow;
 
 public class FileUtils {
 
+	/**
+	 * Reads OpenCL file
+	 * 
+	 * @param name
+	 * @return
+	 */
 	public static String loadText(String name) {
 		if (!name.endsWith(".cls")) {
 			name += ".cls";
@@ -76,6 +82,12 @@ public class FileUtils {
 		for (int i = 0; i < shorts.capacity(); i++) {
 			floatCTMatrix[i] = shorts.get(i);
 		}
+
+		// Dereference variables
+		file = null;
+		fileData = null;
+		buffer = null;
+		shorts = null;
 
 		return floatCTMatrix;
 	}

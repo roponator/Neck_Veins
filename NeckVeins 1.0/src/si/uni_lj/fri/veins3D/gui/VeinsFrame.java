@@ -182,7 +182,7 @@ public class VeinsFrame extends Widget {
 		fileSelector.setFileSystemModel(fsm);
 		fileSelector.setUserWidgetBottom(initSegmentationOptions());
 		fileSelector.getUserWidgetBottom().setEnabled(false);
-		fileSelector.setCurrentFolder(new File("D:\\Faks\\Diploma\\workspace\\MHDReaderOpenCL"));
+		fileSelector.setCurrentFolder(new File(VeinsWindow.settings.workingDirectory));
 		Callback2 cb = new Callback2() {
 			@Override
 			public void filesSelected(Object[] files) {
@@ -214,6 +214,8 @@ public class VeinsFrame extends Widget {
 
 			@Override
 			public void folderChanged(Object arg0) {
+				if (arg0 instanceof File)
+					VeinsWindow.settings.workingDirectory = ((File) arg0).getAbsolutePath();
 			}
 
 			@Override

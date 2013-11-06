@@ -113,6 +113,7 @@ public class VeinsWindow extends Container {
 				settings.stereoEnabled = false;
 				settings.stereoValue = 0;
 				settings.locale = Locale.getDefault();
+				settings.workingDirectory = "";
 			}
 			settings.resWidth = currentDisplayMode.getWidth();
 			settings.resHeight = currentDisplayMode.getHeight();

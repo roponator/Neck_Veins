@@ -181,6 +181,10 @@ public class ModelCreator {
 		int maxWorkGroupSize = (int) deviceInfoBuff.getLong(0);
 		int nWorkItems = (int) (Math.ceil((MHDReader.Nx * MHDReader.Ny * MHDReader.Nz) / maxWorkGroupSize
 				/ (double) FIND_MAX_LOCAL_SIZE) * FIND_MAX_LOCAL_SIZE);
+
+		// localGroupSize - Se ne uporablja pri zagonu kernela
+		// TODO - popravi localGroupSize za hardware neodvisnost - implementiraj
+		// podobno kot pri execOtsuHistogram
 		int localGroupSize = FIND_MAX_LOCAL_SIZE;
 		int nWorkGroups = nWorkItems / localGroupSize + 1;
 
@@ -192,7 +196,8 @@ public class ModelCreator {
 		CL10.clSetKernelArg(findMax, 2, localGroupSize * 4);
 		findMax.setArg(3, maxMemory);
 
-		enqueueKernel(findMax, new int[] { nWorkItems }, new int[] { localGroupSize });
+		// Local groups size is not defined
+		enqueueKernel(findMax, new int[] { nWorkItems });
 		Util.checkCLError(CL10.clFinish(queue));
 
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(nWorkGroups);
@@ -319,6 +324,10 @@ public class ModelCreator {
 		CLMem memory = CL10.clCreateBuffer(context, flags, buffer.capacity() * 4, errorBuff);
 		CL10.clEnqueueWriteBuffer(queue, memory, CL10.CL_TRUE, 0, buffer, null, null);
 		Util.checkCLError(errorBuff.get(0));
+
+		// Dereference buffer
+		buffer = null;
+
 		return memory;
 	}
 
@@ -329,6 +338,10 @@ public class ModelCreator {
 		CLMem memory = CL10.clCreateBuffer(context, flags, buffer.capacity() * 4, errorBuff);
 		CL10.clEnqueueWriteBuffer(queue, memory, CL10.CL_TRUE, 0, buffer, null, null);
 		Util.checkCLError(errorBuff.get(0));
+
+		// Dereference buffer
+		buffer = null;
+
 		return memory;
 	}
 
