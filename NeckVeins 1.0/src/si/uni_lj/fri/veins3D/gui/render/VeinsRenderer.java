@@ -62,6 +62,18 @@ import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 
+/**
+ * @author Anze
+ *
+ */
+/**
+ * @author Anze
+ * 
+ */
+/**
+ * @author Anze
+ * 
+ */
 public class VeinsRenderer extends LWJGLRenderer {
 	public static final int FIXED_PIPELINE = -1;
 	public static final int SIMPLE_SHADER = 0;
@@ -85,10 +97,10 @@ public class VeinsRenderer extends LWJGLRenderer {
 
 	private VeinsModel veinsModel;
 
-	public double[] screenPlaneInitialUpperLeft;
-	public double[] screenPlaneInitialUpperRight;
-	public double[] screenPlaneInitialLowerLeft;
-	public double[] screenPlaneInitialLowerRight;
+	public double[] screenPlaneInitialUpperLeft = new double[3];
+	public double[] screenPlaneInitialUpperRight = new double[3];
+	public double[] screenPlaneInitialLowerLeft = new double[3];
+	public double[] screenPlaneInitialLowerRight = new double[3];
 
 	private int[] shaderPrograms;
 	private int[] vertexShaders;
@@ -272,18 +284,56 @@ public class VeinsRenderer extends LWJGLRenderer {
 	}
 
 	/**
+	 * Loads obj file with
+	 * 
+	 * @param fileName
+	 * @throws LWJGLException
+	 */
+	public void loadModelObj(String fileName) throws LWJGLException {
+		loadModel(fileName, -1, -1, true);
+	}
+
+	/**
+	 * Loads Mhd with raw file using OpenCL
+	 * 
+	 * @param fileName
+	 * @param sigma
+	 * @param threshold
+	 * @throws LWJGLException
+	 */
+	public void loadModelRaw(String fileName, double sigma, double threshold) throws LWJGLException {
+		veinsModel = new VeinsModel();
+		veinsModel.constructVBOFromRawFile(fileName, sigma, threshold);
+		setDefaultViewOptions();
+	}
+
+	/**
+	 * Loads Mhd with raw file using Java implemenentation
+	 * 
+	 * @param fileName
+	 * @param sigma
+	 * @param threshold
+	 */
+	public void loadModelRawSafeMode(String fileName, double sigma, double threshold) {
+		veinsModel = new VeinsModel();
+		veinsModel.constructVBOFromRawFileSafeMode(fileName, sigma, threshold);
+		setDefaultViewOptions();
+	}
+
+	/**
 	 * Loads the model and sets model orientation, camera position and screen
 	 * planes
 	 * 
 	 * @param fileName
+	 * @throws LWJGLException
 	 */
-	public void loadModel(String fileName, double sigma, double threshold) {
+	private void loadModel(String fileName, double sigma, double threshold, boolean isObj) throws LWJGLException {
 		// The smaller angle of view of the horizontal and vertical ones.
 		double fovMin = (VeinsWindow.settings.resWidth < VeinsWindow.settings.resHeight) ? FOV_Y
 				* VeinsWindow.settings.resWidth / (double) VeinsWindow.settings.resHeight : FOV_Y;
 		fovMin = Math.toRadians(fovMin); // Math.PI * fovMin / 180
 
-		veinsModel = new VeinsModel(fileName, sigma, threshold);
+		veinsModel = (isObj) ? new VeinsModel(fileName) : new VeinsModel(fileName, sigma, threshold);
 		double d = calculateCameraDistance(veinsModel);
 		veinsModel.veinsGrabRadius = d / Math.sqrt(2);
 
@@ -291,7 +341,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 		setScreenPlanes(d, fovMin);
 	}
 
-	public void changeModel(double threshold) {
+	public void changeModel(double threshold) throws LWJGLException {
 		// The smaller angle of view of the horizontal and vertical ones.
 		double fovMin = (VeinsWindow.settings.resWidth < VeinsWindow.settings.resHeight) ? FOV_Y
 				* VeinsWindow.settings.resWidth / (double) VeinsWindow.settings.resHeight : FOV_Y;
@@ -301,6 +351,16 @@ public class VeinsRenderer extends LWJGLRenderer {
 		double d = calculateCameraDistance(veinsModel);
 		veinsModel.veinsGrabRadius = d / Math.sqrt(2);
 
+		setCameraPositionAndOrientation(d, fovMin);
+		setScreenPlanes(d, fovMin);
+	}
+
+	private void setDefaultViewOptions() {
+		double fovMin = (VeinsWindow.settings.resWidth < VeinsWindow.settings.resHeight) ? FOV_Y
+				* VeinsWindow.settings.resWidth / (double) VeinsWindow.settings.resHeight : FOV_Y;
+		fovMin = Math.toRadians(fovMin); // Math.PI * fovMin / 180
+		double d = calculateCameraDistance(veinsModel);
+		veinsModel.veinsGrabRadius = d / Math.sqrt(2);
 		setCameraPositionAndOrientation(d, fovMin);
 		setScreenPlanes(d, fovMin);
 	}

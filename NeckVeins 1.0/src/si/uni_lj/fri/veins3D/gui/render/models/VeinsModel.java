@@ -59,24 +59,29 @@ public class VeinsModel {
 	public double[] veinsGrabbedAt;
 	public double veinsGrabRadius;
 
-	public VeinsModel(String filepath, double sigma, double threshold) {
-		constructVBOFromFile(filepath, sigma, threshold);
+	public VeinsModel() {
+		meshes = new ArrayList<Mesh>();
 		setDefaultOrientation();
 	}
 
-	public VeinsModel(double threshold, Quaternion currentQuaternion) {
+	public VeinsModel(String filepath) {
+		constructVBOFromObjFile(filepath);
+		setDefaultOrientation();
+	}
+
+	public VeinsModel(String filepath, double sigma, double threshold) throws LWJGLException {
+		constructVBOFromRawFile(filepath, sigma, threshold);
+		setDefaultOrientation();
+	}
+
+	public VeinsModel(double threshold, Quaternion currentQuaternion) throws LWJGLException {
 		changeThreshold(threshold);
 		this.currentOrientation = currentQuaternion;
 		this.addedOrientation = new Quaternion();
 	}
 
-	public void changeThreshold(double threshold) {
-		Object[] output = null;
-		try {
-			output = ModelCreator.changeModel(threshold);
-		} catch (LWJGLException e) {
-			e.printStackTrace();
-		}
+	public void changeThreshold(double threshold) throws LWJGLException {
+		Object[] output = ModelCreator.changeModel(threshold);
 		constructVBO(output);
 	}
 
@@ -105,32 +110,25 @@ public class VeinsModel {
 		}
 	}
 
-	public void constructVBOFromFile(String filepath, double sigma, double threshold) {
-		String[] tokens = filepath.split("\\.(?=[^\\.]+$)");
-		if (tokens[tokens.length - 1].equals("mhd")) {
-			constructVBOFromRawFile(filepath, sigma, threshold);
-		} else
-			constructVBOFromObjFile(filepath);
-	}
-
 	/**
-	 * Normals calculated on GPU, are currently not used, instead Normals
+	 * Normals calculated on GPU are currently not used, instead Normals
 	 * calculated in constructVBO are used.
 	 * 
 	 * @param filepath
 	 */
-	public void constructVBOFromRawFile(String filepath, double sigma, double threshold) {
+	public void constructVBOFromRawFile(String filepath, double sigma, double threshold) throws LWJGLException {
 		Object[] output = null;
-		try {
-			output = ModelCreator.createModel(filepath, sigma, threshold);
-		} catch (LWJGLException e) {
-			e.printStackTrace();
-		}
-
+		output = ModelCreator.createModel(filepath, sigma, threshold);
 		constructVBO(output);
 	}
 
-	public void constructVBO(Object[] output) {
+	public void constructVBOFromRawFileSafeMode(String filepath, double sigma, double threshold) {
+		// Object[] output = null;
+		// output = ModelCreator.createModel(filepath, sigma, threshold);
+		// constructVBO(output);
+	}
+
+	private void constructVBO(Object[] output) {
 		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
 		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
 		// FloatBuffer normalsBuff = (FloatBuffer) output[2];
@@ -337,7 +335,7 @@ public class VeinsModel {
 		Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
 		FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
 		GL11.glMultMatrix(fb);
-		
+
 		/* Translate and render */
 		glTranslatef(-(float) centerx, -(float) centery, -(float) centerz);
 		for (Mesh vbo : meshes) {
@@ -352,7 +350,7 @@ public class VeinsModel {
 	 */
 	public void changeAddedOrientation(VeinsRenderer renderer) {
 		double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
-		
+
 		if (veinsHeldAt != null) {
 			double[] rotationAxis = Vector.crossProduct(veinsGrabbedAt, veinsHeldAt);
 			if (Vector.length(rotationAxis) > 0) {
@@ -399,33 +397,34 @@ public class VeinsModel {
 	}
 
 	public void rotateModel3D(double[] rot, VeinsRenderer renderer) {
-		
-		double[] centerVector=RayUtil.getRayDirection((int)VeinsWindow.settings.resWidth/2,(int)VeinsWindow.settings.resHeight/2,renderer);
-						
-		Quaternion temp=new Quaternion();
+
+		double[] centerVector = RayUtil.getRayDirection((int) VeinsWindow.settings.resWidth / 2,
+				(int) VeinsWindow.settings.resHeight / 2, renderer);
+
+		Quaternion temp = new Quaternion();
 		double[] rotationAxis;
-		
-		rotationAxis = Vector.crossProduct(centerVector, new double[] {0,1,0});
+
+		rotationAxis = Vector.crossProduct(centerVector, new double[] { 0, 1, 0 });
 		rotationAxis = Vector.normalize(rotationAxis);
 		rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
-		
+
 		temp = Quaternion.quaternionFromAngleAndRotationAxis(rot[0], rotationAxis);
 		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, temp);
-		
-		rotationAxis = Vector.crossProduct(centerVector, new double[] {1,0,0});
+
+		rotationAxis = Vector.crossProduct(centerVector, new double[] { 1, 0, 0 });
 		rotationAxis = Vector.normalize(rotationAxis);
 		rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
-		
+
 		temp = Quaternion.quaternionFromAngleAndRotationAxis(rot[2], rotationAxis);
 		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, temp);
-		
-		rotationAxis = Vector.crossProduct(centerVector, new double[] {0,0,1});
+
+		rotationAxis = Vector.crossProduct(centerVector, new double[] { 0, 0, 1 });
 		rotationAxis = Vector.normalize(centerVector);
 		rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
-		
+
 		temp = Quaternion.quaternionFromAngleAndRotationAxis(-rot[1], rotationAxis);
 		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, temp);
-		
+
 	}
 
 }

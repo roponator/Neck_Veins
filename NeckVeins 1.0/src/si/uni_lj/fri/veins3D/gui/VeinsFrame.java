@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ResourceBundle;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.opencl.OpenCLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
@@ -11,6 +12,8 @@ import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
 import de.matthiasmann.twl.BorderLayout;
 import de.matthiasmann.twl.BorderLayout.Location;
+import de.matthiasmann.twl.BoxLayout;
+import de.matthiasmann.twl.BoxLayout.Direction;
 import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.FileSelector;
 import de.matthiasmann.twl.FileSelector.Callback2;
@@ -18,6 +21,7 @@ import de.matthiasmann.twl.FileTable.Entry;
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.Label;
 import de.matthiasmann.twl.ListBox;
+import de.matthiasmann.twl.PopupWindow;
 import de.matthiasmann.twl.ScrollPane;
 import de.matthiasmann.twl.Scrollbar;
 import de.matthiasmann.twl.TextArea;
@@ -72,6 +76,10 @@ public class VeinsFrame extends Widget {
 	BorderLayout minTriangelsLayout;
 	Scrollbar minTrianglesScrollbar;
 
+	// Error Popup
+	PopupWindow errorPop;
+	Label errorPopLabel;
+
 	public VeinsFrame() throws LWJGLException {
 		getDisplayModes();
 		initGUI();
@@ -99,6 +107,7 @@ public class VeinsFrame extends Widget {
 		initVideoSettingsButtons();
 		initDisplayModeListBox();
 		init3DmouseButtons();
+		initErrorPopup();
 	}
 
 	private void initMinTrianglesScroll() {
@@ -112,16 +121,8 @@ public class VeinsFrame extends Widget {
 		minTrianglesScrollbar.addCallback(new Runnable() {
 			@Override
 			public void run() {
-				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
-				VeinsModel model = renderer.getVeinsModel();
-				renderer.setCursor((MouseCursor) VeinsWindow.themeManager.getCursor("cursor.wait"));
-
-				int scrollMaxValue = minTrianglesScrollbar.getMaxValue();
-				int scrollCurrentValue = minTrianglesScrollbar.getValue();
-				int minTriangels = (int) (model.maxTriangels * ((float) scrollCurrentValue / (float) (scrollMaxValue)));
-
-				minTriangelsValue.setText(Integer.toString(minTriangels));
-				model.changeMinTriangles(minTriangels);
+				setWaitCursor();
+				applyMinTrianglesValue();
 			}
 		});
 
@@ -131,6 +132,17 @@ public class VeinsFrame extends Widget {
 		minTriangelsLayout.add(minTriangelsLabel, Location.NORTH);
 		minTriangelsLayout.setVisible(false);
 		add(minTriangelsLayout);
+	}
+
+	private void applyMinTrianglesValue() {
+		VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+		VeinsModel model = renderer.getVeinsModel();
+		int scrollMaxValue = minTrianglesScrollbar.getMaxValue();
+		int scrollCurrentValue = minTrianglesScrollbar.getValue();
+		int minTriangels = (int) (model.maxTriangels * ((float) scrollCurrentValue / (float) (scrollMaxValue)));
+		model.changeMinTriangles(minTriangels);
+		// TODO Update min triangles value label
+		// minTriangelsValue.setText(Integer.toString(minTriangels));
 	}
 
 	private void initThresholdScroll() {
@@ -153,11 +165,16 @@ public class VeinsFrame extends Widget {
 		applyThreshBtn.addCallback(new Runnable() {
 			@Override
 			public void run() {
-				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
-				renderer.setCursor((MouseCursor) VeinsWindow.themeManager.getCursor("cursor.wait"));
-				renderer.changeModel(thresholdScrollbar.getValue() / 100.0f);
-				minTrianglesScrollbar.setValue(0);
+				try {
+					setWaitCursor();
+					applyModelThreshold();
+					minTrianglesScrollbar.setValue(0);
+				} catch (LWJGLException | OpenCLException e) {
+					e.printStackTrace();
+					handleLWJGLException();
+				}
 			}
+
 		});
 		exportObjBtn = new Button("Export");
 		thresholdLevel = new Label("0.5");
@@ -174,6 +191,11 @@ public class VeinsFrame extends Widget {
 		this.add(thresholdLayout);
 	}
 
+	private void applyModelThreshold() throws LWJGLException {
+		VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+		renderer.changeModel(thresholdScrollbar.getValue() / 100.0f);
+	}
+
 	private void initFileSelector() {
 		fileSelector = new FileSelector();
 		fileSelector.setTheme("fileselector");
@@ -186,24 +208,10 @@ public class VeinsFrame extends Widget {
 		Callback2 cb = new Callback2() {
 			@Override
 			public void filesSelected(Object[] files) {
-				setButtonsEnabled(true);
+				setWaitCursor();
 				fileSelector.setVisible(false);
-				File file = (File) files[0];
-				System.out.println("\nOpening file: " + file.getAbsolutePath());
-
-				String[] tokens = file.getAbsolutePath().split("\\.(?=[^\\.]+$)");
-				thresholdLayout.setVisible(tokens[tokens.length - 1].equals("mhd"));
-				minTriangelsLayout.setVisible(tokens[tokens.length - 1].equals("mhd"));
-				double sigma = (gaussFileOptionsScroll.isEnabled()) ? gaussFileOptionsScroll.getValue()
-						/ (double) gaussFileOptionsScroll.getMaxValue() : -1;
-				double threshold = (threshFileOptionsScroll.isEnabled()) ? threshFileOptionsScroll.getValue()
-						/ (double) threshFileOptionsScroll.getMaxValue() : -1;
-
-				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
-				renderer.setCursor((MouseCursor) VeinsWindow.themeManager.getCursor("cursor.wait"));
-				renderer.loadModel(file.getAbsolutePath(), sigma, threshold);
-
-				thresholdScrollbar.setValue((int) (renderer.getVeinsModel().threshold * 100));
+				setButtonsEnabled(true);
+				openFile((File) files[0]);
 			}
 
 			@Override
@@ -229,6 +237,63 @@ public class VeinsFrame extends Widget {
 		};
 		fileSelector.addCallback(cb);
 		add(fileSelector);
+	}
+
+	private void setWaitCursor() {
+		VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+		renderer.setCursor((MouseCursor) VeinsWindow.themeManager.getCursor("cursor.wait"));
+	}
+
+	private void openFile(File file) {
+		System.out.println("\nOpening file: " + file.getAbsolutePath());
+		try {
+			if (fileExtensionEquals(file, "mhd")) {
+				showThresholdOptions(true);
+				openMhd(file);
+				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+				thresholdScrollbar.setValue((int) (renderer.getVeinsModel().threshold * 100));
+			} else {
+				showThresholdOptions(false);
+				openObj(file);
+			}
+		} catch (LWJGLException | OpenCLException e) {
+			e.printStackTrace();
+			handleLWJGLException();
+		}
+	}
+
+	private void openMhd(File file) throws LWJGLException {
+		double sigma = gaussFileOptionsScroll.getValue() / (double) gaussFileOptionsScroll.getMaxValue();
+		double threshold = threshFileOptionsScroll.getValue() / (double) threshFileOptionsScroll.getMaxValue();
+		VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+		renderer.loadModelRaw(file.getAbsolutePath(), sigma, threshold);
+	}
+
+	private void openMhdSafeMode(File file) {
+		double sigma = gaussFileOptionsScroll.getValue() / (double) gaussFileOptionsScroll.getMaxValue();
+		double threshold = threshFileOptionsScroll.getValue() / (double) threshFileOptionsScroll.getMaxValue();
+		VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+		renderer.loadModelRawSafeMode(file.getAbsolutePath(), sigma, threshold);
+	}
+
+	private void openObj(File file) throws LWJGLException {
+		VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+		renderer.loadModelObj(file.getAbsolutePath());
+	}
+
+	private void handleLWJGLException() {
+		showThresholdOptions(false);
+		errorPop.openPopupCentered();
+	}
+
+	private boolean fileExtensionEquals(File file, String ext) {
+		String[] tokens = file.getAbsolutePath().split("\\.(?=[^\\.]+$)");
+		return tokens[tokens.length - 1].equals(ext);
+	}
+
+	private void showThresholdOptions(boolean show) {
+		thresholdLayout.setVisible(show);
+		minTriangelsLayout.setVisible(show);
 	}
 
 	private Widget initSegmentationOptions() {
@@ -301,7 +366,7 @@ public class VeinsFrame extends Widget {
 		openButton.setTooltipContent("Open the dialog with the file chooser to select an .obj file.");
 		openButton.addCallback(new Runnable() {
 			public void run() {
-				openAFile();
+				showFileSelector();
 			}
 		});
 		add(openButton);
@@ -605,6 +670,38 @@ public class VeinsFrame extends Widget {
 
 	}
 
+	// TODO edit error widget look
+	private void initErrorPopup() {
+		Button okBtn = new Button("Ok");
+		okBtn.addCallback(new Runnable() {
+			@Override
+			public void run() {
+				String lastFilePath = fileSelector.getFileTable().getSelection()[0].getPath();
+				openMhdSafeMode(new File(lastFilePath));
+			}
+		});
+		Button cancelBtn = new Button("Cancel");
+		cancelBtn.addCallback(new Runnable() {
+			@Override
+			public void run() {
+				errorPop.closePopup();
+			}
+		});
+
+		Widget btns = new BoxLayout(Direction.HORIZONTAL);
+		btns.add(okBtn);
+		btns.add(cancelBtn);
+		errorPopLabel = new Label();
+
+		BorderLayout errorWidget = new BorderLayout();
+		errorWidget.add(errorPopLabel, Location.NORTH);
+		errorWidget.add(btns, Location.EAST);
+
+		errorPop = new PopupWindow(this);
+		errorPop.setCloseOnClickedOutside(false);
+		errorPop.add(errorWidget);
+	}
+
 	public void setButtonsEnabled(boolean enabled) {
 		isDialogOpened = enabled;
 		openButton.setEnabled(enabled);
@@ -627,7 +724,7 @@ public class VeinsFrame extends Widget {
 	 * @since 0.4
 	 * @version 0.4
 	 */
-	public void openAFile() {
+	public void showFileSelector() {
 		fileSelector.setVisible(true);
 		setButtonsEnabled(false);
 	}
@@ -837,6 +934,8 @@ public class VeinsFrame extends Widget {
 		strong.setText(labels.getString("strongBtnLabel"));
 		lockRot.setText(labels.getString("lockRotBtnLabel"));
 		lockTrans.setText(labels.getString("lockTransBtnLabel"));
+
+		errorPopLabel.setText(labels.getString("popupErrorMsg"));
 
 		ResourceBundle credits = ResourceBundle.getBundle("inter/Credits", VeinsWindow.settings.locale);
 		ResourceBundle help = ResourceBundle.getBundle("inter/Help", VeinsWindow.settings.locale);
