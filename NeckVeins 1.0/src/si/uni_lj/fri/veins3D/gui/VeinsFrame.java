@@ -171,7 +171,7 @@ public class VeinsFrame extends Widget {
 					minTrianglesScrollbar.setValue(0);
 				} catch (LWJGLException | OpenCLException e) {
 					e.printStackTrace();
-					handleLWJGLException();
+					handleLWJGLException(false);
 				}
 			}
 
@@ -258,7 +258,7 @@ public class VeinsFrame extends Widget {
 			}
 		} catch (LWJGLException | OpenCLException e) {
 			e.printStackTrace();
-			handleLWJGLException();
+			handleLWJGLException(true);
 		}
 	}
 
@@ -281,9 +281,17 @@ public class VeinsFrame extends Widget {
 		renderer.loadModelObj(file.getAbsolutePath());
 	}
 
-	private void handleLWJGLException() {
+	// TODO
+	private void handleLWJGLException(boolean isFallBack) {
+		showErrorPopupOkBtn(isFallBack);
 		showThresholdOptions(false);
+		setErrorPopLabel(isFallBack);
 		errorPop.openPopupCentered();
+	}
+
+	private void showErrorPopupOkBtn(boolean show) {
+		BorderLayout errorLayout = (BorderLayout) errorPop.getChild(0);
+		errorLayout.getChild(Location.EAST).getChild(0).setVisible(show);
 	}
 
 	private boolean fileExtensionEquals(File file, String ext) {
@@ -680,7 +688,7 @@ public class VeinsFrame extends Widget {
 				openMhdSafeMode(new File(lastFilePath));
 			}
 		});
-		Button cancelBtn = new Button("Cancel");
+		Button cancelBtn = new Button("Close");
 		cancelBtn.addCallback(new Runnable() {
 			@Override
 			public void run() {
@@ -935,7 +943,7 @@ public class VeinsFrame extends Widget {
 		lockRot.setText(labels.getString("lockRotBtnLabel"));
 		lockTrans.setText(labels.getString("lockTransBtnLabel"));
 
-		errorPopLabel.setText(labels.getString("popupErrorMsg"));
+		errorPopLabel.setText(labels.getString("popupErrorMsg1"));
 
 		ResourceBundle credits = ResourceBundle.getBundle("inter/Credits", VeinsWindow.settings.locale);
 		ResourceBundle help = ResourceBundle.getBundle("inter/Help", VeinsWindow.settings.locale);
@@ -944,6 +952,12 @@ public class VeinsFrame extends Widget {
 		stamCredits.setText(credits.getString("credits"));
 
 		ResourceBundle.clearCache();
+	}
+
+	private void setErrorPopLabel(boolean javaFallBack) {
+		ResourceBundle labels = ResourceBundle.getBundle("inter/LabelsBundle", VeinsWindow.settings.locale);
+		String key = (javaFallBack) ? "popupErrorMsg1" : "popupErrorMsg2";
+		errorPopLabel.setText(labels.getString(key));
 	}
 
 	public boolean isDialogOpened() {
