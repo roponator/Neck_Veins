@@ -11,7 +11,7 @@ public class Graytresh {
 	 * @param m
 	 * @return
 	 */
-	public static double[] graytresh1(double[][][] m) {
+	public static double[] graytresh(float[][][] m) {
 		double maxValue = 0;
 		int[] histogram = new int[256];
 		int zeros = 0;

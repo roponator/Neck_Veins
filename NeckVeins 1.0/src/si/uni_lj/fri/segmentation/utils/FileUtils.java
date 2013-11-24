@@ -92,4 +92,65 @@ public class FileUtils {
 		return floatCTMatrix;
 	}
 
+	/**
+	 * Currently is reading just shorts
+	 * 
+	 * TODO - read different number types written in MHD
+	 * 
+	 * @param fileName
+	 * @return
+	 */
+	public static float[][][] readFile3D(String fileName) {
+		MHDReader.readMHD(fileName);
+		ShortBuffer shorts = fastFileRead();
+		return bufferAs3DMatrix(shorts);
+	}
+
+	private static ShortBuffer fastFileRead() {
+		System.out.println("Reading raw file " + MHDReader.rawFile + "...");
+		File file = new File(MHDReader.rawFile);
+		byte[] fileData = new byte[(int) file.length()];
+		try {
+			DataInputStream dis = new DataInputStream(new FileInputStream(file));
+			dis.readFully(fileData);
+			dis.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		ByteBuffer buffer = ByteBuffer.wrap(fileData);
+		buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+		ShortBuffer shorts = buffer.asShortBuffer();
+
+		// Dereference variables
+		file = null;
+		fileData = null;
+		buffer = null;
+
+		return shorts;
+	}
+
+	private static float[] bufferAs1DMatrix(ShortBuffer buff) {
+		float[] matrix = new float[buff.capacity()];
+		for (int i = 0; i < buff.capacity(); i++) {
+			matrix[i] = buff.get(i);
+		}
+		buff = null;
+		return matrix;
+	}
+
+	private static float[][][] bufferAs3DMatrix(ShortBuffer buff) {
+		float[][][] matrix = new float[MHDReader.Nx][MHDReader.Ny][MHDReader.Nz];
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[0].length; j++) {
+				for (int k = 0; k < matrix[0][0].length; k++) {
+					matrix[i][j][k] = buff.get();
+				}
+			}
+		}
+		buff = null;
+
+		return matrix;
+	}
 }

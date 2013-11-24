@@ -33,6 +33,10 @@ import de.matthiasmann.twl.renderer.MouseCursor;
 import de.matthiasmann.twl.textarea.SimpleTextAreaModel;
 
 public class VeinsFrame extends Widget {
+	private enum Message {
+		FALLBACK, IMPORT, LOADING;
+	}
+
 	private FileSelector fileSelector;
 	private Scrollbar gaussFileOptionsScroll;
 	private Scrollbar threshFileOptionsScroll;
@@ -285,7 +289,7 @@ public class VeinsFrame extends Widget {
 	private void handleLWJGLException(boolean isFallBack) {
 		showErrorPopupOkBtn(isFallBack);
 		showThresholdOptions(false);
-		setErrorPopLabel(isFallBack);
+		setErrorPopLabel((isFallBack) ? Message.FALLBACK : Message.IMPORT);
 		errorPop.openPopupCentered();
 	}
 
@@ -684,6 +688,8 @@ public class VeinsFrame extends Widget {
 		okBtn.addCallback(new Runnable() {
 			@Override
 			public void run() {
+				setWaitCursor();
+				setErrorPopLabel(Message.LOADING);
 				String lastFilePath = fileSelector.getFileTable().getSelection()[0].getPath();
 				openMhdSafeMode(new File(lastFilePath));
 			}
@@ -954,9 +960,20 @@ public class VeinsFrame extends Widget {
 		ResourceBundle.clearCache();
 	}
 
-	private void setErrorPopLabel(boolean javaFallBack) {
+	private void setErrorPopLabel(Message m) {
 		ResourceBundle labels = ResourceBundle.getBundle("inter/LabelsBundle", VeinsWindow.settings.locale);
-		String key = (javaFallBack) ? "popupErrorMsg1" : "popupErrorMsg2";
+		String key = "";
+		switch (m) {
+		case FALLBACK:
+			key = "popupErrorMsg1";
+			break;
+		case IMPORT:
+			key = "popupErrorMsg2";
+			break;
+		case LOADING:
+			key = "popupErrorMsg3";
+			break;
+		}
 		errorPopLabel.setText(labels.getString(key));
 	}
 

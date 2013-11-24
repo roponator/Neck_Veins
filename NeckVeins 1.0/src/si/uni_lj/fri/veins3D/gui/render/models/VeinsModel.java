@@ -24,6 +24,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import si.uni_lj.fri.segmentation.ModelCreator;
+import si.uni_lj.fri.segmentation.ModelCreatorJava;
 import si.uni_lj.fri.segmentation.utils.LabelUtil;
 import si.uni_lj.fri.segmentation.utils.TrianglesLabelHelper;
 import si.uni_lj.fri.segmentation.utils.obj.Triangle;
@@ -123,9 +124,9 @@ public class VeinsModel {
 	}
 
 	public void constructVBOFromRawFileSafeMode(String filepath, double sigma, double threshold) {
-		// Object[] output = null;
-		// output = ModelCreator.createModel(filepath, sigma, threshold);
-		// constructVBO(output);
+		Object[] output = null;
+		output = ModelCreatorJava.createModel(filepath, sigma, threshold);
+		constructVBO(output);
 	}
 
 	private void constructVBO(Object[] output) {
