@@ -2,8 +2,6 @@ package si.uni_lj.fri.segmentation.utils;
 
 import java.util.ArrayList;
 
-import si.uni_lj.fri.segmentation.utils.obj.Vertex;
-
 public class MarchingCubes {
 	/**
 	 * Table from Paul Bourke's website
@@ -289,13 +287,11 @@ public class MarchingCubes {
 			{ 0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
 			{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } };
 
-	public static ArrayList<Float> marchingCubes(float[][][] CTMatrix, float thresholdCoeff, float threshold) {
-		System.out.println("Marching cubes...");
+	public static ArrayList<Float> marchingCubes(float[][][] CTMatrix, float isolevel) {
 		ArrayList<Float> vertices = new ArrayList<Float>();
 		Vertex[] cubesVertices = new Vertex[8];
 		for (int i = 0; i < cubesVertices.length; i++)
-			cubesVertices[i] = new Vertex(0, 0, 0, 0);
-		int vertInd = 1;
+			cubesVertices[i] = new Vertex(0, 0, 0);
 		for (int z = 0; z < CTMatrix[0][0].length - 1; z++) {
 			for (int y = 0; y < CTMatrix.length - 1; y++) {
 				for (int x = 0; x < CTMatrix[0].length - 1; x++) {
@@ -305,6 +301,7 @@ public class MarchingCubes {
 					int right = x + 1;
 					int back = z + 1;
 					int front = z;
+
 					cubesVertices[0].setVertex(left, bottom, back, CTMatrix[bottom][left][back]);
 					cubesVertices[1].setVertex(right, bottom, back, CTMatrix[bottom][right][back]);
 					cubesVertices[2].setVertex(right, bottom, front, CTMatrix[bottom][right][front]);
@@ -313,36 +310,33 @@ public class MarchingCubes {
 					cubesVertices[5].setVertex(right, top, back, CTMatrix[top][right][back]);
 					cubesVertices[6].setVertex(right, top, front, CTMatrix[top][right][front]);
 					cubesVertices[7].setVertex(left, top, front, CTMatrix[top][left][front]);
-					//
-					// for (int i = 0; i < cubesVertices.length; i++)
-					// System.out.println("i " + cubesVertices[i].value);
 
 					int cubeIndex = 0;
 					// 0
-					if (cubesVertices[0].value < threshold) {
+					if (cubesVertices[0].value < isolevel) {
 						cubeIndex |= 1;
 					}
 					// 1
-					if (cubesVertices[1].value < threshold)
+					if (cubesVertices[1].value < isolevel)
 						cubeIndex |= 2;
 					// 2
-					if (cubesVertices[2].value < threshold)
+					if (cubesVertices[2].value < isolevel)
 						cubeIndex |= 4;
 
 					// 3
-					if (cubesVertices[3].value < threshold)
+					if (cubesVertices[3].value < isolevel)
 						cubeIndex |= 8;
 					// 4
-					if (cubesVertices[4].value < threshold)
+					if (cubesVertices[4].value < isolevel)
 						cubeIndex |= 16;
 					// 5
-					if (cubesVertices[5].value < threshold)
+					if (cubesVertices[5].value < isolevel)
 						cubeIndex |= 32;
 					// 6
-					if (cubesVertices[6].value < threshold)
+					if (cubesVertices[6].value < isolevel)
 						cubeIndex |= 64;
 					// 7
-					if (cubesVertices[7].value < threshold)
+					if (cubesVertices[7].value < isolevel)
 						cubeIndex |= 128;
 
 					if (cubeIndex == 0)
@@ -350,40 +344,35 @@ public class MarchingCubes {
 
 					Vertex[] v = new Vertex[12];
 					if ((edgeTable[cubeIndex] & 1) == 1)
-						v[0] = linearInterpolate(cubesVertices[0], cubesVertices[1], thresholdCoeff);
+						v[0] = linearInterpolate(cubesVertices[0], cubesVertices[1], isolevel);
 					if ((edgeTable[cubeIndex] & 2) == 2)
-						v[1] = linearInterpolate(cubesVertices[1], cubesVertices[2], thresholdCoeff);
+						v[1] = linearInterpolate(cubesVertices[1], cubesVertices[2], isolevel);
 					if ((edgeTable[cubeIndex] & 4) == 4)
-						v[2] = linearInterpolate(cubesVertices[2], cubesVertices[3], thresholdCoeff);
+						v[2] = linearInterpolate(cubesVertices[2], cubesVertices[3], isolevel);
 					if ((edgeTable[cubeIndex] & 8) == 8)
-						v[3] = linearInterpolate(cubesVertices[3], cubesVertices[0], thresholdCoeff);
+						v[3] = linearInterpolate(cubesVertices[3], cubesVertices[0], isolevel);
 					if ((edgeTable[cubeIndex] & 16) == 16)
-						v[4] = linearInterpolate(cubesVertices[4], cubesVertices[5], thresholdCoeff);
+						v[4] = linearInterpolate(cubesVertices[4], cubesVertices[5], isolevel);
 					if ((edgeTable[cubeIndex] & 32) == 32)
-						v[5] = linearInterpolate(cubesVertices[5], cubesVertices[6], thresholdCoeff);
+						v[5] = linearInterpolate(cubesVertices[5], cubesVertices[6], isolevel);
 					if ((edgeTable[cubeIndex] & 64) == 64)
-						v[6] = linearInterpolate(cubesVertices[6], cubesVertices[7], thresholdCoeff);
+						v[6] = linearInterpolate(cubesVertices[6], cubesVertices[7], isolevel);
 					if ((edgeTable[cubeIndex] & 128) == 128)
-						v[7] = linearInterpolate(cubesVertices[7], cubesVertices[4], thresholdCoeff);
+						v[7] = linearInterpolate(cubesVertices[7], cubesVertices[4], isolevel);
 					if ((edgeTable[cubeIndex] & 256) == 256)
-						v[8] = linearInterpolate(cubesVertices[0], cubesVertices[4], thresholdCoeff);
+						v[8] = linearInterpolate(cubesVertices[0], cubesVertices[4], isolevel);
 					if ((edgeTable[cubeIndex] & 512) == 512)
-						v[9] = linearInterpolate(cubesVertices[1], cubesVertices[5], thresholdCoeff);
+						v[9] = linearInterpolate(cubesVertices[1], cubesVertices[5], isolevel);
 					if ((edgeTable[cubeIndex] & 1024) == 1024)
-						v[10] = linearInterpolate(cubesVertices[2], cubesVertices[6], thresholdCoeff);
+						v[10] = linearInterpolate(cubesVertices[2], cubesVertices[6], isolevel);
 					if ((edgeTable[cubeIndex] & 2048) == 2048)
-						v[11] = linearInterpolate(cubesVertices[3], cubesVertices[7], thresholdCoeff);
-					// if (z == CTMatrix[0][0].length - 2)
-					// System.out.println(nTri);
+						v[11] = linearInterpolate(cubesVertices[3], cubesVertices[7], isolevel);
 
 					// now build the triangles using triTable
 					for (int n = 0; triTable[cubeIndex][n] != -1; n += 3) {
 						Vertex first = v[triTable[cubeIndex][n]];
-						first.index = vertInd++;
 						Vertex second = v[triTable[cubeIndex][n + 1]];
-						second.index = vertInd++;
 						Vertex third = v[triTable[cubeIndex][n + 2]];
-						third.index = vertInd++;
 						vertices.add(first.x);
 						vertices.add(first.y);
 						vertices.add(first.z);
@@ -403,29 +392,36 @@ public class MarchingCubes {
 		return vertices;
 	}
 
-	private static Vertex linearInterpolate(Vertex first, Vertex second, float thresholdCoeff) {
+	private static Vertex linearInterpolate(Vertex first, Vertex second, float isolevel) {
 
-		// if (Math.abs(0.5 - first.value) < 0.00001)
-		// return (second);
-		// if (Math.abs(0.5 - second.value) < 0.00001)
-		// return (first);
-		// if (Math.abs(first.value - second.value) < 0.00001)
-		// return (first);
-		// double mu = (0.5 - first.value) / (second.value - first.value);
-		// double x = first.x + mu * (second.x - first.x);
-		// double y = first.y + mu * (second.y - first.y);
-		// double z = first.z + mu * (second.z - first.z);
-		//
-		// return new Vertex(x, y, z, 100);
+		if (Math.abs(isolevel - first.value) < 0.00001)
+			return (second);
+		if (Math.abs(isolevel - second.value) < 0.00001)
+			return (first);
+		if (Math.abs(first.value - second.value) < 0.00001)
+			return (first);
+		double mu = (isolevel - first.value) / (second.value - first.value);
+		float x = (float) (first.x + mu * (second.x - first.x));
+		float y = (float) (first.y + mu * (second.y - first.y));
+		float z = (float) (first.z + mu * (second.z - first.z));
 
-		float posX = ((first.x + second.x) * 0.5f);
-		// System.out.println("first.x " + first.x + " second.x " +
-		// second.x);
-		float posY = ((first.y + second.y) * 0.5f);
-		float posZ = ((first.z + second.z) * 0.5f);
-		Vertex newVertex = new Vertex(posX, posY, posZ, 0);
-
-		return newVertex;
+		return new Vertex(x, y, z);
 	}
 
+	private static class Vertex {
+		public float x, y, z, value;
+
+		public Vertex(float x, float y, float z) {
+			this.x = x;
+			this.y = y;
+			this.z = z;
+		}
+
+		public void setVertex(float x, float y, float z, float value) {
+			this.x = x;
+			this.y = y;
+			this.z = z;
+			this.value = value;
+		}
+	}
 }

@@ -530,6 +530,11 @@
         </theme>
         <param name="maxHeight"><int>150</int></param>
     </theme>
+    
+    <theme name="errorPopup" ref="-defaults">
+        <param name="background"><image>-borderA</image></param>
+        <param name="border"><border>10</border></param>
+    </theme>
 
     <theme name="scrollpane" ref="-defaults" allowWildcard="true">
         <theme name="hscrollbar" ref="hscrollbar"/>

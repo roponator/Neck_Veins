@@ -71,7 +71,6 @@ public class Gauss3D {
 	}
 
 	public static void gauss3D(float[][][] ct, double sigma) {
-		System.out.println("Gauss Java implementation...");
 		int size = (int) (2 * Math.ceil(3 * sigma / MHDReader.dx) + 1);
 		gauss3D(size, size, size, sigma, sigma, sigma, ct);
 	}

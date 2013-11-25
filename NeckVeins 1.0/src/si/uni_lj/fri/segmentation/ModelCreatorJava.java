@@ -13,31 +13,59 @@ public class ModelCreatorJava {
 
 	public static Object[] createModel(String fileName, double sigma, double threshold) {
 		float[][][] ctMatrix = FileUtils.readFile3D(fileName);
-		if (sigma > 0)
-			Gauss3D.gauss3D(ctMatrix, sigma);
+		execGauss(ctMatrix, sigma);
+		double isolevel = execFindTreshold(ctMatrix, threshold);
+		execNormalization(ctMatrix, execFindMax(ctMatrix));
+		float[] vertices = execMarchingCubes(ctMatrix, isolevel);
+		int[] nTriangles = new int[] { vertices.length / 9 };
+		return new Object[] { IntBuffer.wrap(nTriangles), FloatBuffer.wrap(vertices), 0, (float) isolevel };
+	}
 
-		double max = 0;
-		if (threshold < 0) {
-			double[] t = Graytresh.graytresh(ctMatrix);
-			threshold = t[0];
-			max = t[1];
-		} else {
-			for (float[][] i : ctMatrix) {
-				for (float[] j : i) {
-					for (float f : j) {
-						if (f > max)
-							max = f;
-					}
+	private static void execNormalization(float[][][] ctMatrix, double max) {
+		System.out.println("Values normalization...");
+		for (int i = 0; i < ctMatrix.length; i++) {
+			for (int j = 0; j < ctMatrix[0].length; j++) {
+				for (int k = 0; k < ctMatrix[0][0].length; k++) {
+					ctMatrix[i][j][k] /= max;
 				}
 			}
 		}
-		ArrayList<Float> vertices = MarchingCubes.marchingCubes(ctMatrix, (float) threshold, (float) (threshold * max));
-		int nTriangles = vertices.size() / 9;
+	}
+
+	private static void execGauss(float[][][] ctMatrix, double sigma) {
+		System.out.println("Gauss Java implementation...");
+		if (sigma > 0)
+			Gauss3D.gauss3D(ctMatrix, sigma);
+	}
+
+	private static double execFindMax(float[][][] ctMatrix) {
+		double max = 0;
+		for (int i = 0; i < ctMatrix.length; i++) {
+			for (int j = 0; j < ctMatrix[0].length; j++) {
+				for (int k = 0; k < ctMatrix[0][0].length; k++) {
+					if (ctMatrix[i][j][k] > max)
+						max = ctMatrix[i][j][k];
+				}
+			}
+		}
+		return max;
+	}
+
+	private static double execFindTreshold(float[][][] ctMatrix, double threshold) {
+		System.out.println("Thresholding...");
+		if (threshold < 0) {
+			return Graytresh.graytresh(ctMatrix)[0];
+		} else {
+			return threshold;
+		}
+	}
+
+	private static float[] execMarchingCubes(float[][][] ctMatrix, double isolevel) {
+		System.out.println("Marching cubes...");
+		ArrayList<Float> vertices = MarchingCubes.marchingCubes(ctMatrix, (float) isolevel);
 		float[] v = new float[vertices.size()];
 		for (int i = 0; i < vertices.size(); i++)
 			v[i] = vertices.get(i);
-
-		return new Object[] { IntBuffer.wrap(new int[] { nTriangles }), FloatBuffer.wrap(v), 0,
-				(float) (threshold * max) };
+		return v;
 	}
 }

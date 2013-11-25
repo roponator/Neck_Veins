@@ -118,14 +118,12 @@ public class VeinsModel {
 	 * @param filepath
 	 */
 	public void constructVBOFromRawFile(String filepath, double sigma, double threshold) throws LWJGLException {
-		Object[] output = null;
-		output = ModelCreator.createModel(filepath, sigma, threshold);
+		Object[] output = ModelCreator.createModel(filepath, sigma, threshold);
 		constructVBO(output);
 	}
 
 	public void constructVBOFromRawFileSafeMode(String filepath, double sigma, double threshold) {
-		Object[] output = null;
-		output = ModelCreatorJava.createModel(filepath, sigma, threshold);
+		Object[] output = ModelCreatorJava.createModel(filepath, sigma, threshold);
 		constructVBO(output);
 	}
 

@@ -64,32 +64,8 @@ public class FileUtils {
 	 */
 	public static float[] readFile(String fileName) {
 		MHDReader.readMHD(fileName);
-		System.out.println("Reading raw file " + fileName + "...");
-		File file = new File(MHDReader.rawFile);
-		byte[] fileData = new byte[(int) file.length()];
-		try {
-			DataInputStream dis = new DataInputStream(new FileInputStream(file));
-			dis.readFully(fileData);
-			dis.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		ByteBuffer buffer = ByteBuffer.wrap(fileData);
-		buffer.order(ByteOrder.LITTLE_ENDIAN);
-		ShortBuffer shorts = buffer.asShortBuffer();
-		float[] floatCTMatrix = new float[shorts.capacity()];
-		for (int i = 0; i < shorts.capacity(); i++) {
-			floatCTMatrix[i] = shorts.get(i);
-		}
-
-		// Dereference variables
-		file = null;
-		fileData = null;
-		buffer = null;
-		shorts = null;
-
-		return floatCTMatrix;
+		ShortBuffer shorts = fastFileRead();
+		return bufferAs1DMatrix(shorts);
 	}
 
 	/**
@@ -141,16 +117,15 @@ public class FileUtils {
 	}
 
 	private static float[][][] bufferAs3DMatrix(ShortBuffer buff) {
-		float[][][] matrix = new float[MHDReader.Nx][MHDReader.Ny][MHDReader.Nz];
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix[0].length; j++) {
-				for (int k = 0; k < matrix[0][0].length; k++) {
-					matrix[i][j][k] = buff.get();
+		float[][][] matrix = new float[MHDReader.Ny][MHDReader.Ny][MHDReader.Ny];
+		for (int i = 0; i < MHDReader.Nz; i++) {
+			for (int j = 0; j < MHDReader.Ny; j++) {
+				for (int k = 0; k < MHDReader.Nx; k++) {
+					matrix[j][k][i] = buff.get();
 				}
 			}
 		}
 		buff = null;
-
 		return matrix;
 	}
 }

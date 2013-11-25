@@ -284,13 +284,15 @@ public class VeinsRenderer extends LWJGLRenderer {
 	}
 
 	/**
-	 * Loads obj file with
+	 * Loads obj file
 	 * 
 	 * @param fileName
 	 * @throws LWJGLException
 	 */
-	public void loadModelObj(String fileName) throws LWJGLException {
-		loadModel(fileName, -1, -1, true);
+	public void loadModelObj(String fileName) {
+		veinsModel = new VeinsModel();
+		veinsModel.constructVBOFromObjFile(fileName);
+		setDefaultViewOptions();
 	}
 
 	/**
@@ -318,27 +320,6 @@ public class VeinsRenderer extends LWJGLRenderer {
 		veinsModel = new VeinsModel();
 		veinsModel.constructVBOFromRawFileSafeMode(fileName, sigma, threshold);
 		setDefaultViewOptions();
-	}
-
-	/**
-	 * Loads the model and sets model orientation, camera position and screen
-	 * planes
-	 * 
-	 * @param fileName
-	 * @throws LWJGLException
-	 */
-	private void loadModel(String fileName, double sigma, double threshold, boolean isObj) throws LWJGLException {
-		// The smaller angle of view of the horizontal and vertical ones.
-		double fovMin = (VeinsWindow.settings.resWidth < VeinsWindow.settings.resHeight) ? FOV_Y
-				* VeinsWindow.settings.resWidth / (double) VeinsWindow.settings.resHeight : FOV_Y;
-		fovMin = Math.toRadians(fovMin); // Math.PI * fovMin / 180
-
-		veinsModel = (isObj) ? new VeinsModel(fileName) : new VeinsModel(fileName, sigma, threshold);
-		double d = calculateCameraDistance(veinsModel);
-		veinsModel.veinsGrabRadius = d / Math.sqrt(2);
-
-		setCameraPositionAndOrientation(d, fovMin);
-		setScreenPlanes(d, fovMin);
 	}
 
 	public void changeModel(double threshold) throws LWJGLException {
