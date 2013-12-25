@@ -3,6 +3,7 @@ package si.uni_lj.fri.veins3D.gui.render.models;
 import static org.lwjgl.opengl.ARBBufferObject.GL_STATIC_DRAW_ARB;
 import static org.lwjgl.opengl.ARBBufferObject.glBindBufferARB;
 import static org.lwjgl.opengl.ARBBufferObject.glBufferDataARB;
+import static org.lwjgl.opengl.ARBBufferObject.glDeleteBuffersARB;
 import static org.lwjgl.opengl.ARBBufferObject.glGenBuffersARB;
 import static org.lwjgl.opengl.ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB;
 import static org.lwjgl.opengl.ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB;
@@ -276,6 +277,17 @@ public class Mesh {
 		constructVBO();
 	}
 
+	public void deleteVBO() {
+		for (int i : verticesAndNormalsIDs) {
+			glDeleteBuffersARB(i);
+		}
+		for (int i : indicesIDs) {
+			glDeleteBuffersARB(i);
+		}
+		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+	}
+
 	public void constructVBO() {
 		maxSubDepth++;
 		verticesAndNormalsIDs.add(glGenBuffersARB());
@@ -315,6 +327,10 @@ public class Mesh {
 		glNormalPointer(GL_FLOAT, 0, (4 * verticesCounters.get(subDepth)));
 
 		glDrawElements(GL_TRIANGLES, facesCounters.get(subDepth), GL_UNSIGNED_INT, 0);
+
+		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+
 	}
 
 	public static float[] getNormals(ArrayList<Float> vertices, ArrayList<Integer> faces) {

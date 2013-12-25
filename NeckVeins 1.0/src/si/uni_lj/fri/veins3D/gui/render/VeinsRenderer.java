@@ -62,18 +62,6 @@ import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 
-/**
- * @author Anze
- *
- */
-/**
- * @author Anze
- * 
- */
-/**
- * @author Anze
- * 
- */
 public class VeinsRenderer extends LWJGLRenderer {
 	public static final int FIXED_PIPELINE = -1;
 	public static final int SIMPLE_SHADER = 0;
@@ -290,6 +278,8 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 * @throws LWJGLException
 	 */
 	public void loadModelObj(String fileName) {
+		if (veinsModel != null)
+			veinsModel.deleteMeshes();
 		veinsModel = new VeinsModel();
 		veinsModel.constructVBOFromObjFile(fileName);
 		setDefaultViewOptions();
@@ -304,6 +294,8 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 * @throws LWJGLException
 	 */
 	public void loadModelRaw(String fileName, double sigma, double threshold) throws LWJGLException {
+		if (veinsModel != null)
+			veinsModel.deleteMeshes();
 		veinsModel = new VeinsModel();
 		veinsModel.constructVBOFromRawFile(fileName, sigma, threshold);
 		setDefaultViewOptions();
@@ -317,23 +309,18 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 * @param threshold
 	 */
 	public void loadModelRawSafeMode(String fileName, double sigma, double threshold) {
+		if (veinsModel != null)
+			veinsModel.deleteMeshes();
 		veinsModel = new VeinsModel();
 		veinsModel.constructVBOFromRawFileSafeMode(fileName, sigma, threshold);
 		setDefaultViewOptions();
 	}
 
 	public void changeModel(double threshold) throws LWJGLException {
-		// The smaller angle of view of the horizontal and vertical ones.
-		double fovMin = (VeinsWindow.settings.resWidth < VeinsWindow.settings.resHeight) ? FOV_Y
-				* VeinsWindow.settings.resWidth / (double) VeinsWindow.settings.resHeight : FOV_Y;
-		fovMin = Math.toRadians(fovMin); // Math.PI * fovMin / 180
-
+		veinsModel.deleteMeshes();
 		veinsModel = new VeinsModel(threshold, veinsModel.currentOrientation);
 		double d = calculateCameraDistance(veinsModel);
 		veinsModel.veinsGrabRadius = d / Math.sqrt(2);
-
-		setCameraPositionAndOrientation(d, fovMin);
-		setScreenPlanes(d, fovMin);
 	}
 
 	private void setDefaultViewOptions() {

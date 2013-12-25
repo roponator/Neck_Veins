@@ -8,8 +8,11 @@ import org.lwjgl.opencl.CL10;
 import org.lwjgl.opencl.CLCommandQueue;
 import org.lwjgl.opencl.CLMem;
 
+import si.uni_lj.fri.segmentation.MHDReader;
+
 public class Utils {
-	public static float[] getGauss1DKernel(int size, double sigma) {
+	public static float[] getGauss1DKernel(double sigma) {
+		int size = (int) (2 * Math.ceil(3 * sigma / MHDReader.dx) + 1);
 		float[] kernel = new float[size];
 		double sum = 0;
 		for (int i = 0; i < size; i++) {
@@ -66,14 +69,14 @@ public class Utils {
 		System.out.println(sum);
 	}
 
-	public static void readCLBuffer(CLCommandQueue queue, CLMem memObj, int size, int compareValue) {
-		FloatBuffer buffer = BufferUtils.createFloatBuffer(size);
+	public static void readCLBufferFloat(CLCommandQueue queue, CLMem memObj, int nfloats, int compareValue) {
+		FloatBuffer buffer = BufferUtils.createFloatBuffer(nfloats);
 		CL10.clEnqueueReadBuffer(queue, memObj, CL10.CL_TRUE, 0, buffer, null, null);
 		readBuffer(buffer, compareValue);
 	}
 
-	public static void readCLBufferInt(CLCommandQueue queue, CLMem memObj, int size, int compareValue) {
-		IntBuffer buffer = BufferUtils.createIntBuffer(size);
+	public static void readCLBufferInt(CLCommandQueue queue, CLMem memObj, int nints, int compareValue) {
+		IntBuffer buffer = BufferUtils.createIntBuffer(nints);
 		CL10.clEnqueueReadBuffer(queue, memObj, CL10.CL_TRUE, 0, buffer, null, null);
 		readBuffer(buffer, compareValue);
 	}
@@ -91,5 +94,14 @@ public class Utils {
 		for (int i = 0; i < histogram.length; i++) {
 			System.out.println("i: " + i + " value: " + histogram[i]);
 		}
+	}
+
+	public static long startTime() {
+		return System.currentTimeMillis();
+	}
+
+	public static void endTime(long startTime, String measureName) {
+		long measuredTime = System.currentTimeMillis() - startTime;
+		System.out.println(measureName + " time: " + measuredTime / 1000.0f + "s");
 	}
 }

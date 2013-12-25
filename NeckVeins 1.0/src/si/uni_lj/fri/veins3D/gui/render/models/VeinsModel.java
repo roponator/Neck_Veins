@@ -87,6 +87,9 @@ public class VeinsModel {
 	}
 
 	public void changeMinTriangles(int min) {
+		for (Mesh mesh : meshes) {
+			mesh.deleteVBO();
+		}
 		boolean[] labels = LabelUtil.getValidLabels(maxTriangels, min, labelHelper);
 		meshes = new ArrayList<Mesh>();
 		ArrayList<Integer> tempFaces = new ArrayList<Integer>();
@@ -108,6 +111,14 @@ public class VeinsModel {
 
 		for (Mesh mesh : meshes) {
 			mesh.constructVBO();
+		}
+	}
+
+	public void deleteMesh() {
+		if (meshes != null) {
+			for (Mesh mesh : meshes) {
+				mesh.deleteVBO();
+			}
 		}
 	}
 
@@ -393,6 +404,14 @@ public class VeinsModel {
 
 	public void setAddedOrientation(Quaternion q) {
 		addedOrientation = q;
+	}
+
+	public void deleteMeshes() {
+		if (meshes != null) {
+			for (Mesh m : meshes) {
+				m.deleteVBO();
+			}
+		}
 	}
 
 	public void rotateModel3D(double[] rot, VeinsRenderer renderer) {
