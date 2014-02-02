@@ -32,7 +32,7 @@ public class ModelCreator {
 	private static final int MATRIX_DATA = 0;
 	private static final int DIMENSIONS_DATA = 1;
 
-	private static final int FIND_MAX_LOCAL_SIZE = 512;
+	// private static final int FIND_MAX_LOCAL_SIZE = 512;
 	private static final int HISTOGRAM_LOCAL_SIZE = 64;
 
 	// OpenCL variables
@@ -63,7 +63,10 @@ public class ModelCreator {
 		program = CLUtils.createProgram("/opencl/segmentation.cls", context, devices);
 		initStaticData(fileName, sigma);
 		execGauss3D(sigma);
+		long t = Utils.startTime();
 		max = execFindMax();
+		Utils.endTime(t, "Max");
+		System.out.println(max);
 		threshold = execOtsuThreshold((float) threshold);
 		Object[] output = execMarchingCubes((float) threshold);
 		return output;
@@ -123,28 +126,30 @@ public class ModelCreator {
 	}
 
 	private static float execFindMax() {
+		// Get device info
 		ByteBuffer deviceInfoBuff = BufferUtils.createByteBuffer(8);
+		CL10.clGetDeviceInfo(devices.get(0), CL10.CL_DEVICE_MAX_COMPUTE_UNITS, deviceInfoBuff, null);
+		final int MAX_COMPUTE_UNITS = (int) deviceInfoBuff.getLong(0);
+		deviceInfoBuff.clear();
+		CL10.clGetDeviceInfo(devices.get(0), CL10.CL_DEVICE_LOCAL_MEM_SIZE, deviceInfoBuff, null);
+		final int LOCAL_MEM_SIZE = (int) deviceInfoBuff.getLong(0);
+		deviceInfoBuff.clear();
 		CL10.clGetDeviceInfo(devices.get(0), CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE, deviceInfoBuff, null);
-		int maxWorkGroupSize = (int) deviceInfoBuff.getLong(0);
-		int nWorkItems = (int) (Math.ceil((MHDReader.Nx * MHDReader.Ny * MHDReader.Nz) / maxWorkGroupSize
-				/ (double) FIND_MAX_LOCAL_SIZE) * FIND_MAX_LOCAL_SIZE);
+		final int MAX_WORK_GROUP_SIZE = (int) deviceInfoBuff.getLong(0);
 
-		// localGroupSize - Se ne uporablja pri zagonu kernela
-		// TODO - popravi localGroupSize za hardware neodvisnost - implementiraj
-		// podobno kot pri execOtsuHistogram
-		int localGroupSize = FIND_MAX_LOCAL_SIZE;
-		int nWorkGroups = nWorkItems / localGroupSize + 1;
+		int nLocalWorkItems = MAX_WORK_GROUP_SIZE;
+		int nWorkGroups = LOCAL_MEM_SIZE * (MAX_COMPUTE_UNITS + 2) / (nLocalWorkItems * 4);
+		int nGlobalWorkItems = nLocalWorkItems * nWorkGroups;
 
 		CLKernel findMax = CL10.clCreateKernel(program, "findMax", null);
 		CLMem maxMemory = CLUtils.locateMemory(nWorkGroups * 4, CL10.CL_MEM_WRITE_ONLY, context);
 
 		findMax.setArg(0, staticMemory[MATRIX_DATA]);
 		findMax.setArg(1, staticMemory[DIMENSIONS_DATA]);
-		CL10.clSetKernelArg(findMax, 2, localGroupSize * 4);
+		CL10.clSetKernelArg(findMax, 2, nLocalWorkItems);
 		findMax.setArg(3, maxMemory);
 
-		// Local groups size is not defined
-		CLUtils.enqueueKernel(findMax, new int[] { nWorkItems }, queue);
+		CLUtils.enqueueKernel(findMax, new int[] { nGlobalWorkItems }, new int[] { nLocalWorkItems }, queue);
 		Util.checkCLError(CL10.clFinish(queue));
 
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(nWorkGroups);
