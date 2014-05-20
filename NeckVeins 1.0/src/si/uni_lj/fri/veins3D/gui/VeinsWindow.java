@@ -1,6 +1,7 @@
 package si.uni_lj.fri.veins3D.gui;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Locale;
 
 import org.lwjgl.LWJGLException;
@@ -12,12 +13,15 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 
+import com.leapmotion.leap.Controller;
+
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import si.uni_lj.fri.veins3D.utils.Mouse3D;
 import si.uni_lj.fri.veins3D.utils.RayUtil;
+import si.uni_lj.fri.veins3D.utils.LeapMotion;
 import si.uni_lj.fri.veins3D.utils.SettingsUtil;
 import de.matthiasmann.twl.Container;
 import de.matthiasmann.twl.GUI;
@@ -53,7 +57,28 @@ public class VeinsWindow extends Container {
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
 	public static Mouse3D joystick;
+	LeapMotion leap;
+    Controller leapController;
 
+    /**
+     * Used for assesment of controllers
+     * 
+     */
+    //TODO: FOR USABILITY TEST
+    private final double[][] rotations={
+    		{-90,90,0},
+    		{0,180,0},
+    		{0,0,90},
+    		{45,0,0},
+    		{0,55,0},
+    		{0,50,15},
+    		{80,0,0},
+    		{0,60,0},
+    		{0,180,0},
+    		{128,45,30}
+    };
+    private int displayedRotation=0;
+    private boolean showHud=false;
 	/**
 	 * 
 	 */
@@ -152,6 +177,10 @@ public class VeinsWindow extends Container {
 			add(gui);
 			setTheme("mainframe");
 			joystick = new Mouse3D(settings);
+			
+			leap = new LeapMotion();
+	        leapController = new Controller();
+	        leapController.addListener(leap);
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 			exitProgram(1);
@@ -192,6 +221,7 @@ public class VeinsWindow extends Container {
 		timePastFps = timePastFrame;
 		fpsToDisplay = 0;
 		renderer.setupView();
+		
 		while (!Display.isCloseRequested() && isRunning) {
 			/* Reset view */
 			renderer.resetView();
@@ -202,7 +232,8 @@ public class VeinsWindow extends Container {
 
 			/* Render */
 			renderer.render();
-			hud.drawHUD();
+			if(showHud)hud.drawHUD();
+			
 			setTitle();
 
 			/* Update */
@@ -211,6 +242,7 @@ public class VeinsWindow extends Container {
 			logic();
 			Display.sync(settings.frequency);
 		}
+		
 	}
 
 	/**
@@ -250,6 +282,7 @@ public class VeinsWindow extends Container {
 		pollKeyboardInput();
 		pollMouseInput();
 		poll3DMouseInput();
+		pollLeapMotionInput();
 	}
 
 	/**
@@ -293,7 +326,85 @@ public class VeinsWindow extends Container {
 					else
 						settings.locale = new Locale("sl", "SI");
 					frame.setLanguageSpecific();
-				}
+				} else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD0) {
+					displayedRotation=0;
+					System.out.println("***************************");
+					System.out.println("\tExample "+displayedRotation);
+					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
+					
+				}  else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD1) {
+					displayedRotation=1;
+					System.out.println("***************************");
+					System.out.println("\tExample "+displayedRotation);
+					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
+					
+				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD2) {
+					displayedRotation=2;
+					System.out.println("***************************");
+					System.out.println("\tExample "+displayedRotation);
+					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
+					
+				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD3) {
+					displayedRotation=3;
+					System.out.println("***************************");
+					System.out.println("\tExample "+displayedRotation);
+					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
+					
+				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD4) {
+					displayedRotation=4;
+					System.out.println("***************************");
+					System.out.println("\tExample "+displayedRotation);
+					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
+					
+				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD5) {
+					displayedRotation=5;
+					System.out.println("***************************");
+					System.out.println("\tExample "+displayedRotation);
+					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
+					
+				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD6) {
+					displayedRotation=6;
+					System.out.println("***************************");
+					System.out.println("\tExample "+displayedRotation);
+					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
+					
+				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD7) {
+					displayedRotation=7;
+					System.out.println("***************************");
+					System.out.println("\tExample "+displayedRotation);
+					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
+					
+				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD8) {
+					displayedRotation=8;
+					System.out.println("***************************");
+					System.out.println("\tExample "+displayedRotation);
+					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
+					
+				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD9) {
+					displayedRotation=9;
+					System.out.println("***************************");
+					System.out.println("\tExample "+displayedRotation);
+					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
+				} 
+				
+				else if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
+					//Calculate accuracy of rotations
+					// TODO: Add timer functionality and Control with space, which task is currently assigned
+					double calculatedAccuracy=0;
+					double[] curOrientation=renderer.getVeinsModel().currentOrientation.getVectorPart();			
+					double[] plannedOrientation=renderer.getDummyModel().currentOrientation.getVectorPart();
+					
+					System.out.printf("\tVeins:[%.3f,%.3f,%.3f]",curOrientation[0],curOrientation[1],curOrientation[2]);
+					System.out.printf("\n\tGoal:[%.3f,%.3f,%.3f]",plannedOrientation[0],plannedOrientation[1],plannedOrientation[2]);
+					
+					calculatedAccuracy=Math.abs(curOrientation[0]-plannedOrientation[0])+
+							Math.abs(curOrientation[1]-plannedOrientation[1])+
+							Math.abs(curOrientation[2]-plannedOrientation[2]);
+					
+					System.out.println("\n\tCalculated accuracy for Example "+displayedRotation+" is: "+calculatedAccuracy);
+					System.out.println("***************************\n");
+				} 
+				 
 			}
 		}
 
@@ -423,7 +534,52 @@ public class VeinsWindow extends Container {
 			}
 		}
 	}
+	double[] lastRotation=new double[3];
+	private void pollLeapMotionInput(){
+		if(leap.isPalm()){
 
+				//Translations
+				float[] axis=leap.getAxis();
+				//System.out.printf("\n\tVeins:[%.3f,%.3f,%.3f]\n",axis[0],axis[1],axis[2]);
+				//renderer.getCamera().cameraX=-axis[0]; //left/right
+				//renderer.getCamera().cameraY=-axis[1];  //up/down
+				
+				renderer.getCamera().cameraZ= -axis[2]+200; //in/out
+				double[] rotations=renderer.getVeinsModel().currentOrientation.getVectorPart();
+				//System.out.println(renderer.getVeinsModel().currentOrientation.toString());
+				//rotations[1]=;
+				//rotations[1]=-axis[1];
+				//.setVector(rotations);
+				renderer.getVeinsModel().normalizeCurrentOrientation();
+				Quaternion currentOrientation=renderer.getVeinsModel().currentOrientation;
+
+				double angle1 = Math.toRadians(axis[1]-90);
+				double angle2 = Math.toRadians(axis[0]+180);
+				
+				currentOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle1, new double[] { 1, 0, 0 });
+				
+				double[] v = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(new double[] { 0, 1, 0 });
+				
+				currentOrientation = Quaternion.quaternionMultiplication(currentOrientation,Quaternion.quaternionFromAngleAndRotationAxis(angle2, v));
+				
+				renderer.getVeinsModel().currentOrientation=currentOrientation;
+				
+				
+				//double[] rotations=leap.getRotations();
+				//renderer.getVeinsModel().rotateModel3D(rotations, renderer);
+				
+				//renderer.getCamera().cameraOrientation.setVector(rotations);
+			//double[] rotations=leap.getRotations();
+			
+			//System.out.println("\n\n\n"+rotations[0]+"  "+rotations[0]+"  "+rotations[0]);
+			//System.out.println(renderer.getCamera().cameraOrientation.toString()+"\n\n\n");
+			
+			//renderer.getCamera().cameraOrientation.setVector(rotations);
+			
+		}
+
+	}
+	
 	/**
 	 * Calculates on which element mouse click was performed - on HUD element or
 	 * on veins model
@@ -448,21 +604,22 @@ public class VeinsWindow extends Container {
 			if (settings.resHeight - Mouse.getY() < settings.resHeight / 18) {
 				clickedOn = CLICKED_ON_BUTTONS;
 
-			} else if (distanceToRotationCircle <= hud.r * hud.r) {
+			} else if (distanceToRotationCircle <= hud.r * hud.r && showHud) {
 				clickedOn = CLICKED_ON_ROTATION_CIRCLE;
 
-			} else if (distanceToMoveCircle <= hud.r * hud.r) {
+			} else if (distanceToMoveCircle <= hud.r * hud.r && showHud) {
 				clickedOn = CLICKED_ON_MOVE_CIRCLE;
 
-			} else if (distanceToRotationFoci <= hud.r * 3f) {
+			} else if (distanceToRotationFoci <= hud.r * 3f && showHud) {
 				clickedOn = CLICKED_ON_ROTATION_ELLIPSE;
 
-			} else if (distanceToMoveFoci <= hud.r * 3f) {
+			} else if (distanceToMoveFoci <= hud.r * 3f && showHud) {
 				clickedOn = CLICKED_ON_MOVE_ELLIPSE;
 
 			} else {
 				renderer.getVeinsModel().veinsGrabbedAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(),
 						renderer);
+//				System.out.println(renderer.getVeinsModel().veinsGrabbedAt[0] + " " + renderer.getVeinsModel().veinsGrabbedAt[1]);
 				// renderer.getVeinsModel().setAddedOrientation(new
 				// Quaternion());
 				if (renderer.getVeinsModel().veinsGrabbedAt != null)
@@ -476,6 +633,7 @@ public class VeinsWindow extends Container {
 	 */
 	public void exitProgram(int n) {
 		SettingsUtil.writeSettingsFile(settings, title);
+		leapController.removeListener(leap);
 		renderer.cleanShaders();
 		gui.destroy();
 		if (themeManager != null)

@@ -373,7 +373,7 @@ public class VeinsModel {
 		}
 	}
 
-	private void setDefaultOrientation() {
+	public void setDefaultOrientation() {
 		double angle1 = Math.toRadians(-90); // Math.PI * -90 / 180;
 		double angle2 = Math.toRadians(180); // Math.PI * 180 / 180;
 		currentOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle1, new double[] { 1, 0, 0 });
@@ -444,5 +444,21 @@ public class VeinsModel {
 		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, temp);
 
 	}
-
+	
+	public void setOrientation(double[] vector) {
+		double angle1 =Math.toRadians(vector[0]);
+		double angle2 = Math.toRadians(vector[1]); 
+		double angle3 = Math.toRadians(vector[2]);
+		
+		currentOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle1, new double[] { 1, 0, 0 });
+		double[] v = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(new double[] { 0, 1, 0 });
+		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation,
+				Quaternion.quaternionFromAngleAndRotationAxis(angle2, v));
+		v = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(new double[] { 0, 0, 1 });
+		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation,
+				Quaternion.quaternionFromAngleAndRotationAxis(angle3, v));
+		
+		
+		addedOrientation = new Quaternion();
+	}
 }

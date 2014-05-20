@@ -82,8 +82,10 @@ public class VeinsRenderer extends LWJGLRenderer {
 	private boolean isAAEnabled;
 
 	private Camera cam;
+	private Camera cam2;
 
 	private VeinsModel veinsModel;
+	private VeinsModel dummyVein;
 
 	public double[] screenPlaneInitialUpperLeft = new double[3];
 	public double[] screenPlaneInitialUpperRight = new double[3];
@@ -97,6 +99,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 	public VeinsRenderer() throws LWJGLException {
 		super();
 		cam = new Camera();
+		cam2=new Camera();
 		activeShaderProgram = 4;
 		isWireframeOn = false;
 		isAAEnabled = false;
@@ -142,8 +145,20 @@ public class VeinsRenderer extends LWJGLRenderer {
 			renderVeins();
 			glDisable(GL_STENCIL_TEST);
 		} else {
+			glViewport(0, 0, VeinsWindow.settings.resWidth/2, VeinsWindow.settings.resHeight);
+			GL11.glMatrixMode(GL11.GL_PROJECTION);
+			GL11.glLoadIdentity();
+			GLU.gluPerspective(FOV_Y, (VeinsWindow.settings.resWidth/2) / (float) VeinsWindow.settings.resHeight, Z_NEAR, Z_FAR);
 			setCameraAndLight(0);
 			renderVeins();
+			glViewport(VeinsWindow.settings.resWidth/2, 0, VeinsWindow.settings.resWidth/2, VeinsWindow.settings.resHeight);
+//			GLU.gluPerspective(FOV_Y, (VeinsWindow.settings.resWidth/2) / (float) VeinsWindow.settings.resHeight, Z_NEAR, Z_FAR);
+			renderDummy();
+			
+			glViewport(0, 0, VeinsWindow.settings.resWidth, VeinsWindow.settings.resHeight);
+			GL11.glMatrixMode(GL11.GL_PROJECTION);
+			GL11.glLoadIdentity();
+			GLU.gluPerspective(FOV_Y, VeinsWindow.settings.resWidth / (float) VeinsWindow.settings.resHeight, Z_NEAR, Z_FAR);
 		}
 	}
 
@@ -151,7 +166,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 		if (veinsModel != null) {
 			glMatrixMode(GL_MODELVIEW);
 			glPushMatrix();
-
+			
 			if (activeShaderProgram == -1) {
 				GL20.glUseProgram(0);
 			} else {
@@ -170,7 +185,49 @@ public class VeinsRenderer extends LWJGLRenderer {
 			veinsModel.render();
 
 			GL20.glUseProgram(0);
+			
 			glPopMatrix();
+		}
+	}
+	
+	private void renderDummy() {
+		if (veinsModel != null) {
+			glMatrixMode(GL_MODELVIEW);
+			GL11.glScissor(VeinsWindow.settings.resWidth/2, 0, VeinsWindow.settings.resWidth/2, VeinsWindow.settings.resHeight);
+			GL11.glEnable(GL11.GL_SCISSOR_TEST);
+			GL11.glClearDepth(1.0);
+			glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+	
+
+			GL11.glLoadIdentity();
+			Quaternion worldOrientation = Quaternion.quaternionReciprocal(cam2.cameraOrientation);
+			glMultMatrix(worldOrientation.getRotationMatrix(false));
+			glTranslatef(-cam2.cameraX, -cam2.cameraY, -cam2.cameraZ);
+
+			glEnable(GL_LIGHTING);
+			glEnable(GL_LIGHT0);
+			glLight(GL_LIGHT0, GL_POSITION, allocFloats(new float[] { 0.0f, 1000.0f, 0.0f, 0.0f }));
+			glLight(GL_LIGHT0, GL_DIFFUSE, allocFloats(new float[] { 1f, 1f, 1f, 1 }));
+			glLight(GL_LIGHT0, GL_AMBIENT, allocFloats(new float[] { 0.3f, 0.3f, 0.3f, 1 }));
+			glLight(GL_LIGHT0, GL_SPECULAR, allocFloats(new float[] { 1.0f, 1.0f, 1.0f, 1.0f }));
+			
+			glPushMatrix();
+			
+			GL20.glUseProgram(0);
+			
+			glEnable(GL_LIGHTING);
+
+			glMaterial(GL_FRONT, GL_AMBIENT, allocFloats(new float[] {0.5f, 0.5f, 0.5f, 1 }));
+			glMaterial(GL_FRONT, GL_DIFFUSE, allocFloats(new float[] { 0.5f, 0.5f, 0.5f, 1 }));
+			glMaterial(GL_FRONT, GL_SPECULAR, allocFloats(new float[] { 0.5f, 0.5f, 0.5f, 1 }));
+			glMaterial(GL_FRONT, GL_SHININESS, allocFloats(new float[] { 100f, 256.0f, 256.0f, 0.0f }));
+			
+				dummyVein.render();
+			
+			glPopMatrix();
+			
+			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		}
 	}
 
@@ -282,6 +339,8 @@ public class VeinsRenderer extends LWJGLRenderer {
 			veinsModel.deleteMeshes();
 		veinsModel = new VeinsModel();
 		veinsModel.constructVBOFromObjFile(fileName);
+		dummyVein=new VeinsModel(fileName);
+		
 		setDefaultViewOptions();
 	}
 
@@ -370,6 +429,11 @@ public class VeinsRenderer extends LWJGLRenderer {
 		cam.cameraX = 0;
 		cam.cameraY = 0;
 		cam.cameraOrientation = new Quaternion();
+		
+		cam2.cameraZ = (float) (d / Math.tan(fovMin / 2));
+		cam2.cameraX = 0;
+		cam2.cameraY = 0;
+		cam2.cameraOrientation = new Quaternion();
 	}
 
 	private void setScreenPlanes(double d1, double fovMin) {
@@ -405,6 +469,10 @@ public class VeinsRenderer extends LWJGLRenderer {
 
 	public VeinsModel getVeinsModel() {
 		return veinsModel;
+	}
+	
+	public VeinsModel getDummyModel() {
+		return dummyVein;
 	}
 
 	public void setActiveShaderProgram(int shaderProgram) {
