@@ -155,6 +155,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 //			GLU.gluPerspective(FOV_Y, (VeinsWindow.settings.resWidth/2) / (float) VeinsWindow.settings.resHeight, Z_NEAR, Z_FAR);
 			renderDummy();
 			
+			
 			glViewport(0, 0, VeinsWindow.settings.resWidth, VeinsWindow.settings.resHeight);
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();
@@ -193,12 +194,12 @@ public class VeinsRenderer extends LWJGLRenderer {
 	private void renderDummy() {
 		if (veinsModel != null) {
 			glMatrixMode(GL_MODELVIEW);
+			glPushMatrix();
 			GL11.glScissor(VeinsWindow.settings.resWidth/2, 0, VeinsWindow.settings.resWidth/2, VeinsWindow.settings.resHeight);
 			GL11.glEnable(GL11.GL_SCISSOR_TEST);
 			GL11.glClearDepth(1.0);
 			glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-	
 
 			GL11.glLoadIdentity();
 			Quaternion worldOrientation = Quaternion.quaternionReciprocal(cam2.cameraOrientation);
@@ -212,7 +213,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 			glLight(GL_LIGHT0, GL_AMBIENT, allocFloats(new float[] { 0.3f, 0.3f, 0.3f, 1 }));
 			glLight(GL_LIGHT0, GL_SPECULAR, allocFloats(new float[] { 1.0f, 1.0f, 1.0f, 1.0f }));
 			
-			glPushMatrix();
+			
 			
 			GL20.glUseProgram(0);
 			
@@ -225,9 +226,8 @@ public class VeinsRenderer extends LWJGLRenderer {
 			
 				dummyVein.render();
 			
+				GL11.glDisable(GL11.GL_SCISSOR_TEST);
 			glPopMatrix();
-			
-			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		}
 	}
 

@@ -1,8 +1,13 @@
 package si.uni_lj.fri.veins3D.gui;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Locale;
+import java.util.Scanner;
+import java.util.Timer;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
@@ -78,11 +83,19 @@ public class VeinsWindow extends Container {
     		{128,45,30}
     };
     private int displayedRotation=0;
+    private String userId="";
     private boolean showHud=false;
+    private boolean getReady=false;
+    private Date timer;
+    
 	/**
 	 * 
 	 */
 	public VeinsWindow() {
+		Scanner in = new Scanner(System.in);
+		System.out.println("Enter User ID");
+		userId = in.nextLine();
+	
 		isRunning = true;
 		title = "Veins3D";
 		loadSettings(title);
@@ -233,6 +246,7 @@ public class VeinsWindow extends Container {
 			/* Render */
 			renderer.render();
 			if(showHud)hud.drawHUD();
+			hud.drawText();
 			
 			setTitle();
 
@@ -263,6 +277,23 @@ public class VeinsWindow extends Container {
 			}
 		}
 		timePastFrame = time;
+		
+		if(getReady){
+			
+		
+			long elapsed=0;
+			Date now=new Date();
+			Date until=new Date(timer.getTime()+300000);
+			elapsed=until.getTime()- now.getTime();
+			
+			
+			DateFormat formatter = new SimpleDateFormat("mm:ss");
+			String dateFormatted = formatter.format(elapsed);
+			
+			hud.data=String.format("%s", dateFormatted);
+			
+			if(elapsed<0)endTesting();
+		}
 	}
 
 	/**
@@ -280,6 +311,7 @@ public class VeinsWindow extends Container {
 	 */
 	public void pollInput() {
 		pollKeyboardInput();
+		if(!getReady)return;
 		pollMouseInput();
 		poll3DMouseInput();
 		pollLeapMotionInput();
@@ -328,83 +360,87 @@ public class VeinsWindow extends Container {
 					frame.setLanguageSpecific();
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD0) {
 					displayedRotation=0;
-					System.out.println("***************************");
-					System.out.println("\tExample "+displayedRotation);
+					hud.title="Primer "+displayedRotation;
+					hud.tooltip="Pritisnite presledek za zacetek testiranja";
+					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}  else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD1) {
 					displayedRotation=1;
-					System.out.println("***************************");
-					System.out.println("\tExample "+displayedRotation);
+					hud.title="Primer "+displayedRotation;
+					hud.tooltip="Pritisnite presledek za zacetek testiranja";
+					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD2) {
 					displayedRotation=2;
-					System.out.println("***************************");
-					System.out.println("\tExample "+displayedRotation);
+					hud.title="Primer "+displayedRotation;
+					hud.tooltip="Pritisnite presledek za zacetek testiranja";
+					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD3) {
 					displayedRotation=3;
-					System.out.println("***************************");
-					System.out.println("\tExample "+displayedRotation);
+					hud.title="Primer "+displayedRotation;
+					hud.tooltip="Pritisnite presledek za zacetek testiranja";
+					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD4) {
 					displayedRotation=4;
-					System.out.println("***************************");
-					System.out.println("\tExample "+displayedRotation);
+					hud.title="Primer "+displayedRotation;
+					hud.tooltip="Pritisnite presledek za zacetek testiranja";
+					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD5) {
 					displayedRotation=5;
-					System.out.println("***************************");
-					System.out.println("\tExample "+displayedRotation);
+					hud.title="Primer "+displayedRotation;
+					hud.tooltip="Pritisnite presledek za zacetek testiranja";
+					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD6) {
 					displayedRotation=6;
-					System.out.println("***************************");
-					System.out.println("\tExample "+displayedRotation);
+					hud.title="Primer "+displayedRotation;
+					hud.tooltip="Pritisnite presledek za zacetek testiranja";
+					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD7) {
 					displayedRotation=7;
-					System.out.println("***************************");
-					System.out.println("\tExample "+displayedRotation);
+					hud.title="Primer "+displayedRotation;
+					hud.tooltip="Pritisnite presledek za zacetek testiranja";
+					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD8) {
 					displayedRotation=8;
-					System.out.println("***************************");
-					System.out.println("\tExample "+displayedRotation);
+					hud.title="Primer "+displayedRotation;
+					hud.tooltip="Pritisnite presledek za zacetek testiranja";
+					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD9) {
 					displayedRotation=9;
-					System.out.println("***************************");
-					System.out.println("\tExample "+displayedRotation);
+					hud.title="Primer "+displayedRotation;
+					hud.tooltip="Pritisnite presledek za zacetek testiranja";
+					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 				} 
 				
 				else if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
-					//Calculate accuracy of rotations
-					// TODO: Add timer functionality and Control with space, which task is currently assigned
-					double calculatedAccuracy=0;
-					double[] curOrientation=renderer.getVeinsModel().currentOrientation.getVectorPart();			
-					double[] plannedOrientation=renderer.getDummyModel().currentOrientation.getVectorPart();
-					
-					System.out.printf("\tVeins:[%.3f,%.3f,%.3f]",curOrientation[0],curOrientation[1],curOrientation[2]);
-					System.out.printf("\n\tGoal:[%.3f,%.3f,%.3f]",plannedOrientation[0],plannedOrientation[1],plannedOrientation[2]);
-					
-					calculatedAccuracy=Math.abs(curOrientation[0]-plannedOrientation[0])+
-							Math.abs(curOrientation[1]-plannedOrientation[1])+
-							Math.abs(curOrientation[2]-plannedOrientation[2]);
-					
-					System.out.println("\n\tCalculated accuracy for Example "+displayedRotation+" is: "+calculatedAccuracy);
-					System.out.println("***************************\n");
+					if(!getReady){
+						//Start timer
+						timer=new Date();
+						getReady=true;
+
+						hud.tooltip="Pritisni presledek ko koncaste z nalogo";
+					}
+					else{
+						endTesting();
+					}
 				} 
-				 
 			}
 		}
 
@@ -449,6 +485,37 @@ public class VeinsWindow extends Container {
 			renderer.getCamera().moveDown();
 		}
 
+	}
+	
+	private void endTesting(){
+		//Calculate accuracy of rotations
+		// TODO: Add timer functionality and Control with space, which task is currently assigned
+		double calculatedAccuracy=0;
+		double[] curOrientation=renderer.getVeinsModel().currentOrientation.getVectorPart();			
+		double[] plannedOrientation=renderer.getDummyModel().currentOrientation.getVectorPart();
+		
+		System.out.printf("\tVeins:[%.3f,%.3f,%.3f]",curOrientation[0],curOrientation[1],curOrientation[2]);
+		System.out.printf("\n\tGoal:[%.3f,%.3f,%.3f]",plannedOrientation[0],plannedOrientation[1],plannedOrientation[2]);
+		
+		calculatedAccuracy=Math.abs(curOrientation[0]-plannedOrientation[0])+
+				Math.abs(curOrientation[1]-plannedOrientation[1])+
+				Math.abs(curOrientation[2]-plannedOrientation[2]);
+		
+		System.out.println("\n\tCalculated accuracy for Example "+displayedRotation+" is: "+calculatedAccuracy);
+		
+		
+		long elapsed=0;
+		Date now=new Date();
+		elapsed=now.getTime()-timer.getTime();
+		
+		DateFormat formatter = new SimpleDateFormat("mm:ss:SSS");
+		String dateFormatted = formatter.format(elapsed);
+		
+		
+		hud.data=String.format("Cas: %s\tNatancnost: %.2f", dateFormatted,calculatedAccuracy);
+		
+		getReady=false;
+		
 	}
 
 	private void pollMouseInput() {
