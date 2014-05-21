@@ -14,9 +14,9 @@ public class LeapMotion extends Listener {
 	boolean lastSwipe; // true = left, false = right
 	
 	float[] axis;
-	double[] rotation;
-	private Vector startPosition=new Vector(40, -230, 30);
-	private Vector relativePosition=new Vector(0,0,0);
+	float tilt;
+	private Vector startPosition=new Vector(0, 0, 0);
+	private Vector relativePosition=new Vector(40,-230,30);
 	private LimitedQueue<Vector> positionAverage = new LimitedQueue<Vector>(20);
 	
 	private boolean openPalm;
@@ -47,7 +47,7 @@ public class LeapMotion extends Listener {
     public void onInit(Controller controller) {
         System.out.println("LeapMotion sensor initialized");
         axis=new float[3];
-        rotation=new double[3];
+        tilt=0;
     }
 
     public void onConnect(Controller controller) {
@@ -90,9 +90,11 @@ public class LeapMotion extends Listener {
                              + " mm, palm position: " + hand.palmPosition());*/
 
             // Get the hand's normal vector and direction
-//            Vector normal = hand.palmNormal();
-//            Vector direction = hand.direction();
-
+            Vector normal = hand.palmNormal();
+            Vector direction = hand.direction();
+            
+            tilt=(float)Math.toDegrees(normal.roll());
+            
             // Calculate the hand's pitch, roll, and yaw angles
             /*System.out.println("Hand pitch: " + Math.toDegrees(direction.pitch()) + " degrees, "
                              + "roll: " + Math.toDegrees(normal.roll()) + " degrees, "
@@ -107,24 +109,20 @@ public class LeapMotion extends Listener {
             
             Vector averageHandPostion=average(positionAverage);
             
-            axis=(averageHandPostion.plus(startPosition).minus(relativePosition)).toFloatArray();
-            
-          //  System.out.println(axis[0]+"\t"+axis[1]+"\t"+axis[2]);
-           /* System.out.println("Frame "+frame.id()+
-            		"Start: "+ startPosition+
-            		"Relative: "+ relativePosition+
-            		"Actual: "+ hand.palmPosition());*/
-            
+            axis=(relativePosition.minus(startPosition).plus(averageHandPostion)).toFloatArray();
+            //axis=startPosition.plus(averageHandPostion).toFloatArray();
+            //axis=averageHandPostion.toFloatArray();
+                   
             //If palm has been open, change start position
             if(!openPalm && hand.fingers().count()>3){
             	openPalm=true;
-            	relativePosition=hand.palmPosition();
+            	startPosition=averageHandPostion;
             }
             	
             if(openPalm && hand.fingers().count()<=3){
             	openPalm=false; 
-            	System.out.println("Palm closed at: "+averageHandPostion.toString());
-            	startPosition=averageHandPostion;
+            	relativePosition=relativePosition.minus(startPosition).plus(averageHandPostion);
+            	//System.out.println("Palm closed at: "+averageHandPostion.toString());
             }
             
             /*
@@ -139,8 +137,8 @@ public class LeapMotion extends Listener {
     public float[] getAxis(){
   	   	return axis;
     }
-    public double[] getRotations(){
-    	return rotation;
+    public float getTilt(){
+    	return tilt;
     }
     public boolean isPalm(){
     	return openPalm;

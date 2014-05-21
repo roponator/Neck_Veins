@@ -70,7 +70,7 @@ public class HUD {
 	private float fw = 0.065f, dx = 0.010f, fh = 0.13f, ff = 0.55f;
 	public String title="";
 	public String data="";
-	public String tooltip="Odprite datoteko za testiranje, nato pritisnite Numpad 0";
+	public String tooltip="Za pricetek testiranja pritisnite Numpad 0";
 	
 	public HUD() {
 		setHUDPositionAndSize();

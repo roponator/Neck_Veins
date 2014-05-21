@@ -416,7 +416,7 @@ public class VeinsModel {
 
 	public void rotateModel3D(double[] rot, VeinsRenderer renderer) {
 
-		double[] centerVector = RayUtil.getRayDirection((int) VeinsWindow.settings.resWidth / 2,
+		double[] centerVector = RayUtil.getRayDirection((int) VeinsWindow.settings.resWidth / 4,
 				(int) VeinsWindow.settings.resHeight / 2, renderer);
 
 		Quaternion temp = new Quaternion();

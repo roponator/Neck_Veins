@@ -379,7 +379,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 		veinsModel.deleteMeshes();
 		veinsModel = new VeinsModel(threshold, veinsModel.currentOrientation);
 		double d = calculateCameraDistance(veinsModel);
-		veinsModel.veinsGrabRadius = d / Math.sqrt(2);
+		veinsModel.veinsGrabRadius = d * Math.sqrt(2);
 	}
 
 	private void setDefaultViewOptions() {
@@ -387,7 +387,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 				* VeinsWindow.settings.resWidth / (double) VeinsWindow.settings.resHeight : FOV_Y;
 		fovMin = Math.toRadians(fovMin); // Math.PI * fovMin / 180
 		double d = calculateCameraDistance(veinsModel);
-		veinsModel.veinsGrabRadius = d / Math.sqrt(2);
+		veinsModel.veinsGrabRadius = d * Math.sqrt(2);
 		setCameraPositionAndOrientation(d, fovMin);
 		setScreenPlanes(d, fovMin);
 	}

@@ -82,6 +82,10 @@ public class VeinsWindow extends Container {
     		{0,180,0},
     		{128,45,30}
     };
+    
+    private String[] names={"Miska","3dMiska","LeapMotion"};
+    
+    private int selectedDevice=0;
     private int displayedRotation=0;
     private String userId="";
     private boolean showHud=false;
@@ -94,7 +98,7 @@ public class VeinsWindow extends Container {
 	public VeinsWindow() {
 		Scanner in = new Scanner(System.in);
 		System.out.println("Enter User ID");
-		userId = in.nextLine();
+		//userId = in.nextLine();
 	
 		isRunning = true;
 		title = "Veins3D";
@@ -311,10 +315,10 @@ public class VeinsWindow extends Container {
 	 */
 	public void pollInput() {
 		pollKeyboardInput();
-		if(!getReady)return;
-		pollMouseInput();
-		poll3DMouseInput();
-		pollLeapMotionInput();
+		
+		if(selectedDevice==0)pollMouseInput();
+		if(selectedDevice==1)poll3DMouseInput();
+		if(selectedDevice==2)pollLeapMotionInput();
 	}
 
 	/**
@@ -358,72 +362,81 @@ public class VeinsWindow extends Container {
 					else
 						settings.locale = new Locale("sl", "SI");
 					frame.setLanguageSpecific();
+				} else if (Keyboard.getEventKey() == Keyboard.KEY_F1) {
+					selectedDevice=0;
+					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
+				}else if (Keyboard.getEventKey() == Keyboard.KEY_F2) {
+					selectedDevice=1;
+					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
+				}else if (Keyboard.getEventKey() == Keyboard.KEY_F3) {
+					selectedDevice=2;
+					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD0) {
 					displayedRotation=0;
-					hud.title="Primer "+displayedRotation;
+					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
 					hud.tooltip="Pritisnite presledek za zacetek testiranja";
 					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}  else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD1) {
 					displayedRotation=1;
-					hud.title="Primer "+displayedRotation;
+					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
 					hud.tooltip="Pritisnite presledek za zacetek testiranja";
 					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD2) {
 					displayedRotation=2;
-					hud.title="Primer "+displayedRotation;
+					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
 					hud.tooltip="Pritisnite presledek za zacetek testiranja";
 					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD3) {
 					displayedRotation=3;
-					hud.title="Primer "+displayedRotation;
+					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
 					hud.tooltip="Pritisnite presledek za zacetek testiranja";
 					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD4) {
 					displayedRotation=4;
-					hud.title="Primer "+displayedRotation;
+					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
 					hud.tooltip="Pritisnite presledek za zacetek testiranja";
 					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD5) {
 					displayedRotation=5;
-					hud.title="Primer "+displayedRotation;
+					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
 					hud.tooltip="Pritisnite presledek za zacetek testiranja";
 					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD6) {
 					displayedRotation=6;
-					hud.title="Primer "+displayedRotation;
+					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
 					hud.tooltip="Pritisnite presledek za zacetek testiranja";
 					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD7) {
 					displayedRotation=7;
-					hud.title="Primer "+displayedRotation;
+					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
 					hud.tooltip="Pritisnite presledek za zacetek testiranja";
 					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD8) {
 					displayedRotation=8;
-					hud.title="Primer "+displayedRotation;
+					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
 					hud.tooltip="Pritisnite presledek za zacetek testiranja";
 					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
 				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD9) {
 					displayedRotation=9;
-					hud.title="Primer "+displayedRotation;
+					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
 					hud.tooltip="Pritisnite presledek za zacetek testiranja";
 					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
@@ -511,7 +524,8 @@ public class VeinsWindow extends Container {
 		DateFormat formatter = new SimpleDateFormat("mm:ss:SSS");
 		String dateFormatted = formatter.format(elapsed);
 		
-		
+		hud.tooltip="Za naslednjo nalogo pritisnte Numpad "+(displayedRotation+1);
+		if(displayedRotation+1==10)hud.tooltip="Testiranje zakljuceno";
 		hud.data=String.format("Cas: %s\tNatancnost: %.2f", dateFormatted,calculatedAccuracy);
 		
 		getReady=false;
@@ -601,50 +615,36 @@ public class VeinsWindow extends Container {
 			}
 		}
 	}
-	double[] lastRotation=new double[3];
+	float[] lastRotation={0,0,0};
+	boolean openedPalm=false;
 	private void pollLeapMotionInput(){
+		double sensitivity=75.0;
 		if(leap.isPalm()){
-
-				//Translations
-				float[] axis=leap.getAxis();
-				//System.out.printf("\n\tVeins:[%.3f,%.3f,%.3f]\n",axis[0],axis[1],axis[2]);
-				//renderer.getCamera().cameraX=-axis[0]; //left/right
-				//renderer.getCamera().cameraY=-axis[1];  //up/down
+			//TODO: Leap
+				
+			float[] axis=leap.getAxis();
+			float tilt=leap.getTilt();
+			if(!openedPalm){
+				lastRotation[0]=axis[0];
+				lastRotation[1]=axis[1];
+				lastRotation[2]=tilt;
+			}
+				double[] addedRotation=new double[3];
+				addedRotation[2]=(lastRotation[0]-axis[0])/sensitivity;
+				addedRotation[0]=(lastRotation[1]-axis[1])/sensitivity;
+				addedRotation[1]=-(lastRotation[2]-tilt)/sensitivity;
+				
+				lastRotation[0]=axis[0];
+				lastRotation[1]=axis[1];
+				lastRotation[2]=tilt;
+				
+				//System.out.println(Arrays.toString(addedRotation));
 				
 				renderer.getCamera().cameraZ= -axis[2]+200; //in/out
-				double[] rotations=renderer.getVeinsModel().currentOrientation.getVectorPart();
-				//System.out.println(renderer.getVeinsModel().currentOrientation.toString());
-				//rotations[1]=;
-				//rotations[1]=-axis[1];
-				//.setVector(rotations);
-				renderer.getVeinsModel().normalizeCurrentOrientation();
-				Quaternion currentOrientation=renderer.getVeinsModel().currentOrientation;
+				renderer.getVeinsModel().rotateModel3D(addedRotation, renderer);
 
-				double angle1 = Math.toRadians(axis[1]-90);
-				double angle2 = Math.toRadians(axis[0]+180);
-				
-				currentOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle1, new double[] { 1, 0, 0 });
-				
-				double[] v = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(new double[] { 0, 1, 0 });
-				
-				currentOrientation = Quaternion.quaternionMultiplication(currentOrientation,Quaternion.quaternionFromAngleAndRotationAxis(angle2, v));
-				
-				renderer.getVeinsModel().currentOrientation=currentOrientation;
-				
-				
-				//double[] rotations=leap.getRotations();
-				//renderer.getVeinsModel().rotateModel3D(rotations, renderer);
-				
-				//renderer.getCamera().cameraOrientation.setVector(rotations);
-			//double[] rotations=leap.getRotations();
-			
-			//System.out.println("\n\n\n"+rotations[0]+"  "+rotations[0]+"  "+rotations[0]);
-			//System.out.println(renderer.getCamera().cameraOrientation.toString()+"\n\n\n");
-			
-			//renderer.getCamera().cameraOrientation.setVector(rotations);
-			
 		}
-
+		openedPalm=leap.isPalm();
 	}
 	
 	/**
