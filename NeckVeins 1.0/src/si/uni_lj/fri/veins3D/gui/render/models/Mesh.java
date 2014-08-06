@@ -22,6 +22,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 
 import si.uni_lj.fri.veins3D.math.Vector;
 
@@ -318,6 +319,7 @@ public class Mesh {
 	public void render(int subDepth) {
 		if (maxSubDepth < subDepth)
 			return;
+		
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, verticesAndNormalsIDs.get(subDepth));
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, indicesIDs.get(subDepth));
 

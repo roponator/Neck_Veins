@@ -173,7 +173,10 @@ public class VeinsFrame extends Widget {
 					setWaitCursor();
 					applyModelThreshold();
 					minTrianglesScrollbar.setValue(0);
-				} catch (LWJGLException | OpenCLException e) {
+				} catch (LWJGLException  e) {
+					e.printStackTrace();
+					handleLWJGLException(false);
+				} catch (OpenCLException e) {
 					e.printStackTrace();
 					handleLWJGLException(false);
 				}
@@ -260,7 +263,10 @@ public class VeinsFrame extends Widget {
 				showThresholdOptions(false);
 				openObj(file);
 			}
-		} catch (LWJGLException | OpenCLException e) {
+		} catch (LWJGLException e) {
+			e.printStackTrace();
+			handleLWJGLException(true);
+		} catch (OpenCLException e) {
 			e.printStackTrace();
 			handleLWJGLException(true);
 		}

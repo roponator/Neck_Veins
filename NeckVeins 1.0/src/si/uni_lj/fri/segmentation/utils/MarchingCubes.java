@@ -290,8 +290,10 @@ public class MarchingCubes {
 	public static ArrayList<Float> marchingCubes(float[][][] CTMatrix, float isolevel) {
 		ArrayList<Float> vertices = new ArrayList<Float>();
 		Vertex[] cubesVertices = new Vertex[8];
-		for (int i = 0; i < cubesVertices.length; i++)
+		for (int i = 0; i < cubesVertices.length; i++){
 			cubesVertices[i] = new Vertex(0, 0, 0);
+		}
+				
 		for (int z = 0; z < CTMatrix[0][0].length - 1; z++) {
 			for (int y = 0; y < CTMatrix.length - 1; y++) {
 				for (int x = 0; x < CTMatrix[0].length - 1; x++) {
@@ -370,7 +372,10 @@ public class MarchingCubes {
 
 					// now build the triangles using triTable
 					for (int n = 0; triTable[cubeIndex][n] != -1; n += 3) {
-						Vertex first = v[triTable[cubeIndex][n]];
+						
+						//System.out.println(triTable[cubeIndex][n]);
+						
+						Vertex first = v[triTable[cubeIndex][n]];						
 						Vertex second = v[triTable[cubeIndex][n + 1]];
 						Vertex third = v[triTable[cubeIndex][n + 2]];
 						vertices.add(first.x);
@@ -388,7 +393,6 @@ public class MarchingCubes {
 				}
 			}
 		}
-
 		return vertices;
 	}
 
@@ -408,7 +412,7 @@ public class MarchingCubes {
 		return new Vertex(x, y, z);
 	}
 
-	private static class Vertex {
+	public static class Vertex {
 		public float x, y, z, value;
 
 		public Vertex(float x, float y, float z) {
@@ -422,6 +426,11 @@ public class MarchingCubes {
 			this.y = y;
 			this.z = z;
 			this.value = value;
+		}
+		
+		public String getVertex() {
+			String deli = "X: "+x+", Y: "+y+", Z: "+z;
+			return deli;
 		}
 	}
 }
