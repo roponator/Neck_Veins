@@ -79,13 +79,13 @@ public class Kockanje {
 	public static ArrayList<Float> delneKocke(float[][][] CTMatrix, float isolevel, int meja) {
 		
 		int MEJAGLOBINE = 3;
-		int GLOBINA = 1;
+		int GLOBINA = 0;
+		int NASLEDNJI = 0;
 		
 		Map<String, Vertex[]> cubes = new TreeMap<String, Vertex[]>();
 		Map<String, Integer> pogoji = new TreeMap<String, Integer>();
 		Map<String, Integer> indeksiZank = new TreeMap<String, Integer>();
 		ArrayList<Float> vertices = new ArrayList<Float>();
-		Vertex[] tabela = new Vertex[8];
 		
 		int pogoj;
 		Vertex[] cubesVertices = new Vertex[8];
@@ -93,16 +93,28 @@ public class Kockanje {
 			cubesVertices[i] = new Vertex(0, 0, 0);
 		}
 		
+		
+		Vertex[] cubeVer2 = new Vertex[8];
+		Vertex[] cubeVer3 = new Vertex[8];
+		
+		for (int i = 0; i < cubesVertices.length; i++){
+			cubeVer2[i] = new Vertex(0, 0, 0);
+			cubeVer3[i] = new Vertex(0, 0, 0);
+		}
+		cubes.put("cubesVer2", cubeVer2);
+		cubes.put("cubesVer3", cubeVer3);
+		
+		
 		/*
 		int pogoj2;
 		int pogoj3;
 		
-		Vertex[] litleCubes = new Vertex[8];
-		Vertex[] litleCubes2 = new Vertex[8];
+		Vertex[] cubeVer2 = new Vertex[8];
+		Vertex[] cubeVer3 = new Vertex[8];
 		
 		for (int i = 0; i < cubesVertices.length; i++){
-			litleCubes[i] = new Vertex(0, 0, 0);
-			litleCubes2[i] = new Vertex(0, 0, 0);
+			cubeVer2[i] = new Vertex(0, 0, 0);
+			cubeVer3[i] = new Vertex(0, 0, 0);
 		}
 		*/
 		
@@ -114,6 +126,8 @@ public class Kockanje {
 			6, 0, 4, 0, 1, 4,
 			2, 7, 3, 7, 5, 3 
 		};
+		
+		int stevec =0;
 		
 		for (int z = 0; z < meja; z++) {
 			for (int y = 0; y < meja; y++) {
@@ -136,7 +150,8 @@ public class Kockanje {
 					cubesVertices[1].setVertex(right, bottom, front, CTMatrix[bottom][right][front]); //6
 					cubesVertices[0].setVertex(left, bottom, front, CTMatrix[bottom][left][front]); //7
 					
-					cubes.put("cubesVer0", cubesVertices);
+					cubes.put("cubesVer1", cubesVertices);
+					//GLOBINA = 0;
 					
 					for(int pog = 0; pog < cubesVertices.length; pog++){
 						if(cubesVertices[pog].value < isolevel){
@@ -163,39 +178,49 @@ public class Kockanje {
 					
 					if(pogoj != 0){
 						//REKURZIJA
-						for (int i = 0; i < tabela.length; i++){
-							tabela[i] = new Vertex(0, 0, 0);
-						}
-						rekurzijaKocke(GLOBINA, MEJAGLOBINE, isolevel, tabela, indeksi, cubes, pogoji, indeksiZank, vertices);
 						
+						//rekurzijaKocke(GLOBINA, MEJAGLOBINE, isolevel, indeksi, cubes,
+						//		pogoji, indeksiZank, vertices);
 						
-						/*
-						for (int a = 0; a < litleCubes.length; a++){
-							pogoj2 = 0;
-							for(int b = 0; b < litleCubes.length; b++){
-								if(a != b){
-									float pointX = (cubesVertices[a].x + cubesVertices[b].x)/2;
-									float pointY = (cubesVertices[a].y + cubesVertices[b].y)/2;
-									float pointZ = (cubesVertices[a].z + cubesVertices[b].z)/2;
-									float pointValue = (cubesVertices[a].value + cubesVertices[b].value)/2;
+						//DELUJE SAMO 0.5x0.5x0.5
+						
+						//GLOBINA = 1
+						//NASLEDNJI = 2
+						GLOBINA = 1;
+						NASLEDNJI = GLOBINA + 1;
+						
+						for (indeksiZank.put("a"+NASLEDNJI, 0); indeksiZank.get("a"+NASLEDNJI) < cubes.get("cubesVer"+NASLEDNJI).length; indeksiZank.put("a"+NASLEDNJI,indeksiZank.get("a"+NASLEDNJI)+1)){
+							stevec++;
+							//if(indeksiZank.get("a"+NASLEDNJI) == 8){
+							//	System.out.println(GLOBINA);
+							//	System.out.println(NASLEDNJI);
+							//}
+							
+							pogoji.put("pogoj"+NASLEDNJI, 0);
+							for(int b = 0; b < cubes.get("cubesVer"+NASLEDNJI).length; b++){
+								if(indeksiZank.get("a"+NASLEDNJI) != b){
+									float pointX = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+NASLEDNJI)].x + cubes.get("cubesVer"+GLOBINA)[b].x)/2;
+									float pointY = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+NASLEDNJI)].y + cubes.get("cubesVer"+GLOBINA)[b].y)/2;
+									float pointZ = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+NASLEDNJI)].z + cubes.get("cubesVer"+GLOBINA)[b].z)/2;
+									float pointValue = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+NASLEDNJI)].value + cubes.get("cubesVer"+GLOBINA)[b].value)/2;
 								
-									litleCubes[b].setVertex(pointX, pointY,	pointZ, pointValue);
+									cubes.get("cubesVer"+NASLEDNJI)[b].setVertex(pointX, pointY, pointZ, pointValue);			
 								}else{
-									litleCubes[b].setVertex(cubesVertices[b].x, cubesVertices[b].y,	cubesVertices[b].z, cubesVertices[b].value);
+									cubes.get("cubesVer"+NASLEDNJI)[b].setVertex(cubes.get("cubesVer"+GLOBINA)[b].x, cubes.get("cubesVer"+GLOBINA)[b].y, cubes.get("cubesVer"+GLOBINA)[b].z, cubes.get("cubesVer"+GLOBINA)[b].value);									
 								}
 							}
 							
-							for(int pog = 0; pog < litleCubes.length; pog++){
-								if(litleCubes[pog].value < isolevel){
-									pogoj2++;
+							for(int pog = 0; pog < cubes.get("cubesVer"+NASLEDNJI).length; pog++){
+								if(cubes.get("cubesVer"+NASLEDNJI)[pog].value < isolevel){
+									pogoji.put("pogoj"+NASLEDNJI, pogoji.get("pogoj"+NASLEDNJI)+1);
 								}
 							}
 							
-							if(pogoj2 == 0){
+							if(pogoji.get("pogoj"+NASLEDNJI) == 0){
 								for (int n = 0; n < 36 ; n +=3) {
-									Vertex first = litleCubes[indeksi[n]];
-									Vertex second = litleCubes[indeksi[n + 1]];
-									Vertex third = litleCubes[indeksi[n + 2]];
+									Vertex first = cubes.get("cubesVer"+NASLEDNJI)[indeksi[n]];
+									Vertex second = cubes.get("cubesVer"+NASLEDNJI)[indeksi[n + 1]];
+									Vertex third = cubes.get("cubesVer"+NASLEDNJI)[indeksi[n + 2]];
 									vertices.add(first.x);
 									vertices.add(first.y);
 									vertices.add(first.z);
@@ -208,33 +233,126 @@ public class Kockanje {
 								}
 							}
 							
-							if(pogoj2 != 0){
-								for (int aa = 0; aa < litleCubes2.length; aa++){
-									pogoj3 = 0;
-									for(int bb = 0; bb < litleCubes2.length; bb++){
-										if(aa != bb){
-											float pointX = (litleCubes[aa].x + litleCubes[bb].x)/2;
-											float pointY = (litleCubes[aa].y + litleCubes[bb].y)/2;
-											float pointZ = (litleCubes[aa].z + litleCubes[bb].z)/2;
-											float pointValue = (litleCubes[aa].value + litleCubes[bb].value)/2;
+							
+							if(pogoji.get("pogoj"+NASLEDNJI) != 0){
+								//GLOBINA = 2
+								//NASLEDNJI = 3
+								GLOBINA = 2;
+								NASLEDNJI = GLOBINA + 1;
+								
+								for (indeksiZank.put("a"+NASLEDNJI, 0); indeksiZank.get("a"+NASLEDNJI) < cubes.get("cubesVer"+NASLEDNJI).length; indeksiZank.put("a"+NASLEDNJI,indeksiZank.get("a"+NASLEDNJI)+1)){
+									pogoji.put("pogoj"+NASLEDNJI, 0);
+									for(int b = 0; b < cubes.get("cubesVer"+NASLEDNJI).length; b++){
+										if(indeksiZank.get("a"+NASLEDNJI) != b){
+											float pointX = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+NASLEDNJI)].x + cubes.get("cubesVer"+GLOBINA)[b].x)/2;
+											float pointY = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+NASLEDNJI)].y + cubes.get("cubesVer"+GLOBINA)[b].y)/2;
+											float pointZ = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+NASLEDNJI)].z + cubes.get("cubesVer"+GLOBINA)[b].z)/2;
+											float pointValue = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+NASLEDNJI)].value + cubes.get("cubesVer"+GLOBINA)[b].value)/2;
 										
-											litleCubes2[bb].setVertex(pointX, pointY,	pointZ, pointValue);
+											cubes.get("cubesVer"+NASLEDNJI)[b].setVertex(pointX, pointY, pointZ, pointValue);			
 										}else{
-											litleCubes2[bb].setVertex(litleCubes[bb].x, litleCubes[bb].y,	litleCubes[bb].z, litleCubes[bb].value);
+											cubes.get("cubesVer"+NASLEDNJI)[b].setVertex(cubes.get("cubesVer"+GLOBINA)[b].x, cubes.get("cubesVer"+GLOBINA)[b].y, cubes.get("cubesVer"+GLOBINA)[b].z, cubes.get("cubesVer"+GLOBINA)[b].value);									
 										}
 									}
 									
-									for(int pog = 0; pog < litleCubes2.length; pog++){
-										if(litleCubes2[pog].value < isolevel){
+									for(int pog = 0; pog < cubes.get("cubesVer"+NASLEDNJI).length; pog++){
+										if(cubes.get("cubesVer"+NASLEDNJI)[pog].value < isolevel){
+											pogoji.put("pogoj"+NASLEDNJI, pogoji.get("pogoj"+NASLEDNJI)+1);
+										}
+									}
+									
+									if(pogoji.get("pogoj"+NASLEDNJI) == 0){
+										for (int n = 0; n < 36 ; n +=3) {
+											Vertex first = cubes.get("cubesVer"+NASLEDNJI)[indeksi[n]];
+											Vertex second = cubes.get("cubesVer"+NASLEDNJI)[indeksi[n + 1]];
+											Vertex third = cubes.get("cubesVer"+NASLEDNJI)[indeksi[n + 2]];
+											vertices.add(first.x);
+											vertices.add(first.y);
+											vertices.add(first.z);
+											vertices.add(second.x);
+											vertices.add(second.y);
+											vertices.add(second.z);
+											vertices.add(third.x);
+											vertices.add(third.y);
+											vertices.add(third.z);
+										}
+									}
+									
+								}
+								GLOBINA = 1;
+								NASLEDNJI = GLOBINA + 1;
+							}
+						}
+						
+						
+						//DELUJE; AMPAK NI REKURZIJE
+						/*
+						for (int a1 = 0; a1 < cubeVer2.length; a1++){
+							pogoj2 = 0;
+							for(int b = 0; b < cubeVer2.length; b++){
+								if(a1 != b){
+									float pointX = (cubesVertices[a1].x + cubesVertices[b].x)/2;
+									float pointY = (cubesVertices[a1].y + cubesVertices[b].y)/2;
+									float pointZ = (cubesVertices[a1].z + cubesVertices[b].z)/2;
+									float pointValue = (cubesVertices[a1].value + cubesVertices[b].value)/2;
+								
+									cubeVer2[b].setVertex(pointX, pointY,	pointZ, pointValue);
+								}else{
+									cubeVer2[b].setVertex(cubesVertices[b].x, cubesVertices[b].y,	cubesVertices[b].z, cubesVertices[b].value);
+								}
+							}
+							
+							for(int pog = 0; pog < cubeVer2.length; pog++){
+								if(cubeVer2[pog].value < isolevel){
+									pogoj2++;
+								}
+							}
+							
+							if(pogoj2 == 0){
+								for (int n = 0; n < 36 ; n +=3) {
+									Vertex first = cubeVer2[indeksi[n]];
+									Vertex second = cubeVer2[indeksi[n + 1]];
+									Vertex third = cubeVer2[indeksi[n + 2]];
+									vertices.add(first.x);
+									vertices.add(first.y);
+									vertices.add(first.z);
+									vertices.add(second.x);
+									vertices.add(second.y);
+									vertices.add(second.z);
+									vertices.add(third.x);
+									vertices.add(third.y);
+									vertices.add(third.z);
+								}
+							}
+							
+							
+							if(pogoj2 != 0){
+								for (int a2 = 0; a2 < cubeVer3.length; a2++){
+									pogoj3 = 0;
+									for(int b = 0; b < cubeVer3.length; b++){
+										if(a2 != b){
+											float pointX = (cubeVer2[a2].x + cubeVer2[b].x)/2;
+											float pointY = (cubeVer2[a2].y + cubeVer2[b].y)/2;
+											float pointZ = (cubeVer2[a2].z + cubeVer2[b].z)/2;
+											float pointValue = (cubeVer2[a2].value + cubeVer2[b].value)/2;
+										
+											cubeVer3[b].setVertex(pointX, pointY,	pointZ, pointValue);
+										}else{
+											cubeVer3[b].setVertex(cubeVer2[b].x, cubeVer2[b].y,	cubeVer2[b].z, cubeVer2[b].value);
+										}
+									}
+									
+									for(int pog = 0; pog < cubeVer3.length; pog++){
+										if(cubeVer3[pog].value < isolevel){
 											pogoj3++;
 										}
 									}
 									
 									if(pogoj3 == 0){
 										for (int n = 0; n < 36 ; n +=3) {
-											Vertex first = litleCubes2[indeksi[n]];
-											Vertex second = litleCubes2[indeksi[n + 1]];
-											Vertex third = litleCubes2[indeksi[n + 2]];
+											Vertex first = cubeVer3[indeksi[n]];
+											Vertex second = cubeVer3[indeksi[n + 1]];
+											Vertex third = cubeVer3[indeksi[n + 2]];
 											vertices.add(first.x);
 											vertices.add(first.y);
 											vertices.add(first.z);
@@ -255,54 +373,56 @@ public class Kockanje {
 				}
 			}
 		}
+		System.out.println(stevec);
 		return vertices;
 	}
 	
-	private static void rekurzijaKocke(int GLOBINA, int MEJAGLOBINE, float isolevel, Vertex[] tabela, int indeksi[], Map<String, Vertex[]> cubes, Map<String, Integer> pogoji,
+	private static void rekurzijaKocke(int GLOBINA, int MEJAGLOBINE, float isolevel,
+			int indeksi[], Map<String, Vertex[]> cubes, Map<String, Integer> pogoji,
 			Map<String, Integer> indeksiZank, ArrayList<Float> vertices) {
-		//System.out.println(GLOBINA);
-		if(GLOBINA > MEJAGLOBINE){
+		
+		if(GLOBINA >= MEJAGLOBINE){
 			return;
 		}
-	
-		indeksiZank.put("a"+GLOBINA, 0);
 		
-		//System.out.println(cubes);
-		//System.out.println(pogoji);
-		//System.out.println(indeksiZank);
-		System.out.println(cubes.get("cubesVer"+GLOBINA).length);
-		for (indeksiZank.get("a"+GLOBINA); indeksiZank.get("a"+GLOBINA) < cubes.get("cubesVer"+GLOBINA).length; indeksiZank.put("a"+GLOBINA,indeksiZank.get("a"+GLOBINA)+1)){
-
-			pogoji.put("pogoj"+GLOBINA, 0);
-
-			for(int b = 0; b < cubes.get("cubesVer"+GLOBINA).length; b++){
-				if(indeksiZank.get("a"+GLOBINA) != b){
-					float pointX = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+GLOBINA)].x + cubes.get("cubesVer"+GLOBINA)[b].x)/2;
-					float pointY = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+GLOBINA)].y + cubes.get("cubesVer"+GLOBINA)[b].y)/2;
-					float pointZ = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+GLOBINA)].z + cubes.get("cubesVer"+GLOBINA)[b].z)/2;
-					float pointValue = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+GLOBINA)].value + cubes.get("cubesVer"+GLOBINA)[b].value)/2;
+		int NASLEDNJI=GLOBINA+1;
+		//System.out.println(indeksiZank.get("a"+NASLEDNJI));
+		//System.out.println(cubes.get("cubesVer"+GLOBINA).length);
+		//System.out.println(indeksiZank.put("a"+NASLEDNJI,indeksiZank.get("a"+NASLEDNJI)+1));
+		//System.out.println(indeksiZank.get("a"+NASLEDNJI));
+		//System.out.println(NASLEDNJI);
+		//System.out.println();
+		
+		for (indeksiZank.get("a"+NASLEDNJI); indeksiZank.get("a"+NASLEDNJI) < cubes.get("cubesVer"+GLOBINA).length; indeksiZank.put("a"+NASLEDNJI,indeksiZank.get("a"+NASLEDNJI)+1)){
+			//System.out.println(GLOBINA);
+			//System.out.println(NASLEDNJI);
+			for(int b = 0; b < cubes.get("cubesVer"+NASLEDNJI).length; b++){
+				if(indeksiZank.get("a"+NASLEDNJI) != b){
+					float pointX = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+NASLEDNJI)].x + cubes.get("cubesVer"+GLOBINA)[b].x)/2;
+					float pointY = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+NASLEDNJI)].y + cubes.get("cubesVer"+GLOBINA)[b].y)/2;
+					float pointZ = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+NASLEDNJI)].z + cubes.get("cubesVer"+GLOBINA)[b].z)/2;
+					float pointValue = (cubes.get("cubesVer"+GLOBINA)[indeksiZank.get("a"+NASLEDNJI)].value + cubes.get("cubesVer"+GLOBINA)[b].value)/2;
 					
-					tabela[b].setVertex(pointX, pointY,	pointZ, pointValue);
+					//tabela[b].setVertex(pointX, pointY,	pointZ, pointValue);
+					cubes.get("cubesVer"+NASLEDNJI)[b].setVertex(pointX, pointY, pointZ, pointValue);
 				}else{
-					tabela[b].setVertex(cubes.get("cubesVer"+GLOBINA)[b].x, cubes.get("cubesVer"+GLOBINA)[b].y,	cubes.get("cubesVer"+GLOBINA)[b].z, cubes.get("cubesVer"+GLOBINA)[b].value);
-				}
-			}
-
-			int naslednji=GLOBINA+1;
-			cubes.put("cubesVer"+naslednji, tabela);
-			
-			for(int pog = 0; pog < cubes.get("cubesVer"+GLOBINA).length; pog++){
-				if(tabela[pog].value < isolevel){
-					pogoji.put("pogoj"+GLOBINA, pogoji.get("pogoj"+GLOBINA)+1);
+					//tabela[b].setVertex(cubes.get("cubesVer"+GLOBINA)[b].x, cubes.get("cubesVer"+GLOBINA)[b].y,	cubes.get("cubesVer"+GLOBINA)[b].z, cubes.get("cubesVer"+GLOBINA)[b].value);
+					cubes.get("cubesVer"+NASLEDNJI)[b].setVertex(cubes.get("cubesVer"+GLOBINA)[b].x, cubes.get("cubesVer"+GLOBINA)[b].y, cubes.get("cubesVer"+GLOBINA)[b].z, cubes.get("cubesVer"+GLOBINA)[b].value);
 				}
 			}
 			
-			if(pogoji.get("pogoj"+GLOBINA) == 0){
-				System.out.println("blabla");
+			for(int pog = 0; pog < cubes.get("cubesVer"+NASLEDNJI).length; pog++){
+				if(cubes.get("cubesVer"+NASLEDNJI)[pog].value < isolevel){
+					pogoji.put("pogoj"+NASLEDNJI, pogoji.get("pogoj"+NASLEDNJI)+1);
+				}
+			}
+			
+			if(pogoji.get("pogoj"+NASLEDNJI) == 0){
+				//System.out.println("blabla");
 				for (int n = 0; n < 36 ; n +=3) {
-					Vertex first = tabela[indeksi[n]];
-					Vertex second = tabela[indeksi[n + 1]];
-					Vertex third = tabela[indeksi[n + 2]];
+					Vertex first = cubes.get("cubesVer"+NASLEDNJI)[indeksi[n]];
+					Vertex second = cubes.get("cubesVer"+NASLEDNJI)[indeksi[n + 1]];
+					Vertex third = cubes.get("cubesVer"+NASLEDNJI)[indeksi[n + 2]];
 					vertices.add(first.x);
 					vertices.add(first.y);
 					vertices.add(first.z);
@@ -314,11 +434,13 @@ public class Kockanje {
 					vertices.add(third.z);
 				}
 			}
-
-			//System.out.println(pogoji.get("pogoj"+GLOBINA));
-			if(pogoji.get("pogoj"+GLOBINA) != 0){
+			
+			if(pogoji.get("pogoj"+NASLEDNJI) != 0 && GLOBINA < MEJAGLOBINE){
 				GLOBINA++;
-				rekurzijaKocke(GLOBINA, MEJAGLOBINE, isolevel, tabela, indeksi, cubes, pogoji, indeksiZank, vertices);
+				rekurzijaKocke(GLOBINA, MEJAGLOBINE, isolevel, indeksi, cubes,
+						pogoji, indeksiZank, vertices);
+			}else{
+				return;
 			}
 		}
 	}
