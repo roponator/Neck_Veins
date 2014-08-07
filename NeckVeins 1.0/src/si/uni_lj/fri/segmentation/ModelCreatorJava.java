@@ -98,7 +98,6 @@ public class ModelCreatorJava {
 		System.out.println("Kockanje...");
 		//ArrayList<Float> vertices = Kockanje.vseKocke(ctMatrix, (float) isolevel);
 		ArrayList<Float> vertices = Kockanje.delneKocke(ctMatrix, (float) isolevel, 40);
-		//ArrayList<Float> vertices = Kockanje.razcepiKocko();
 		float[] v = new float[vertices.size()];
 		for (int i = 0; i < vertices.size(); i++)
 			v[i] = vertices.get(i);
