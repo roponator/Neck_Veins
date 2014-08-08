@@ -40,6 +40,7 @@ public class VeinsFrame extends Widget {
 	private FileSelector fileSelector;
 	private Scrollbar gaussFileOptionsScroll;
 	private Scrollbar threshFileOptionsScroll;
+	private Scrollbar recursionFileOptionScroll;
 	private boolean isDialogOpened;
 	private Button openButton;
 	private Button exitButton;
@@ -286,8 +287,10 @@ public class VeinsFrame extends Widget {
 		sigma = (gaussFileOptionsScroll.isEnabled()) ? sigma : -1;
 		double threshold = threshFileOptionsScroll.getValue() / (double) threshFileOptionsScroll.getMaxValue();
 		threshold = (threshFileOptionsScroll.isEnabled()) ? threshold : -1;
+		int recursion = recursionFileOptionScroll.getValue();
+		recursion = (recursionFileOptionScroll.isEnabled()) ? recursion : -1;
 		VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
-		renderer.loadModelRawSafeMode(file.getAbsolutePath(), sigma, threshold);
+		renderer.loadModelRawSafeMode(file.getAbsolutePath(), sigma, threshold, recursion);
 	}
 
 	private void openObj(File file) {
@@ -374,10 +377,39 @@ public class VeinsFrame extends Widget {
 		thresholdOptions.add(threshValue, Location.CENTER);
 		thresholdOptions.add(autoThreshBtn, Location.EAST);
 		thresholdOptions.add(thresholdLabel, Location.NORTH);
+		
+		/* Recursion option */
+		final Label recursionValue = new Label("1");
+		recursionValue.setTheme("value-label");
+		recursionFileOptionScroll = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
+		recursionFileOptionScroll.setTheme("hscrollbar");
+		recursionFileOptionScroll.setTooltipContent("Sets the recursion value.");
+		recursionFileOptionScroll.setMinMaxValue(1, 10);
+		recursionFileOptionScroll.setValue(1);
+		recursionFileOptionScroll.addCallback(new Runnable() {
+			public void run() {
+				recursionValue.setText(Float.toString(recursionFileOptionScroll.getValue()));
+			}
+		});
+		final Button recursionhBtn = new Button("Disable");
+		recursionhBtn.addCallback(new Runnable() {
+			public void run() {
+				recursionFileOptionScroll.setEnabled(recursionhBtn.getText().equals("Enable"));
+				recursionhBtn.setText(recursionhBtn.getText().equals("Enable") ? "Disable" : "Enable");
+			}
+		});
+		Label recursionLabel = new Label("Set recursion level:");
+		recursionLabel.setTheme("title-label");
+		BorderLayout recursionOptions = new BorderLayout();
+		recursionOptions.add(recursionFileOptionScroll, Location.WEST);
+		recursionOptions.add(recursionValue, Location.CENTER);
+		recursionOptions.add(recursionhBtn, Location.EAST);
+		recursionOptions.add(recursionLabel, Location.NORTH);
 
 		BorderLayout userBottomWidget = new BorderLayout();
 		userBottomWidget.add(gaussOptions, Location.NORTH);
-		userBottomWidget.add(thresholdOptions, Location.SOUTH);
+		userBottomWidget.add(thresholdOptions, Location.CENTER);
+		userBottomWidget.add(recursionOptions, Location.SOUTH);
 
 		return userBottomWidget;
 	}

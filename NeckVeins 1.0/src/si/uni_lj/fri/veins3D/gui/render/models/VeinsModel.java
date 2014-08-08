@@ -133,8 +133,8 @@ public class VeinsModel {
 		constructVBO(output);
 	}
 
-	public void constructVBOFromRawFileSafeMode(String filepath, double sigma, double threshold) {
-		Object[] output = ModelCreatorJava.createModel(filepath, sigma, threshold);
+	public void constructVBOFromRawFileSafeMode(String filepath, double sigma, double threshold, int recursion) {
+		Object[] output = ModelCreatorJava.createModel(filepath, sigma, threshold, recursion);
 		constructVBO(output);
 	}
 

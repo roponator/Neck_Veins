@@ -12,34 +12,17 @@ import si.uni_lj.fri.segmentation.utils.MarchingCubes;
 
 public class ModelCreatorJava {
 
-	public static Object[] createModel(String fileName, double sigma, double threshold) {
-		float[][][] ctMatrix = FileUtils.readFile3D(fileName);
-		
-		/*for (int i = 0; i < ctMatrix.length; i++) {
-			for (int j = 0; j < ctMatrix[0].length; j++) {
-				for (int k = 0; k < ctMatrix[0][0].length; k++) {
-					System.out.print(ctMatrix[i][j][k]+" ");
-				}
-				System.out.println("test 2");
-			}
-			System.out.println("test 1");
-		}*/
-		
-		//execGauss(ctMatrix, sigma);
+	public static Object[] createModel(String fileName, double sigma, double threshold, int recursion) {
+		float[][][] ctMatrix = FileUtils.readFile3D(fileName);		
 		double isolevel = execFindTreshold(ctMatrix, threshold);
 		execNormalization(ctMatrix, execFindMax(ctMatrix));
-		System.out.println("Threshold je: "+threshold);
-		System.out.println("Isolevel je: "+isolevel);
-		//float[] vertices = execMarchingCubes(ctMatrix, isolevel);
-		float[] vertices = execKocke(ctMatrix, isolevel);
-		//System.out.println(vertices.length / 9);
-		
-		/*for (int i = 0; i < vertices.length; i++) {
-			System.out.print(vertices[i]+" ");
+		float[] vertices;
+		if(recursion == -1){
+			execGauss(ctMatrix, sigma);
+			vertices = execMarchingCubes(ctMatrix, isolevel);
+		}else{
+			vertices = execKocke(ctMatrix, isolevel, recursion);
 		}
-		System.out.println();*/
-		
-		//tukaj uredi treshold
 		int[] nTriangles = new int[] { vertices.length / 9 };		
 		return new Object[] { IntBuffer.wrap(nTriangles), FloatBuffer.wrap(vertices), 0, (float) isolevel };
 	}
@@ -49,7 +32,6 @@ public class ModelCreatorJava {
 		for (int i = 0; i < ctMatrix.length; i++) {
 			for (int j = 0; j < ctMatrix[0].length; j++) {
 				for (int k = 0; k < ctMatrix[0][0].length; k++) {
-					//System.out.println(ctMatrix[i][j][k]);
 					ctMatrix[i][j][k] /= max;
 				}
 			}
@@ -73,7 +55,6 @@ public class ModelCreatorJava {
 			}
 		}
 		return max;
-		//return 1700;
 	}
 
 	private static double execFindTreshold(float[][][] ctMatrix, double threshold) {
@@ -94,10 +75,11 @@ public class ModelCreatorJava {
 		return v;
 	}
 	
-	private static float[] execKocke(float[][][] ctMatrix, double isolevel) {
+	private static float[] execKocke(float[][][] ctMatrix, double isolevel, int recursion) {
 		System.out.println("Kockanje...");
 		//ArrayList<Float> vertices = Kockanje.vseKocke(ctMatrix, (float) isolevel);
-		ArrayList<Float> vertices = Kockanje.delneKocke(ctMatrix, (float) isolevel, 40);
+		//ArrayList<Float> vertices = Kockanje.delneKocke(ctMatrix, (float) isolevel, 40, recursion);
+		ArrayList<Float> vertices = Kockanje.delneKockeMarching(ctMatrix, (float) isolevel, 127, recursion);
 		float[] v = new float[vertices.size()];
 		for (int i = 0; i < vertices.size(); i++)
 			v[i] = vertices.get(i);

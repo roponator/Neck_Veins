@@ -307,7 +307,7 @@ public class MarchingCubes {
 					cubesVertices[0].setVertex(left, bottom, back, CTMatrix[bottom][left][back]);
 					cubesVertices[1].setVertex(right, bottom, back, CTMatrix[bottom][right][back]);
 					cubesVertices[2].setVertex(right, bottom, front, CTMatrix[bottom][right][front]);
-					cubesVertices[3].setVertex(left, bottom, front, CTMatrix[y + 1][left][front]);
+					cubesVertices[3].setVertex(left, bottom, front, CTMatrix[bottom][left][front]);
 					cubesVertices[4].setVertex(left, top, back, CTMatrix[top][left][back]);
 					cubesVertices[5].setVertex(right, top, back, CTMatrix[top][right][back]);
 					cubesVertices[6].setVertex(right, top, front, CTMatrix[top][right][front]);
@@ -372,9 +372,6 @@ public class MarchingCubes {
 
 					// now build the triangles using triTable
 					for (int n = 0; triTable[cubeIndex][n] != -1; n += 3) {
-						
-						//System.out.println(triTable[cubeIndex][n]);
-						
 						Vertex first = v[triTable[cubeIndex][n]];						
 						Vertex second = v[triTable[cubeIndex][n + 1]];
 						Vertex third = v[triTable[cubeIndex][n + 2]];
@@ -387,9 +384,7 @@ public class MarchingCubes {
 						vertices.add(third.x);
 						vertices.add(third.y);
 						vertices.add(third.z);
-
 					}
-
 				}
 			}
 		}
