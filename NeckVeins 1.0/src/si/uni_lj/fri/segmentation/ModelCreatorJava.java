@@ -12,17 +12,29 @@ import si.uni_lj.fri.segmentation.utils.MarchingCubes;
 
 public class ModelCreatorJava {
 
-	public static Object[] createModel(String fileName, double sigma, double threshold, int recursion) {
+	public static Object[] createModel(String fileName, double sigma, double threshold, int recursion, int funkcija) {
 		float[][][] ctMatrix = FileUtils.readFile3D(fileName);		
 		double isolevel = execFindTreshold(ctMatrix, threshold);
 		execNormalization(ctMatrix, execFindMax(ctMatrix));
 		float[] vertices;
-		if(recursion == -1){
+		
+		if(funkcija == 1){
 			execGauss(ctMatrix, sigma);
 			vertices = execMarchingCubes(ctMatrix, isolevel);
-		}else{
+		}else if(funkcija == 2){
 			vertices = execKocke(ctMatrix, isolevel, recursion);
+		}else if(funkcija == 3){
+			execGauss(ctMatrix, sigma);
+			vertices = execMarchingCubesRecursion(ctMatrix, isolevel, recursion);
+		}else{
+			if(recursion == -1){
+				execGauss(ctMatrix, sigma);
+				vertices = execMarchingCubes(ctMatrix, isolevel);
+			}else{
+				vertices = execKocke(ctMatrix, isolevel, recursion);
+			}
 		}
+		
 		int[] nTriangles = new int[] { vertices.length / 9 };		
 		return new Object[] { IntBuffer.wrap(nTriangles), FloatBuffer.wrap(vertices), 0, (float) isolevel };
 	}
@@ -75,11 +87,20 @@ public class ModelCreatorJava {
 		return v;
 	}
 	
-	private static float[] execKocke(float[][][] ctMatrix, double isolevel, int recursion) {
-		System.out.println("Kockanje...");
+	private static float[] execMarchingCubesRecursion(float[][][] ctMatrix, double isolevel, int recursion) {
+		System.out.println("Marching Cubes with recursion...");
 		//ArrayList<Float> vertices = Kockanje.vseKocke(ctMatrix, (float) isolevel);
-		//ArrayList<Float> vertices = Kockanje.delneKocke(ctMatrix, (float) isolevel, 40, recursion);
 		ArrayList<Float> vertices = Kockanje.delneKockeMarching(ctMatrix, (float) isolevel, 127, recursion);
+		float[] v = new float[vertices.size()];
+		for (int i = 0; i < vertices.size(); i++)
+			v[i] = vertices.get(i);
+		return v;
+	}
+	
+	private static float[] execKocke(float[][][] ctMatrix, double isolevel, int recursion) {
+		System.out.println("Recursion...");
+		//ArrayList<Float> vertices = Kockanje.vseKocke(ctMatrix, (float) isolevel);
+		ArrayList<Float> vertices = Kockanje.delneKocke(ctMatrix, (float) isolevel, 40, recursion);
 		float[] v = new float[vertices.size()];
 		for (int i = 0; i < vertices.size(); i++)
 			v[i] = vertices.get(i);

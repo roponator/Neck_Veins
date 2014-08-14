@@ -308,11 +308,11 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 * @param sigma
 	 * @param threshold
 	 */
-	public void loadModelRawSafeMode(String fileName, double sigma, double threshold, int recursion) {
+	public void loadModelRawSafeMode(String fileName, double sigma, double threshold, int recursion, int funkcija) {
 		if (veinsModel != null)
 			veinsModel.deleteMeshes();
 		veinsModel = new VeinsModel();
-		veinsModel.constructVBOFromRawFileSafeMode(fileName, sigma, threshold, recursion);
+		veinsModel.constructVBOFromRawFileSafeMode(fileName, sigma, threshold, recursion, funkcija);
 		setDefaultViewOptions();
 	}
 

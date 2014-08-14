@@ -37,6 +37,10 @@ public class VeinsFrame extends Widget {
 		FALLBACK, IMPORT, LOADING;
 	}
 
+	private Button prvi;
+	private Button drugi;
+	private Button tretji;
+	
 	private FileSelector fileSelector;
 	private Scrollbar gaussFileOptionsScroll;
 	private Scrollbar threshFileOptionsScroll;
@@ -289,8 +293,22 @@ public class VeinsFrame extends Widget {
 		threshold = (threshFileOptionsScroll.isEnabled()) ? threshold : -1;
 		int recursion = recursionFileOptionScroll.getValue();
 		recursion = (recursionFileOptionScroll.isEnabled()) ? recursion : -1;
+		boolean prviBesedilo = prvi.isEnabled();
+		boolean drugiBesedilo = drugi.isEnabled();
+		boolean tretjiBesedilo = tretji.isEnabled();
+		int funkcija = 0;
+		
+		if(prviBesedilo && !drugiBesedilo && !tretjiBesedilo){
+			funkcija = 1;
+		}
+		if(drugiBesedilo && !prviBesedilo && !tretjiBesedilo){
+			funkcija = 2;
+		}
+		if(tretjiBesedilo && !prviBesedilo && !drugiBesedilo){
+			funkcija = 3;
+		}
 		VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
-		renderer.loadModelRawSafeMode(file.getAbsolutePath(), sigma, threshold, recursion);
+		renderer.loadModelRawSafeMode(file.getAbsolutePath(), sigma, threshold, recursion, funkcija);
 	}
 
 	private void openObj(File file) {
@@ -321,7 +339,32 @@ public class VeinsFrame extends Widget {
 		minTriangelsLayout.setVisible(show);
 	}
 
-	private Widget initSegmentationOptions() {
+	private Widget initSegmentationOptions() {		
+		Label opcijeLabel = new Label("Pick a method:");
+		opcijeLabel.setTheme("title-label");
+		prvi = new Button("Marching Cubes");
+		drugi = new Button("Recursion");
+		tretji = new Button("Marching Cubes + Recursion");
+		
+		//fileSelector.getUserWidgetBottom().setEnabled(true);
+		
+		tretji.addCallback(new Runnable() {
+			public void run() {
+				prvi.setEnabled(tretji.getText().equals("Disable Marching Cubes + Recursion"));
+				drugi.setEnabled(tretji.getText().equals("Disable Marching Cubes + Recursion"));
+				tretji.setText(tretji.getText().equals("Marching Cubes + Recursion") ? "Disable Marching Cubes + Recursion" : "Marching Cubes + Recursion");
+			}
+		});
+		
+		BorderLayout vecOpcij = new BorderLayout();
+		vecOpcij.add(prvi, Location.WEST);
+		vecOpcij.add(drugi, Location.CENTER);
+		vecOpcij.add(tretji, Location.EAST);
+		
+		BorderLayout opcije = new BorderLayout();
+		opcije.add(opcijeLabel, Location.NORTH);
+		opcije.add(vecOpcij, Location.WEST);
+		
 		/* Gauss Options */
 		final Label sigmaValue = new Label("0.50");
 		sigmaValue.setTheme("value-label");
@@ -342,14 +385,30 @@ public class VeinsFrame extends Widget {
 				gaussEnableBtn.setText(gaussEnableBtn.getText().equals("Enable") ? "Disable" : "Enable");
 			}
 		});
+		drugi.addCallback(new Runnable() {
+			public void run() {
+				gaussFileOptionsScroll.setEnabled(drugi.getText().equals("Disable Recursion"));
+				gaussEnableBtn.setEnabled(drugi.getText().equals("Disable Recursion"));
+				prvi.setEnabled(drugi.getText().equals("Disable Recursion"));
+				tretji.setEnabled(drugi.getText().equals("Disable Recursion"));
+				drugi.setText(drugi.getText().equals("Recursion") ? "Disable Recursion" : "Recursion");
+			}
+		});	
+		
 		Label gaussLabel = new Label("Sets Gaussian filter sigma.");
 		gaussLabel.setTheme("title-label");
 		BorderLayout gaussOptions = new BorderLayout();
-		gaussOptions.add(gaussFileOptionsScroll, Location.WEST);
+		BorderLayout topMenu = new BorderLayout();
+		
+		gaussOptions.add(opcije, Location.NORTH);
+		gaussOptions.add(gaussLabel, Location.WEST);
+		gaussOptions.add(gaussFileOptionsScroll, Location.SOUTH);
 		gaussOptions.add(sigmaValue, Location.CENTER);
-		gaussOptions.add(gaussEnableBtn, Location.EAST);
-		gaussOptions.add(gaussLabel, Location.NORTH);
-
+		
+		topMenu.add(gaussEnableBtn, Location.CENTER);
+		
+		gaussOptions.add(topMenu, Location.EAST);
+		
 		/* Threshold options */
 		final Label threshValue = new Label("0.50");
 		threshValue.setTheme("value-label");
@@ -383,7 +442,7 @@ public class VeinsFrame extends Widget {
 		recursionValue.setTheme("value-label");
 		recursionFileOptionScroll = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
 		recursionFileOptionScroll.setTheme("hscrollbar");
-		recursionFileOptionScroll.setTooltipContent("Sets the recursion value.");
+		recursionFileOptionScroll.setTooltipContent("Set the recursion value.");
 		recursionFileOptionScroll.setMinMaxValue(1, 10);
 		recursionFileOptionScroll.setValue(1);
 		recursionFileOptionScroll.addCallback(new Runnable() {
@@ -398,8 +457,18 @@ public class VeinsFrame extends Widget {
 				recursionhBtn.setText(recursionhBtn.getText().equals("Enable") ? "Disable" : "Enable");
 			}
 		});
+		prvi.addCallback(new Runnable() {
+			public void run() {
+				recursionFileOptionScroll.setEnabled(prvi.getText().equals("Disable Marching Cubes"));
+				recursionhBtn.setEnabled(prvi.getText().equals("Disable Marching Cubes"));
+				drugi.setEnabled(prvi.getText().equals("Disable Marching Cubes"));
+				tretji.setEnabled(prvi.getText().equals("Disable Marching Cubes"));
+				prvi.setText(prvi.getText().equals("Marching Cubes") ? "Disable Marching Cubes" : "Marching Cubes");
+			}
+		});	
 		Label recursionLabel = new Label("Set recursion level:");
 		recursionLabel.setTheme("title-label");
+
 		BorderLayout recursionOptions = new BorderLayout();
 		recursionOptions.add(recursionFileOptionScroll, Location.WEST);
 		recursionOptions.add(recursionValue, Location.CENTER);
@@ -410,6 +479,7 @@ public class VeinsFrame extends Widget {
 		userBottomWidget.add(gaussOptions, Location.NORTH);
 		userBottomWidget.add(thresholdOptions, Location.CENTER);
 		userBottomWidget.add(recursionOptions, Location.SOUTH);
+		
 
 		return userBottomWidget;
 	}
