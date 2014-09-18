@@ -71,6 +71,7 @@ public class HUD {
 	public String title="";
 	public String data="";
 	public String tooltip="Za pricetek testiranja pritisnite Numpad 0";
+	public String userId="dummy";
 	
 	public HUD() {
 		setHUDPositionAndSize();
@@ -302,7 +303,6 @@ public class HUD {
 
 		startHUD();
 		glColor4f(1, 1, 1, 1);
-		//drawRotationEllipse();
 		GL11.glTranslatef(x1-r, y1-r, 0);
 		
 		glPushMatrix();
@@ -318,6 +318,11 @@ public class HUD {
 		glPushMatrix();
 			GL11.glTranslatef(-(VeinsWindow.settings.resWidth/8.0f+textWidth(data,25)/2.0f), -400, 0);
 			drawString(data, 25);
+		glPopMatrix();
+		
+		glPushMatrix();
+			GL11.glTranslatef(-(VeinsWindow.settings.resWidth/3.0f+textWidth(data,25)), -500, 0);
+			drawString(userId, 25);
 		glPopMatrix();
 		
 		endHUD();

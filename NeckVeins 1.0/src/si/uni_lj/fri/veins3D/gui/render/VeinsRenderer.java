@@ -335,6 +335,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 * @throws LWJGLException
 	 */
 	public void loadModelObj(String fileName) {
+		
 		if (veinsModel != null)
 			veinsModel.deleteMeshes();
 		veinsModel = new VeinsModel();

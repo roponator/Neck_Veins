@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Scanner;
@@ -69,7 +70,7 @@ public class VeinsWindow extends Container {
      * Used for assesment of controllers
      * 
      */
-    //TODO: FOR USABILITY TEST
+    //TODO: FOR USABILITY TEST - ADD ZOOM VARIABLE
     private final double[][] rotations={
     		{-90,90,0},
     		{0,180,0},
@@ -82,6 +83,8 @@ public class VeinsWindow extends Container {
     		{0,180,0},
     		{128,45,30}
     };
+    
+    private long[][][] results;
     
     private String[] names={"Miska","3dMiska","LeapMotion"};
     
@@ -96,16 +99,15 @@ public class VeinsWindow extends Container {
 	 * 
 	 */
 	public VeinsWindow() {
-		Scanner in = new Scanner(System.in);
-		System.out.println("Enter User ID");
-		//userId = in.nextLine();
-	
 		isRunning = true;
-		title = "Veins3D";
+		title = "Veins3D - Usability test";
 		loadSettings(title);
 		createDisplay();
 		initWindowElements();
 		setupWindow();
+
+		renderer.loadModelObj("res/models/teapot.obj");
+		frame.setButtonsEnabled(true);
 	}
 
 	/**
@@ -198,6 +200,15 @@ public class VeinsWindow extends Container {
 			leap = new LeapMotion();
 	        leapController = new Controller();
 	        leapController.addListener(leap);
+	        
+			//Initalize user ID
+			Date now=new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("ddMMhh");
+			String uID=sdf.format(now);
+			hud.userId=uID;
+			
+			results=new long[3][7][2]; //3 devices, 7 tests, 2 values
+	        
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 			exitProgram(1);
@@ -228,7 +239,7 @@ public class VeinsWindow extends Container {
 			exitProgram(1);
 		}
 	}
-
+	
 	/**
 	 * 
 	 */
@@ -238,6 +249,8 @@ public class VeinsWindow extends Container {
 		timePastFps = timePastFrame;
 		fpsToDisplay = 0;
 		renderer.setupView();
+		
+		
 		
 		while (!Display.isCloseRequested() && isRunning) {
 			/* Reset view */
@@ -283,8 +296,7 @@ public class VeinsWindow extends Container {
 		timePastFrame = time;
 		
 		if(getReady){
-			
-		
+
 			long elapsed=0;
 			Date now=new Date();
 			Date until=new Date(timer.getTime()+300000);
@@ -362,6 +374,9 @@ public class VeinsWindow extends Container {
 					else
 						settings.locale = new Locale("sl", "SI");
 					frame.setLanguageSpecific();
+				} else if (Keyboard.getEventKey() == Keyboard.KEY_RETURN) {
+					double [] rot={-90,180,0};
+					renderer.getVeinsModel().setOrientation(rot);
 				} else if (Keyboard.getEventKey() == Keyboard.KEY_F1) {
 					selectedDevice=0;
 					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
@@ -420,27 +435,7 @@ public class VeinsWindow extends Container {
 					getReady=false;
 					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
 					
-				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD7) {
-					displayedRotation=7;
-					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
-					hud.tooltip="Pritisnite presledek za zacetek testiranja";
-					getReady=false;
-					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
-					
-				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD8) {
-					displayedRotation=8;
-					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
-					hud.tooltip="Pritisnite presledek za zacetek testiranja";
-					getReady=false;
-					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
-					
-				}   else if (Keyboard.getEventKey() == Keyboard.KEY_NUMPAD9) {
-					displayedRotation=9;
-					hud.title="Primer "+displayedRotation+" - "+names[selectedDevice];
-					hud.tooltip="Pritisnite presledek za zacetek testiranja";
-					getReady=false;
-					renderer.getDummyModel().setOrientation(rotations[displayedRotation]);
-				} 
+				}
 				
 				else if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
 					if(!getReady){
@@ -499,6 +494,14 @@ public class VeinsWindow extends Container {
 		}
 
 	}
+		
+	double normalizeAngle(double angle)
+	{
+		double newAngle = angle;
+	    while (newAngle <= 0) newAngle += 1;
+	    while (newAngle > 1) newAngle -= 1;
+	    return newAngle;
+	}
 	
 	private void endTesting(){
 		//Calculate accuracy of rotations
@@ -506,9 +509,28 @@ public class VeinsWindow extends Container {
 		double calculatedAccuracy=0;
 		double[] curOrientation=renderer.getVeinsModel().currentOrientation.getVectorPart();			
 		double[] plannedOrientation=renderer.getDummyModel().currentOrientation.getVectorPart();
+		System.out.println(renderer.getVeinsModel().currentOrientation.toString());
+		System.out.println(renderer.getDummyModel().currentOrientation.toString());
+		//System.out.println("Dot: "+renderer.getVeinsModel().currentOrientation.);
+
+		//System.out.printf("\tVeins:[%.3f,%.3f,%.3f]",curOrientation[0],curOrientation[1],curOrientation[2]);
+		//System.out.printf("\n\tGoal:[%.3f,%.3f,%.3f]",plannedOrientation[0],plannedOrientation[1],plannedOrientation[2]);
 		
-		System.out.printf("\tVeins:[%.3f,%.3f,%.3f]",curOrientation[0],curOrientation[1],curOrientation[2]);
-		System.out.printf("\n\tGoal:[%.3f,%.3f,%.3f]",plannedOrientation[0],plannedOrientation[1],plannedOrientation[2]);
+		
+		//To absolute
+		double a11=curOrientation[0];
+		double a12=curOrientation[1];
+		double a13=curOrientation[2];
+		double a21=plannedOrientation[0];
+		double a22=plannedOrientation[1];
+		double a23=plannedOrientation[2];
+		
+		
+		//System.out.printf("\tVeins:[%.3f,%.3f,%.3f]",a11,a12,a13);
+		//System.out.printf("\n\tGoal:[%.3f,%.3f,%.3f]",a21,a22,a23);
+		
+		
+		
 		
 		calculatedAccuracy=Math.abs(curOrientation[0]-plannedOrientation[0])+
 				Math.abs(curOrientation[1]-plannedOrientation[1])+
@@ -535,12 +557,18 @@ public class VeinsWindow extends Container {
 	private void pollMouseInput() {
 		if (!frame.isDialogOpened() || renderer.getVeinsModel() == null)
 			return;
-
+		
 		int z = Mouse.getDWheel();
 		if (z > 0) {
-			renderer.getCamera().zoomIn();
+			//renderer.getCamera().zoomIn();
+			renderer.getCamera().cameraZ-=100;
+			System.out.println(renderer.getCamera().cameraZ);
+			if(renderer.getCamera().cameraZ<500)renderer.getCamera().cameraZ=500;
 		} else if (z < 0) {
-			renderer.getCamera().zoomOut();
+//			renderer.getCamera().zoomOut();
+			renderer.getCamera().cameraZ+=100;
+			System.out.println(renderer.getCamera().cameraZ);
+			if(renderer.getCamera().cameraZ>1500)renderer.getCamera().cameraZ=1500;
 		}
 
 		if (Mouse.isButtonDown(0)) {
@@ -613,36 +641,41 @@ public class VeinsWindow extends Container {
 						new double[] { 0, 0, 0 });
 				renderer.getVeinsModel().rotateModel3D(joystick.getRot(), renderer);
 			}
+			if(renderer.getCamera().cameraZ>1500)renderer.getCamera().cameraZ=1500;
+			if(renderer.getCamera().cameraZ<500)renderer.getCamera().cameraZ=500;
 		}
 	}
-	float[] lastRotation={0,0,0};
+	float[] lastPosition={0,0,0,0}; //X,Y,tilt,Camera
 	boolean openedPalm=false;
 	private void pollLeapMotionInput(){
-		double sensitivity=75.0;
+		double sensitivity=(double)settings.leapSensitivity;
 		if(leap.isPalm()){
 			//TODO: Leap
 				
 			float[] axis=leap.getAxis();
 			float tilt=leap.getTilt();
 			if(!openedPalm){
-				lastRotation[0]=axis[0];
-				lastRotation[1]=axis[1];
-				lastRotation[2]=tilt;
+				lastPosition[0]=axis[0];
+				lastPosition[1]=axis[1];
+				lastPosition[2]=tilt;
+				lastPosition[3]=axis[2];
 			}
 				double[] addedRotation=new double[3];
-				addedRotation[2]=(lastRotation[0]-axis[0])/sensitivity;
-				addedRotation[0]=(lastRotation[1]-axis[1])/sensitivity;
-				addedRotation[1]=-(lastRotation[2]-tilt)/sensitivity;
+				addedRotation[2]=(lastPosition[0]-axis[0])/sensitivity;
+				addedRotation[0]=(lastPosition[1]-axis[1])/sensitivity;
+				addedRotation[1]=-(lastPosition[2]-tilt)/sensitivity;
 				
-				lastRotation[0]=axis[0];
-				lastRotation[1]=axis[1];
-				lastRotation[2]=tilt;
+				lastPosition[0]=axis[0];
+				lastPosition[1]=axis[1];
+				lastPosition[2]=tilt;
 				
 				//System.out.println(Arrays.toString(addedRotation));
 				
 				renderer.getCamera().cameraZ= -axis[2]+200; //in/out
 				renderer.getVeinsModel().rotateModel3D(addedRotation, renderer);
 
+				if(renderer.getCamera().cameraZ>1500)renderer.getCamera().cameraZ=1500;
+				if(renderer.getCamera().cameraZ<500)renderer.getCamera().cameraZ=500;
 		}
 		openedPalm=leap.isPalm();
 	}
@@ -699,6 +732,8 @@ public class VeinsWindow extends Container {
 	 * @param n
 	 */
 	public void exitProgram(int n) {
+		//TODO: write CSV writer!
+		
 		SettingsUtil.writeSettingsFile(settings, title);
 		leapController.removeListener(leap);
 		renderer.cleanShaders();
