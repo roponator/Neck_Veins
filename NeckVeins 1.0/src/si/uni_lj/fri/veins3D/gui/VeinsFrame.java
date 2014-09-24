@@ -67,6 +67,9 @@ public class VeinsFrame extends Widget {
 	private ToggleButton lockRot;
 	private ToggleButton lockTrans;
 	private Button camObj;
+	
+	//Leap
+	private Scrollbar leapSensitivityScrollbar;
 
 	// Threshold scroll
 	private BorderLayout thresholdLayout;
@@ -631,6 +634,18 @@ public class VeinsFrame extends Widget {
 			}
 		});
 		add(sensitivityScrollbar);
+		
+		leapSensitivityScrollbar = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
+		leapSensitivityScrollbar.setTheme("hscrollbar");
+		leapSensitivityScrollbar.setTooltipContent("Sets the sensitivity of the leap.");
+		leapSensitivityScrollbar.setMinMaxValue(1, 150);
+		leapSensitivityScrollbar.setValue(151 - VeinsWindow.settings.leapSensitivity);
+		leapSensitivityScrollbar.addCallback(new Runnable() {
+			public void run() {
+				VeinsWindow.settings.leapSensitivity = (151 - leapSensitivityScrollbar.getValue());
+			}
+		});
+		add(leapSensitivityScrollbar);
 
 		if (VeinsWindow.settings.mSelected)
 			camObj = new Button("Camera active");
@@ -737,6 +752,7 @@ public class VeinsFrame extends Widget {
 		lockTrans.setVisible(visible);
 		camObj.setVisible(visible);
 		sensitivityScrollbar.setVisible(visible);
+		leapSensitivityScrollbar.setVisible(visible);
 	}
 
 	/**
@@ -861,9 +877,11 @@ public class VeinsFrame extends Widget {
 		camObj.setSize(widthBy7 * 2, openHeight);
 		sensitivityScrollbar.setPosition(0, openHeight * 4);
 		sensitivityScrollbar.setSize(widthBy7 * 2, openHeight / 2);
-
+		leapSensitivityScrollbar.setPosition(0, openHeight * 5-openHeight / 2);
+		leapSensitivityScrollbar.setSize(widthBy7 * 2, openHeight / 2);
+		
 		mouseSettingsVisible(mouse3d.isActive());
-		mouse3d.setEnabled(VeinsWindow.joystick.connected());
+		mouse3d.setEnabled(VeinsWindow.joystick.connected() || VeinsWindow.leapController.isConnected());
 
 		int rlWidth = VeinsWindow.settings.resWidth * 8 / 10;
 		int rlHeight = VeinsWindow.settings.resHeight * 6 / 10;

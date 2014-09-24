@@ -1,6 +1,7 @@
 package si.uni_lj.fri.veins3D.gui;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Locale;
 
 import org.lwjgl.LWJGLException;
@@ -12,11 +13,14 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 
+import com.leapmotion.leap.Controller;
+
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import si.uni_lj.fri.veins3D.utils.Mouse3D;
+import si.uni_lj.fri.veins3D.utils.LeapMotion;
 import si.uni_lj.fri.veins3D.utils.RayUtil;
 import si.uni_lj.fri.veins3D.utils.SettingsUtil;
 import de.matthiasmann.twl.Container;
@@ -53,6 +57,8 @@ public class VeinsWindow extends Container {
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
 	public static Mouse3D joystick;
+	public LeapMotion leap;
+	public static Controller leapController;
 
 	/**
 	 * 
@@ -152,6 +158,11 @@ public class VeinsWindow extends Container {
 			add(gui);
 			setTheme("mainframe");
 			joystick = new Mouse3D(settings);
+			
+			leap = new LeapMotion();
+	        leapController = new Controller();
+	        leapController.addListener(leap);
+	        
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 			exitProgram(1);
@@ -250,6 +261,7 @@ public class VeinsWindow extends Container {
 		pollKeyboardInput();
 		pollMouseInput();
 		poll3DMouseInput();
+		pollLeapMotionInput();
 	}
 
 	/**
@@ -424,6 +436,39 @@ public class VeinsWindow extends Container {
 		}
 	}
 
+	float[] lastPosition={0,0,0,0}; //X,Y,tilt,Camera
+	boolean openedPalm=false;
+	private void pollLeapMotionInput(){
+		double sensitivity=(double)settings.leapSensitivity;
+		System.out.println(sensitivity);
+		if(leap.isPalm()){
+				
+			float[] axis=leap.getAxis();
+			float tilt=leap.getTilt();
+			if(!openedPalm){
+				lastPosition[0]=axis[0];
+				lastPosition[1]=axis[1];
+				lastPosition[2]=tilt;
+				lastPosition[3]=axis[2];
+			}
+				double[] addedRotation=new double[3];
+				addedRotation[2]=(lastPosition[0]-axis[0])/sensitivity;
+				addedRotation[0]=(lastPosition[1]-axis[1])/sensitivity;
+				addedRotation[1]=-(lastPosition[2]-tilt)/sensitivity;
+				
+				lastPosition[0]=axis[0];
+				lastPosition[1]=axis[1];
+				lastPosition[2]=tilt;
+				
+				renderer.getCamera().cameraZ= -axis[2]+200; //in/out
+				renderer.getVeinsModel().rotateModel3D(addedRotation, renderer);
+				//System.out.println(Arrays.toString(addedRotation));
+				if(renderer.getCamera().cameraZ>1500)renderer.getCamera().cameraZ=1700;
+				if(renderer.getCamera().cameraZ<500)renderer.getCamera().cameraZ=200;
+		}
+		openedPalm=leap.isPalm();
+	}
+	
 	/**
 	 * Calculates on which element mouse click was performed - on HUD element or
 	 * on veins model
