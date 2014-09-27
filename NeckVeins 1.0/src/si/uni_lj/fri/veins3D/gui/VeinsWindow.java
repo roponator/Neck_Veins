@@ -13,8 +13,6 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 
-import com.leapmotion.leap.Controller;
-
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
@@ -57,8 +55,7 @@ public class VeinsWindow extends Container {
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
 	public static Mouse3D joystick;
-	public LeapMotion leap;
-	public static Controller leapController;
+	public static LeapMotion leap;
 
 	/**
 	 * 
@@ -158,10 +155,7 @@ public class VeinsWindow extends Container {
 			add(gui);
 			setTheme("mainframe");
 			joystick = new Mouse3D(settings);
-			
-			leap = new LeapMotion();
-	        leapController = new Controller();
-	        leapController.addListener(leap);
+			leap = new LeapMotion(settings);
 	        
 		} catch (LWJGLException e) {
 			e.printStackTrace();
@@ -349,6 +343,11 @@ public class VeinsWindow extends Container {
 		if (Keyboard.isKeyDown(Keyboard.KEY_F)) {
 			renderer.getCamera().moveDown();
 		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_BACK)) {
+			renderer.resetScene();
+			
+			
+		}
 
 	}
 
@@ -436,37 +435,18 @@ public class VeinsWindow extends Container {
 		}
 	}
 
-	float[] lastPosition={0,0,0,0}; //X,Y,tilt,Camera
-	boolean openedPalm=false;
 	private void pollLeapMotionInput(){
 		double sensitivity=(double)settings.leapSensitivity;
-		System.out.println(sensitivity);
-		if(leap.isPalm()){
-				
-			float[] axis=leap.getAxis();
-			float tilt=leap.getTilt();
-			if(!openedPalm){
-				lastPosition[0]=axis[0];
-				lastPosition[1]=axis[1];
-				lastPosition[2]=tilt;
-				lastPosition[3]=axis[2];
-			}
-				double[] addedRotation=new double[3];
-				addedRotation[2]=(lastPosition[0]-axis[0])/sensitivity;
-				addedRotation[0]=(lastPosition[1]-axis[1])/sensitivity;
-				addedRotation[1]=-(lastPosition[2]-tilt)/sensitivity;
-				
-				lastPosition[0]=axis[0];
-				lastPosition[1]=axis[1];
-				lastPosition[2]=tilt;
-				
-				renderer.getCamera().cameraZ= -axis[2]+200; //in/out
-				renderer.getVeinsModel().rotateModel3D(addedRotation, renderer);
-				//System.out.println(Arrays.toString(addedRotation));
-				if(renderer.getCamera().cameraZ>1500)renderer.getCamera().cameraZ=1700;
-				if(renderer.getCamera().cameraZ<500)renderer.getCamera().cameraZ=200;
+		leap.poll();
+		if(!leap.isPalm()){
+			float[] translations=leap.getAxisTranslations();
+			double[] rotations=leap.getAxisRotations();
+			renderer.getCamera().moveCamera3D(
+					new double[] { translations[0], translations[2], -translations[1] },
+					new double[] { 0, 0, 0 });
+			
+			renderer.getVeinsModel().rotateModel3D(rotations, renderer);
 		}
-		openedPalm=leap.isPalm();
 	}
 	
 	/**

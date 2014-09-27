@@ -406,7 +406,10 @@ public class VeinsRenderer extends LWJGLRenderer {
 	public VeinsModel getVeinsModel() {
 		return veinsModel;
 	}
-
+	public void resetScene(){
+		setDefaultViewOptions();
+		veinsModel.resetOrientation();
+	}
 	public void setActiveShaderProgram(int shaderProgram) {
 		activeShaderProgram = shaderProgram;
 	}

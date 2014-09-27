@@ -60,6 +60,7 @@ public class VeinsFrame extends Widget {
 	private String[] displayModeStrings;
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
+	
 	// 3Dmouse
 	private static ToggleButton mouse3d;
 	private Scrollbar sensitivityScrollbar;
@@ -70,6 +71,7 @@ public class VeinsFrame extends Widget {
 	
 	//Leap
 	private Scrollbar leapSensitivityScrollbar;
+	private ToggleButton leapShowIcon;
 
 	// Threshold scroll
 	private BorderLayout thresholdLayout;
@@ -612,12 +614,12 @@ public class VeinsFrame extends Widget {
 	}
 
 	private void init3DmouseButtons() {
-		mouse3d = new ToggleButton("3d Mouse");
+		mouse3d = new ToggleButton("3d Mouse / Leap");
 		mouse3d.setTheme("togglebutton");
 		mouse3d.setTooltipContent("3d Mouse settings");
 		mouse3d.addCallback(new Runnable() {
 			public void run() {
-				mouse3d.setEnabled(VeinsWindow.joystick.connected());
+				mouse3d.setEnabled(VeinsWindow.joystick.connected()|| VeinsWindow.leap.isConnected());
 				mouseSettingsVisible(mouse3d.isActive() && mouse3d.isEnabled());
 			}
 		});
@@ -635,18 +637,6 @@ public class VeinsFrame extends Widget {
 		});
 		add(sensitivityScrollbar);
 		
-		leapSensitivityScrollbar = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
-		leapSensitivityScrollbar.setTheme("hscrollbar");
-		leapSensitivityScrollbar.setTooltipContent("Sets the sensitivity of the leap.");
-		leapSensitivityScrollbar.setMinMaxValue(1, 150);
-		leapSensitivityScrollbar.setValue(151 - VeinsWindow.settings.leapSensitivity);
-		leapSensitivityScrollbar.addCallback(new Runnable() {
-			public void run() {
-				VeinsWindow.settings.leapSensitivity = (151 - leapSensitivityScrollbar.getValue());
-			}
-		});
-		add(leapSensitivityScrollbar);
-
 		if (VeinsWindow.settings.mSelected)
 			camObj = new Button("Camera active");
 		else
@@ -699,6 +689,29 @@ public class VeinsFrame extends Widget {
 		});
 		add(lockTrans);
 
+		Label leapSensitivityLabel = new Label("Leap Motion sensitivity");
+		leapSensitivityScrollbar = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
+		leapSensitivityScrollbar.setTheme("hscrollbar");
+		leapSensitivityScrollbar.setTooltipContent("Sets the sensitivity of the leap.");
+		leapSensitivityScrollbar.setMinMaxValue(1, 150);
+		leapSensitivityScrollbar.setValue(151 - VeinsWindow.settings.leapSensitivity);
+		leapSensitivityScrollbar.addCallback(new Runnable() {
+			public void run() {
+				VeinsWindow.settings.leapSensitivity = (151 - leapSensitivityScrollbar.getValue());
+			}
+		});
+		add(leapSensitivityScrollbar);
+		
+		leapShowIcon = new ToggleButton("Show hand icon");
+		lockRot.setActive(VeinsWindow.settings.showLeapIcon);
+		leapShowIcon.setTheme("togglebutton");
+		leapShowIcon.setTooltipContent("Show if hand is held, released");
+		leapShowIcon.addCallback(new Runnable() {
+			public void run() {
+				VeinsWindow.settings.showLeapIcon=leapShowIcon.isActive();
+			}
+		});
+		add(leapShowIcon);
 	}
 
 	// TODO edit error widget look
@@ -753,6 +766,7 @@ public class VeinsFrame extends Widget {
 		camObj.setVisible(visible);
 		sensitivityScrollbar.setVisible(visible);
 		leapSensitivityScrollbar.setVisible(visible);
+		leapShowIcon.setVisible(visible);
 	}
 
 	/**
@@ -835,6 +849,9 @@ public class VeinsFrame extends Widget {
 		strong.adjustSize();
 		lockRot.adjustSize();
 		lockTrans.adjustSize();
+		leapSensitivityScrollbar.adjustSize();
+		leapShowIcon.adjustSize();
+		
 
 		int openHeight = Math.max(25, VeinsWindow.settings.resHeight / 18);
 		int widthBy7 = VeinsWindow.settings.resWidth / 7 + 1;
@@ -879,9 +896,11 @@ public class VeinsFrame extends Widget {
 		sensitivityScrollbar.setSize(widthBy7 * 2, openHeight / 2);
 		leapSensitivityScrollbar.setPosition(0, openHeight * 5-openHeight / 2);
 		leapSensitivityScrollbar.setSize(widthBy7 * 2, openHeight / 2);
+		leapShowIcon.setPosition(0, openHeight * 5);
+		leapShowIcon.setSize(widthBy7*2, openHeight);
 		
 		mouseSettingsVisible(mouse3d.isActive());
-		mouse3d.setEnabled(VeinsWindow.joystick.connected() || VeinsWindow.leapController.isConnected());
+		mouse3d.setEnabled(VeinsWindow.joystick.connected() || VeinsWindow.leap.isConnected()||true);
 
 		int rlWidth = VeinsWindow.settings.resWidth * 8 / 10;
 		int rlHeight = VeinsWindow.settings.resHeight * 6 / 10;
@@ -971,6 +990,8 @@ public class VeinsFrame extends Widget {
 		strong.setText(labels.getString("strongBtnLabel"));
 		lockRot.setText(labels.getString("lockRotBtnLabel"));
 		lockTrans.setText(labels.getString("lockTransBtnLabel"));
+		
+		leapShowIcon.setText(labels.getString("leapShowIconBtnLabel"));
 
 		errorPopLabel.setText(labels.getString("popupErrorMsg1"));
 

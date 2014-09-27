@@ -444,5 +444,7 @@ public class VeinsModel {
 		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, temp);
 
 	}
-
+	public void resetOrientation(){
+		setDefaultOrientation();
+	}
 }
