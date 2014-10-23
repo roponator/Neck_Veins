@@ -293,10 +293,14 @@ public class MarchingCubes {
 		for (int i = 0; i < cubesVertices.length; i++){
 			cubesVertices[i] = new Vertex(0, 0, 0);
 		}
-				
+		
+		//int meja = 280;
 		for (int z = 0; z < CTMatrix[0][0].length - 1; z++) {
 			for (int y = 0; y < CTMatrix.length - 1; y++) {
 				for (int x = 0; x < CTMatrix[0].length - 1; x++) {
+		/*for (int z = 0; z < meja; z++) {
+			for (int y = 0; y < meja; y++) {
+				for (int x = 0; x < meja; x++) {*/
 					int top = y;
 					int bottom = y + 1;
 					int left = x;

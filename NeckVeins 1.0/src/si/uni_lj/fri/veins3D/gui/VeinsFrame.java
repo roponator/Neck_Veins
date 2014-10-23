@@ -343,16 +343,16 @@ public class VeinsFrame extends Widget {
 		Label opcijeLabel = new Label("Pick a method:");
 		opcijeLabel.setTheme("title-label");
 		prvi = new Button("Marching Cubes");
-		drugi = new Button("Recursion");
-		tretji = new Button("Marching Cubes + Recursion");
+		drugi = new Button("Subdivision");
+		tretji = new Button("Marching Cubes + Subdivision");
 		
 		//fileSelector.getUserWidgetBottom().setEnabled(true);
 		
 		tretji.addCallback(new Runnable() {
 			public void run() {
-				prvi.setEnabled(tretji.getText().equals("Disable Marching Cubes + Recursion"));
-				drugi.setEnabled(tretji.getText().equals("Disable Marching Cubes + Recursion"));
-				tretji.setText(tretji.getText().equals("Marching Cubes + Recursion") ? "Disable Marching Cubes + Recursion" : "Marching Cubes + Recursion");
+				prvi.setEnabled(tretji.getText().equals("Disable Marching Cubes + Subdivision"));
+				drugi.setEnabled(tretji.getText().equals("Disable Marching Cubes + Subdivision"));
+				tretji.setText(tretji.getText().equals("Marching Cubes + Subdivision") ? "Disable Marching Cubes + Subdivision" : "Marching Cubes + Subdivision");
 			}
 		});
 		
@@ -387,11 +387,11 @@ public class VeinsFrame extends Widget {
 		});
 		drugi.addCallback(new Runnable() {
 			public void run() {
-				gaussFileOptionsScroll.setEnabled(drugi.getText().equals("Disable Recursion"));
-				gaussEnableBtn.setEnabled(drugi.getText().equals("Disable Recursion"));
-				prvi.setEnabled(drugi.getText().equals("Disable Recursion"));
-				tretji.setEnabled(drugi.getText().equals("Disable Recursion"));
-				drugi.setText(drugi.getText().equals("Recursion") ? "Disable Recursion" : "Recursion");
+				gaussFileOptionsScroll.setEnabled(drugi.getText().equals("Disable Subdivision"));
+				gaussEnableBtn.setEnabled(drugi.getText().equals("Disable Subdivision"));
+				prvi.setEnabled(drugi.getText().equals("Disable Subdivision"));
+				tretji.setEnabled(drugi.getText().equals("Disable Subdivision"));
+				drugi.setText(drugi.getText().equals("Subdivision") ? "Disable Subdivision" : "Subdivision");
 			}
 		});	
 		

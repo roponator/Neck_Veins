@@ -154,7 +154,7 @@ public class Kockanje {
 						}
 					}
 					
-					if(pogoj != 0){
+					if(pogoj != 0 && pogoj < 8){
 						//REKURZIJA
 						rekurzijaKocke(GLOBINA, NASLEDNJI, recursion, isolevel, indeksi, cubes,
 								pogoji, indeksiZank, vertices);						 
@@ -215,7 +215,7 @@ public class Kockanje {
 			}
 			
 			
-			if(pogoji.get("pogoj"+NASLEDNJI) != 0){
+			if(pogoji.get("pogoj"+NASLEDNJI) != 0 && pogoji.get("pogoj"+NASLEDNJI) < 8){
 				rekurzijaKocke(GLOBINA, NASLEDNJI, MEJAGLOBINE, isolevel, indeksi, cubes,
 						pogoji, indeksiZank, vertices);
 			}
