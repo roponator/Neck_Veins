@@ -1,5 +1,5 @@
 package si.uni_lj.fri.segmentation;
-
+//Git Test Luka
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
