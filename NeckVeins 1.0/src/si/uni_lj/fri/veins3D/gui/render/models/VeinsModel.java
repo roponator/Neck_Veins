@@ -60,6 +60,11 @@ public class VeinsModel {
 	public double[] veinsGrabbedAt;
 	public double veinsGrabRadius;
 
+	public ArrayList<Mesh> getMeshes()
+	{
+		return meshes;
+	}
+	
 	public VeinsModel() {
 		meshes = new ArrayList<Mesh>();
 		setDefaultOrientation();

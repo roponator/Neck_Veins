@@ -60,6 +60,16 @@ public class Mesh {
 		this.vertices = vertices;
 	}
 
+	public ArrayList<Float> getVertices()
+	{
+		return vertices;
+	}
+	
+	public ArrayList<Integer> getFaces()
+	{
+		return faces;
+	}
+	
 	public void increaseMaxSubdivision() {
 		// Disclaimer: This will change the location of vertices used in other
 		// VBOs as well. (At the writing of the program, that's not an issue).

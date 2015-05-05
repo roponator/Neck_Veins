@@ -9,6 +9,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
+import si.uni_lj.fri.veins3D.gui.render.VeinsRendererInterface;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
 import de.matthiasmann.twl.BorderLayout;
 import de.matthiasmann.twl.BorderLayout.Location;
@@ -290,7 +291,7 @@ public class VeinsFrame extends Widget {
 	}
 
 	private void openObj(File file) {
-		VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+		VeinsRendererInterface renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
 		renderer.loadModelObj(file.getAbsolutePath());
 	}
 

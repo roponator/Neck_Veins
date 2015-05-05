@@ -10,6 +10,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
+
+import org.lwjgl.BufferUtils;
 
 /**
  * @author Simon Žagar, 63090355
@@ -235,4 +238,28 @@ public class Tools {
 	    ib.put(intarray).flip();
 	    return ib;
 	  }
+	
+	public static FloatBuffer arrayListToBuffer(ArrayList<Float> list, FloatBuffer buf)
+	{
+		if(buf == null || buf.capacity() < list.size())
+			buf = BufferUtils.createFloatBuffer(list.size());
+		else
+			buf.clear();
+		for(float f: list)
+			buf.put(f);
+		buf.rewind();
+		return buf;
+	}
+
+	public static IntBuffer arrayListToBuffer(ArrayList<Integer> list, IntBuffer buf)
+	{
+		if(buf == null || buf.capacity() < list.size())
+			buf = BufferUtils.createIntBuffer(list.size());
+		else
+			buf.clear();
+		for(int f: list)
+			buf.put(f);
+		buf.rewind();
+		return buf;
+	}
 }

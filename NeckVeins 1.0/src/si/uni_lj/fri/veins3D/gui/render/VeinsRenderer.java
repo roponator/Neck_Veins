@@ -52,17 +52,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.GLU;
 
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
+import si.uni_lj.fri.veins3D.gui.HUD;
 import si.uni_lj.fri.veins3D.gui.VeinsWindow;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
 import si.uni_lj.fri.veins3D.math.Quaternion;
-import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 
-public class VeinsRenderer extends LWJGLRenderer {
+public class VeinsRenderer extends VeinsRendererInterface{
 	public static final int FIXED_PIPELINE = -1;
 	public static final int SIMPLE_SHADER = 0;
 	public static final int SIMPLE_SHADER_NORM_INTERP = 1;
@@ -106,6 +108,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 * @since 0.1
 	 * @version 0.2
 	 */
+	@Override
 	public void setupView() {
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
@@ -121,6 +124,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 * @since 0.1
 	 * @version 0.1
 	 */
+	@Override
 	public void resetView() {
 		glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
@@ -130,6 +134,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 * @since 0.1
 	 * @version 0.4
 	 */
+	@Override
 	public void render() {
 		if (VeinsWindow.settings.stereoEnabled) {
 			float offset = VeinsWindow.settings.stereoValue / 10f;
@@ -199,7 +204,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 * 
 	 * @throws ShaderLoadException
 	 */
-	public void prepareShaders() throws ShaderLoadException {
+	public void loadShaders() throws IOException {
 		shaderPrograms = new int[NUMBER_OF_SHADER_PROGRAMS];
 		vertexShaders = new int[NUMBER_OF_SHADER_PROGRAMS];
 		fragmentShaders = new int[NUMBER_OF_SHADER_PROGRAMS];
@@ -212,31 +217,20 @@ public class VeinsRenderer extends LWJGLRenderer {
 			StringBuilder vertexShaderSource = new StringBuilder();
 			StringBuilder fragmentShaderSource = new StringBuilder();
 
-			try {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(
-						VeinsWindow.class.getResourceAsStream(path + "shader" + i + ".vert")));
-				String line;
-				while ((line = reader.readLine()) != null) {
-					vertexShaderSource.append(line).append("\n");
-				}
-				reader.close();
-			} catch (IOException e) {
-				System.err.println("Vertex shader" + i + " wasn't loaded properly.");
-				throw new ShaderLoadException("Vertex shader" + i + " wasn't loaded properly.");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					VeinsWindow.class.getResourceAsStream(path + "shader" + i + ".vert")));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				vertexShaderSource.append(line).append("\n");
 			}
-
-			try {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(
-						VeinsRenderer.class.getResourceAsStream(path + "shader" + i + ".frag")));
-				String line;
-				while ((line = reader.readLine()) != null) {
-					fragmentShaderSource.append(line).append("\n");
-				}
-				reader.close();
-			} catch (IOException e) {
-				System.err.println("Fragment shader" + i + " wasn't loaded properly.");
-				throw new ShaderLoadException("Fragment shader" + i + " wasn't loaded properly.");
+			reader.close();
+			reader = new BufferedReader(new InputStreamReader(
+					VeinsRenderer.class.getResourceAsStream(path + "shader" + i + ".frag")));
+			while ((line = reader.readLine()) != null) {
+				fragmentShaderSource.append(line).append("\n");
 			}
+			reader.close();
+			
 
 			glShaderSource(vertexShaders[i], vertexShaderSource);
 			glCompileShader(vertexShaders[i]);
@@ -413,5 +407,154 @@ public class VeinsRenderer extends LWJGLRenderer {
 	public void setActiveShaderProgram(int shaderProgram) {
 		activeShaderProgram = shaderProgram;
 	}
+
+	@Override
+	public void handleKeyboardInputPresses() {
+		if (Keyboard.getEventKeyState()) {
+			if (Keyboard.getEventKey() == Keyboard.KEY_1) {
+				setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER);
+			} else if (Keyboard.getEventKey() == Keyboard.KEY_2) {
+				setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP);
+			} else if (Keyboard.getEventKey() == Keyboard.KEY_3) {
+				setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP_AMBIENT_L);
+			} else if (Keyboard.getEventKey() == Keyboard.KEY_4) {
+				setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP_AMBIENT_L_SPEC_BLINN_PHONG);
+			} else if (Keyboard.getEventKey() == Keyboard.KEY_5) {
+				setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP_AMBIENT_L_SPEC_PHONG);
+			} else if (Keyboard.getEventKey() == Keyboard.KEY_6) {
+				setActiveShaderProgram(VeinsRenderer.SHADER_6);
+			} else if (Keyboard.getEventKey() == Keyboard.KEY_7) {
+				setActiveShaderProgram(VeinsRenderer.SHADER_7);
+			} else if (Keyboard.getEventKey() == Keyboard.KEY_8) {
+				setActiveShaderProgram(VeinsRenderer.SHADER_8);
+			} else if (Keyboard.getEventKey() == Keyboard.KEY_0) {
+				setActiveShaderProgram(VeinsRenderer.FIXED_PIPELINE);
+			} else if (Keyboard.getEventKey() == Keyboard.KEY_9) {
+				switchWireframe();
+			} else if (Keyboard.getEventKey() == Keyboard.KEY_ADD && getVeinsModel() != null) {
+				getVeinsModel().increaseSubdivisionDepth();
+			} else if (Keyboard.getEventKey() == Keyboard.KEY_SUBTRACT && getVeinsModel() != null) {
+				getVeinsModel().decreaseSubdivisionDepth();
+			} else if (Keyboard.getEventKey() == Keyboard.KEY_9) {
+				switchAA();
+			}
+		}
+	}
+
+	@Override
+	public void handleKeyboardInputContinuous() {
+		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
+			getCamera().lookUp();
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
+			getCamera().lookDown();
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
+			getCamera().lookRight();
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
+			getCamera().lookLeft();
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
+			getCamera().rotateCounterClockwise();
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
+			getCamera().rotateClockwise();
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
+			getCamera().moveForward();
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
+			getCamera().moveBackwards();
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
+			getCamera().moveRight();
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
+			getCamera().moveLeft();
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
+			getCamera().moveUp();
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_F)) {
+			getCamera().moveDown();
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_BACK)) {
+			resetScene();
+		}
+	}
+	
+	@Override
+	public void handleMouseInput(int dx, int dy, int dz, HUD hud, VeinsWindow veinsWindow) {
+		if(getVeinsModel() == null)
+			return;
+		if (dz > 0) {
+			getCamera().zoomIn();
+		} else if (dz < 0) {
+			getCamera().zoomOut();
+		}
+		
+		if (veinsWindow.getClickedOn() == VeinsWindow.CLICKED_ON_VEINS_MODEL) {
+			getVeinsModel().changeAddedOrientation(this);
+		}
+
+		if (Mouse.isButtonDown(0)) {
+			veinsWindow.calculateClickedOn();
+			if (veinsWindow.getClickedOn() == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE || veinsWindow.getClickedOn() == VeinsWindow.CLICKED_ON_MOVE_CIRCLE) {
+				float x = (veinsWindow.getClickedOn() == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? hud.x1 : hud.x2;
+				float y = (veinsWindow.getClickedOn() == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? hud.y1 : hud.y2;
+
+				float clickToCircleDistance = (float) Math.sqrt((x - Mouse.getX()) * (x - Mouse.getX())
+						+ (y - Mouse.getY()) * (y - Mouse.getY()));
+				float upRotation = (Mouse.getY() - y)
+						/ ((clickToCircleDistance > hud.r) ? clickToCircleDistance : hud.r);
+				float rightRotation = (Mouse.getX() - x)
+						/ ((clickToCircleDistance > hud.r) ? clickToCircleDistance : hud.r);
+
+				hud.clickToCircleDistance = Math.min(clickToCircleDistance, hud.r) / hud.r;
+				hud.clickOnCircleAngle = (float) Math.atan2(Mouse.getY() - y, Mouse.getX() - x);
+
+				if (veinsWindow.getClickedOn() == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) {
+					getCamera().rotate(upRotation, rightRotation);
+				} else {
+					getCamera().move(upRotation, rightRotation);
+				}
+
+			}
+
+			if (veinsWindow.getClickedOn() == VeinsWindow.CLICKED_ON_ROTATION_ELLIPSE) {
+				if (hud.x1 - Mouse.getX() <= 0) {
+					hud.ellipseSide = 0;
+					getCamera().rotateClockwise();
+				} else {
+					hud.ellipseSide = 1;
+					getCamera().rotateCounterClockwise();
+				}
+			}
+
+			if (veinsWindow.getClickedOn() == VeinsWindow.CLICKED_ON_MOVE_ELLIPSE) {
+				if (hud.x2 - Mouse.getX() <= 0) {
+					hud.ellipseSide = 0;
+					getCamera().moveDown();
+				} else {
+					hud.ellipseSide = 1;
+					getCamera().moveUp();
+				}
+			}
+
+		} else {
+			veinsWindow.setClickedOn(VeinsWindow.CLICKED_ON_NOTHING);
+			getVeinsModel().veinsGrabbedAt = null;
+			getVeinsModel().saveCurrentOrientation();
+			getVeinsModel().setAddedOrientation(new Quaternion());
+		}
+		
+	}
+
+	@Override
+	public void cleanup() {
+		cleanShaders();
+	}
+
 
 }
