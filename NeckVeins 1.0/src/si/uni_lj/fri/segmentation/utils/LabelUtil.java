@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
+import org.lwjgl.util.vector.Vector3f;
+
 import si.uni_lj.fri.segmentation.utils.obj.Triangle;
 import si.uni_lj.fri.segmentation.utils.obj.Vertex;
 
@@ -112,5 +114,49 @@ public class LabelUtil {
 			tris[i] = new Triangle(verts[0], verts[1], verts[2]);
 			tris[i].normalIndex = 1;
 		}
+	}
+	
+	public static float[] createVertexNormalList(int nTriangles, FloatBuffer trianglesBuff, TrianglesLabelHelper helper, float[] normals) {
+		helper.resetLabels();
+		Triangle[] tris = helper.getTriangles();
+		LinkedHashMap<Vertex, Vertex> map = helper.getVertTriMap();
+		Vertex[] verts = new Vertex[3];
+		int vertIndex = 1;
+		LinkedList<Float> normalList = new LinkedList<Float>();
+		
+		
+		for (int i = 0; i < nTriangles; i++) {
+			for (int j = 0; j < 3; j++) {
+				float x = trianglesBuff.get(i * 9 + j * 3);
+				float y = trianglesBuff.get(i * 9 + j * 3 + 1);
+				float z = trianglesBuff.get(i * 9 + j * 3 + 2);
+				Vector3f n = new Vector3f(normals[i * 9 + j * 3], normals[i * 9 + j * 3 + 1], normals[ i * 9 + j * 3 + 2]);
+				Vertex v = new Vertex(x, y, z, vertIndex);
+				Vertex vert = map.get(v);
+				if (vert != null) {
+					vert.triangles.add(i);
+					verts[j] = vert;
+				} else {
+					v.triangles = new ArrayList<Integer>();
+					v.triangles.add(i);
+					map.put(v, v);
+					normalList.add(n.x); 	normalList.add(n.y); 	normalList.add(n.z); 
+					vertIndex++;
+					verts[j] = v;
+				}
+			}
+			tris[i] = new Triangle(verts[0], verts[1], verts[2]);
+			tris[i].normalIndex = 1;
+		}
+		
+		float[] array = new float[normalList.size()];
+		int i = 0;
+		for(float f : normalList){
+			array[i] = f;
+			i++;
+			
+		}
+		
+		return array;
 	}
 }

@@ -9,7 +9,9 @@ import static org.lwjgl.opengl.ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB;
 import static org.lwjgl.opengl.ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
+import static org.lwjgl.opengl.GL11.glPointSize;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_POINTS;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY;
 import static org.lwjgl.opengl.GL11.glDrawElements;
@@ -17,9 +19,16 @@ import static org.lwjgl.opengl.GL11.glEnableClientState;
 import static org.lwjgl.opengl.GL11.glNormalPointer;
 import static org.lwjgl.opengl.GL11.glVertexPointer;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import org.lwjgl.BufferUtils;
 
@@ -39,17 +48,19 @@ import si.uni_lj.fri.veins3D.math.Vector;
  */
 public class Mesh {
 	ArrayList<Float> vertices;
-	ArrayList<Float> normals;
+	float[] normals;
 	ArrayList<Integer> faces;
 	ArrayList<String> groups;// groups this VBO belongs to
-
+	
 	int maxSubDepth;// maximal number of subdivisions able to render
 	ArrayList<Integer> verticesAndNormalsIDs;
 	ArrayList<Integer> verticesCounters;
 	ArrayList<Integer> indicesIDs;
 	ArrayList<Integer> facesCounters;
-
-	public Mesh(ArrayList<String> groups, ArrayList<Integer> faces, ArrayList<Float> vertices) {
+	private String meshInfo = "";
+	
+	public Mesh(ArrayList<String> groups, ArrayList<Integer> faces, ArrayList<Float> vertices, float[] normals) {
+		this.normals = normals;
 		maxSubDepth = -1;
 		verticesAndNormalsIDs = new ArrayList<Integer>();
 		verticesCounters = new ArrayList<Integer>();
@@ -249,7 +260,7 @@ public class Mesh {
 
 				newFaces.add(c);
 				newFaces.add(fPoint);
-				newFaces.add(e2);
+				newFaces.add(e2);   
 
 			} else {
 				newFaces.add(b);
@@ -297,7 +308,10 @@ public class Mesh {
 
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, verticesAndNormalsIDs.get(maxSubDepth));
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, indicesIDs.get(maxSubDepth));
-		float[] normals = getNormals(vertices, faces);
+		if(normals == null){
+			System.out.println("No normals given, calculating normals.");
+			normals = getNormals(vertices, faces);
+		}
 		FloatBuffer verticesAndNormalsBuffer = BufferUtils.createFloatBuffer(vertices.size() + normals.length);
 		for (float f : vertices)
 			verticesAndNormalsBuffer.put(f);
@@ -313,6 +327,33 @@ public class Mesh {
 		glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, facesBuffer, GL_STATIC_DRAW_ARB);
 		System.out.println("Finished building a VBO. Faces: " + (faces.size() / 3) + " Vertices: "
 				+ (vertices.size() / 3));
+		
+		PrintWriter writer;
+		try {
+			DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd__HH_mm_ss");
+			Calendar cal = Calendar.getInstance();
+			writer = new PrintWriter("VeinsObj"+ meshInfo + " "+dateFormat.format(cal.getTime())+ ".obj", "UTF-8");
+			writer.println("o Sample");
+			for(int i = 0; i<vertices.size(); i+=3){
+				writer.println("v "+vertices.get(i)+" "+vertices.get(i+1)+" "+vertices.get(i+2));				
+				
+			}
+			for(int i = 0; i<normals.length; i+=3){
+				writer.println("vn "+normals[i]+" "+normals[i+1]+" "+normals[i+2]);				
+				
+			}
+			for(int i = 0; i<faces.size(); i+=3){
+				writer.println("f "+faces.get(i)+"//"+faces.get(i)+" "+faces.get(i+1)+"//"+faces.get(i+1)+" "+faces.get(i+2)+"//"+faces.get(i+2));				
+				
+			}	
+			writer.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void render(int subDepth) {
@@ -321,12 +362,27 @@ public class Mesh {
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, verticesAndNormalsIDs.get(subDepth));
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, indicesIDs.get(subDepth));
 
+		
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_FLOAT, 0, 0);
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glNormalPointer(GL_FLOAT, 0, (4 * verticesCounters.get(subDepth)));
-
-		glDrawElements(GL_TRIANGLES, facesCounters.get(subDepth), GL_UNSIGNED_INT, 0);
+		
+		
+		 
+		
+		boolean pointCloud = false;
+		
+		if(pointCloud){
+			glPointSize(7);
+			glDrawElements(GL_POINTS, facesCounters.get(subDepth), GL_UNSIGNED_INT, 0);
+		}else{
+			
+			glDrawElements(GL_TRIANGLES, facesCounters.get(subDepth), GL_UNSIGNED_INT, 0);
+			
+		}
+		
+	
 
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
@@ -367,6 +423,19 @@ public class Mesh {
 			normals[normal * 3 + 2] = (float) n[2];
 		}
 		return normals;
+	}
+
+	public void setNormals(float[] normals) {
+		this.normals = normals;
+		
+	}
+
+	public String getMeshInfo() {
+		return meshInfo;
+	}
+
+	public void setMeshInfo(String meshInfo) {
+		this.meshInfo = meshInfo;
 	}
 
 }

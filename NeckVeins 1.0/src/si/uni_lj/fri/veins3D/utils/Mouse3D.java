@@ -22,7 +22,7 @@ public class Mouse3D {
                 }
             }
             if (controller == null) {
-                System.err.println("Space Navigator was not found.");
+                System.err.println("No SpaceNavigator was found.");
                 connected=false;
             }
         }

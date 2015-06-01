@@ -1,7 +1,6 @@
 package si.uni_lj.fri.veins3D.gui;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Locale;
 
 import org.lwjgl.LWJGLException;
@@ -18,7 +17,6 @@ import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import si.uni_lj.fri.veins3D.utils.Mouse3D;
-import si.uni_lj.fri.veins3D.utils.LeapMotion;
 import si.uni_lj.fri.veins3D.utils.RayUtil;
 import si.uni_lj.fri.veins3D.utils.SettingsUtil;
 import de.matthiasmann.twl.Container;
@@ -40,7 +38,7 @@ public class VeinsWindow extends Container {
 
 	public static NeckVeinsSettings settings;
 
-	private VeinsFrame frame;
+	private VeinsFrame frame; 
 	private VeinsRenderer renderer;
 	private HUD hud;
 	private boolean isRunning;
@@ -55,7 +53,6 @@ public class VeinsWindow extends Container {
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
 	public static Mouse3D joystick;
-	public static LeapMotion leap;
 
 	/**
 	 * 
@@ -112,7 +109,7 @@ public class VeinsWindow extends Container {
 			} else {
 				settings = new NeckVeinsSettings();
 				settings.isFpsShown = false;
-				settings.fullscreen = true;
+				settings.fullscreen = false;
 				settings.stereoEnabled = false;
 				settings.stereoValue = 0;
 				settings.locale = Locale.getDefault();
@@ -125,6 +122,8 @@ public class VeinsWindow extends Container {
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 		}
+		settings.resWidth = 1024;
+		settings.resHeight = 1024;
 	}
 
 	/**
@@ -135,6 +134,7 @@ public class VeinsWindow extends Container {
 			Display.setDisplayMode(currentDisplayMode);
 			Display.setTitle(title);
 			Display.setVSyncEnabled(true);
+			Display.setDisplayMode(new DisplayMode(1024, 1024));
 			Display.create(new PixelFormat().withStencilBits(1));
 			// Display.create();
 		} catch (LWJGLException e) {
@@ -155,8 +155,6 @@ public class VeinsWindow extends Container {
 			add(gui);
 			setTheme("mainframe");
 			joystick = new Mouse3D(settings);
-			leap = new LeapMotion(settings);
-	        
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 			exitProgram(1);
@@ -191,6 +189,7 @@ public class VeinsWindow extends Container {
 	/**
 	 * 
 	 */
+	
 	public void mainLoop() {
 		fps = 0;
 		timePastFrame = (Sys.getTime() * 1000) / Sys.getTimerResolution();
@@ -207,11 +206,11 @@ public class VeinsWindow extends Container {
 
 			/* Render */
 			renderer.render();
-			hud.drawHUD();
+			//hud.drawHUD();
 			setTitle();
 
 			/* Update */
-			gui.update();
+			if(!renderer.isOpen) gui.update();
 			Display.update();
 			logic();
 			Display.sync(settings.frequency);
@@ -255,7 +254,6 @@ public class VeinsWindow extends Container {
 		pollKeyboardInput();
 		pollMouseInput();
 		poll3DMouseInput();
-		pollLeapMotionInput();
 	}
 
 	/**
@@ -342,11 +340,6 @@ public class VeinsWindow extends Container {
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_F)) {
 			renderer.getCamera().moveDown();
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_BACK)) {
-			renderer.resetScene();
-			
-			
 		}
 
 	}
@@ -435,20 +428,6 @@ public class VeinsWindow extends Container {
 		}
 	}
 
-	private void pollLeapMotionInput(){
-		double sensitivity=(double)settings.leapSensitivity;
-		leap.poll();
-		if(!leap.isPalm()){
-			float[] translations=leap.getAxisTranslations();
-			double[] rotations=leap.getAxisRotations();
-			renderer.getCamera().moveCamera3D(
-					new double[] { translations[0], translations[2], -translations[1] },
-					new double[] { 0, 0, 0 });
-			
-			renderer.getVeinsModel().rotateModel3D(rotations, renderer);
-		}
-	}
-	
 	/**
 	 * Calculates on which element mouse click was performed - on HUD element or
 	 * on veins model

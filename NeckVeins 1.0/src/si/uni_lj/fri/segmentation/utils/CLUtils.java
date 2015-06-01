@@ -191,8 +191,9 @@ public class CLUtils {
 		PointerBuffer globalWorkSize = BufferUtils.createPointerBuffer(dim);
 		for (int i = 0; i < dim; i++) {
 			globalWorkSize.put(i, dimensions[i]);
+
 		}
-		CL10.clEnqueueNDRangeKernel(queue, kernel, dim, null, globalWorkSize, null, null, null);
+		CL10.clEnqueueNDRangeKernel(queue, kernel, dim, null, globalWorkSize, null , null, null);
 	}
 
 	/**

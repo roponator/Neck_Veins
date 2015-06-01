@@ -14,11 +14,12 @@ public class ModelCreatorJava {
 	public static Object[] createModel(String fileName, double sigma, double threshold) {
 		float[][][] ctMatrix = FileUtils.readFile3D(fileName);
 		execGauss(ctMatrix, sigma);
+		threshold = 0.0019760127f;
 		double isolevel = execFindTreshold(ctMatrix, threshold);
-		execNormalization(ctMatrix, execFindMax(ctMatrix));
+		execNormalization(ctMatrix, 65536.0);
 		float[] vertices = execMarchingCubes(ctMatrix, isolevel);
 		int[] nTriangles = new int[] { vertices.length / 9 };
-		return new Object[] { IntBuffer.wrap(nTriangles), FloatBuffer.wrap(vertices), 0, (float) isolevel };
+		return new Object[] { IntBuffer.wrap(nTriangles), FloatBuffer.wrap(vertices), null, (float) isolevel, "Marching Cubes" };
 	}
 
 	private static void execNormalization(float[][][] ctMatrix, double max) {

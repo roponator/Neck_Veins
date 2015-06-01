@@ -46,10 +46,6 @@ public class HUD {
 	private Texture rotationElipse;
 	private Texture movementElipse;
 	private Texture ellipseGlow;
-	
-	private Texture leapGrabbedTrue;
-	private Texture leapGrabbedFalse;
-	
 	private int clickedOn;
 
 	public int ellipseSide = 0;
@@ -130,18 +126,6 @@ public class HUD {
 			System.err.println("Loading texture " + PATH + "ellipseGlow.png unsuccessful");
 			e.printStackTrace();
 		}
-		try {
-			leapGrabbedFalse = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream(PATH + "hand_open.png"));
-		} catch (IOException e) {
-			System.err.println("Loading texture " + PATH + "hand_open.png unsuccessful");
-			e.printStackTrace();
-		}
-		try {
-			leapGrabbedTrue = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream(PATH + "hand_closed.png"));
-		} catch (IOException e) {
-			System.err.println("Loading texture " + PATH + "hand_closed.png unsuccessful");
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -167,8 +151,7 @@ public class HUD {
 		drawMovementCircle();
 		if (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE || clickedOn == VeinsWindow.CLICKED_ON_MOVE_CIRCLE)
 			drawCircleGlow();
-		if (VeinsWindow.settings.showLeapIcon) drawLeapIcon(!VeinsWindow.leap.isPalm());
-		
+
 		endHUD();
 	}
 
@@ -293,23 +276,6 @@ public class HUD {
 		glPopMatrix();
 	}
 
-	private void drawLeapIcon(boolean grab) {
-		if(grab)GL11.glBindTexture(GL_TEXTURE_2D, leapGrabbedTrue.getTextureID());
-		else GL11.glBindTexture(GL_TEXTURE_2D, leapGrabbedFalse.getTextureID());
-		float height=lastWindowHeight / 18 + r;
-		
-		glBegin(GL_QUADS);
-		glTexCoord2f(1, 0);
-		glVertex3f(x2 + r, height + r, -0.3f);
-		glTexCoord2f(0, 0);
-		glVertex3f(x2 - r, height + r, -0.3f);
-		glTexCoord2f(0, 1);
-		glVertex3f(x2 - r, height - r, -0.3f);
-		glTexCoord2f(1, 1);
-		glVertex3f(x2 + r, height - r, -0.3f);
-		glEnd();
-	}
-	
 	private void endHUD() {
 		glDisable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);

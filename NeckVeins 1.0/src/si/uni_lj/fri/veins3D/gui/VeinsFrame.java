@@ -42,6 +42,7 @@ public class VeinsFrame extends Widget {
 	private Scrollbar threshFileOptionsScroll;
 	private boolean isDialogOpened;
 	private Button openButton;
+	private Button saveButton;
 	private Button exitButton;
 	private Scrollbar stereoScrollbar;
 	private ToggleButton stereoToggleButton;
@@ -60,7 +61,6 @@ public class VeinsFrame extends Widget {
 	private String[] displayModeStrings;
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
-	
 	// 3Dmouse
 	private static ToggleButton mouse3d;
 	private Scrollbar sensitivityScrollbar;
@@ -68,10 +68,6 @@ public class VeinsFrame extends Widget {
 	private ToggleButton lockRot;
 	private ToggleButton lockTrans;
 	private Button camObj;
-	
-	//Leap
-	private Scrollbar leapSensitivityScrollbar;
-	private ToggleButton leapShowIcon;
 
 	// Threshold scroll
 	private BorderLayout thresholdLayout;
@@ -107,6 +103,7 @@ public class VeinsFrame extends Widget {
 		initThresholdScroll();
 		initFileSelector();
 		initOpenButton();
+		initSaveButton();
 		initExitButton();
 		initStereoScrollBar();
 		initStereoToggleButton();
@@ -118,6 +115,8 @@ public class VeinsFrame extends Widget {
 		initDisplayModeListBox();
 		init3DmouseButtons();
 		initErrorPopup();
+
+			showFileSelector();
 	}
 
 	private void initMinTrianglesScroll() {
@@ -204,7 +203,48 @@ public class VeinsFrame extends Widget {
 		VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
 		renderer.changeModel(thresholdScrollbar.getValue() / 100.0f);
 	}
+	private void initSaveFileSelector() {
+		fileSelector = new FileSelector();
+		fileSelector.setTheme("fileselector");
+		fileSelector.setVisible(false);
+		JavaFileSystemModel fsm = JavaFileSystemModel.getInstance();
+		fileSelector.setFileSystemModel(fsm);
+		fileSelector.setUserWidgetBottom(initSegmentationOptions());
+		fileSelector.getUserWidgetBottom().setEnabled(false);
+		fileSelector.setCurrentFolder(new File(VeinsWindow.settings.workingDirectory));
+		Callback2 cb = new Callback2() {
+			@Override
+			public void filesSelected(Object[] files) {
+				setWaitCursor();
+				fileSelector.setVisible(false);
+				setButtonsEnabled(true);
+				openFile((File) files[0]);
+			}
 
+			@Override
+			public void canceled() {
+				setButtonsEnabled(true);
+				fileSelector.setVisible(false);
+			}
+
+			@Override
+			public void folderChanged(Object arg0) {
+				if (arg0 instanceof File)
+					VeinsWindow.settings.workingDirectory = ((File) arg0).getAbsolutePath();
+			}
+
+			@Override
+			public void selectionChanged(Entry[] arg0) {
+				if (arg0[0].getExtension().equals("mhd")) {
+					fileSelector.getUserWidgetBottom().setEnabled(true);
+				} else {
+					fileSelector.getUserWidgetBottom().setEnabled(false);
+				}
+			}
+		};
+		fileSelector.addCallback(cb);
+		add(fileSelector);
+	}
 	private void initFileSelector() {
 		fileSelector = new FileSelector();
 		fileSelector.setTheme("fileselector");
@@ -261,7 +301,12 @@ public class VeinsFrame extends Widget {
 				openMhd(file);
 				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
 				thresholdScrollbar.setValue((int) (renderer.getVeinsModel().threshold * 100));
-			} else {
+			}else if(fileExtensionEquals(file, "png") || fileExtensionEquals(file, "raw")){
+				//Ce je koncnica png, preberemo celo mapo in convertamo v .raw
+				convertImaging(file);
+				
+			}
+			else {
 				showThresholdOptions(false);
 				openObj(file);
 			}
@@ -280,6 +325,19 @@ public class VeinsFrame extends Widget {
 		renderer.loadModelRaw(file.getAbsolutePath(), sigma, threshold);
 	}
 
+	private void convertImaging(File file){
+		double sigma = gaussFileOptionsScroll.getValue() / (double) gaussFileOptionsScroll.getMaxValue();
+		sigma = (gaussFileOptionsScroll.isEnabled()) ? sigma : -1;
+		double threshold = threshFileOptionsScroll.getValue() / (double) threshFileOptionsScroll.getMaxValue();
+		threshold = (threshFileOptionsScroll.isEnabled()) ? threshold : -1;
+	
+		VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+		renderer.loadModelRawSafeMode(file.getAbsolutePath(), sigma, threshold);
+		
+		
+		
+	}
+	
 	private void openMhdSafeMode(File file) {
 		double sigma = gaussFileOptionsScroll.getValue() / (double) gaussFileOptionsScroll.getMaxValue();
 		sigma = (gaussFileOptionsScroll.isEnabled()) ? sigma : -1;
@@ -385,6 +443,7 @@ public class VeinsFrame extends Widget {
 		openButton = new Button("Open...");
 		openButton.setTheme("button");
 		openButton.setTooltipContent("Open the dialog with the file chooser to select an .obj file.");
+
 		openButton.addCallback(new Runnable() {
 			public void run() {
 				showFileSelector();
@@ -393,7 +452,18 @@ public class VeinsFrame extends Widget {
 		add(openButton);
 
 	}
+	private void initSaveButton() {
+		saveButton = new Button("Save...");
+		saveButton.setTheme("button");
+		saveButton.setTooltipContent("Open the dialog with the file chooser to select an .obj file.");
+		saveButton.addCallback(new Runnable() {
+			public void run() {
+				showFileSelector();
+			}
+		});
+		add(saveButton);
 
+	}
 	private void initExitButton() {
 		exitButton = new Button("Exit");
 		exitButton.setTheme("button");
@@ -614,12 +684,12 @@ public class VeinsFrame extends Widget {
 	}
 
 	private void init3DmouseButtons() {
-		mouse3d = new ToggleButton("3d Mouse / Leap");
+		mouse3d = new ToggleButton("3d Mouse");
 		mouse3d.setTheme("togglebutton");
 		mouse3d.setTooltipContent("3d Mouse settings");
 		mouse3d.addCallback(new Runnable() {
 			public void run() {
-				mouse3d.setEnabled(VeinsWindow.joystick.connected()|| VeinsWindow.leap.isConnected());
+				mouse3d.setEnabled(VeinsWindow.joystick.connected());
 				mouseSettingsVisible(mouse3d.isActive() && mouse3d.isEnabled());
 			}
 		});
@@ -636,7 +706,7 @@ public class VeinsFrame extends Widget {
 			}
 		});
 		add(sensitivityScrollbar);
-		
+
 		if (VeinsWindow.settings.mSelected)
 			camObj = new Button("Camera active");
 		else
@@ -689,29 +759,6 @@ public class VeinsFrame extends Widget {
 		});
 		add(lockTrans);
 
-		Label leapSensitivityLabel = new Label("Leap Motion sensitivity");
-		leapSensitivityScrollbar = new Scrollbar(Scrollbar.Orientation.HORIZONTAL);
-		leapSensitivityScrollbar.setTheme("hscrollbar");
-		leapSensitivityScrollbar.setTooltipContent("Sets the sensitivity of the leap.");
-		leapSensitivityScrollbar.setMinMaxValue(1, 150);
-		leapSensitivityScrollbar.setValue(151 - VeinsWindow.settings.leapSensitivity);
-		leapSensitivityScrollbar.addCallback(new Runnable() {
-			public void run() {
-				VeinsWindow.settings.leapSensitivity = (151 - leapSensitivityScrollbar.getValue());
-			}
-		});
-		add(leapSensitivityScrollbar);
-		
-		leapShowIcon = new ToggleButton("Show hand icon");
-		lockRot.setActive(VeinsWindow.settings.showLeapIcon);
-		leapShowIcon.setTheme("togglebutton");
-		leapShowIcon.setTooltipContent("Show if hand is held, released");
-		leapShowIcon.addCallback(new Runnable() {
-			public void run() {
-				VeinsWindow.settings.showLeapIcon=leapShowIcon.isActive();
-			}
-		});
-		add(leapShowIcon);
 	}
 
 	// TODO edit error widget look
@@ -765,8 +812,6 @@ public class VeinsFrame extends Widget {
 		lockTrans.setVisible(visible);
 		camObj.setVisible(visible);
 		sensitivityScrollbar.setVisible(visible);
-		leapSensitivityScrollbar.setVisible(visible);
-		leapShowIcon.setVisible(visible);
 	}
 
 	/**
@@ -849,43 +894,50 @@ public class VeinsFrame extends Widget {
 		strong.adjustSize();
 		lockRot.adjustSize();
 		lockTrans.adjustSize();
-		leapSensitivityScrollbar.adjustSize();
-		leapShowIcon.adjustSize();
-		
 
-		int openHeight = Math.max(25, VeinsWindow.settings.resHeight / 18);
-		int widthBy7 = VeinsWindow.settings.resWidth / 7 + 1;
+		int openHeight = Math.max(25, VeinsWindow.settings.resHeight / 16);
+		int widthBy7 = VeinsWindow.settings.resWidth / 8 + 1;
+		
 		openButton.setSize(widthBy7, openHeight);
 		openButton.setPosition(0, 0);
-		displayModesButton.setPosition(widthBy7, 0);
+		int iter = 1;
+		saveButton.setSize(widthBy7, openHeight);
+		saveButton.setPosition(widthBy7*iter, 0);
+		iter++;
+		displayModesButton.setPosition(widthBy7*iter, 0);
 		displayModesButton.setSize(widthBy7, openHeight);
-
+		iter++;
+		
+		
 		if (VeinsWindow.settings.stereoEnabled) {
-			stereoToggleButton.setPosition(widthBy7 * 2, 0);
+			stereoToggleButton.setPosition(widthBy7 * iter, 0);
 			stereoToggleButton.setSize(widthBy7, openHeight / 2);
-			stereoScrollbar.setPosition(widthBy7 * 2, openHeight / 2);
+			stereoScrollbar.setPosition(widthBy7 * iter, openHeight / 2);
 			stereoScrollbar.setSize(widthBy7, openHeight / 2);
 			// stereoScrollbar.setMinSize(VeinsWindow.settings.resWidth/36,
 			// openHeight);
 		} else {
-			stereoToggleButton.setPosition(widthBy7 * 2, 0);
+			stereoToggleButton.setPosition(widthBy7 * iter, 0);
 			stereoToggleButton.setSize(widthBy7, openHeight);
 
-			stereoScrollbar.setPosition(widthBy7 * 2, openHeight);
+			stereoScrollbar.setPosition(widthBy7 * iter, openHeight);
 			stereoScrollbar.setSize(widthBy7, openHeight);
 		}
-
-		helpButton.setPosition(widthBy7 * 3, 0);
+		iter++;
+		helpButton.setPosition(widthBy7 * iter, 0);
 		helpButton.setSize(widthBy7, openHeight);
-		creditsButton.setPosition(widthBy7 * 4, 0);
+		iter++;
+		creditsButton.setPosition(widthBy7 * iter, 0);
 		creditsButton.setSize(widthBy7, openHeight);
-		mouse3d.setPosition(widthBy7 * 5, 0);
+		iter++;
+		mouse3d.setPosition(widthBy7 * iter, 0);
 		mouse3d.setSize(widthBy7, openHeight);
-		exitButton.setPosition(widthBy7 * 6, 0);
-		exitButton.setSize(VeinsWindow.settings.resWidth - widthBy7 * 6, openHeight);
-
+		iter++;
+		exitButton.setPosition(widthBy7 * iter, 0);
+		exitButton.setSize(widthBy7, openHeight);
+		iter++;
 		strong.setPosition(0, openHeight);
-		strong.setSize(widthBy7 * 2, openHeight);
+		strong.setSize(widthBy7 * iter, openHeight);
 		lockRot.setPosition(0, openHeight * 2);
 		lockRot.setSize(widthBy7, openHeight);
 		lockTrans.setPosition(widthBy7, openHeight * 2);
@@ -894,13 +946,9 @@ public class VeinsFrame extends Widget {
 		camObj.setSize(widthBy7 * 2, openHeight);
 		sensitivityScrollbar.setPosition(0, openHeight * 4);
 		sensitivityScrollbar.setSize(widthBy7 * 2, openHeight / 2);
-		leapSensitivityScrollbar.setPosition(0, openHeight * 5-openHeight / 2);
-		leapSensitivityScrollbar.setSize(widthBy7 * 2, openHeight / 2);
-		leapShowIcon.setPosition(0, openHeight * 5);
-		leapShowIcon.setSize(widthBy7*2, openHeight);
-		
+
 		mouseSettingsVisible(mouse3d.isActive());
-		mouse3d.setEnabled(VeinsWindow.joystick.connected() || VeinsWindow.leap.isConnected()||true);
+		mouse3d.setEnabled(VeinsWindow.joystick.connected());
 
 		int rlWidth = VeinsWindow.settings.resWidth * 8 / 10;
 		int rlHeight = VeinsWindow.settings.resHeight * 6 / 10;
@@ -990,8 +1038,6 @@ public class VeinsFrame extends Widget {
 		strong.setText(labels.getString("strongBtnLabel"));
 		lockRot.setText(labels.getString("lockRotBtnLabel"));
 		lockTrans.setText(labels.getString("lockTransBtnLabel"));
-		
-		leapShowIcon.setText(labels.getString("leapShowIconBtnLabel"));
 
 		errorPopLabel.setText(labels.getString("popupErrorMsg1"));
 

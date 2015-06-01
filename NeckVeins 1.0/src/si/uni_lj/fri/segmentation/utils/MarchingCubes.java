@@ -290,11 +290,14 @@ public class MarchingCubes {
 	public static ArrayList<Float> marchingCubes(float[][][] CTMatrix, float isolevel) {
 		ArrayList<Float> vertices = new ArrayList<Float>();
 		Vertex[] cubesVertices = new Vertex[8];
+		float dim = 0.66f;
 		for (int i = 0; i < cubesVertices.length; i++)
 			cubesVertices[i] = new Vertex(0, 0, 0);
-		for (int z = 0; z < CTMatrix[0][0].length - 1; z++) {
-			for (int y = 0; y < CTMatrix.length - 1; y++) {
-				for (int x = 0; x < CTMatrix[0].length - 1; x++) {
+		for (int x = 0; x < CTMatrix.length - 1; x++) {
+			for (int y = 0; y < CTMatrix[0].length - 1; y++) {
+				for (int z = 0; z < CTMatrix[0][0].length - 1; z++) {
+
+
 					int top = y;
 					int bottom = y + 1;
 					int left = x;
@@ -302,14 +305,14 @@ public class MarchingCubes {
 					int back = z + 1;
 					int front = z;
 
-					cubesVertices[0].setVertex(left, bottom, back, CTMatrix[bottom][left][back]);
-					cubesVertices[1].setVertex(right, bottom, back, CTMatrix[bottom][right][back]);
-					cubesVertices[2].setVertex(right, bottom, front, CTMatrix[bottom][right][front]);
-					cubesVertices[3].setVertex(left, bottom, front, CTMatrix[y + 1][left][front]);
-					cubesVertices[4].setVertex(left, top, back, CTMatrix[top][left][back]);
-					cubesVertices[5].setVertex(right, top, back, CTMatrix[top][right][back]);
-					cubesVertices[6].setVertex(right, top, front, CTMatrix[top][right][front]);
-					cubesVertices[7].setVertex(left, top, front, CTMatrix[top][left][front]);
+					cubesVertices[0].setVertex(left, bottom, back, CTMatrix[left][bottom][back]);
+					cubesVertices[1].setVertex(right, bottom, back, CTMatrix[right][bottom][back]);
+					cubesVertices[2].setVertex(right, bottom, front, CTMatrix[right][bottom][front]);
+					cubesVertices[3].setVertex(left, bottom, front, CTMatrix[left][bottom][front]);
+					cubesVertices[4].setVertex(left, top, back, CTMatrix[left][top][back]);
+					cubesVertices[5].setVertex(right, top, back, CTMatrix[right][top][back]);
+					cubesVertices[6].setVertex(right, top, front, CTMatrix[right][top][front]);
+					cubesVertices[7].setVertex(left, top, front, CTMatrix[left][top][front]);
 
 					int cubeIndex = 0;
 					// 0
@@ -368,20 +371,22 @@ public class MarchingCubes {
 					if ((edgeTable[cubeIndex] & 2048) == 2048)
 						v[11] = linearInterpolate(cubesVertices[3], cubesVertices[7], isolevel);
 
+					
+					
 					// now build the triangles using triTable
 					for (int n = 0; triTable[cubeIndex][n] != -1; n += 3) {
 						Vertex first = v[triTable[cubeIndex][n]];
 						Vertex second = v[triTable[cubeIndex][n + 1]];
 						Vertex third = v[triTable[cubeIndex][n + 2]];
-						vertices.add(first.x);
-						vertices.add(first.y);
-						vertices.add(first.z);
-						vertices.add(second.x);
-						vertices.add(second.y);
-						vertices.add(second.z);
-						vertices.add(third.x);
-						vertices.add(third.y);
-						vertices.add(third.z);
+						vertices.add(first.x*dim);
+						vertices.add(first.y*dim);
+						vertices.add(first.z*dim);
+						vertices.add(second.x*dim);
+						vertices.add(second.y*dim);
+						vertices.add(second.z*dim);
+						vertices.add(third.x*dim);
+						vertices.add(third.y*dim);
+						vertices.add(third.z*dim);
 
 					}
 
