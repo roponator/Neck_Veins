@@ -206,11 +206,11 @@ public class VeinsWindow extends Container {
 
 			/* Render */
 			renderer.render();
-			//hud.drawHUD();
+			hud.drawHUD();
 			setTitle();
 
 			/* Update */
-			if(!renderer.isOpen) gui.update();
+			gui.update();
 			Display.update();
 			logic();
 			Display.sync(settings.frequency);
@@ -467,8 +467,8 @@ public class VeinsWindow extends Container {
 			} else {
 				renderer.getVeinsModel().veinsGrabbedAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(),
 						renderer);
-				// renderer.getVeinsModel().setAddedOrientation(new
-				// Quaternion());
+				 renderer.getVeinsModel().setAddedOrientation(new
+				 Quaternion());
 				if (renderer.getVeinsModel().veinsGrabbedAt != null)
 					clickedOn = CLICKED_ON_VEINS_MODEL;
 			}

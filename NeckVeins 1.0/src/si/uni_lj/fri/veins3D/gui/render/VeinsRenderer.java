@@ -200,12 +200,9 @@ public class VeinsRenderer extends LWJGLRenderer {
 		
 
 		Quaternion worldOrientation = Quaternion.quaternionReciprocal(cam.cameraOrientation);
-		//glMultMatrix(worldOrientation.getRotationMatrix(false));
+		glMultMatrix(worldOrientation.getRotationMatrix(false));
 
-
-		System.out.println(cam.cameraX+" "+cam.cameraY+" "+cam.cameraZ);
-		//glMultMatrix(fb);
-	//	glTranslatef(-cam.cameraX + (float) v[0], -cam.cameraY + (float) v[1], -cam.cameraZ + (float) v[2]);
+		glTranslatef(-cam.cameraX + (float) v[0], -cam.cameraY + (float) v[1], -cam.cameraZ + (float) v[2]);
 
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);

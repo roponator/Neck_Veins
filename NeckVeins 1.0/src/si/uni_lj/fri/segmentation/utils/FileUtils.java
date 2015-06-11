@@ -19,6 +19,7 @@ import java.nio.channels.FileChannel;
 
 import javax.imageio.ImageIO;
 
+import si.uni_lj.fri.MPU_Implicits.Configuration;
 import si.uni_lj.fri.segmentation.MHDReader;
 import si.uni_lj.fri.veins3D.gui.VeinsWindow;
 
@@ -142,7 +143,19 @@ public class FileUtils {
 			}
 		}
 		buff = null;
-		return matrix;
+		
+		float[][][] newMatrix = matrix;
+		if(Configuration.__TAKE_SAMPLE){
+			newMatrix = new float[Configuration.__SAMPLE_SIZE][Configuration.__SAMPLE_SIZE][Configuration.__SAMPLE_SIZE];
+			for (int i = 0; i < Configuration.__SAMPLE_SIZE; i++) {
+				for (int j = 0; j < Configuration.__SAMPLE_SIZE; j++) {
+					for (int k = 0; k < Configuration.__SAMPLE_SIZE; k++) {
+						newMatrix[i][j][k] = matrix[i][j][k];
+					}
+				}
+			}
+		}
+		return newMatrix;
 	}
 	
 	private static float[][][] convertImagingToRaw(String filename){

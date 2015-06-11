@@ -4,7 +4,7 @@
  * or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  */
 package si.uni_lj.fri.veins3D.gui.render.models;
-
+import si.uni_lj.fri.MPU_Implicits.Configuration;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
@@ -130,14 +130,24 @@ public class VeinsModel {
 	 * @param filepath
 	 */
 	public void constructVBOFromRawFile(String filepath, double sigma, double threshold) throws LWJGLException {
-		Object[] output = ModelCreatorMPUI.createModel(filepath, sigma, threshold);
-	//	Object[] output = ModelCreatorJava.createModel(filepath, sigma, threshold);
+		sigma = Configuration.__GAUSS_PARAMETER;
+		
+		Object[] output = null;
+		if(Configuration.__MPUI==true)
+			output = ModelCreatorMPUI.createModel(filepath, sigma, threshold);
+		else
+			output = ModelCreatorJava.createModel(filepath, sigma, threshold);
 		constructVBOPointCloud(output);
 	}
 
 	public void constructVBOFromRawFileSafeMode(String filepath, double sigma, double threshold) {
-	//	Object[] output = ModelCreatorJava.createModel(filepath, sigma, threshold);
-		Object[] output = ModelCreatorMPUI.createModel(filepath, sigma, threshold);
+		sigma = Configuration.__GAUSS_PARAMETER;
+		
+		Object[] output = null;
+		if(Configuration.__MPUI==true)
+			output = ModelCreatorMPUI.createModel(filepath, sigma, threshold);
+		else
+			output = ModelCreatorJava.createModel(filepath, sigma, threshold);
 		constructVBOPointCloud(output);
 	}
 

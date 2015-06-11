@@ -157,10 +157,10 @@ public class Camera {
 		addRotation = Quaternion.quaternionFromAngleAndRotationAxis(rot[2], Y_NEGATIVE_AXIS);
 		cameraOrientation = Quaternion.quaternionMultiplication(cameraOrientation, addRotation);
 		
-		/* REMOVE IF LEANING OF CAMERA NEEDED
+		/* REMOVE IF LEANING OF CAMERA NEEDED*/
 		addRotation = Quaternion.quaternionFromAngleAndRotationAxis(rot[1], Z_POSITIVE_AXIS);
 		cameraOrientation = Quaternion.quaternionMultiplication(cameraOrientation, addRotation);
-		*/
+		
 	}
 	public void normalizeCameraOrientation() {
 		cameraOrientation = Quaternion.quaternionNormalization(cameraOrientation);

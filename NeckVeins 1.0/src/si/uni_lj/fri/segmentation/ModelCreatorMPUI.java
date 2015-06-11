@@ -12,18 +12,20 @@ import si.uni_lj.fri.segmentation.utils.Graytresh;
 import si.uni_lj.fri.segmentation.utils.MarchingCubes;
 import si.uni_lj.fri.segmentation.utils.PointCloud;
 
+import si.uni_lj.fri.MPU_Implicits.Configuration;
+
 public class ModelCreatorMPUI {
 
 	public static Object[] createModel(String fileName, double sigma, double threshold) {
 		float[][][] origMatrix = FileUtils.readFile3D(fileName);
 		float[][][] ctMatrix = origMatrix;
 		System.out.println(ctMatrix.length + " "+ctMatrix[0].length + " "+ctMatrix[0][0].length);
-		float alpha = 1.4f;
-		float lambda = 0.1f;
-		float error = 0.005f;
-		float res = 0.0025f;
+		float alpha = Configuration.__APLHA;
+		float lambda = Configuration.__LAMBDA;
+		float error = Configuration.__ERROR;
+		float res = Configuration.__RESOLUTION;
 		boolean cubes = true;
-		boolean pointCloud = false;
+		boolean pointCloud = Configuration.__POINT_CLOUD;
 		String s = "";
 
 		
