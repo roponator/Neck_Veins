@@ -2,20 +2,20 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value=".MPUI" key="selection"/>
+		<item value="constructVBOPointCloud" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value=".MPUI"/>
-			<item value="MPUI"/>
-			<item value="initOpen"/>
-			<item value="openFile"/>
-			<item value="fileSelector"/>
-			<item value="openObjOrMHDWithMarchingCubesBtn"/>
-			<item value="initGUI"/>
-			<item value="showFileSelector"/>
+			<item value="constructVBOPointCloud"/>
+			<item value="safe"/>
+			<item value="initErrorPopup"/>
+			<item value="openMhdSafeMode"/>
+			<item value="openMhd("/>
+			<item value="openMhd"/>
+			<item value="loadModelRaw"/>
+			<item value="constructVBOFromRawFileSafeMode"/>
 		</list>
 		<list key="replacehistory">
 		</list>
