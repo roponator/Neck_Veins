@@ -1,0 +1,29 @@
+package si.uni_lj.fri.MPU_Implicits;
+
+public class Configuration {
+	
+	/* Approximation radius - bigger radius smoother objects - slower algorithm */
+	public static final float __APLHA = 0.7f;
+	
+	/* Increasing step, leave it be. */
+	public static final float __LAMBDA = 0.1f;
+	
+	/* Approximation error, dont set it too low. */
+	public static final float __ERROR = 0.005f;
+	
+	/* Polygonization resolution, 0.01 means 100x100 */
+	public static final float __RESOLUTION = 0.01f;
+	
+	/* Draw point cloud instead of MPUI or MC */
+	public static final boolean __POINT_CLOUD = false;
+	
+	
+	/* For debugging/testing, take __SAMPLE_SIZE^3 sample, will crash if input is smaller */
+	public static final boolean __TAKE_SAMPLE = true;
+	
+	
+	public static final int __SAMPLE_SIZE = 200;
+
+	public static final double __GAUSS_PARAMETER = 0.75;
+	
+}
