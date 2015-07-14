@@ -5,15 +5,17 @@
  */
 varying vec3 normal;
 varying vec4 position;
+varying vec3 worldPos;
 
 void main(){
 	vec4 ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
 	vec4 globalAmbient = gl_FrontMaterial.ambient * gl_LightModel.ambient;
 	gl_FrontColor=ambient+globalAmbient;
 
-	normal = gl_NormalMatrix * gl_Normal;
+	normal = gl_Normal;
 	position = ftransform();
 	gl_Position = position;
+	worldPos = gl_Vertex.xyz;
 }
 
 

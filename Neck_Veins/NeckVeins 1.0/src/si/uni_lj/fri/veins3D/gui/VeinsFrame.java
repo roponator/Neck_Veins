@@ -11,6 +11,7 @@ import org.lwjgl.opengl.DisplayMode;
 import si.uni_lj.fri.segmentation.ModelCreatorSettings;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
+import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelMesh;
 import de.matthiasmann.twl.BorderLayout;
 import de.matthiasmann.twl.BorderLayout.Location;
 import de.matthiasmann.twl.BoxLayout;
@@ -154,10 +155,11 @@ public class VeinsFrame extends Widget {
 
 	private void applyMinTrianglesValue() {
 		VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
+		
 		VeinsModel model = renderer.getVeinsModel();
 		int scrollMaxValue = minTrianglesScrollbar.getMaxValue();
 		int scrollCurrentValue = minTrianglesScrollbar.getValue();
-		int minTriangels = (int) (model.maxTriangels * ((float) scrollCurrentValue / (float) (scrollMaxValue)));
+		int minTriangels = (int) (model.GetMaxTriangles() * ((float) scrollCurrentValue / (float) (scrollMaxValue)));
 		model.changeMinTriangles(minTriangels);
 		minTriangelsValue.setText(Integer.toString(minTriangels));
 	}
@@ -314,7 +316,7 @@ public class VeinsFrame extends Widget {
 				showThresholdOptions(true);
 				openMhd(file);
 				VeinsRenderer renderer = (VeinsRenderer) VeinsFrame.this.getGUI().getRenderer();
-				thresholdScrollbar.setValue((int) (renderer.getVeinsModel().threshold * 100));
+				thresholdScrollbar.setValue((int) (renderer.getVeinsModel().GetThreshold() * 100));
 			}else if(fileExtensionEquals(file, "png") || fileExtensionEquals(file, "raw")){
 				//Ce je koncnica png, preberemo celo mapo in convertamo v .raw
 				convertImaging(file);

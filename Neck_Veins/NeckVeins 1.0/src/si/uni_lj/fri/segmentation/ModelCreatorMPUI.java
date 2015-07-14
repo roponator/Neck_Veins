@@ -11,14 +11,41 @@ import si.uni_lj.fri.segmentation.utils.Gauss3D;
 import si.uni_lj.fri.segmentation.utils.Graytresh;
 import si.uni_lj.fri.segmentation.utils.MarchingCubes;
 import si.uni_lj.fri.segmentation.utils.PointCloud;
-
 import si.uni_lj.fri.MPU_Implicits.Configuration;
 
 public class ModelCreatorMPUI {
 
+	// TODO: REMOVE
+	public static float[][][] testMatrix()
+	{
+		int dim=20;
+		float[][][] m=new float[20][20][20];
+		
+		for(int z=0;z<dim;++z)
+			for(int y=0;y<dim;++y)
+				for(int x=0;x<dim;++x)
+				{
+					float dx=(float)x-10.0f;
+					float dy=(float)y-10.0f;
+					float dz=(float)z-10.0f;
+					float dist = (float)Math.sqrt(dx*dx+dy*dy+dz*dz);
+					
+					if(dist > 5.0f)
+						m[z][y][x]=0.0f;
+					else
+						m[z][y][x]=100.0f;
+				}
+		
+		
+		
+		
+		return m;
+	}
+	
 	public static Object[] createModel(String fileName, double sigma, double threshold) {
-		float[][][] origMatrix = FileUtils.readFile3D(fileName);
-		float[][][] ctMatrix = origMatrix;
+		System.out.println("createModel (MPUI)...");
+		//float[][][] ctMatrix = FileUtils.readFile3D(fileName);
+		float[][][] ctMatrix = testMatrix();
 		System.out.println(ctMatrix.length + " "+ctMatrix[0].length + " "+ctMatrix[0][0].length);
 		float alpha = Configuration.__APLHA;
 		float lambda = Configuration.__LAMBDA;
@@ -29,10 +56,11 @@ public class ModelCreatorMPUI {
 		String s = "";
 
 		
-
-		double isolevel = execFindTreshold(ctMatrix, 0.0019760127);
+		// TODO: UNCOMMENT
+		/*double isolevel = execFindTreshold(ctMatrix, 0.0019760127);
 		execNormalization(ctMatrix, 65536.0);
-		execGauss(ctMatrix, sigma);
+		execGauss(ctMatrix, sigma);*/
+		double isolevel = 10.0;
 		
 		//POINT CLOUD
 		long startTime = System.nanoTime(); 
@@ -44,26 +72,29 @@ public class ModelCreatorMPUI {
 		long duration = endTime - startTime;
 		System.out.println("Point Cloud calculated in: "+(float) duration / 1000000000f);
 		
-		float[] vertices = cloud.getVertices();
-		float[] normals = cloud.getNormals();
-	
+		float[] voxelVertices = cloud.getVertices();
+		float[] voxelNormals = cloud.getNormals();
+		
+		float[] mpuiMeshVertices = null;
+		float[] mpuiMeshNormals = null;
+		
 		//MPUI + POLYGONIZATION
-		if(!pointCloud && vertices.length > 10){
+		if(!pointCloud && voxelVertices.length > 10){
 			s+="MPU alpha_"+Math.round(alpha * 100.0)+" error_"+Math.round(error*10000)+ " tresh_"+Math.round(threshold*10000)+ " res_"+Math.round(res*10000);
 			if(cubes) s += " CUBES";
 			else s+= "TETRA";
 
-			MPUI mpu = new MPUI(alpha, lambda, error, cubes, res, vertices, normals, ctMatrix.length, ctMatrix[0].length, ctMatrix[0][0].length );
-			vertices = mpu.getOutputVertices();
-			normals = mpu.getOutputNormals();
+			MPUI mpu = new MPUI(alpha, lambda, error, cubes, res, voxelVertices, voxelNormals, ctMatrix.length, ctMatrix[0].length, ctMatrix[0][0].length );
+			mpuiMeshVertices = mpu.getOutputVertices();
+			mpuiMeshNormals = mpu.getOutputNormals();
 		
 		}else{
 			
 			s+="Point Cloud tresh_"+Math.round(threshold*10000);
 			
 		}
-		int[] nTriangles = new int[] { vertices.length / 9 };
-		return new Object[] { IntBuffer.wrap(nTriangles), FloatBuffer.wrap(vertices), normals, (float) isolevel, s };
+		int[] nTriangles = new int[] { mpuiMeshVertices.length / 9 };
+		return new Object[] { IntBuffer.wrap(nTriangles), FloatBuffer.wrap(mpuiMeshVertices), mpuiMeshNormals, (float) isolevel, s,voxelVertices,voxelNormals };
 	}
 
 	private static void execNormalization(float[][][] ctMatrix, double max) {

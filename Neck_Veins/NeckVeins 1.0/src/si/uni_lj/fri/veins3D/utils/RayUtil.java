@@ -3,6 +3,7 @@ package si.uni_lj.fri.veins3D.utils;
 import si.uni_lj.fri.veins3D.gui.VeinsWindow;
 import si.uni_lj.fri.veins3D.gui.render.Camera;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
+import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelMesh;
 import si.uni_lj.fri.veins3D.math.Vector;
 
 public class RayUtil {
@@ -17,7 +18,7 @@ public class RayUtil {
 		// figure out if the click on the screen intersects the circle that
 		// surrounds the veins model
 		Camera cam = renderer.getCamera();
-		double veinsRadius = renderer.getVeinsModel().veinsGrabRadius;
+		double veinsRadius = renderer.getVeinsModel().GetVeinsGrabRadius();
 
 		// get the direction of the "ray" cast from the camera location
 		double[] d = getRayDirection(x, y, renderer);

@@ -1,5 +1,7 @@
 package si.uni_lj.fri.veins3D.gui;
 
+import static org.lwjgl.opengl.GL11.glClearColor;
+
 import java.io.IOException;
 import java.util.Locale;
 
@@ -19,6 +21,7 @@ import si.uni_lj.fri.veins3D.math.Quaternion;
 import si.uni_lj.fri.veins3D.utils.Mouse3D;
 import si.uni_lj.fri.veins3D.utils.RayUtil;
 import si.uni_lj.fri.veins3D.utils.SettingsUtil;
+import si.uni_lj.fri.volumeRaycast.VolumeRaycast;
 import de.matthiasmann.twl.Container;
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.theme.ThemeManager;
@@ -53,7 +56,7 @@ public class VeinsWindow extends Container {
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
 	public static Mouse3D joystick;
-
+	
 	/**
 	 * 
 	 */
@@ -61,9 +64,9 @@ public class VeinsWindow extends Container {
 		isRunning = true;
 		title = "Veins3D";
 		loadSettings(title);
-		createDisplay();
-		initWindowElements();
-		setupWindow();
+		createDisplay();		
+		initWindowElements();	
+		setupWindow();		
 	}
 
 	/**
@@ -76,6 +79,8 @@ public class VeinsWindow extends Container {
 		createDisplay();
 		initWindowElements();
 		setupWindow();
+		
+
 	}
 
 	/**
@@ -178,6 +183,8 @@ public class VeinsWindow extends Container {
 			// Sync
 			renderer.syncViewportSize();
 			frame.invalidateLayout();
+			
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ShaderLoadException e) {
@@ -195,21 +202,20 @@ public class VeinsWindow extends Container {
 		timePastFrame = (Sys.getTime() * 1000) / Sys.getTimerResolution();
 		timePastFps = timePastFrame;
 		fpsToDisplay = 0;
-		renderer.setupView();
+	
 		while (!Display.isCloseRequested() && isRunning) {
-			/* Reset view */
-			renderer.resetView();
-
-			/* Handle input and inform HUD about it */
+			
+			renderer.setupView(); // raycast volume renderer changes some states, theys must be reset		
+			renderer.clearView();
+	
 			pollInput();
 			hud.setClickedOn(clickedOn);
 
-			/* Render */
 			renderer.render();
+				
 			hud.drawHUD();
 			setTitle();
 
-			/* Update */
 			gui.update();
 			Display.update();
 			logic();
@@ -406,7 +412,7 @@ public class VeinsWindow extends Container {
 
 		} else {
 			clickedOn = CLICKED_ON_NOTHING;
-			renderer.getVeinsModel().veinsGrabbedAt = null;
+			//renderer.getVeinsModel().veinsGrabbedAt = null; // TODO: WHAT, IS THIS EVEN NEEDED?
 			renderer.getVeinsModel().saveCurrentOrientation();
 			renderer.getVeinsModel().setAddedOrientation(new Quaternion());
 		}
@@ -465,11 +471,10 @@ public class VeinsWindow extends Container {
 				clickedOn = CLICKED_ON_MOVE_ELLIPSE;
 
 			} else {
-				renderer.getVeinsModel().veinsGrabbedAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(),
-						renderer);
+				renderer.getVeinsModel().SetVeinsGrabbedAt(RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(),	renderer));
 				 renderer.getVeinsModel().setAddedOrientation(new
 				 Quaternion());
-				if (renderer.getVeinsModel().veinsGrabbedAt != null)
+				if (renderer.getVeinsModel().GetVeinsGrabbedAt() != null)
 					clickedOn = CLICKED_ON_VEINS_MODEL;
 			}
 		}

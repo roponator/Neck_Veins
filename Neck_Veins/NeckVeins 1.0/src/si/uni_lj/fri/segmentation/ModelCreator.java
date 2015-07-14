@@ -45,9 +45,12 @@ public class ModelCreator {
 	private static float max = 0;
 	private static CLMem[] staticMemory;
 
+	
+	
 	public ModelCreator() {
 	}
 
+	
 	/**
 	 * Called when loading from file
 	 * 
@@ -58,6 +61,7 @@ public class ModelCreator {
 	 * @throws LWJGLException
 	 */
 	public static Object[] createModel(String fileName, double sigma, double threshold) throws LWJGLException {
+		System.out.println("createModel on Graphics Card (marching cubes)...");
 		clearOldProgram();
 		initializeCL();
 		program = CLUtils.createProgram("/opencl/segmentation.cls", context, devices);
@@ -269,6 +273,7 @@ public class ModelCreator {
 		CLMem dimensionsMemory = CLUtils.locateMemory(dimensions, CL10.CL_MEM_READ_ONLY, queue, context);
 		CLMem matrixMemory = CLUtils.locateMemory(matrix, CL10.CL_MEM_READ_WRITE, queue, context);
 		staticMemory = new CLMem[] { matrixMemory, dimensionsMemory };
+		
 	}
 
 }

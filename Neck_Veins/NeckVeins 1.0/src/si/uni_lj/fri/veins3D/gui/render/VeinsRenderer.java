@@ -63,6 +63,8 @@ import org.lwjgl.util.glu.GLU;
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.VeinsWindow;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
+import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelMesh;
+import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelRaycastVolume;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 
@@ -87,7 +89,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 
 	private Camera cam;
 
-	private VeinsModel veinsModel;
+	public VeinsModel veinsModel; // TODO: CHANGE TO PRIVATE
 	public boolean isOpen = false;
 	public double[] screenPlaneInitialUpperLeft = new double[3];
 	public double[] screenPlaneInitialUpperRight = new double[3];
@@ -125,7 +127,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 * @since 0.1
 	 * @version 0.1
 	 */
-	public void resetView() {
+	public void clearView() {
 		glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 	}
@@ -134,7 +136,8 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 * @since 0.1
 	 * @version 0.4
 	 */
-	public void render() {
+	public void render()
+	{
 		if (VeinsWindow.settings.stereoEnabled) {
 			float offset = VeinsWindow.settings.stereoValue / 10f;
 			StencilMask.initStencil();
@@ -148,11 +151,13 @@ public class VeinsRenderer extends LWJGLRenderer {
 		} else {
 			setCameraAndLight(0);
 			renderVeins();
-		}
+		}		
 	}
 
-	private void renderVeins() {
-		if (veinsModel != null) {
+	private void renderVeins()
+	{
+		if (veinsModel != null) 
+		{
 			glMatrixMode(GL_MODELVIEW);
 			glPushMatrix();
 
@@ -175,7 +180,12 @@ public class VeinsRenderer extends LWJGLRenderer {
 
 			GL20.glUseProgram(0);
 			glPopMatrix();
+			
+		
 		}
+		
+		
+
 	}
 
 	/**
@@ -224,7 +234,8 @@ public class VeinsRenderer extends LWJGLRenderer {
 		fragmentShaders = new int[NUMBER_OF_SHADER_PROGRAMS];
 
 		String path = "/shaders/";
-		for (int i = 0; i < NUMBER_OF_SHADER_PROGRAMS; i++) {
+		for (int i = 0; i < NUMBER_OF_SHADER_PROGRAMS; i++) 
+		{
 			shaderPrograms[i] = GL20.glCreateProgram();
 			vertexShaders[i] = glCreateShader(GL_VERTEX_SHADER);
 			fragmentShaders[i] = glCreateShader(GL_FRAGMENT_SHADER);
@@ -273,12 +284,15 @@ public class VeinsRenderer extends LWJGLRenderer {
 			glAttachShader(shaderPrograms[i], fragmentShaders[i]);
 			glLinkProgram(shaderPrograms[i]);
 			glValidateProgram(shaderPrograms[i]);
-
+			glDetachShader(shaderPrograms[i], vertexShaders[i]); // must unbind all, otherwise raycaster tries to use it and renders nothing
+			glDetachShader(shaderPrograms[i], fragmentShaders[i]);
+			
 			System.out.println("Vertex shader" + i + " info: " + glGetShaderInfoLog(vertexShaders[i], 999));
 			System.out.println("Fragment shader" + i + " info: " + glGetShaderInfoLog(fragmentShaders[i], 999));
 			System.out.println("Shader program" + i + " info: " + glGetShaderInfoLog(shaderPrograms[i], 999));
 		}
 	}
+	
 
 	public void cleanShaders() {
 		for (int i = 0; i < NUMBER_OF_SHADER_PROGRAMS; i++) {
@@ -298,9 +312,10 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 */
 	public void loadModelObj(String fileName) {
 		if (veinsModel != null)
-			veinsModel.deleteMeshes();
-		veinsModel = new VeinsModel();
-		veinsModel.constructVBOFromObjFile(fileName);
+			veinsModel.cleanup();
+		veinsModel = new VeinsModelMesh();
+		VeinsModelMesh veinsModelMesh = (VeinsModelMesh)veinsModel;
+		veinsModelMesh.constructVBOFromObjFile(fileName);
 		setDefaultViewOptions();
 		isOpen = true;
 	}
@@ -315,9 +330,13 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 */
 	public void loadModelRaw(String fileName, double sigma, double threshold) throws LWJGLException {
 		if (veinsModel != null)
-			veinsModel.deleteMeshes();
-		veinsModel = new VeinsModel();
-		veinsModel.constructVBOFromRawFile(fileName, sigma, threshold);
+			veinsModel.cleanup();
+		
+		/*veinsModel = new VeinsModelMesh();
+		VeinsModelMesh veinsModelMesh = (VeinsModelMesh)veinsModel;
+		veinsModelMesh.constructVBOFromRawFile(fileName, sigma, threshold);*/
+		veinsModel = new VeinsModelRaycastVolume(VeinsWindow.settings.resWidth,VeinsWindow.settings.resHeight);
+
 		setDefaultViewOptions();
 		isOpen = true;
 	}
@@ -331,26 +350,31 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 */
 	public void loadModelRawSafeMode(String fileName, double sigma, double threshold) {
 		if (veinsModel != null)
-			veinsModel.deleteMeshes();
-		veinsModel = new VeinsModel();
-		veinsModel.constructVBOFromRawFileSafeMode(fileName, sigma, threshold);
+			veinsModel.cleanup();
+		veinsModel = new VeinsModelMesh();
+		VeinsModelMesh veinsModelMesh = (VeinsModelMesh)veinsModel;
+		veinsModelMesh.constructVBOFromRawFileSafeMode(fileName, sigma, threshold);
 		setDefaultViewOptions();
 		isOpen = true;
 	}
 
-	public void changeModel(double threshold) throws LWJGLException {
-		veinsModel.deleteMeshes();
-		veinsModel = new VeinsModel(threshold, veinsModel.currentOrientation);
-		double d = calculateCameraDistance(veinsModel);
-		veinsModel.veinsGrabRadius = d / Math.sqrt(2);
+	public void changeModel(double threshold) throws LWJGLException 
+	{
+		veinsModel.cleanup();
+		veinsModel = new VeinsModelMesh(threshold, veinsModel.GetCurrentOrientation());
+		VeinsModelMesh veinsModelMesh = (VeinsModelMesh)veinsModel;
+		double d = veinsModel.calculateCameraDistance();
+		 veinsModelMesh.SetVeinsGrabRadius(d / Math.sqrt(2));
 	}
 
-	private void setDefaultViewOptions() {
+	private void setDefaultViewOptions()
+	{
 		double fovMin = (VeinsWindow.settings.resWidth < VeinsWindow.settings.resHeight) ? FOV_Y
 				* VeinsWindow.settings.resWidth / (double) VeinsWindow.settings.resHeight : FOV_Y;
 		fovMin = Math.toRadians(fovMin); // Math.PI * fovMin / 180
-		double d = calculateCameraDistance(veinsModel);
-		veinsModel.veinsGrabRadius = d / Math.sqrt(2);
+		
+		double d = veinsModel.calculateCameraDistance();
+		veinsModel.SetVeinsGrabRadius(d / Math.sqrt(2));
 		setCameraPositionAndOrientation(d, fovMin);
 		setScreenPlanes(d, fovMin);
 	}
@@ -366,7 +390,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 	 * @param veinsModel
 	 * @return
 	 */
-	private double calculateCameraDistance(VeinsModel veinsModel) {
+	/*private double calculateCameraDistance(VeinsModel veinsModel) {
 		double d1 = veinsModel.minX - veinsModel.centerx;
 		double d2 = veinsModel.maxX - veinsModel.centerx;
 		double d3 = veinsModel.minY - veinsModel.centery;
@@ -385,7 +409,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 		d1 = Math.sqrt(Math.max(Math.max(d1 + d2, d2 + d3), d1 + d3));
 
 		return d1;
-	}
+	}*/
 
 	private void setCameraPositionAndOrientation(double d, double fovMin) {
 		cam.cameraZ = 0;
