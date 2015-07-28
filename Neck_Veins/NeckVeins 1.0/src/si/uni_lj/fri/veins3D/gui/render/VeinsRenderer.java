@@ -332,10 +332,10 @@ public class VeinsRenderer extends LWJGLRenderer {
 		if (veinsModel != null)
 			veinsModel.cleanup();
 		
-		/*veinsModel = new VeinsModelMesh();
+		veinsModel = new VeinsModelMesh();
 		VeinsModelMesh veinsModelMesh = (VeinsModelMesh)veinsModel;
-		veinsModelMesh.constructVBOFromRawFile(fileName, sigma, threshold);*/
-		veinsModel = new VeinsModelRaycastVolume(VeinsWindow.settings.resWidth,VeinsWindow.settings.resHeight);
+		veinsModelMesh.constructVBOFromRawFile(fileName, sigma, threshold);
+		//veinsModel = new VeinsModelRaycastVolume(VeinsWindow.settings.resWidth,VeinsWindow.settings.resHeight);
 
 		setDefaultViewOptions();
 		isOpen = true;

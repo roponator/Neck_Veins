@@ -37,7 +37,7 @@ import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 public class HUD {
-	private final String PATH = "res/imgs/";
+	private final String PATH = "imgs/";
 	private final float ELLIPSEF = 1.1180339887498948482045868343656f;
 
 	private Texture rotationCircle;

@@ -113,7 +113,7 @@ public class VeinsModelMesh extends VeinsModel{
 		}
 
 		for (Mesh mesh : meshes) {
-			mesh.constructVBO();
+			mesh.constructVBO(true);
 		}
 	}
 
@@ -138,12 +138,19 @@ public class VeinsModelMesh extends VeinsModel{
 		if(ModelCreatorSettings.useMPUIForMeshFromVolumetricDataGeneration)
 		{
 			output = ModelCreatorMPUI.createModel(filepath, sigma, threshold);
-			constructVBOPointCloud(output);
+			if(output.length!=1)
+				constructVBOPointCloud(output); // generate mesh from raw file
+			else
+				constructVBOFromObjFile((String)output[0]); // load existing obj
 		}
 		else
 		{
 			output = ModelCreator.createModel(filepath, sigma, threshold);	
-			constructVBO(output);
+			if(output.length!=1)
+				constructVBO(output); // generate mesh from raw file
+			else
+				constructVBOFromObjFile((String)output[0]); // load existing obj
+			
 		}
 		
 	}
@@ -155,12 +162,19 @@ public class VeinsModelMesh extends VeinsModel{
 		if(ModelCreatorSettings.useMPUIForMeshFromVolumetricDataGeneration)
 		{
 			output = ModelCreatorMPUI.createModel(filepath, sigma, threshold);
-			constructVBOPointCloud(output);
+			if(output.length!=1)
+				constructVBOPointCloud(output); // generate mesh from raw file
+			else
+				constructVBOFromObjFile((String)output[0]); // load existing obj
+				
 		}
 		else
 		{
 			output = ModelCreatorJava.createModel(filepath, sigma, threshold);	
-			constructVBO(output);
+			if(output.length!=1)
+				constructVBO(output); // generate mesh from raw file
+			else
+				constructVBOFromObjFile((String)output[0]); // load existing obj
 		}
 	}
 
@@ -173,7 +187,7 @@ public class VeinsModelMesh extends VeinsModel{
 
 		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
 		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
-		String s = (String ) output[4];
+		MeshCreationInfo.MeshInfo meshCreationInfo = (MeshCreationInfo.MeshInfo) output[4];
 		
 		g_voxelPositions =  (float[]) output[5];		
 		g_voxelNormals = (float[]) output[6];
@@ -263,8 +277,8 @@ public class VeinsModelMesh extends VeinsModel{
 
 		for (Mesh mesh : meshes)
 		{
-			mesh.setMeshInfo(s);
-			mesh.constructVBO();
+			mesh.SetMeshCreationInfo(meshCreationInfo);
+			mesh.constructVBO(true);
 		}
 		
 	}
@@ -282,10 +296,12 @@ public class VeinsModelMesh extends VeinsModel{
 		glEnd();
 	}*/
 	
-	private void constructVBO(Object[] output) {
+	private void constructVBO(Object[] output) 
+	{
 		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
 		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
-	
+		MeshCreationInfo.MeshInfo meshCreationInfo = (MeshCreationInfo.MeshInfo) output[4];
+		
 		labelHelper = new TrianglesLabelHelper(nTrianglesBuff.get(0));
 		LabelUtil.createVertexList(nTrianglesBuff.get(0), trianglesBuff, labelHelper);
 		this.threshold = (Float) output[3];
@@ -354,12 +370,11 @@ public class VeinsModelMesh extends VeinsModel{
 
 		for (Mesh mesh : meshes) 
 		{
-			mesh.constructVBO();
+			mesh.SetMeshCreationInfo(meshCreationInfo);
+			mesh.constructVBO(true);
 		}
 	}
 
-	
-	
 	
 	public void constructVBOFromObjFile(String filepath) {
 		vertices = new ArrayList<Float>();
@@ -491,7 +506,7 @@ public class VeinsModelMesh extends VeinsModel{
 		centerz /= (vertices.size() / 3);
 
 		for (Mesh mesh : meshes) {
-			mesh.constructVBO();
+			mesh.constructVBO(false); // don't save obj to file if it's created from obj
 		}
 	}
 

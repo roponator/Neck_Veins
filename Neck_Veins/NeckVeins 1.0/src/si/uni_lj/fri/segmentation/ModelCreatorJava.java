@@ -1,17 +1,34 @@
 package si.uni_lj.fri.segmentation;
 
+import java.io.File;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import si.uni_lj.fri.segmentation.utils.FileUtils;
 import si.uni_lj.fri.segmentation.utils.Gauss3D;
 import si.uni_lj.fri.segmentation.utils.Graytresh;
 import si.uni_lj.fri.segmentation.utils.MarchingCubes;
+import si.uni_lj.fri.veins3D.gui.render.models.MeshCreationInfo;
 
 public class ModelCreatorJava {
 
-	public static Object[] createModel(String fileName, double sigma, double threshold) {
+	public static Object[] createModel(String fileName, double sigma, double threshold) 
+	{
+		// Create mesh info
+		String fileNameOnly = MeshCreationInfo.GetFileNameOnlyFromPath(fileName);
+		MeshCreationInfo.InfoMarchingCubes meshCreationInfo= new MeshCreationInfo.InfoMarchingCubes(fileNameOnly, sigma, threshold);
+			
+		// check if the obj  file exists for this model params: if it does, return one output.
+		File existingObjFile = new File(meshCreationInfo.GetObjFilePath());
+		if(existingObjFile.exists())
+		{
+			System.out.println("createModel (CPU MARCHING CUBES): obj file exists, using obj file..");
+			return new Object[]{meshCreationInfo.GetObjFilePath()};
+		}
+				
 		float[][][] ctMatrix = FileUtils.readFile3D(fileName);
 		execGauss(ctMatrix, sigma);
 		threshold = 0.0019760127f;
@@ -19,7 +36,8 @@ public class ModelCreatorJava {
 		execNormalization(ctMatrix, 65536.0);
 		float[] vertices = execMarchingCubes(ctMatrix, isolevel);
 		int[] nTriangles = new int[] { vertices.length / 9 };
-		return new Object[] { IntBuffer.wrap(nTriangles), FloatBuffer.wrap(vertices), null, (float) isolevel, "Marching Cubes" };
+		
+		return new Object[] { IntBuffer.wrap(nTriangles), FloatBuffer.wrap(vertices), null, (float) isolevel, meshCreationInfo };
 	}
 
 	private static void execNormalization(float[][][] ctMatrix, double max) {

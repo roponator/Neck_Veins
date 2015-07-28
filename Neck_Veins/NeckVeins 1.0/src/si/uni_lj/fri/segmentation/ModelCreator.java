@@ -1,8 +1,11 @@
 package si.uni_lj.fri.segmentation;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.lwjgl.BufferUtils;
@@ -22,6 +25,7 @@ import si.uni_lj.fri.segmentation.utils.CLUtils;
 import si.uni_lj.fri.segmentation.utils.FileUtils;
 import si.uni_lj.fri.segmentation.utils.Graytresh;
 import si.uni_lj.fri.segmentation.utils.Utils;
+import si.uni_lj.fri.veins3D.gui.render.models.MeshCreationInfo;
 
 /**
  * TODO FIX execFindMax, REFACTOR
@@ -45,7 +49,8 @@ public class ModelCreator {
 	private static float max = 0;
 	private static CLMem[] staticMemory;
 
-	
+	static double m_sigma = 0.0;
+	static  String m_fileName = "";
 	
 	public ModelCreator() {
 	}
@@ -53,6 +58,7 @@ public class ModelCreator {
 	
 	/**
 	 * Called when loading from file
+	 * Returns an output of length one if an obj file for these presets exists.
 	 * 
 	 * @param fileName
 	 * @param sigma
@@ -61,6 +67,21 @@ public class ModelCreator {
 	 * @throws LWJGLException
 	 */
 	public static Object[] createModel(String fileName, double sigma, double threshold) throws LWJGLException {
+		m_sigma = sigma;
+		m_fileName = fileName;
+		
+		// create mesh info
+		String fileNameOnly = MeshCreationInfo.GetFileNameOnlyFromPath(fileName);
+		MeshCreationInfo.InfoMarchingCubes meshCreationInfo= new MeshCreationInfo.InfoMarchingCubes(fileNameOnly, sigma, threshold);
+		
+		// check if the obj  file exists for this model params: if it does, return one output.
+		File existingObjFile = new File(meshCreationInfo.GetObjFilePath());
+		if(existingObjFile.exists())
+		{
+			System.out.println("createModel (CPU MARCHING CUBES): obj file exists, using obj file..");
+			return new Object[]{meshCreationInfo.GetObjFilePath()};
+		}
+		
 		System.out.println("createModel on Graphics Card (marching cubes)...");
 		clearOldProgram();
 		initializeCL();
@@ -72,7 +93,7 @@ public class ModelCreator {
 		Utils.endTime(t, "Max");
 		System.out.println(max);
 		threshold = execOtsuThreshold((float) threshold);
-		Object[] output = execMarchingCubes((float) threshold);
+		Object[] output = execMarchingCubes(meshCreationInfo,(float) threshold);
 		return output;
 	}
 
@@ -87,8 +108,12 @@ public class ModelCreator {
 	 * @throws LWJGLException
 	 */
 	public static Object[] changeModel(double threshold) throws LWJGLException {
+		// create mesh info
+		String fileNameOnly = MeshCreationInfo.GetFileNameOnlyFromPath(m_fileName);
+		MeshCreationInfo.InfoMarchingCubes meshCreationInfo= new MeshCreationInfo.InfoMarchingCubes(fileNameOnly, m_sigma, threshold);
+
 		System.out.println("Marching cubes on GPU...");
-		return execMarchingCubes((float) threshold);
+		return execMarchingCubes(meshCreationInfo, (float) threshold);
 	}
 
 	private static void execGauss3D(double sigma) {
@@ -204,7 +229,7 @@ public class ModelCreator {
 		return histogram;
 	}
 
-	private static Object[] execMarchingCubes(float threshold) {
+	private static Object[] execMarchingCubes(MeshCreationInfo.InfoMarchingCubes meshCreationInfo,float threshold) {
 		CLKernel marchingKernel = CL10.clCreateKernel(program, "marchingCubes", null);
 		CLMem maxThreshMemory = CLUtils.locateMemory(new float[] { max, threshold }, CL10.CL_MEM_READ_WRITE, queue,
 				context);
@@ -234,7 +259,7 @@ public class ModelCreator {
 		CLKernel[] kernelObj = { marchingKernel };
 		CLUtils.cleanCLResources(memObj, kernelObj, null);
 
-		return new Object[] { nTrianglesBuff, trianglesBuff, normalsBuff, threshold };
+		return new Object[] { nTrianglesBuff, trianglesBuff, normalsBuff, threshold, meshCreationInfo };
 
 	}
 

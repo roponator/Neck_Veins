@@ -1,7 +1,10 @@
 package si.uni_lj.fri.segmentation;
 
+import java.io.File;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -11,6 +14,7 @@ import si.uni_lj.fri.segmentation.utils.Gauss3D;
 import si.uni_lj.fri.segmentation.utils.Graytresh;
 import si.uni_lj.fri.segmentation.utils.MarchingCubes;
 import si.uni_lj.fri.segmentation.utils.PointCloud;
+import si.uni_lj.fri.veins3D.gui.render.models.MeshCreationInfo;
 import si.uni_lj.fri.MPU_Implicits.Configuration;
 
 public class ModelCreatorMPUI {
@@ -42,7 +46,21 @@ public class ModelCreatorMPUI {
 		return m;
 	}
 	
+	// Returns only one String in output if the obj file with these presets already exists.
 	public static Object[] createModel(String fileName, double sigma, double threshold) {
+		// Create mesh info
+		String fileNameOnly = MeshCreationInfo.GetFileNameOnlyFromPath(fileName);
+		MeshCreationInfo.InfoMPUI meshCreationInfo= new MeshCreationInfo.InfoMPUI(fileNameOnly, sigma, threshold,
+		Configuration.__APLHA,Configuration.__LAMBDA,Configuration.__ERROR,Configuration.__RESOLUTION,Configuration.__POINT_CLOUD );
+	
+		// check if the obj  file exists for this model params: if it does, return one output.
+		File existingObjFile = new File(meshCreationInfo.GetObjFilePath());
+		if(existingObjFile.exists())
+		{
+			System.out.println("createModel (MPUI): obj file exists, using obj file..");
+			return new Object[]{meshCreationInfo.GetObjFilePath()};
+		}
+		
 		System.out.println("createModel (MPUI)...");
 		//float[][][] ctMatrix = FileUtils.readFile3D(fileName);
 		float[][][] ctMatrix = testMatrix();
@@ -53,7 +71,7 @@ public class ModelCreatorMPUI {
 		float res = Configuration.__RESOLUTION;
 		boolean cubes = true;
 		boolean pointCloud = Configuration.__POINT_CLOUD;
-		String s = "";
+		//String s = "";
 
 		
 		// TODO: UNCOMMENT
@@ -80,9 +98,9 @@ public class ModelCreatorMPUI {
 		
 		//MPUI + POLYGONIZATION
 		if(!pointCloud && voxelVertices.length > 10){
-			s+="MPU alpha_"+Math.round(alpha * 100.0)+" error_"+Math.round(error*10000)+ " tresh_"+Math.round(threshold*10000)+ " res_"+Math.round(res*10000);
-			if(cubes) s += " CUBES";
-			else s+= "TETRA";
+			//s+="MPU alpha_"+Math.round(alpha * 100.0)+" error_"+Math.round(error*10000)+ " tresh_"+Math.round(threshold*10000)+ " res_"+Math.round(res*10000);
+			//if(cubes) s += " CUBES";
+			//else s+= "TETRA";
 
 			MPUI mpu = new MPUI(alpha, lambda, error, cubes, res, voxelVertices, voxelNormals, ctMatrix.length, ctMatrix[0].length, ctMatrix[0][0].length );
 			mpuiMeshVertices = mpu.getOutputVertices();
@@ -90,11 +108,12 @@ public class ModelCreatorMPUI {
 		
 		}else{
 			
-			s+="Point Cloud tresh_"+Math.round(threshold*10000);
-			
+			//s+="Point Cloud tresh_"+Math.round(threshold*10000);			
 		}
+		
+	
 		int[] nTriangles = new int[] { mpuiMeshVertices.length / 9 };
-		return new Object[] { IntBuffer.wrap(nTriangles), FloatBuffer.wrap(mpuiMeshVertices), mpuiMeshNormals, (float) isolevel, s,voxelVertices,voxelNormals };
+		return new Object[] { IntBuffer.wrap(nTriangles), FloatBuffer.wrap(mpuiMeshVertices), mpuiMeshNormals, (float) isolevel, meshCreationInfo,voxelVertices,voxelNormals };
 	}
 
 	private static void execNormalization(float[][][] ctMatrix, double max) {
