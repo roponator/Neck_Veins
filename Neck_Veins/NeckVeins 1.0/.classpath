@@ -20,7 +20,7 @@
 	<classpathentry kind="lib" path="libs/xpp3-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lwjgl-2.8.4/jar/jinput.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="NeckVeins 1.0/lwjgl-2.8.4/native/windows"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="NeckVeins 1.0/lwjgl-2.8.4/native"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="libs/LeapJava.jar">

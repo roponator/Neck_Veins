@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project NeckVeins 1.0 with libraries in sub-folder">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <target name="create_run_jar">
+        <jar destfile="C:/Users/ropo/Desktop/distr/program/veins.jar">
+            <manifest>
+                <attribute name="Main-Class" value="si.uni_lj.fri.veins3D.gui.Main"/>
+                <attribute name="Class-Path" value=". veins_lib/lwjgl_util.jar veins_lib/lwjgl.jar veins_lib/TWL.jar veins_lib/slick-util.jar veins_lib/xpp3-1.1.4c.jar veins_lib/jinput.jar veins_lib/LeapJava.jar veins_lib/EJML-core-0.27.jar veins_lib/EJML-simple-0.27.jar veins_lib/EJML-dense64-0.27.jar veins_lib/EJML-denseC64-0.27.jar veins_lib/EJML-equation-0.27.jar"/>
+            </manifest>
+            <fileset dir="bin"/>
+        </jar>
+        <delete dir="platform_build"/>
+        <mkdir dir="platform_build/program/veins_lib"/>
+        <copy file="lwjgl-2.8.4/jar/lwjgl_util.jar" todir="C:/Users/ropo/Desktop/distr/program/veins_lib"/>
+        <copy file="lwjgl-2.8.4/jar/lwjgl.jar" todir="C:/Users/ropo/Desktop/distr/program/veins_lib"/>
+        <copy file="libs/TWL.jar" todir="C:/Users/ropo/Desktop/distr/program/veins_lib"/>
+        <copy file="libs/slick-util.jar" todir="C:/Users/ropo/Desktop/distr/program/veins_lib"/>
+        <copy file="libs/xpp3-1.1.4c.jar" todir="C:/Users/ropo/Desktop/distr/program/veins_lib"/>
+        <copy file="lwjgl-2.8.4/jar/jinput.jar" todir="C:/Users/ropo/Desktop/distr/program/veins_lib"/>
+        <copy file="libs/LeapJava.jar" todir="C:/Users/ropo/Desktop/distr/program/veins_lib"/>
+        <copy file="libs/ejml-v0.27-libs/EJML-core-0.27.jar" todir="C:/Users/ropo/Desktop/distr/program/veins_lib"/>
+        <copy file="libs/ejml-v0.27-libs/EJML-simple-0.27.jar" todir="C:/Users/ropo/Desktop/distr/program/veins_lib"/>
+        <copy file="libs/ejml-v0.27-libs/EJML-dense64-0.27.jar" todir="C:/Users/ropo/Desktop/distr/program/veins_lib"/>
+        <copy file="libs/ejml-v0.27-libs/EJML-denseC64-0.27.jar" todir="C:/Users/ropo/Desktop/distr/program/veins_lib"/>
+        <copy file="libs/ejml-v0.27-libs/EJML-equation-0.27.jar" todir="C:/Users/ropo/Desktop/distr/program/veins_lib"/>
+       
+        <copy todir="C:/Users/ropo/Desktop/distr/program/native" >     <fileset dir="lwjgl-2.8.4/native" includes="**"/>  </copy>
+ 		
+ 		<copy todir="C:/Users/ropo/Desktop/distr" >   <fileset dir="build_additional_files" includes="**"/>  </copy>
+ 
+    
+    </target>
+</project>

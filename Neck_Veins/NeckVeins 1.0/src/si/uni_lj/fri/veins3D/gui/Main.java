@@ -12,14 +12,15 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args)
-	{		
-		setLWJGLNativeLibBindings(); // must be called first
-		
+	{		  
+		//System.setProperty("org.lwjgl.librarypath", new File("native").getAbsolutePath());
+		//setLWJGLNativeLibBindings(); // must be called first
+		//System.setProperty("org.lwjgl.librarypath", new File("lwjgl-2.8.4/native").getAbsolutePath());	
 		new VeinsWindow().mainLoop();
 	}
 	
 	// sets the native bindings for LWJGL based on which OS this app is ran on
-	static void setLWJGLNativeLibBindings()
+	/*static void setLWJGLNativeLibBindings()
 	{
 		if (OSValidator.isWindows()) 
 		{
@@ -47,7 +48,7 @@ public class Main {
 			JOptionPane.showMessageDialog(null,"Your OS is not supported!", "Error" , JOptionPane.INFORMATION_MESSAGE);
 		}
 		
-	}
+	}*/
 	
 	
 }
