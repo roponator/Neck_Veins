@@ -37,6 +37,7 @@
         This is a very simple looking theme using a fake 3d look and shades of gray.
         It can be used as a base for new applications / projects.
 --><themes>
+	
     <images file="../imgs/simple.png" format="COLOR">
         <area name="-borderA" border="3" xywh="0,0,9,9" splitx="L3,R3" splity="T3,B3"/>
         <area name="-borderB" border="3" xywh="10,0,9,9" splitx="L3,R3" splity="T3,B3"/>
@@ -382,18 +383,46 @@
         <theme name="" ref="*"/>
     </theme>
 
+    
+    
     <!-- the fallback theme is used when the requested theme can't be found -->
     <theme name="*" ref="-defaults"/>
-    <theme name="mainframe" ref="-defaults"/>
+    <theme name="mainframe" ref="-defaults">
+        <param name="defaultGap"><dimension>5,5</dimension></param>
+        <param name="smallGap"><dimension>8,8</dimension></param>
+        <param name="mediumGap"><dimension>10,10</dimension></param>
+        <param name="largeGap"><dimension>15,15</dimension></param>
+        <param name="namedGaps"><map/></param>
+    </theme>
+
     
-    
-    
-    
+      
     <theme name="button" ref="-defaults" allowWildcard="true">
         <param name=""><image>button.*</image></param>
         <param name="border"><border>background.border</border></param>
         <param name="textAlignment"><enum type="alignment">center</enum></param>
+         <param name="minWidth"><int>20</int></param>
+          <param name="minHeight"><int>40</int></param>
     </theme>
+    
+      <theme name="popupMenuButton" ref="button"> 
+              
+        <param name="border"><border>background.border</border></param>
+        <param name="textAlignment"><enum type="alignment">left</enum></param>
+      
+    </theme>
+    
+    <theme name="mainmenu" ref="mainframe">
+           <param name="background"><image>-iconC</image></param>
+            <param name="border"><border>background.border</border></param>
+            <theme name="submenu" ref="popupMenuButton"/>
+            <theme name="button" ref="popupMenuButton"/>
+            <param name="namedGaps"><map>
+                <param name="menuitem"><gap>5</gap></param>
+            </map></param>
+        </theme>
+
+  
 
     <theme name="togglebutton" ref="button" allowWildcard="true">
         <param name=""><image>togglebutton.*</image></param>
@@ -568,6 +597,7 @@
         <param name="mediumGap"><dimension>10,10</dimension></param>
         <param name="largeGap"><dimension>15,15</dimension></param>
         <param name="namedGaps"><map/></param>
+		
     </theme>
     
     <theme name="borderlayout" ref="-defaults" allowWildcard="true">
