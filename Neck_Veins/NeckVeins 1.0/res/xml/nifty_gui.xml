@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<nifty xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://nifty-gui.lessvoid.com/nifty-gui" xsi:schemaLocation="https://raw.githubusercontent.com/void256/nifty-gui/1.4/nifty-core/src/main/resources/nifty.xsd https://raw.githubusercontent.com/void256/nifty-gui/1.4/nifty-core/src/main/resources/nifty.xsd">
+    <useControls filename="nifty-default-controls.xml"/>
+    <useStyles filename="nifty-default-styles.xml"/>
+    <screen id="GScreen0">
+        <layer id="GLayer0" childLayout="absolute">
+            <panel id="GPanel0" childLayout="horizontal" width="100.0%" x="20" y="36" style="nifty-panel-simple" valign="top" align="center" height="32.0px">
+                <control name="button" id="GButton0" childLayout="center" label="GButton0"/>
+                <control name="button" id="GButton1" childLayout="center" label="GButton1"/>
+            </panel>
+            <control name="radioButton" id="GRadioButton0" x="317" y="137"/>
+        </layer>
+    </screen>
+</nifty>

@@ -2,7 +2,7 @@ package si.uni_lj.fri.veins3D.gui.render.models;
 
 import org.lwjgl.input.Mouse;
 
-import si.uni_lj.fri.veins3D.gui.VeinsWindow;
+
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import si.uni_lj.fri.veins3D.math.Vector;

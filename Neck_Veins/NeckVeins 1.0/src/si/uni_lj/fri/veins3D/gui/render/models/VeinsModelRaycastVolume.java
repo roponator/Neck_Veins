@@ -32,7 +32,6 @@ import si.uni_lj.fri.segmentation.utils.LabelUtil;
 import si.uni_lj.fri.segmentation.utils.TrianglesLabelHelper;
 import si.uni_lj.fri.segmentation.utils.obj.Triangle;
 import si.uni_lj.fri.segmentation.utils.obj.Vertex;
-import si.uni_lj.fri.veins3D.gui.VeinsWindow;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import si.uni_lj.fri.veins3D.math.Vector;

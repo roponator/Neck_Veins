@@ -68,7 +68,7 @@ import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelRaycastVolume;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 
-public class VeinsRenderer extends LWJGLRenderer {
+public class VeinsRenderer  {
 	public static final int FIXED_PIPELINE = -1;
 	public static final int SIMPLE_SHADER = 0;
 	public static final int SIMPLE_SHADER_NORM_INTERP = 1;
@@ -101,7 +101,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 	private int[] fragmentShaders;
 
 	public VeinsRenderer() throws LWJGLException {
-		super();
+		
 		cam = new Camera();
 		activeShaderProgram = 4;
 		isWireframeOn = false;
@@ -121,6 +121,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 		GLU.gluPerspective(FOV_Y, VeinsWindow.settings.resWidth / (float) VeinsWindow.settings.resHeight, Z_NEAR, Z_FAR);
 		glShadeModel(GL_SMOOTH);
 		setCameraAndLight(0);
+		
 	}
 
 	/**
@@ -242,7 +243,7 @@ public class VeinsRenderer extends LWJGLRenderer {
 			StringBuilder vertexShaderSource = new StringBuilder();
 			StringBuilder fragmentShaderSource = new StringBuilder();
 
-			try {
+		try {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(
 						VeinsWindow.class.getResourceAsStream(path + "shader" + i + ".vert")));
 				String line;
@@ -287,9 +288,11 @@ public class VeinsRenderer extends LWJGLRenderer {
 			glDetachShader(shaderPrograms[i], vertexShaders[i]); // must unbind all, otherwise raycaster tries to use it and renders nothing
 			glDetachShader(shaderPrograms[i], fragmentShaders[i]);
 			
-			System.out.println("Vertex shader" + i + " info: " + glGetShaderInfoLog(vertexShaders[i], 999));
-			System.out.println("Fragment shader" + i + " info: " + glGetShaderInfoLog(fragmentShaders[i], 999));
-			System.out.println("Shader program" + i + " info: " + glGetShaderInfoLog(shaderPrograms[i], 999));
+			// DONT PRINT CAUSES CRASH, NOT SURE WHY, STARTED HAPPENING WHEN SWITCHED TO NIFTY, 
+			// MAYBE BECAUSE SHADERS ARE DETACHED
+			//System.out.println("Vertex shader" + i + " info: " + glGetShaderInfoLog(vertexShaders[i], 999));
+			//System.out.println("Fragment shader" + i + " info: " + glGetShaderInfoLog(fragmentShaders[i], 999));
+			//System.out.println("Shader program" + i + " info: " + glGetShaderInfoLog(shaderPrograms[i], 999));
 		}
 	}
 	
