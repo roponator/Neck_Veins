@@ -41,7 +41,10 @@ import de.lessvoid.nifty.builder.TextBuilder;
 import de.lessvoid.nifty.controls.ButtonClickedEvent;
 import de.lessvoid.nifty.controls.button.builder.ButtonBuilder;
 import de.lessvoid.nifty.nulldevice.NullSoundDevice;
+import de.lessvoid.nifty.render.batch.BatchRenderConfiguration;
 import de.lessvoid.nifty.render.batch.BatchRenderDevice;
+import de.lessvoid.nifty.render.batch.core.BatchRenderBackendCoreProfileInternal;
+import de.lessvoid.nifty.render.batch.spi.BatchRenderBackend;
 import de.lessvoid.nifty.render.batch.spi.GL;
 import de.lessvoid.nifty.renderer.lwjgl.input.LwjglInputSystem;
 import de.lessvoid.nifty.renderer.lwjgl.render.LwjglBatchRenderBackendCoreProfileFactory;
@@ -51,6 +54,7 @@ import de.lessvoid.nifty.screen.ScreenController;
 import de.lessvoid.nifty.spi.time.impl.AccurateTimeProvider;
 import de.lessvoid.nifty.tools.Color;
 import de.lessvoid.nifty.tools.SizeValue;
+import de.lessvoid.nifty.tools.resourceloader.NiftyResourceLoader;
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.HUD;
 import si.uni_lj.fri.veins3D.gui.GUIMain;
@@ -127,15 +131,25 @@ public class VeinsWindow
 		// Init nifty
 		try
 		{
-			Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); // spams console a lot otherwise
+			//Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); // spams console a lot otherwise
 			inputSystem = new LwjglInputSystem();
 			inputSystem.startup();
-			nifty = new Nifty(new BatchRenderDevice(LwjglBatchRenderBackendCoreProfileFactory.create()), new NullSoundDevice(), inputSystem, new AccurateTimeProvider());
+			//BatchRenderConfiguration.DEFAULT_USE_HIGH_QUALITY_TEXTURES=true;
+			BatchRenderBackendCoreProfileInternal niftyRenderFactory = (BatchRenderBackendCoreProfileInternal)LwjglBatchRenderBackendCoreProfileFactory.create();
+			niftyRenderFactory.useHighQualityTextures(true); 
+			
+			BatchRenderDevice niftyRenderer = new BatchRenderDevice(niftyRenderFactory);
+			niftyRenderFactory.useHighQualityTextures(true); 
+			
+			nifty = new Nifty(niftyRenderer, new NullSoundDevice(), inputSystem, new AccurateTimeProvider());
+			niftyRenderFactory.useHighQualityTextures(true); 
 			
 			System.out.println("**NIFTY FROM XML*********************");
 			nifty.fromXml("0", ResourceLoader.getResourceAsStream("xml/nifty_gui.xml"), "GScreen0");
 			System.out.println("**NIFTY FROM XML DONE*********************");
-
+			
+			
+			
 		}
 		catch (Exception e)
 		{
@@ -144,6 +158,7 @@ public class VeinsWindow
 		}
 
 	}
+	
 
 	private void loadSettings(String fileName)
 	{

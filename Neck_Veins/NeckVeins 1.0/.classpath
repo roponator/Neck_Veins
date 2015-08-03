@@ -19,10 +19,7 @@
 	<classpathentry kind="lib" path="libs/nifty-1.4.1/dependencies/eventbus-1.4.jar"/>
 	<classpathentry kind="lib" path="libs/nifty-1.4.1/dependencies/jglfont-core-1.4.jar"/>
 	<classpathentry kind="lib" path="libs/nifty-1.4.1/dependencies/jorbis-0.0.17.jar"/>
-	<classpathentry kind="lib" path="libs/nifty-1.4.1/nifty-style-black-1.4.1.jar"/>
 	<classpathentry kind="lib" path="libs/nifty-1.4.1/nifty-1.4.1.jar" sourcepath="libs/nifty-1.4.1/nifty-1.4.1-sources.jar"/>
-	<classpathentry kind="lib" path="libs/nifty-1.4.1/nifty-default-controls-1.4.1.jar" sourcepath="libs/nifty-1.4.1/nifty-default-controls-1.4.1-sources.jar"/>
-	<classpathentry kind="lib" path="libs/nifty-1.4.1/nifty-lwjgl-renderer-1.4.1.jar" sourcepath="libs/nifty-1.4.1/nifty-lwjgl-renderer-1.4.1-sources.jar"/>
 	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/AppleJavaExtensions.jar"/>
 	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/jinput.jar"/>
 	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/laf-plugin-7.2.1.jar"/>

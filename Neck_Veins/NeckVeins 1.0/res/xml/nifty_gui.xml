@@ -5,33 +5,66 @@
 
     	 
 	 <!-- base="nifty-panel-simple" -->
-    <style id="STYLE_SQUARE_CORNER"   >
+	 
+	  <!-- PADDING ORDER: top,right,down,left? -->
+	 
+	 <!-- ******************************************* -->
+	 <!-- Top menu bar styles -->
+	 <!-- ******************************************* -->
+	 
+	 <!-- ******************************************* -->
+	 <!-- Settings side menu styles -->
+	 <!-- ******************************************* -->
+	 
+    <style id="STYLE_TOP_MENU_BAR_PANEL"   >
         <attributes 
-           backgroundImage="imgs\simple.png" 
+           backgroundImage="imgs\new_gui\rect_gray_long_ver.png"  filter="true"
            imageMode="normal"/>
     </style>
     
     
+     <style id="STYLE_TOP_MENU_BUTTON"   >
+        <attributes 
+            backgroundImage="" 
+            imageMode="normal"
+        	padding="0px,21px,0px,21px"   	
+        />
+        
+       	<effect>
+			<onHover name="imageOverlay" filename="imgs/new_gui/rect_green_long.png" imageMode="normal" post="true" />
+		</effect>	        
+    </style>
+    
+    <style id="STYLE_TOP_MENU_BUTTON#text" base="button-font">
+   		<attributes align="center" valign="center" textHAlign="center" textVAlign="center" visibleToMouse="false" color="#ffff" />
+ 	</style>
+    
+    
     <screen id="GScreen0"  controller="si.uni_lj.fri.veins3D.gui.NiftyScreenController">
       
-             
+	    <!-- ******************************************* -->
+		<!-- Top menu bar controls -->
+		<!-- ******************************************* -->
         <layer id="LAYER_TOP_MENU_BAR" childLayout="absolute">
-            <panel id="GPanel1" childLayout="horizontal" width="100.0%" x="3" y="6" style="nifty-panel-simple" valign="top" height="42.0px">
+            <panel id="GPanel1" style="STYLE_TOP_MENU_BAR_PANEL" childLayout="horizontal" width="100.0%" x="0" y="0" valign="top" height="42.0px">
                
-                <image id="GImage2" childLayout="center" filename="imgs\simple.png" width="81.0px" x="0.0px" y="0.0px" valign="center" align="left" height="42.0px"/>
+                <image id="GImage2" childLayout="center" filename="imgs\new_gui\ico_gray_background.png" width="81.0px" x="0.0px" y="0.0px" valign="center" align="left" height="42.0px" filter="true"/>
                 
-                <control name="button" id="GButton0" childLayout="center" x="24" y="12" valign="center" label="GButton0" align="left" height="42.0px">
-                	<interact onClick="onBtn(bla)"/>
+                <control name="button" id="BUTTON_TOP_MENU_OPEN" style="STYLE_TOP_MENU_BUTTON" childLayout="center" x="24" y="12" valign="center" label="File" align="left" height="42.0px">
+                	<interact onClick="onBtn(bla)"/>        	
                 </control>
                 
-                <control name="button" id="GButton0Cloned(6)" childLayout="center" x="24" y="12" valign="center" label="GButton0" align="left" height="42.0px"/>
+                <control name="button" id="BUTTON_TOP_MENU_OPTIONS" style="STYLE_TOP_MENU_BUTTON" childLayout="center" x="24" y="12" valign="center" label="Options" align="left" height="42.0px"/>
                
-                <control name="button" id="GButton0Cloned(7)" childLayout="center" x="24" y="12" valign="center" label="GButton0" align="left" height="42.0px"/>
+                <control name="button" id="BUTTON_TOP_MENU_HELP" style="STYLE_TOP_MENU_BUTTON" childLayout="center" x="24" y="12" valign="center" label="Help" align="left" height="42.0px"/>
                
                 </panel>
          
         </layer>
        
+        <!-- ******************************************* -->
+		<!-- Settings side menu panel -->
+		<!-- ******************************************* -->
         <layer id="LAYER_SIDE_SETTINGS_MENU" childLayout="absolute">
             <panel id="PANEL_SIDE_SETTINGS_MENU" childLayout="absolute" width="170px" x="59" y="148" style="nifty-panel-simple" height="30%">
             	<effect>
