@@ -61,10 +61,10 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.GLU;
 
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
-import si.uni_lj.fri.veins3D.gui.VeinsWindow;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelMesh;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelRaycastVolume;
+import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 

@@ -28,9 +28,12 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 
 
+
+
+
 import org.lwjgl.opengl.GL11;
 
-import si.uni_lj.fri.veins3D.gui.VeinsWindow;
+import si.uni_lj.fri.veins3D.main.VeinsWindow;
 
 public class StencilMask {
 

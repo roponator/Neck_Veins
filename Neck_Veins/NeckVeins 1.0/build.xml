@@ -14,7 +14,7 @@
             <fileset dir="bin"/>
         </jar>
        
-        <copy file="lwjgl-2.8.4/jar/lwjgl_util.jar" todir="platform_build/program/veins_lib"/>
+        <copy file="lwjgl-2.9.3/jar/lwjgl_util.jar" todir="platform_build/program/veins_lib"/>
         <copy file="lwjgl-2.8.4/jar/lwjgl.jar" todir="platform_build/program/veins_lib"/>
         <copy file="libs/TWL.jar" todir="platform_build/program/veins_lib"/>
         <copy file="libs/slick-util.jar" todir="platform_build/program/veins_lib"/>

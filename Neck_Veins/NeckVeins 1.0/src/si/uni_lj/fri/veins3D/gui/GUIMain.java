@@ -8,12 +8,15 @@ import org.lwjgl.opencl.OpenCLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
+import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.elements.Element;
 import si.uni_lj.fri.segmentation.ModelCreatorSettings;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelMesh;
+import si.uni_lj.fri.veins3D.main.VeinsWindow;
 
-public class VeinsFrame
+public class GUIMain
 {
 	private enum Message
 	{
@@ -33,31 +36,25 @@ public class VeinsFrame
 	private DisplayMode currentDisplayMode;
 
 
+	
+	
 	private MeshGenerationMethod meshGenerationMethod = MeshGenerationMethod.MARCHING_CUBES_OR_OBJ;
 
-	// NEW UI
 
-	// NEW UI END
-
-	public VeinsFrame() throws LWJGLException
+	public GUIMain() throws LWJGLException
 	{
 		getDisplayModes();
-		initGUI();
+		//initGUI();
 
-	
 	}
+	
+	
 
 	private void getDisplayModes() throws LWJGLException
 	{
 		displayModes = Display.getAvailableDisplayModes();
 		currentDisplayMode = Display.getDisplayMode();
 	}
-
-	private void initGUI()
-	{
-		
-	}
-
 
 
 

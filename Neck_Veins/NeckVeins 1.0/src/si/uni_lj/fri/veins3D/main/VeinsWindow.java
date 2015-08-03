@@ -1,6 +1,7 @@
-package si.uni_lj.fri.veins3D.gui;
+package si.uni_lj.fri.veins3D.main;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Locale;
 
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
@@ -26,6 +29,7 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
+import org.newdawn.slick.util.ResourceLoader;
 
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
@@ -48,16 +52,15 @@ import de.lessvoid.nifty.spi.time.impl.AccurateTimeProvider;
 import de.lessvoid.nifty.tools.Color;
 import de.lessvoid.nifty.tools.SizeValue;
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
+import si.uni_lj.fri.veins3D.gui.HUD;
+import si.uni_lj.fri.veins3D.gui.GUIMain;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import si.uni_lj.fri.veins3D.utils.Mouse3D;
 import si.uni_lj.fri.veins3D.utils.RayUtil;
 import si.uni_lj.fri.veins3D.utils.SettingsUtil;
-
 import static org.lwjgl.opengl.GL11.*;
-
-
 
 public class VeinsWindow
 {
@@ -71,7 +74,7 @@ public class VeinsWindow
 
 	public static NeckVeinsSettings settings;
 
-	private VeinsFrame frame;
+	
 	private VeinsRenderer renderer;
 	LwjglInputSystem inputSystem;
 	private HUD hud;
@@ -85,8 +88,10 @@ public class VeinsWindow
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
 	public static Mouse3D joystick;
-	public Nifty nifty = null;
-
+	
+	public static Nifty nifty = null; // So it can be accessed from outside
+	public static GUIMain gui = null; // So it can be accessed from outside
+	
 	/**
 	 * 
 	 */
@@ -122,21 +127,14 @@ public class VeinsWindow
 		// Init nifty
 		try
 		{
-
+			Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); // spams console a lot otherwise
 			inputSystem = new LwjglInputSystem();
 			inputSystem.startup();
-			nifty = new Nifty(new BatchRenderDevice(
-					LwjglBatchRenderBackendCoreProfileFactory.create()),
-					new NullSoundDevice(), inputSystem,
-					new AccurateTimeProvider());
-
-			// String s = VeinsFrame.class.getResource("/xml/nifty_gui.xml")
-			// .getFile();
-			nifty.loadStyleFile("nifty-default-styles.xml");
-			nifty.loadControlFile("nifty-default-controls.xml");
-			createIntroScreen(nifty, new MyScreenController());
-			nifty.gotoScreen("start");
-			// nifty.gotoScreen("GScreen0");
+			nifty = new Nifty(new BatchRenderDevice(LwjglBatchRenderBackendCoreProfileFactory.create()), new NullSoundDevice(), inputSystem, new AccurateTimeProvider());
+			
+			System.out.println("**NIFTY FROM XML*********************");
+			nifty.fromXml("0", ResourceLoader.getResourceAsStream("xml/nifty_gui.xml"), "GScreen0");
+			System.out.println("**NIFTY FROM XML DONE*********************");
 
 		}
 		catch (Exception e)
@@ -145,85 +143,6 @@ public class VeinsWindow
 			e.printStackTrace();
 		}
 
-	}
-
-	public static class MyScreenController extends DefaultScreenController
-	{
-		@NiftyEventSubscriber(id = "exit")
-		public void exit(final String id, final ButtonClickedEvent event)
-		{
-			nifty.exit();
-		}
-	}
-
-	private static Screen createIntroScreen(final Nifty nifty,
-			final ScreenController controller)
-	{
-		return new ScreenBuilder("start")
-		{
-			{
-				controller(controller);
-				layer(new LayerBuilder("layer")
-				{
-					{
-						childLayoutCenter();
-						onStartScreenEffect(new EffectBuilder("fade")
-						{
-							{
-								length(500);
-								effectParameter("start", "#0");
-								effectParameter("end", "#f");
-							}
-						});
-						onEndScreenEffect(new EffectBuilder("fade")
-						{
-							{
-								length(500);
-								effectParameter("start", "#f");
-								effectParameter("end", "#0");
-							}
-						});
-						onActiveEffect(new EffectBuilder("gradient")
-						{
-							{
-								effectValue("offset", "0%", "color", "#333f");
-								effectValue("offset", "100%", "color", "#ffff");
-							}
-						});
-						panel(new PanelBuilder()
-						{
-							{
-								childLayoutVertical();
-								text(new TextBuilder()
-								{
-									{
-										text("Nifty 1.4 Core Hello World");
-										style("base-font");
-										color(Color.BLACK);
-										alignCenter();
-										valignCenter();
-									}
-								});
-								panel(new PanelBuilder()
-								{
-									{
-										height(SizeValue.px(10));
-									}
-								});
-								control(new ButtonBuilder("exit",
-										"Pretty Cool!")
-								{
-									{
-										alignCenter();
-										valignCenter();
-									}
-								});
-							}
-						});
-					}
-				});
-			}
-		}.build(nifty);
 	}
 
 	private void loadSettings(String fileName)
@@ -238,10 +157,7 @@ public class VeinsWindow
 			{
 				for (DisplayMode mode : displayModes)
 				{
-					if (mode.getWidth() == settings.resWidth
-							&& mode.getHeight() == settings.resHeight
-							&& mode.getBitsPerPixel() == settings.bitsPerPixel
-							&& mode.getFrequency() == settings.frequency)
+					if (mode.getWidth() == settings.resWidth && mode.getHeight() == settings.resHeight && mode.getBitsPerPixel() == settings.bitsPerPixel && mode.getFrequency() == settings.frequency)
 					{
 						currentDisplayMode = mode;
 					}
@@ -282,9 +198,9 @@ public class VeinsWindow
 			Display.setTitle(title);
 			Display.setVSyncEnabled(true);
 			Display.setDisplayMode(new DisplayMode(1024, 1024));
-			//Display.create(new PixelFormat().withStencilBits(1));
+			// Display.create(new PixelFormat().withStencilBits(1));
 			Display.create(new PixelFormat(), new ContextAttribs(2, 0));
-		    
+
 			// Display.create();
 		}
 		catch (LWJGLException e)
@@ -303,7 +219,7 @@ public class VeinsWindow
 		{
 			hud = new HUD();
 			renderer = new VeinsRenderer();
-			frame = new VeinsFrame();
+			gui = new GUIMain();
 			joystick = new Mouse3D(settings);
 		}
 		catch (LWJGLException e)
@@ -350,29 +266,33 @@ public class VeinsWindow
 
 		while (!Display.isCloseRequested() && isRunning)
 		{
+			// Strange render loop
+			boolean done = false;
 
-			renderer.setupView(); // raycast volume renderer changes some
-									// states, theys must be reset
-			renderer.clearView();
+			// renderer.setupView(); // raycast volume renderer changes some
+			// states, theys must be reset
+			// renderer.clearView();
 
-			pollInput();
+			// pollInput();
 			// hud.setClickedOn(clickedOn);
 
-			renderer.render();
+			// renderer.render();
 
 			// hud.drawHUD();
 			setTitle();
 
 			// TODO: PRESENT ORDER: BEFORE OR AFTER NIFTY.RENDER?
-			//Display.update();
+			// Display.update();
 			// logic();
 
 			glDisable(GL_CULL_FACE);
 			glDisable(GL_DEPTH_TEST);
+
+			nifty.update();
 			nifty.render(true); // TODO: THROWS ERROR ON FIRST FRAME??
 			Display.update();
-			
-			 Display.sync(settings.frequency); // TODO NIFTY
+
+			Display.sync(settings.frequency); // TODO NIFTY
 
 			int error = GL11.glGetError();
 			if (error != GL11.GL_NO_ERROR)
@@ -481,13 +401,11 @@ public class VeinsWindow
 				{
 					renderer.switchWireframe();
 				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_ADD
-						&& renderer.getVeinsModel() != null)
+				else if (Keyboard.getEventKey() == Keyboard.KEY_ADD && renderer.getVeinsModel() != null)
 				{
 					renderer.getVeinsModel().increaseSubdivisionDepth();
 				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_SUBTRACT
-						&& renderer.getVeinsModel() != null)
+				else if (Keyboard.getEventKey() == Keyboard.KEY_SUBTRACT && renderer.getVeinsModel() != null)
 				{
 					renderer.getVeinsModel().decreaseSubdivisionDepth();
 				}
@@ -562,51 +480,30 @@ public class VeinsWindow
 
 	// TODO NIFTY
 	/*
-	 * private void pollMouseInput() { if (!frame.isDialogOpened() ||
-	 * renderer.getVeinsModel() == null) return;
+	 * private void pollMouseInput() { if (!frame.isDialogOpened() || renderer.getVeinsModel() == null) return;
 	 * 
-	 * int z = Mouse.getDWheel(); if (z > 0) { renderer.getCamera().zoomIn(); }
-	 * else if (z < 0) { renderer.getCamera().zoomOut(); }
+	 * int z = Mouse.getDWheel(); if (z > 0) { renderer.getCamera().zoomIn(); } else if (z < 0) { renderer.getCamera().zoomOut(); }
 	 * 
 	 * if (Mouse.isButtonDown(0)) { calculateClickedOn();
 	 * 
-	 * if (clickedOn == CLICKED_ON_VEINS_MODEL) {
-	 * renderer.getVeinsModel().changeAddedOrientation(renderer); }
+	 * if (clickedOn == CLICKED_ON_VEINS_MODEL) { renderer.getVeinsModel().changeAddedOrientation(renderer); }
 	 * 
-	 * if (clickedOn == CLICKED_ON_ROTATION_CIRCLE || clickedOn ==
-	 * CLICKED_ON_MOVE_CIRCLE) { float x = (clickedOn ==
-	 * VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? hud.x1 : hud.x2; float y =
-	 * (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? hud.y1 : hud.y2;
+	 * if (clickedOn == CLICKED_ON_ROTATION_CIRCLE || clickedOn == CLICKED_ON_MOVE_CIRCLE) { float x = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? hud.x1 : hud.x2; float y = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? hud.y1 : hud.y2;
 	 * 
-	 * float clickToCircleDistance = (float) Math.sqrt((x - Mouse .getX()) (x -
-	 * Mouse.getX()) + (y - Mouse.getY()) (y - Mouse.getY())); float upRotation
-	 * = (Mouse.getY() - y) / ((clickToCircleDistance > hud.r) ?
-	 * clickToCircleDistance : hud.r); float rightRotation = (Mouse.getX() - x)
-	 * / ((clickToCircleDistance > hud.r) ? clickToCircleDistance : hud.r);
+	 * float clickToCircleDistance = (float) Math.sqrt((x - Mouse .getX()) (x - Mouse.getX()) + (y - Mouse.getY()) (y - Mouse.getY())); float upRotation = (Mouse.getY() - y) / ((clickToCircleDistance > hud.r) ? clickToCircleDistance : hud.r); float rightRotation = (Mouse.getX() - x) /
+	 * ((clickToCircleDistance > hud.r) ? clickToCircleDistance : hud.r);
 	 * 
-	 * hud.clickToCircleDistance = Math.min(clickToCircleDistance, hud.r) /
-	 * hud.r; hud.clickOnCircleAngle = (float) Math.atan2(Mouse.getY() - y,
-	 * Mouse.getX() - x);
+	 * hud.clickToCircleDistance = Math.min(clickToCircleDistance, hud.r) / hud.r; hud.clickOnCircleAngle = (float) Math.atan2(Mouse.getY() - y, Mouse.getX() - x);
 	 * 
-	 * if (clickedOn == CLICKED_ON_ROTATION_CIRCLE) {
-	 * renderer.getCamera().rotate(upRotation, rightRotation); } else {
-	 * renderer.getCamera().move(upRotation, rightRotation); }
+	 * if (clickedOn == CLICKED_ON_ROTATION_CIRCLE) { renderer.getCamera().rotate(upRotation, rightRotation); } else { renderer.getCamera().move(upRotation, rightRotation); }
 	 * 
 	 * }
 	 * 
-	 * if (clickedOn == CLICKED_ON_ROTATION_ELLIPSE) { if (hud.x1 - Mouse.getX()
-	 * <= 0) { hud.ellipseSide = 0; renderer.getCamera().rotateClockwise(); }
-	 * else { hud.ellipseSide = 1;
-	 * renderer.getCamera().rotateCounterClockwise(); } }
+	 * if (clickedOn == CLICKED_ON_ROTATION_ELLIPSE) { if (hud.x1 - Mouse.getX() <= 0) { hud.ellipseSide = 0; renderer.getCamera().rotateClockwise(); } else { hud.ellipseSide = 1; renderer.getCamera().rotateCounterClockwise(); } }
 	 * 
-	 * if (clickedOn == CLICKED_ON_MOVE_ELLIPSE) { if (hud.x2 - Mouse.getX() <=
-	 * 0) { hud.ellipseSide = 0; renderer.getCamera().moveDown(); } else {
-	 * hud.ellipseSide = 1; renderer.getCamera().moveUp(); } }
+	 * if (clickedOn == CLICKED_ON_MOVE_ELLIPSE) { if (hud.x2 - Mouse.getX() <= 0) { hud.ellipseSide = 0; renderer.getCamera().moveDown(); } else { hud.ellipseSide = 1; renderer.getCamera().moveUp(); } }
 	 * 
-	 * } else { clickedOn = CLICKED_ON_NOTHING; //
-	 * renderer.getVeinsModel().veinsGrabbedAt = null; // TODO: WHAT, IS // THIS
-	 * EVEN NEEDED? renderer.getVeinsModel().saveCurrentOrientation();
-	 * renderer.getVeinsModel().setAddedOrientation(new Quaternion()); }
+	 * } else { clickedOn = CLICKED_ON_NOTHING; // renderer.getVeinsModel().veinsGrabbedAt = null; // TODO: WHAT, IS // THIS EVEN NEEDED? renderer.getVeinsModel().saveCurrentOrientation(); renderer.getVeinsModel().setAddedOrientation(new Quaternion()); }
 	 * 
 	 * }
 	 */
@@ -618,50 +515,31 @@ public class VeinsWindow
 		{
 			joystick.pollMouse();
 			if (settings.mSelected)
-				renderer.getCamera().moveCamera3D(joystick.getAxis(),
-						joystick.getRot());
+				renderer.getCamera().moveCamera3D(joystick.getAxis(), joystick.getRot());
 			else
 			{
-				renderer.getCamera().moveCamera3D(
-						new double[]
-						{ -joystick.getAxisX(), -joystick.getAxisY(),
-								-joystick.getAxisZ() }, new double[]
-						{ 0, 0, 0 });
-				renderer.getVeinsModel().rotateModel3D(joystick.getRot(),
-						renderer);
+				renderer.getCamera().moveCamera3D(new double[]
+				{ -joystick.getAxisX(), -joystick.getAxisY(), -joystick.getAxisZ() }, new double[]
+				{ 0, 0, 0 });
+				renderer.getVeinsModel().rotateModel3D(joystick.getRot(), renderer);
 			}
 		}
 	}
 
 	/**
-	 * Calculates on which element mouse click was performed - on HUD element or
-	 * on veins model
+	 * Calculates on which element mouse click was performed - on HUD element or on veins model
 	 */
 	private void calculateClickedOn()
 	{
-		float distanceToRotationCircle = (hud.x1 - Mouse.getX())
-				* (hud.x1 - Mouse.getX()) + (hud.y1 - Mouse.getY())
-				* (hud.y1 - Mouse.getY());
+		float distanceToRotationCircle = (hud.x1 - Mouse.getX()) * (hud.x1 - Mouse.getX()) + (hud.y1 - Mouse.getY()) * (hud.y1 - Mouse.getY());
 
-		float distanceToMoveCircle = (hud.x2 - Mouse.getX())
-				* (hud.x2 - Mouse.getX()) + (hud.y2 - Mouse.getY())
-				* (hud.y2 - Mouse.getY());
+		float distanceToMoveCircle = (hud.x2 - Mouse.getX()) * (hud.x2 - Mouse.getX()) + (hud.y2 - Mouse.getY()) * (hud.y2 - Mouse.getY());
 
-		float distanceToRotationFoci = (float) (Math
-				.sqrt((hud.x1 - hud.f - Mouse.getX())
-						* (hud.x1 - hud.f - Mouse.getX())
-						+ (hud.y1 - Mouse.getY()) * (hud.y1 - Mouse.getY())) + Math
-				.sqrt((hud.x1 + hud.f - Mouse.getX())
-						* (hud.x1 + hud.f - Mouse.getX())
-						+ (hud.y1 - Mouse.getY()) * (hud.y1 - Mouse.getY())));
+		float distanceToRotationFoci = (float) (Math.sqrt((hud.x1 - hud.f - Mouse.getX()) * (hud.x1 - hud.f - Mouse.getX()) + (hud.y1 - Mouse.getY()) * (hud.y1 - Mouse.getY())) + Math.sqrt((hud.x1 + hud.f - Mouse.getX()) * (hud.x1 + hud.f - Mouse.getX()) + (hud.y1 - Mouse.getY())
+				* (hud.y1 - Mouse.getY())));
 
-		float distanceToMoveFoci = (float) (Math.sqrt((hud.x2 - hud.f - Mouse
-				.getX())
-				* (hud.x2 - hud.f - Mouse.getX())
-				+ (hud.y2 - Mouse.getY()) * (hud.y2 - Mouse.getY())) + Math
-				.sqrt((hud.x2 + hud.f - Mouse.getX())
-						* (hud.x2 + hud.f - Mouse.getX())
-						+ (hud.y2 - Mouse.getY()) * (hud.y2 - Mouse.getY())));
+		float distanceToMoveFoci = (float) (Math.sqrt((hud.x2 - hud.f - Mouse.getX()) * (hud.x2 - hud.f - Mouse.getX()) + (hud.y2 - Mouse.getY()) * (hud.y2 - Mouse.getY())) + Math.sqrt((hud.x2 + hud.f - Mouse.getX()) * (hud.x2 + hud.f - Mouse.getX()) + (hud.y2 - Mouse.getY())
+				* (hud.y2 - Mouse.getY())));
 
 		if (clickedOn == CLICKED_ON_NOTHING)
 		{
@@ -692,9 +570,7 @@ public class VeinsWindow
 			}
 			else
 			{
-				renderer.getVeinsModel().SetVeinsGrabbedAt(
-						RayUtil.getRaySphereIntersection(Mouse.getX(),
-								Mouse.getY(), renderer));
+				renderer.getVeinsModel().SetVeinsGrabbedAt(RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer));
 				renderer.getVeinsModel().setAddedOrientation(new Quaternion());
 				if (renderer.getVeinsModel().GetVeinsGrabbedAt() != null)
 					clickedOn = CLICKED_ON_VEINS_MODEL;

@@ -21,7 +21,7 @@ import javax.imageio.ImageIO;
 
 import si.uni_lj.fri.MPU_Implicits.Configuration;
 import si.uni_lj.fri.segmentation.MHDReader;
-import si.uni_lj.fri.veins3D.gui.VeinsWindow;
+import si.uni_lj.fri.veins3D.main.VeinsWindow;
 
 public class FileUtils {
 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<nifty xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://nifty-gui.lessvoid.com/nifty-gui" xsi:schemaLocation="https://raw.githubusercontent.com/void256/nifty-gui/1.4/nifty-core/src/main/resources/nifty.xsd https://raw.githubusercontent.com/void256/nifty-gui/1.4/nifty-core/src/main/resources/nifty.xsd">
+    <useControls filename="nifty-default-controls.xml"/>
+    <useStyles filename="nifty-default-styles.xml"/>
+    <screen id="GScreen0">
+        <layer id="GLayer0" childLayout="absolute">
+            <panel id="GPanel1" childLayout="horizontal" width="100.0%" x="3" y="6" style="nifty-panel-simple" valign="top" height="42.0px">
+                <control name="button" id="GButton0" childLayout="center" x="24" y="12" valign="center" label="GButton0" align="left" height="42.0px"/>
+                <control name="button" id="GButton0Cloned(6)" childLayout="center" x="24" y="12" valign="center" label="GButton0" align="left" height="42.0px"/>
+                <control name="button" id="GButton0Cloned(7)" childLayout="center" x="24" y="12" valign="center" label="GButton0" align="left" height="42.0px"/>
+                <image id="GImage2" childLayout="center" filename="C:\Users\ropo\Desktop\MergedMethods\Neck_Veins\Neck_Veins\NeckVeins 1.0\res\imgs\simple.png" width="81.0px" x="0.0px" y="0.0px" valign="center" align="left" height="42.0px"/>
+            </panel>
+            <panel id="GPanel2" childLayout="center" width="170px" x="23" y="96" style="nifty-panel-simple" height="270px">
+                <panel id="GPanel3" childLayout="overlay" width="36.0px" x="132" y="3" style="nifty-panel-simple" valign="center" align="right" height="100.0%"/>
+            </panel>
+        </layer>
+    </screen>
+</nifty>

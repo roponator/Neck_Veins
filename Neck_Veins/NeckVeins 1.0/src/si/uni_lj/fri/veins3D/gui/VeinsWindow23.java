@@ -17,6 +17,7 @@ import org.lwjgl.opengl.PixelFormat;
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
+import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import si.uni_lj.fri.veins3D.utils.Mouse3D;
 import si.uni_lj.fri.veins3D.utils.RayUtil;
@@ -41,7 +42,7 @@ public class VeinsWindow23 extends Container {
 
 	public static NeckVeinsSettings settings;
 
-	private VeinsFrame frame; 
+	private GUIMain frame; 
 	private VeinsRenderer renderer;
 	private HUD hud;
 	private boolean isRunning;
@@ -155,7 +156,7 @@ public class VeinsWindow23 extends Container {
 		try {
 			hud = new HUD();
 			renderer = new VeinsRenderer();
-			frame = new VeinsFrame();
+			frame = new GUIMain();
 			//gui = new GUI(frame, renderer);
 			add(gui);
 			setTheme("mainframe");

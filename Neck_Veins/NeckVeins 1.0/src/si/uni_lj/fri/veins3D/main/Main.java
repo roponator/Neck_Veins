@@ -1,4 +1,4 @@
-package si.uni_lj.fri.veins3D.gui;
+package si.uni_lj.fri.veins3D.main;
 
 import java.io.File;
 

@@ -12,6 +12,7 @@ import si.uni_lj.fri.segmentation.ModelCreatorSettings;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelMesh;
+import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import de.matthiasmann.twl.BorderLayout;
 import de.matthiasmann.twl.BorderLayout.Location;
 import de.matthiasmann.twl.BoxLayout;

@@ -1,10 +1,10 @@
 package si.uni_lj.fri.veins3D.utils;
 
 
-import si.uni_lj.fri.veins3D.gui.VeinsWindow;
 import si.uni_lj.fri.veins3D.gui.render.Camera;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelMesh;
+import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import si.uni_lj.fri.veins3D.math.Vector;
 
 public class RayUtil {

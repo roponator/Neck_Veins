@@ -36,6 +36,8 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import si.uni_lj.fri.veins3D.main.VeinsWindow;
+
 public class HUD {
 	private final String PATH = "imgs/";
 	private final float ELLIPSEF = 1.1180339887498948482045868343656f;
