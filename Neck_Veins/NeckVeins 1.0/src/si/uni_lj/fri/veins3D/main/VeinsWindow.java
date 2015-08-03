@@ -38,8 +38,6 @@ import de.lessvoid.nifty.builder.LayerBuilder;
 import de.lessvoid.nifty.builder.PanelBuilder;
 import de.lessvoid.nifty.builder.ScreenBuilder;
 import de.lessvoid.nifty.builder.TextBuilder;
-import de.lessvoid.nifty.controls.ButtonClickedEvent;
-import de.lessvoid.nifty.controls.button.builder.ButtonBuilder;
 import de.lessvoid.nifty.nulldevice.NullSoundDevice;
 import de.lessvoid.nifty.render.batch.BatchRenderConfiguration;
 import de.lessvoid.nifty.render.batch.BatchRenderDevice;
@@ -48,6 +46,7 @@ import de.lessvoid.nifty.render.batch.spi.BatchRenderBackend;
 import de.lessvoid.nifty.render.batch.spi.GL;
 import de.lessvoid.nifty.renderer.lwjgl.input.LwjglInputSystem;
 import de.lessvoid.nifty.renderer.lwjgl.render.LwjglBatchRenderBackendCoreProfileFactory;
+import de.lessvoid.nifty.renderer.lwjgl.render.LwjglBatchRenderBackendFactory;
 import de.lessvoid.nifty.screen.DefaultScreenController;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
@@ -136,10 +135,12 @@ public class VeinsWindow
 			inputSystem.startup();
 			//BatchRenderConfiguration.DEFAULT_USE_HIGH_QUALITY_TEXTURES=true;
 			BatchRenderBackendCoreProfileInternal niftyRenderFactory = (BatchRenderBackendCoreProfileInternal)LwjglBatchRenderBackendCoreProfileFactory.create();
+			
 			niftyRenderFactory.useHighQualityTextures(true); 
 			
 			BatchRenderDevice niftyRenderer = new BatchRenderDevice(niftyRenderFactory);
 			niftyRenderFactory.useHighQualityTextures(true); 
+			niftyRenderer.resetTextureAtlases();
 			
 			nifty = new Nifty(niftyRenderer, new NullSoundDevice(), inputSystem, new AccurateTimeProvider());
 			niftyRenderFactory.useHighQualityTextures(true); 
