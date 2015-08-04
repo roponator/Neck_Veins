@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="/NeckVeins 1.0/lwjgl-2.9.3/jar/jinput.jar"/>
 	<classpathentry kind="lib" path="/NeckVeins 1.0/lwjgl-2.9.3/jar/lwjgl_util.jar"/>
 	<classpathentry kind="lib" path="/NeckVeins 1.0/lwjgl-2.9.3/jar/lwjgl.jar"/>
+	<classpathentry kind="lib" path="/NeckVeins 1.0/libs/slick-util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

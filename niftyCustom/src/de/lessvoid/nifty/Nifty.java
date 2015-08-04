@@ -1,3 +1,4 @@
+
 package de.lessvoid.nifty;
 
 import java.io.ByteArrayOutputStream;
@@ -83,7 +84,8 @@ import de.lessvoid.xml.xpp3.Attributes;
  * @author void
  */
 public class Nifty {
-  @Nonnull
+ 	
+   @Nonnull
   private static final Logger log = Logger.getLogger(Nifty.class.getName());
 
   @Nonnull

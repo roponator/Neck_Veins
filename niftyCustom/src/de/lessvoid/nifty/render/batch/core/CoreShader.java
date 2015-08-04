@@ -548,6 +548,6 @@ public class CoreShader {
 
   @Nullable
   private InputStream getStream(@Nonnull final String filename) {
-    return Thread.currentThread().getContextClassLoader().getResourceAsStream(filename);  REPLACE ALL THIS EVERYWHERE WITH JAR FRIENDLY STREAM STUFF
+    return Thread.currentThread().getContextClassLoader().getResourceAsStream(filename);
   }
 }

@@ -8,15 +8,21 @@
 	 
 	  <!-- PADDING ORDER: top,right,down,left? -->
 	 
+	  <!-- ******************************************* -->
+	 <!--Common styles -->
+	 <!-- ******************************************* -->
+	   <style id="STYLE_COMMON_INVISIBLE"   >
+        <attributes 
+            backgroundColor="#00000000"
+           imageMode="normal"/>
+    </style>
+	 
+	 
 	 <!-- ******************************************* -->
 	 <!-- Top menu bar styles -->
 	 <!-- ******************************************* -->
 	 
-	 <!-- ******************************************* -->
-	 <!-- Settings side menu styles -->
-	 <!-- ******************************************* -->
-	 
-    <style id="STYLE_TOP_MENU_BAR_PANEL"   >
+	  <style id="STYLE_TOP_MENU_BAR_PANEL"   >
         <attributes 
            backgroundImage="imgs\new_gui\rect_gray_long_ver.png"  filter="true"
            imageMode="normal"/>
@@ -28,8 +34,7 @@
             backgroundImage="" 
             imageMode="normal"
         	padding="0px,21px,0px,21px"   	
-        />
-        
+        />      
        	<effect>
 			<onHover name="imageOverlay" filename="imgs/new_gui/rect_green_long.png" imageMode="normal" post="true" />
 		</effect>	        
@@ -38,6 +43,54 @@
     <style id="STYLE_TOP_MENU_BUTTON#text" base="button-font">
    		<attributes align="center" valign="center" textHAlign="center" textVAlign="center" visibleToMouse="false" color="#ffff" />
  	</style>
+ 	
+    
+     <style id="STYLE_TOP_MENU_DROPDOWN_BUTTON"   >
+        <attributes 
+            backgroundImage="imgs/new_gui/rect_gray_short_ver.png"  
+            imageMode="normal"
+			padding="0px,21px,0px,21px"   
+        />      
+       	<effect>
+			<onHover name="imageOverlay" filename="imgs/new_gui/rect_green_long.png" imageMode="normal" post="true" />
+		</effect>	        
+    </style>
+    
+     <style id="STYLE_TOP_MENU_DROPDOWN_BUTTON#text" base="button-font">
+   		<attributes align="center" valign="center" 
+   		    textHAlign="center" textVAlign="center"
+   		     visibleToMouse="false" color="#ffff"
+   		       />
+ 	</style>
+
+	 <!-- ******************************************* -->
+	 <!-- Settings side menu styles -->
+	 <!-- ******************************************* -->
+
+	  <style id="STYLE_SIDE_SETTINGS_MENU_LEFT_PANEL"   >
+        <attributes 
+            backgroundColor="#8d8d94ff"
+           imageMode="normal"/>
+    </style>
+    
+	 <style id="STYLE_SIDE_SETTINGS_MENU_RIGHT_PANEL_TOP"   >
+        <attributes 
+            backgroundImage="imgs\new_gui\settings_ver_top.png"  filter="true"
+           imageMode="normal"/>
+    </style>
+    
+	  <style id="STYLE_SIDE_SETTINGS_MENU_RIGHT_PANEL_BOTTOM"   >
+        <attributes 
+            backgroundImage="imgs\new_gui\settings_ver_bottom.png"  filter="true"
+           imageMode="normal"/>
+    </style>
+    
+	    <style id="STYLE_SIDE_SETTINGS_MENU_RIGHT_PANEL_BOTTOM"   >
+        <attributes 
+            backgroundImage="imgs\new_gui\settings_ver_bottom.png"  filter="true"
+           imageMode="normal"/>
+    </style>
+   
     
     
     <screen id="GScreen0"  controller="si.uni_lj.fri.veins3D.gui.NiftyScreenController">
@@ -59,22 +112,44 @@
                 <control name="button" id="BUTTON_TOP_MENU_HELP" style="STYLE_TOP_MENU_BUTTON" childLayout="center" x="24" y="12" valign="center" label="Help" align="left" height="42.0px"/>
                
                 </panel>
+                
+            
+               <panel id="TOP_MENU_BAR_DROPDOWN_FILE" childLayout="vertical" width="200.0px" x="81" y="42" style="STYLE_COMMON_INVISIBLE" height="126.0px">
+               		<panel id="BUTTON_TOP_MENU_BAR_FILE__PANEL_OPEN" childLayout="horizontal" width="200.0px" x="0" y="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON" height="42.0px" valign="center" align="left"  >
+               	   		 <control name="label" id="GLabel0" x="40" width="40px" text="Open" height="100.0%" font="aurulent-sans-16.fnt"/>
+               			 <control name="label" id="GLabel0" x = "0" width="100px" text="CTRL+A" height="100.0%" font="aurulent-sans-16.fnt"/>     		
+               		</panel>
+       			</panel>
          
         </layer>
-       
+        
+        
+      
         <!-- ******************************************* -->
 		<!-- Settings side menu panel -->
 		<!-- ******************************************* -->
         <layer id="LAYER_SIDE_SETTINGS_MENU" childLayout="absolute">
-            <panel id="PANEL_SIDE_SETTINGS_MENU" childLayout="absolute" width="170px" x="59" y="148" style="nifty-panel-simple" height="30%">
-            	<effect>
-            	    <onCustom customKey="openSettingsSideMenu" name="move" direction="left" mode="in"/>
-            	    <onCustom customKey="closeSettingsSideMenu" name="move" direction="right" mode="out"/>
-            	</effect>   
-            
-            	<panel style="STYLE_SQUARE_CORNER"  id="PANEL_SIDE_SETTINGS_MENU_CLICKABLE_BAR" childLayout="center" width="36.0px" x="132" y="3" valign="center" align="right" height="100.0%" />
-         
+
+              
+             <panel id="PANEL_SIDE_SETTINGS_MENU_INVISIBLE_BACKGROUND" childLayout="horizontal" width="246px" x="299px" y="127px" style="STYLE_COMMON_INVISIBLE" height="700px">
+               
+                <panel id="PANEL_SIDE_SETTINGS_MENU_LEFT" childLayout="absolute" width="210px" x="9px" y="16px" style="STYLE_SIDE_SETTINGS_MENU_LEFT_PANEL" height="100.0%"/>
+               
+                <panel id="PANEL_SIDE_SETTINGS_MENU_RIGHT_HOLDER" childLayout="vertical" width="36.0px" x="223" y="5" style="STYLE_COMMON_INVISIBLE" valign="top" align="right" height="121px">
+                    <panel id="PANEL_SIDE_SETTINGS_MENU_RIGHT_TOP" childLayout="absolute"  width="100%" x="0" y="0" style="STYLE_SIDE_SETTINGS_MENU_RIGHT_PANEL_TOP" valign="center" align="right" height="121px"/>
+              		<panel id="PANEL_SIDE_SETTINGS_MENU_RIGHT_BOTTOM" childLayout="absolute" width="100%" x="0" y="0" style="STYLE_SIDE_SETTINGS_MENU_RIGHT_PANEL_BOTTOM" valign="center" align="right" height="579px"/>      
+                </panel>
+                
+                <effect>
+            	    	<onCustom customKey="openSettingsSideMenu" name="move" direction="left" mode="in"/>
+            	   		<onCustom customKey="closeSettingsSideMenu" name="move" direction="right" mode="out"/>
+            	</effect>
+                      
             </panel>
+                	
+           		
+           		
+            
         </layer>
         
     </screen>

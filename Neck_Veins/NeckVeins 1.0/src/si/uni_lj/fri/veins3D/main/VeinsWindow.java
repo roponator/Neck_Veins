@@ -27,6 +27,7 @@ import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.util.ResourceLoader;
@@ -250,6 +251,7 @@ public class VeinsWindow
 	 */
 	private void setupWindow()
 	{
+		//GL14.GL_TEXTURE_LOD_BIAS
 		try
 		{
 			// OpenGL setup
