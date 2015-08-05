@@ -6,7 +6,7 @@
     	 
 	 <!-- base="nifty-panel-simple" -->
 	 
-	  <!-- PADDING ORDER: top,right,down,left? -->
+	  <!-- PADDING ORDER: top,right,down,left -->
 	 
 	  <!-- ******************************************* -->
 	 <!--Common styles -->
@@ -14,6 +14,18 @@
 	   <style id="STYLE_COMMON_INVISIBLE"   >
         <attributes 
             backgroundColor="#00000000"
+           imageMode="normal"/>
+    </style>
+    
+	  <style id="STYLE_COMMON_RED"   >
+        <attributes 
+            backgroundColor="#ff0000ff"
+           imageMode="normal"/>
+    </style>
+	 
+	     <style id="STYLE_COMMON_GREEN"   >
+        <attributes 
+            backgroundColor="#00ff00ff"
            imageMode="normal"/>
     </style>
 	 
@@ -25,7 +37,9 @@
 	  <style id="STYLE_TOP_MENU_BAR_PANEL"   >
         <attributes 
            backgroundImage="imgs\new_gui\rect_gray_long_ver.png"  filter="true"
-           imageMode="normal"/>
+           imageMode="normal"
+       
+           />
     </style>
     
     
@@ -33,7 +47,7 @@
         <attributes 
             backgroundImage="" 
             imageMode="normal"
-        	padding="0px,21px,0px,21px"   	
+        	  	
         />      
        	<effect>
 			<onHover name="imageOverlay" filename="imgs/new_gui/rect_green_long.png" imageMode="normal" post="true" />
@@ -41,15 +55,16 @@
     </style>
     
     <style id="STYLE_TOP_MENU_BUTTON#text" base="button-font">
-   		<attributes align="center" valign="center" textHAlign="center" textVAlign="center" visibleToMouse="false" color="#ffff" />
+   		<attributes 
+   		    align="center" valign="center" textHAlign="center"
+   		     textVAlign="center" visibleToMouse="false" color="#ffff" />
  	</style>
  	
     
      <style id="STYLE_TOP_MENU_DROPDOWN_BUTTON"   >
         <attributes 
             backgroundImage="imgs/new_gui/rect_gray_short_ver.png"  
-            imageMode="normal"
-			padding="0px,21px,0px,21px"   
+            imageMode="normal" 
         />      
        	<effect>
 			<onHover name="imageOverlay" filename="imgs/new_gui/rect_green_long.png" imageMode="normal" post="true" />
@@ -57,11 +72,18 @@
     </style>
     
      <style id="STYLE_TOP_MENU_DROPDOWN_BUTTON#text" base="button-font">
-   		<attributes align="center" valign="center" 
+   		<attributes align="left" valign="center" 
    		    textHAlign="center" textVAlign="center"
-   		     visibleToMouse="false" color="#ffff"
+   		     visibleToMouse="false" color="#ffff"  
    		       />
  	</style>
+ 	
+      <style id="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" base="button-font">
+   		<attributes margin = "0px,0px,0px,20px"
+   		       textHAlign="left"  />
+ 	</style>
+ 	
+       
 
 	 <!-- ******************************************* -->
 	 <!-- Settings side menu styles -->
@@ -98,29 +120,66 @@
 	    <!-- ******************************************* -->
 		<!-- Top menu bar controls -->
 		<!-- ******************************************* -->
-        <layer id="LAYER_TOP_MENU_BAR" childLayout="absolute">
-            <panel id="GPanel1" style="STYLE_TOP_MENU_BAR_PANEL" childLayout="horizontal" width="100.0%" x="0" y="0" valign="top" height="42.0px">
+        <layer id="LAYER_TOP_MENU_BAR" childLayout="center" valign="top" align="left"  width="100.0%" height="100.0%">
+            <panel id="GPanel1" style="STYLE_TOP_MENU_BAR_PANEL" childLayout="horizontal" width="100.0%" valign="top" align="left" height="42.0px">
                
                 <image id="GImage2" childLayout="center" filename="imgs\new_gui\ico_gray_background.png" width="81.0px" x="0.0px" y="0.0px" valign="center" align="left" height="42.0px" filter="true"/>
                 
-                <control name="button" id="BUTTON_TOP_MENU_OPEN" style="STYLE_TOP_MENU_BUTTON" childLayout="center" x="24" y="12" valign="center" label="File" align="left" height="42.0px">
-                	<interact onClick="onBtn(bla)"/>        	
-                </control>
-                
-                <control name="button" id="BUTTON_TOP_MENU_OPTIONS" style="STYLE_TOP_MENU_BUTTON" childLayout="center" x="24" y="12" valign="center" label="Options" align="left" height="42.0px"/>
+                 <!--  ********************************** -->
+                 <!-- button File & its dropdown menu -->
+                 <!--  ********************************** -->
+                 <panel id=""  style="STYLE_TOP_MENU_BUTTON" childLayout="vertical" x="24" y="12" valign="center" align="left" height="42.0px" width="60px">
+           
+                     <!--  the File button -->
+	                <control name="button" id="BUTTON_TOP_MENU_OPEN" style="STYLE_TOP_MENU_BUTTON" childLayout="center" x="0" y="0" valign="center" label="File" align="left" height="100.0%" width="100.0%">
+	                	<interact onClick="onBtn(bla)"/>        	
+	                </control>
+	                
+	                 <!--  Drop-down menu, which is offseted a bit down -->
+	                 <panel id=""  width="200.0px" x="81" y="142" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" height="126.0px" align="left" >
+	               		<panel id="" childLayout="vertical" width="200.0px" x="0" y="" style="STYLE_COMMON_INVISIBLE" height="42.0px" valign="center" align="left"  >
+	               		   
+	               		    <!--  the Open button -->
+	               		    <panel id="" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
+	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" x="0" y="0" valign="center" label="" align="left" height="100.0%" width="100.0%">
+				                	<interact onClick="onBtn(bla)"/>        	
+				                </control>
+	               		        <panel id="" childLayout="horizontal" width="100.0%" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  >
+									<control name="label" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" x = "0px" width="100px" text="Open" height="100.0%" font="aurulent-sans-16.fnt"/>
+		               		 		<control name="label" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" x = "0px" width="100px" text="CTRL+A" height="100.0%" font="aurulent-sans-16.fnt"/>     		
+				                 </panel>  		             
+				            </panel>
+				            
+	               		    <!--  the Save As button -->
+	               		    <panel id="" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
+	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" x="0" y="0" valign="center" label="" align="left" height="100.0%" width="100.0%">
+				                	<interact onClick="onBtn(bla)"/>        	
+				                </control>
+	               		        <panel id="" childLayout="horizontal" width="100.0%" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  >
+									<control name="label" align = "left" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" x = "0px" width="100px" text="Save As" height="100.0%" font="aurulent-sans-16.fnt"/>
+		               		 		<control name="label" align = "left" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" x = "0px" width="60px" text="CTRL+S" height="100.0%" font="aurulent-sans-16.fnt"/>     		
+				                 </panel>  		             
+				            </panel>
+				            
+	               		      <!--  the Exit button -->
+	               		    <panel id="" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
+	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" x="0" y="0" valign="center" label="" align="left" height="100.0%" width="100.0%">
+				                	<interact onClick="onBtn(bla)"/>        	
+				                </control>
+	               		        <panel id="" childLayout="horizontal" width="100.0%" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  >
+									<control name="label" align = "left" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" x = "0px" width="100px" text="Exit" height="100.0%" font="aurulent-sans-16.fnt"/>     		
+				                 </panel>  		             
+				            </panel>
+				             		    
+	               		</panel>
+	       			</panel>      
+                 </panel>
+                <!--  ******** END BUTTON ********** -->
                
-                <control name="button" id="BUTTON_TOP_MENU_HELP" style="STYLE_TOP_MENU_BUTTON" childLayout="center" x="24" y="12" valign="center" label="Help" align="left" height="42.0px"/>
-               
+                 
+                 
                 </panel>
-                
-            
-               <panel id="TOP_MENU_BAR_DROPDOWN_FILE" childLayout="vertical" width="200.0px" x="81" y="42" style="STYLE_COMMON_INVISIBLE" height="126.0px">
-               		<panel id="BUTTON_TOP_MENU_BAR_FILE__PANEL_OPEN" childLayout="horizontal" width="200.0px" x="0" y="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON" height="42.0px" valign="center" align="left"  >
-               	   		 <control name="label" id="GLabel0" x="40" width="40px" text="Open" height="100.0%" font="aurulent-sans-16.fnt"/>
-               			 <control name="label" id="GLabel0" x = "0" width="100px" text="CTRL+A" height="100.0%" font="aurulent-sans-16.fnt"/>     		
-               		</panel>
-       			</panel>
-         
+ 
         </layer>
         
         

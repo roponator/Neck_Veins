@@ -191,17 +191,25 @@ public class VeinsWindow
 				settings.locale = Locale.getDefault();
 				settings.workingDirectory = "";
 			}
+			
+			currentDisplayMode = displayModes[21];
+			//settings.fullscreen = true;
 			settings.resWidth = currentDisplayMode.getWidth();
 			settings.resHeight = currentDisplayMode.getHeight();
 			settings.bitsPerPixel = currentDisplayMode.getBitsPerPixel();
 			settings.frequency = currentDisplayMode.getFrequency();
+			
+			if(settings.fullscreen)
+			{
+				Display.setFullscreen(true);
+				Display.setVSyncEnabled(true);
+			}
 		}
 		catch (LWJGLException e)
 		{
 			e.printStackTrace();
 		}
-		settings.resWidth = 1024;
-		settings.resHeight = 1024;
+
 	}
 
 	/**
@@ -211,10 +219,12 @@ public class VeinsWindow
 	{
 		try
 		{
+			//DisplayMode dm=new DisplayMode(800, 800);
+			//currentDisplayMode = dm;
 			Display.setDisplayMode(currentDisplayMode);
 			Display.setTitle(title);
 			Display.setVSyncEnabled(true);
-			Display.setDisplayMode(new DisplayMode(1024, 1024));
+			//Display.setDisplayMode(new DisplayMode(512, 800));
 			// Display.create(new PixelFormat().withStencilBits(1));
 			Display.create(new PixelFormat(), new ContextAttribs(2, 0));
 
