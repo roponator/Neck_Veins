@@ -1,5 +1,13 @@
 package si.uni_lj.fri.veins3D.main;
 
+import java.awt.BorderLayout;
+import java.awt.Canvas;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
@@ -18,6 +26,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
@@ -58,6 +69,7 @@ import de.lessvoid.nifty.tools.resourceloader.NiftyResourceLoader;
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.HUD;
 import si.uni_lj.fri.veins3D.gui.GUIMain;
+import si.uni_lj.fri.veins3D.gui.NiftyScreenController;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
 import si.uni_lj.fri.veins3D.math.Quaternion;
@@ -78,7 +90,6 @@ public class VeinsWindow
 
 	public static NeckVeinsSettings settings;
 
-	
 	private VeinsRenderer renderer;
 	LwjglInputSystem inputSystem;
 	private HUD hud;
@@ -92,10 +103,13 @@ public class VeinsWindow
 	private DisplayMode[] displayModes;
 	private DisplayMode currentDisplayMode;
 	public static Mouse3D joystick;
-	
+
 	public static Nifty nifty = null; // So it can be accessed from outside
 	public static GUIMain gui = null; // So it can be accessed from outside
-	
+	public static NiftyScreenController screenController = null;
+	public static Frame frame = null; // Window frame
+	public static VeinsWindow veinsWindow = null;// itself
+
 	/**
 	 * 
 	 */
@@ -115,6 +129,7 @@ public class VeinsWindow
 
 	void init(String Title, String filename)
 	{
+		veinsWindow = this;
 		isRunning = true;
 		this.title = Title;
 		loadSettings(filename);
@@ -126,32 +141,38 @@ public class VeinsWindow
 
 	}
 
-	private void initNiftyAndGUI()
+	void initNiftyAndGUI()
 	{
 		// Init nifty
 		try
 		{
-			//Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); // spams console a lot otherwise
+
+			// Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); // spams console a lot otherwise
 			inputSystem = new LwjglInputSystem();
 			inputSystem.startup();
-			//BatchRenderConfiguration.DEFAULT_USE_HIGH_QUALITY_TEXTURES=true;
-			BatchRenderBackendCoreProfileInternal niftyRenderFactory = (BatchRenderBackendCoreProfileInternal)LwjglBatchRenderBackendCoreProfileFactory.create();
-			
-			niftyRenderFactory.useHighQualityTextures(true); 
-			
+			// BatchRenderConfiguration.DEFAULT_USE_HIGH_QUALITY_TEXTURES=true;
+			BatchRenderBackendCoreProfileInternal niftyRenderFactory = (BatchRenderBackendCoreProfileInternal) LwjglBatchRenderBackendCoreProfileFactory.create();
+
+			niftyRenderFactory.useHighQualityTextures(true);
+
 			BatchRenderDevice niftyRenderer = new BatchRenderDevice(niftyRenderFactory);
-			niftyRenderFactory.useHighQualityTextures(true); 
+			niftyRenderFactory.useHighQualityTextures(true);
 			niftyRenderer.resetTextureAtlases();
-			
+
 			nifty = new Nifty(niftyRenderer, new NullSoundDevice(), inputSystem, new AccurateTimeProvider());
-			niftyRenderFactory.useHighQualityTextures(true); 
-			
+			niftyRenderFactory.useHighQualityTextures(true);
+	
+			// load our GUI
 			System.out.println("**NIFTY FROM XML*********************");
 			nifty.fromXml("0", ResourceLoader.getResourceAsStream("xml/nifty_gui.xml"), "GScreen0");
 			System.out.println("**NIFTY FROM XML DONE*********************");
-			
-			
-			
+
+			// get screen controller
+			screenController = (NiftyScreenController) nifty.getScreen("GScreen0").getScreenController();
+
+			// enable auto scale
+			// nifty.enableAutoScaling(1024,768);
+
 		}
 		catch (Exception e)
 		{
@@ -160,9 +181,36 @@ public class VeinsWindow
 		}
 
 	}
-	
 
-	private void loadSettings(String fileName)
+	public void ResizeWindow(boolean fullscreen)
+	{
+		currentDisplayMode = displayModes[13];
+		try
+		{
+			Display.setDisplayMode(currentDisplayMode);
+			Display.setFullscreen(fullscreen);
+
+			VeinsWindow.settings.resWidth = currentDisplayMode.getWidth();
+			VeinsWindow.settings.resHeight = currentDisplayMode.getHeight();
+
+			frame.setPreferredSize(new Dimension(currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
+			frame.setSize(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
+			frame.pack();
+			
+			
+			SCREEN RESIZE FAIL ON MAXIMIZE
+			// frame.pack();
+			// frame.setVisible(true);
+		}
+		catch (LWJGLException e)
+		{
+			e.printStackTrace();
+		}
+		renderer.setupView();
+
+	}
+
+	void loadSettings(String fileName)
 	{
 		try
 		{
@@ -191,15 +239,16 @@ public class VeinsWindow
 				settings.locale = Locale.getDefault();
 				settings.workingDirectory = "";
 			}
-			
-			currentDisplayMode = displayModes[21];
-			//settings.fullscreen = true;
+
+			// ADD TO VM ARGS: -Dorg.lwjgl.opengl.Window.undecorated=true
+			currentDisplayMode = displayModes[10];
+			// settings.fullscreen = true;
 			settings.resWidth = currentDisplayMode.getWidth();
 			settings.resHeight = currentDisplayMode.getHeight();
 			settings.bitsPerPixel = currentDisplayMode.getBitsPerPixel();
 			settings.frequency = currentDisplayMode.getFrequency();
-			
-			if(settings.fullscreen)
+
+			if (settings.fullscreen)
 			{
 				Display.setFullscreen(true);
 				Display.setVSyncEnabled(true);
@@ -215,19 +264,38 @@ public class VeinsWindow
 	/**
 	 * 
 	 */
+
 	private void createDisplay()
 	{
 		try
 		{
-			//DisplayMode dm=new DisplayMode(800, 800);
-			//currentDisplayMode = dm;
+			frame = new Frame("Test");
+			frame.setLayout(new BorderLayout());
+			final Canvas canvas = new Canvas();
+			frame.add(canvas, BorderLayout.CENTER);
+
+			Display.setParent(canvas);
+			frame.setPreferredSize(new Dimension(currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
+			frame.setSize(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
+			frame.setUndecorated(true);  //here
+		
+			frame.pack();
+			frame.setVisible(true);
+			
+			//-Dorg.lwjgl.opengl.Window.undecorated=true
+
+			// DisplayMode dm=new DisplayMode(800, 800);
+			// currentDisplayMode = dm;
 			Display.setDisplayMode(currentDisplayMode);
 			Display.setTitle(title);
-			Display.setVSyncEnabled(true);
-			//Display.setDisplayMode(new DisplayMode(512, 800));
+			Display.setVSyncEnabled(false);
+			// Display.setDisplayMode(new DisplayMode(512, 800));
 			// Display.create(new PixelFormat().withStencilBits(1));
-			Display.create(new PixelFormat(), new ContextAttribs(2, 0));
 
+			Display.create(new PixelFormat(), new ContextAttribs(2, 0));
+			Canvas c = Display.getParent();
+
+			int x = 0;
 			// Display.create();
 		}
 		catch (LWJGLException e)
@@ -261,7 +329,7 @@ public class VeinsWindow
 	 */
 	private void setupWindow()
 	{
-		//GL14.GL_TEXTURE_LOD_BIAS
+		// GL14.GL_TEXTURE_LOD_BIAS
 		try
 		{
 			// OpenGL setup
@@ -285,6 +353,8 @@ public class VeinsWindow
 	 * 
 	 */
 
+	boolean m_wasMouseLeftUp = true;
+
 	public void mainLoop()
 	{
 		fps = 0;
@@ -292,10 +362,19 @@ public class VeinsWindow
 		timePastFps = timePastFrame;
 		fpsToDisplay = 0;
 
-		while (!Display.isCloseRequested() && isRunning)
+		while (isRunning)
 		{
+
+			// Detect on down click after it was up (NOT DOWN->UP!)
+			boolean wasLeftMouseDownClicked = false;
+			if (Mouse.isButtonDown(0) == true && m_wasMouseLeftUp == true)
+				wasLeftMouseDownClicked = true;
+
+			m_wasMouseLeftUp = !Mouse.isButtonDown(0);
+
 			// Strange render loop
 			boolean done = false;
+
 
 			// renderer.setupView(); // raycast volume renderer changes some
 			// states, theys must be reset
@@ -315,6 +394,10 @@ public class VeinsWindow
 
 			glDisable(GL_CULL_FACE);
 			glDisable(GL_DEPTH_TEST);
+
+			// On down click after it was up (NOT DOWN->UP!)
+			if (wasLeftMouseDownClicked)
+				screenController.onMouseLeftDownClicked();
 
 			nifty.update();
 			nifty.render(true); // TODO: THROWS ERROR ON FIRST FRAME??
@@ -534,28 +617,14 @@ public class VeinsWindow
 	 * } else { clickedOn = CLICKED_ON_NOTHING; // renderer.getVeinsModel().veinsGrabbedAt = null; // TODO: WHAT, IS // THIS EVEN NEEDED? renderer.getVeinsModel().saveCurrentOrientation(); renderer.getVeinsModel().setAddedOrientation(new Quaternion()); }
 	 * 
 	 * }
-	 */
-
-	private void poll3DMouseInput()
-	{
-
-		if (joystick.connected() && renderer.getVeinsModel() != null)
-		{
-			joystick.pollMouse();
-			if (settings.mSelected)
-				renderer.getCamera().moveCamera3D(joystick.getAxis(), joystick.getRot());
-			else
-			{
-				renderer.getCamera().moveCamera3D(new double[]
-				{ -joystick.getAxisX(), -joystick.getAxisY(), -joystick.getAxisZ() }, new double[]
-				{ 0, 0, 0 });
-				renderer.getVeinsModel().rotateModel3D(joystick.getRot(), renderer);
-			}
-		}
-	}
-
-	/**
-	 * Calculates on which element mouse click was performed - on HUD element or on veins model
+	 * 
+	 * 
+	 * private void poll3DMouseInput() {
+	 * 
+	 * if (joystick.connected() && renderer.getVeinsModel() != null) { joystick.pollMouse(); if (settings.mSelected) renderer.getCamera().moveCamera3D(joystick.getAxis(), joystick.getRot()); else { renderer.getCamera().moveCamera3D(new double[] { -joystick.getAxisX(), -joystick.getAxisY(),
+	 * -joystick.getAxisZ() }, new double[] { 0, 0, 0 }); renderer.getVeinsModel().rotateModel3D(joystick.getRot(), renderer); } } }
+	 * 
+	 * /** Calculates on which element mouse click was performed - on HUD element or on veins model
 	 */
 	private void calculateClickedOn()
 	{

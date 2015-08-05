@@ -1,5 +1,10 @@
 package si.uni_lj.fri.veins3D.gui;
 
+import java.awt.Frame;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JFrame;
+
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import de.lessvoid.nifty.EndNotify;
 import de.lessvoid.nifty.Nifty;
@@ -8,6 +13,7 @@ import de.lessvoid.nifty.controls.ButtonClickedEvent;
 import de.lessvoid.nifty.effects.EffectEventId;
 import de.lessvoid.nifty.effects.impl.Move;
 import de.lessvoid.nifty.elements.Element;
+import de.lessvoid.nifty.input.NiftyInputEvent;
 import de.lessvoid.nifty.screen.DefaultScreenController;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.tools.SizeValue;
@@ -19,22 +25,88 @@ import de.lessvoid.nifty.tools.SizeValueType;
 public class NiftyScreenController extends DefaultScreenController
 {
 	Screen m_screen = null;;
+	
+	// -----------------------------------
+	// Top menu bar buttons
+	// -----------------------------------
+	Element m_panel_topMenu_FileDropDown;
+	Element m_panel_topMenu_OptionsDropDown;
 
-	//Element m_popupMenu_MainMenu_File = null;;
+	// -----------------------------------
+	// Side menu
+	// -----------------------------------
 	NiftySettingsSideMenu m_settingsSideMenu = null;
 	
+	
+	public void update()
+	{
+		
+	}
+	
+	// Detects mouse down click (after it was up)
+	public void onMouseLeftDownClicked()
+	{
+		// Hide all top menu drop down menus
+		m_panel_topMenu_FileDropDown.setVisible(false);
+		m_panel_topMenu_OptionsDropDown.setVisible(false);
+	}
+
 	
 	// This is called when the screen is created
 	private void init()
 	{
 		//m_popupMenu_MainMenu_File = NiftyPopupMenus.CreatePopup_File(VeinsWindow.nifty);
 		m_settingsSideMenu = new NiftySettingsSideMenu(m_screen);
+		
+		// ---------------------------------------
+		// Top menu bars
+		// ---------------------------------------
+		m_panel_topMenu_FileDropDown = nifty.getScreen("GScreen0").findElementById("TOP_MENU_FILE_DROP_DOWN_PANEL");
+		m_panel_topMenu_FileDropDown.setVisible(false);
+		
+		m_panel_topMenu_OptionsDropDown = nifty.getScreen("GScreen0").findElementById("TOP_MENU_OPTIONS_DROP_DOWN_PANEL");
+		m_panel_topMenu_OptionsDropDown.setVisible(false);
 	}
 
 	static class Bla
 	{
 		
 	}
+	
+	// ----------------------------------------------------
+	// Minimize,maximize,close
+	// ----------------------------------------------------
+	public void onButton_TopMenu_Minimize(String a)
+	{
+		VeinsWindow.frame.setState(Frame.ICONIFIED);
+	}
+	
+	public void onButton_TopMenu_Maximize(String a)
+	{
+		
+		//VeinsWindow.frame.setExtendedState( VeinsWindow.frame.getExtendedState()|JFrame.MAXIMIZED_BOTH );
+		VeinsWindow.veinsWindow.ResizeWindow(true);
+	}
+	
+	public void onButton_TopMenu_Close(String a)
+	{
+		//VeinsWindow.frame.dispatchEvent(new WindowEvent(VeinsWindow.frame, WindowEvent.WINDOW_CLOSING));
+	VeinsWindow.veinsWindow.exitProgram(0);
+
+	}
+	
+	// ----------------------------------------------------
+	
+	public void onButton_TopMenu_File(String a)
+	{
+		m_panel_topMenu_FileDropDown.setVisible(true);
+	}
+	
+	public void onButton_TopMenu_Options(String a)
+	{
+		m_panel_topMenu_OptionsDropDown.setVisible(true);
+	}
+	
 	public void onBtn(String bla)
 	{
 		/*m_popupMenu_MainMenu_File.setConstraintX(new SizeValue(300, SizeValueType.Pixel));
