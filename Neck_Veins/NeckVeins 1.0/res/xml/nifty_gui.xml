@@ -79,7 +79,7 @@
  	</style>
  	
       <style id="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" base="button-font">
-   		<attributes margin = "0%,0%,0%,13%"
+   		<attributes margin = "0px,0px,0px,13px"
    		       textHAlign="left"  />
  	</style>
  	
@@ -128,18 +128,20 @@
 		<!-- Top menu bar controls -->
 		<!-- ******************************************* -->
         <layer id="LAYER_TOP_MENU_BAR" childLayout="center" valign="top" align="left"  width="100.0%" height="100.0%">
-            <panel id="GPanel1" style="STYLE_TOP_MENU_BAR_PANEL" childLayout="horizontal" width="100.0%" valign="top" align="left" height="4%">
+            <panel id="GPanel1" style="STYLE_TOP_MENU_BAR_PANEL" childLayout="horizontal" width="100.0%" valign="top" align="left" height="23px">
                
-                <image id="GImage2" childLayout="center" filename="imgs\new_gui\ico_gray_background.png" width="6%" x="0.0px" y="0.0px" valign="center" align="left" height="100%" filter="true"/>
+                <image id="GImage2" childLayout="center" filename="imgs\pngs720p\Med3D-22.png" width="45px"valign="center" align="left" filter="true"/>
                 
                  <!--  ********************************** -->
                  <!-- button File & its dropdown menu -->
                  <!--  ********************************** -->
-                 <panel id=""  style="STYLE_TOP_MENU_BUTTON" childLayout="vertical" valign="center" align="left" height="100%" width="5%">
+                 <panel id=""  style="STYLE_TOP_MENU_BUTTON" childLayout="vertical" valign="center" align="left" height="100%" width="50px">
            
                      <!--  the File button -->
-	                <control name="button" id="BUTTON_TOP_MENU_OPEN" style="STYLE_TOP_MENU_BUTTON" childLayout="center"  valign="center" label="File" align="left" height="100.0%" width="100.0%">
-	                	<interact onClick="onButton_TopMenu_File(a)"/>        	
+	                <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center"  valign="center" label="File" align="left" height="100.0%" width="100.0%">
+	                	<interact onClick="onButton_TopMenu_File(a)"
+	                	    		 onMouseOver="onHover_TopMenu_File(a)"/>   
+	                   	
 	                </control>
 	                
 	                 <!--  Drop-down menu, which is offseted a bit down -->
@@ -187,11 +189,12 @@
               <!--  ********************************** -->
                  <!-- button Options & its dropdown menu -->
                  <!--  ********************************** -->
-                 <panel id=""  style="STYLE_TOP_MENU_BUTTON" childLayout="vertical" valign="center" align="left" height="100%" width="6%">
+                 <panel id=""  style="STYLE_TOP_MENU_BUTTON" childLayout="vertical" valign="center" align="left" height="100%" width="70px">
            
                      <!--  the File button -->
-	                <control name="button" id="BUTTON_TOP_MENU_OPEN" style="STYLE_TOP_MENU_BUTTON" childLayout="center"  valign="center" label="Options" align="left" height="100.0%" width="100.0%">
-	                	<interact onClick="onButton_TopMenu_Options(a)"/>        	
+	                <control name="button" id="DFFR3FR3" style="STYLE_TOP_MENU_BUTTON" childLayout="center"  valign="center" label="Options" align="left" height="100.0%" width="100.0%">
+	                	<interact onClick="onButton_TopMenu_Options(a)"
+	                	    	onMouseOver="onHover_TopMenu_Options(a)"/>       	
 	                </control>
 	                
 	                 <!--  Drop-down menu, which is offseted a bit down -->
@@ -234,9 +237,9 @@
                  </panel>
                 <!--  ******** END BUTTON ********** -->
                  
-                 	    <!-- ******************************************* -->
-						<!-- minimize, maxmimize, close buttons on top menu bar-->
-						<!-- ******************************************* -->
+                <!-- ******************************************* -->
+				<!-- minimize, maxmimize, close buttons on top menu bar-->
+				<!-- ******************************************* -->
 						
 						<!-- push panel with buttons to right -->
 						 <panel id=""  style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" valign="top" align="right" height="100%" width="*">
@@ -248,27 +251,27 @@
 						 <panel id=""  style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" valign="top" align="right" height="100%" width="*">
 						 </panel>
 						 
-	                     <control name="button" id="" style="STYLE_TOP_MENU_WINDOW_BUTTONS" childLayout="center" valign="top" label="" align="right" height="20px" width="20px"  backgroundImage="imgs\new_gui\btn_minimize.png"  filter="true" >
+	                     <control name="button" id="" style="STYLE_TOP_MENU_WINDOW_BUTTONS" childLayout="center" valign="top" label="" align="right" height="15px" width="17px" backgroundImage="imgs\pngs720p\Med3D-27.png"  filter="true" >
 						        <interact onClick="onButton_TopMenu_Minimize(a)"/> 
 						        <effect>
-									<onHover name="imageOverlay" filename="imgs/new_gui/btn_minimize_mouse_over.png" imageMode="normal" post="true" />
-									<onClick name="imageOverlay" filename="imgs/new_gui/btn_minimize_clicked.png" imageMode="normal" post="true" />
+									<onHover name="imageOverlay" filename="imgs/pngs720p/Med3D-31.png" imageMode="normal" post="true" />
+									<onClick name="imageOverlay" filename="imgs/pngs720p/Med3D-28.png" imageMode="normal" post="true" />
 								</effect>	       	
 						 </control>
 						 
-	                     <control name="button" id="" style="STYLE_TOP_MENU_WINDOW_BUTTONS" childLayout="center" valign="top" label="" align="right" height="20px" width="20px"  backgroundImage="imgs\new_gui\btn_maximize.png"  filter="true" >
-						        <interact onClick="onButton_TopMenu_Maximize(a)"/> 
+	                     <control name="button" id="" style="STYLE_TOP_MENU_WINDOW_BUTTONS" childLayout="center" valign="top" label="" align="right" height="15px" width="17px"  backgroundImage="imgs\pngs720p\Med3D-26.png"  filter="true" >
+						        <interact onClick="onButton_TopMenu_Maximize(a)"/>   
 						        <effect>
-									<onHover name="imageOverlay" filename="imgs/new_gui/btn_maximize_mouse_over.png" imageMode="normal" post="true" />
-									<onClick name="imageOverlay" filename="imgs/new_gui/btn_maximize_clicked.png" imageMode="normal" post="true" />
+									<onHover name="imageOverlay" filename="imgs/pngs720p/Med3D-32.png" imageMode="normal" post="true" />
+									<onClick name="imageOverlay" filename="imgs/pngs720p/Med3D-29.png" imageMode="normal" post="true" />
 								</effect>	       	
 						 </control>
 						 
-		                 <control name="button" id="" style="STYLE_TOP_MENU_WINDOW_BUTTONS" childLayout="center" valign="top" label="" align="right" height="20px" width="20px"  backgroundImage="imgs\new_gui\btn_close.png"  filter="true" >
+		                 <control name="button" id="" style="STYLE_TOP_MENU_WINDOW_BUTTONS" childLayout="center" valign="top" label="" align="right" height="15px" width="17px"  backgroundImage="imgs\pngs720p\Med3D-25.png"  filter="true" >
 						        <interact onClick="onButton_TopMenu_Close(a)"/>        	
 						        <effect>
-									<onHover name="imageOverlay" filename="imgs/new_gui/btn_close_mouse_over.png" imageMode="normal" post="true" />
-									<onClick name="imageOverlay" filename="imgs/new_gui/btn_close_clicked.png" imageMode="normal" post="true" />
+									<onHover name="imageOverlay" filename="imgs/pngs720p/Med3D-33.png" imageMode="normal" post="true" />
+									<onClick name="imageOverlay" filename="imgs/pngs720p/Med3D-30.png" imageMode="normal" post="true" />
 								</effect>	
 						 </control>
 						 

@@ -66,10 +66,12 @@ import de.lessvoid.nifty.spi.time.impl.AccurateTimeProvider;
 import de.lessvoid.nifty.tools.Color;
 import de.lessvoid.nifty.tools.SizeValue;
 import de.lessvoid.nifty.tools.resourceloader.NiftyResourceLoader;
+import de.matthiasmann.twl.GUI;
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.HUD;
 import si.uni_lj.fri.veins3D.gui.GUIMain;
 import si.uni_lj.fri.veins3D.gui.NiftyScreenController;
+import si.uni_lj.fri.veins3D.gui.VeinsWindow23;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
 import si.uni_lj.fri.veins3D.math.Quaternion;
@@ -182,32 +184,29 @@ public class VeinsWindow
 
 	}
 
+	// Contains all logic to resize window, renderer and niftyGUI
 	public void ResizeWindow(boolean fullscreen)
 	{
-		currentDisplayMode = displayModes[13];
-		try
-		{
-			Display.setDisplayMode(currentDisplayMode);
-			Display.setFullscreen(fullscreen);
+		renderer = (VeinsRenderer) renderer;
+		DisplayMode[] displayModes = getDisplayModes();
 
-			VeinsWindow.settings.resWidth = currentDisplayMode.getWidth();
-			VeinsWindow.settings.resHeight = currentDisplayMode.getHeight();
-
+			currentDisplayMode = displayModes[0];
+			try
+			{
+				Display.setDisplayMode(currentDisplayMode);
+				VeinsWindow.settings.resWidth = currentDisplayMode.getWidth();
+				VeinsWindow.settings.resHeight = currentDisplayMode.getHeight();
+			}
+			catch (LWJGLException e)
+			{
+				e.printStackTrace();
+			}
+			renderer.setupView();
 			frame.setPreferredSize(new Dimension(currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
 			frame.setSize(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
 			frame.pack();
 			
-			
-			SCREEN RESIZE FAIL ON MAXIMIZE
-			// frame.pack();
-			// frame.setVisible(true);
-		}
-		catch (LWJGLException e)
-		{
-			e.printStackTrace();
-		}
-		renderer.setupView();
-
+			nifty.resolutionChanged();
 	}
 
 	void loadSettings(String fileName)
@@ -241,7 +240,7 @@ public class VeinsWindow
 			}
 
 			// ADD TO VM ARGS: -Dorg.lwjgl.opengl.Window.undecorated=true
-			currentDisplayMode = displayModes[10];
+			currentDisplayMode = displayModes[6]; // TODO: REMOVE LATER ON
 			// settings.fullscreen = true;
 			settings.resWidth = currentDisplayMode.getWidth();
 			settings.resHeight = currentDisplayMode.getHeight();
