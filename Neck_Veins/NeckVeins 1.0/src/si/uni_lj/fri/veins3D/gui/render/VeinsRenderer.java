@@ -129,7 +129,7 @@ public class VeinsRenderer  {
 	 * @version 0.1
 	 */
 	public void clearView() {
-		glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
+		glClearColor(0.2f, 0.3f, 0.2f, 0.0f);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 	}
 

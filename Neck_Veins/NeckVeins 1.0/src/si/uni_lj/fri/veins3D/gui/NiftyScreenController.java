@@ -5,6 +5,8 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
+import org.lwjgl.input.Mouse;
+
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import de.lessvoid.nifty.EndNotify;
 import de.lessvoid.nifty.Nifty;
@@ -33,12 +35,31 @@ public class NiftyScreenController extends DefaultScreenController
 	static final int TOPMENU_DROPDOWN_FILE = 0;
 	static final int TOPMENU_DROPDOWN_OPTIONS = 1;
 	Element[] m_panel_topMenu_DropDownMenus;
-
+	
 	// -----------------------------------
 	// Side menu
 	// -----------------------------------
 	NiftySettingsSideMenu m_settingsSideMenu = null;
+	boolean m_isSettginsSideMenuOpened = false;
+	
 
+	// This is called when the screen is created
+	private void init()
+	{
+		// m_popupMenu_MainMenu_File = NiftyPopupMenus.CreatePopup_File(VeinsWindow.nifty);
+		m_settingsSideMenu = new NiftySettingsSideMenu(m_screen);
+		
+		// ---------------------------------------
+		// Top menu bars
+		// ---------------------------------------
+		m_panel_topMenu_DropDownMenus = new Element[2];
+		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_FILE] = nifty.getScreen("GScreen0").findElementById("TOP_MENU_FILE_DROP_DOWN_PANEL");
+		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_OPTIONS] = nifty.getScreen("GScreen0").findElementById("TOP_MENU_OPTIONS_DROP_DOWN_PANEL");
+		
+		closeAllTopMenuDropDownMenus();
+	}
+
+	
 	public void update()
 	{
 
@@ -47,49 +68,48 @@ public class NiftyScreenController extends DefaultScreenController
 	// Detects mouse down click (after it was up)
 	public void onMouseLeftDownClicked()
 	{
-		// Hide all top menu drop down menus
-		closeAllTopMenuDropDownMenus();
-	}
-
-	// This is called when the screen is created
-	private void init()
-	{
-		// m_popupMenu_MainMenu_File = NiftyPopupMenus.CreatePopup_File(VeinsWindow.nifty);
-		m_settingsSideMenu = new NiftySettingsSideMenu(m_screen);
-
-		// ---------------------------------------
-		// Top menu bars
-		// ---------------------------------------
-		m_panel_topMenu_DropDownMenus = new Element[2];
-		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_FILE] = nifty.getScreen("GScreen0").findElementById("TOP_MENU_FILE_DROP_DOWN_PANEL");
-		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_OPTIONS] = nifty.getScreen("GScreen0").findElementById("TOP_MENU_OPTIONS_DROP_DOWN_PANEL");
-
-		closeAllTopMenuDropDownMenus();
+		// Hide all top menu drop down menus if mouse clicked on none of them
+		if(isMouseOnAnyDropDownMenu()==false)
+			closeAllTopMenuDropDownMenus();
+		
+		m_settingsSideMenu.OnMouseClick(); // closes it if mouse is clicked outside
 	}
 
 	static class Bla
 	{
 
 	}
+	
+	// ----------------------------------------------------
+	// Common
+	// ----------------------------------------------------
 
+	// is called when some menu will open (so you can close others etc..)
+	void prepareForSomeMenuOpen()
+	{
+		closeAllTopMenuDropDownMenus();
+		m_settingsSideMenu.CloseMenu();
+	}
+	
 	// ----------------------------------------------------
 	// Minimize,maximize,close
 	// ----------------------------------------------------
 	public void onButton_TopMenu_Minimize(String a)
 	{
+		prepareForSomeMenuOpen();
 		VeinsWindow.frame.setState(Frame.ICONIFIED);
 	}
 
 	public void onButton_TopMenu_Maximize(String a)
 	{
 
-		// VeinsWindow.frame.setExtendedState( VeinsWindow.frame.getExtendedState()|JFrame.MAXIMIZED_BOTH );
+		prepareForSomeMenuOpen();
 		VeinsWindow.veinsWindow.ResizeWindow(true);
 	}
 
 	public void onButton_TopMenu_Close(String a)
 	{
-		// VeinsWindow.frame.dispatchEvent(new WindowEvent(VeinsWindow.frame, WindowEvent.WINDOW_CLOSING));
+		prepareForSomeMenuOpen();
 		VeinsWindow.veinsWindow.exitProgram(0);
 
 	}
@@ -99,7 +119,7 @@ public class NiftyScreenController extends DefaultScreenController
 	// ----------------------------------------------------
 	public void onButton_TopMenu_File(String a)
 	{
-		closeAllTopMenuDropDownMenus();
+		prepareForSomeMenuOpen();
 		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_FILE].setVisible(true);
 	}
 	public void onHover_TopMenu_File(String a)
@@ -107,11 +127,10 @@ public class NiftyScreenController extends DefaultScreenController
 		tryOpeningDropDownOnHover(TOPMENU_DROPDOWN_FILE);	
 	}
 
-	IF FONT CHANGE ALL FONTS ARE CHANGED??
 	
 	public void onButton_TopMenu_Options(String a)
 	{
-		closeAllTopMenuDropDownMenus();
+		prepareForSomeMenuOpen();
 		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_OPTIONS].setVisible(true);	
 	}
 	public void onHover_TopMenu_Options(String a)
@@ -126,6 +145,15 @@ public class NiftyScreenController extends DefaultScreenController
 			isVisible = isVisible || m_panel_topMenu_DropDownMenus[i].isVisible();
 		
 		return isVisible;
+	}
+	
+	boolean isMouseOnAnyDropDownMenu()
+	{
+		 PROBLEM: CLICK NOT INSIDE ELEMENT, SHOULD GO OVER ALL CHILDREN
+		boolean isInside = false;
+		for(int i=0;i<m_panel_topMenu_DropDownMenus.length;++i)
+			isInside = isInside || m_panel_topMenu_DropDownMenus[i].isMouseInsideElement(Mouse.getX(), Mouse.getY());
+		return isInside;
 	}
 	
 	void closeAllTopMenuDropDownMenus()
@@ -147,6 +175,31 @@ public class NiftyScreenController extends DefaultScreenController
 	}
 	
 	// ----------------------------------------------------
+	// Settings side menu
+	// ----------------------------------------------------
+	public void onButton_SettingsSideMenu_Open(String a)
+	{
+		prepareForSomeMenuOpen();
+		m_settingsSideMenu.OpenMenu();
+	}
+	
+	public void onButton_SettingsSideMenu_Close(String a)
+	{	
+		m_settingsSideMenu.CloseMenu();
+		prepareForSomeMenuOpen();
+	}
+	
+	public void onEffectEnd_SettingsSideMenuClose()
+	{
+		m_settingsSideMenu.OnMenuCloseAnimationFinished();
+	}
+	
+	public void onButton_SettingsSideMenu_BackPanelClicked(String a)
+	{
+		System.out.println("hhh");
+	}
+	
+	// ----------------------------------------------------
 
 	// ----------------------------------------------------
 	public void onBtn(String bla)
@@ -163,7 +216,8 @@ public class NiftyScreenController extends DefaultScreenController
 		 * ListBox lb = m_screen.findNiftyControl("GListBox0",ListBox.class); lb.enable(); lb.addItem("a"); lb.addItem("b"); lb.addItem("c");
 		 */
 
-		m_settingsSideMenu.OpenMenu();
+		System.out.println("jhjj");
+		//m_settingsSideMenu.OpenMenu();
 
 	}
 

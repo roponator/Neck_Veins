@@ -56,45 +56,36 @@
         <attributes childLayout="horizontal" height="43px" align="center" focusable="true"/>
     </style>
     <style id="nifty-horizontal-slider#left">
-        <attributes filename="slider/slider.png" width="23px" height="23px" imageMode="sprite:23,23,6"/>
+        <attributes filename="imgs/pngs720p/Med3D-47.png" width="17px" height="22px" imageMode="normal" filter="true"/>
         <effect>
             <onClick name="focus" targetElement="#parent"/>
-            <onClick name="imageOverlay" filename="slider/slider.png" imageMode="sprite:23,23,8" post="true"/>
-            <onFocus name="imageOverlay" filename="slider/slider.png" imageMode="sprite:23,23,7" post="true"/>
-            <onHover name="border" color="#822f" post="true"/>
-            <onEnabled name="renderQuad" startColor="#2228" endColor="#2220" post="true" length="150"/>
-            <onDisabled name="renderQuad" startColor="#2220" endColor="#2228" post="true" length="150"/>
+            <onClick name="imageOverlay" filename="imgs/pngs720p/Med3D-47_clicked.png" width="17px" height="22px" imageMode="normal" filter="true" />
+            <onFocus name="imageOverlay" filename="imgs/pngs720p/Med3D-47.png" width="17px" height="22px" imageMode="normal" filter="true" />
+          
         </effect>
     </style>
     <style id="nifty-horizontal-slider#right">
-        <attributes filename="slider/slider.png" width="23px" height="23px" imageMode="sprite:23,23,9"/>
+        <attributes filename="imgs/pngs720p/Med3D-47_right.png" width="17px" height="22px" imageMode="normal" filter="true"/>
         <effect>
             <onClick name="focus" targetElement="#parent"/>
-            <onClick name="imageOverlay" filename="slider/slider.png" imageMode="sprite:23,23,11" post="true"/>
-            <onFocus name="imageOverlay" filename="slider/slider.png" imageMode="sprite:23,23,10" post="true"/>
-            <onHover name="border" color="#822f" post="true"/>
-            <onEnabled name="renderQuad" startColor="#2228" endColor="#2220" post="true" length="150"/>
-            <onDisabled name="renderQuad" startColor="#2220" endColor="#2228" post="true" length="150"/>
+             <onClick name="imageOverlay" filename="imgs/pngs720p/Med3D-47_right_clicked.png" width="17px" height="22px" imageMode="normal" filter="true" />
+            <onFocus name="imageOverlay" filename="imgs/pngs720p/Med3D-47_right.png" width="17px" height="22px" imageMode="normal" filter="true" />
+
         </effect>
     </style>
     <style id="nifty-horizontal-slider#background">
-        <attributes filename="slider/slider.png" width="*" height="23px" childLayout="absolute"
-                    imageMode="sprite-resize:23,23,16,4,15,4,4,4,15,4,15,4,15,4,4"/>
+        <attributes filename="imgs/pngs720p/Med3D-49.png" width="*" height="22px" childLayout="absolute"
+                    imageMode="normal" />
         <effect>
             <onClick name="focus" targetElement="#parent"/>
         </effect>
     </style>
     <style id="nifty-horizontal-slider#position">
-        <attributes filename="slider/slider.png" x="0px" y="0px" width="23px" height="23px"
-                    imageMode="sprite-resize:23,23,17,4,15,4,4,4,15,4,15,4,15,4,4"/>
+        <attributes filename="imgs/pngs720p/Med3D-49.png" x="0px" y="0px" width="30px" height="22px" imageMode="normal"/>
         <effect>
-            <onClick name="focus" targetElement="#parent#parent"/>
-            <onFocus name="imageOverlay" filename="slider/slider.png"
-                     imageMode="sprite-resize:23,23,19,4,15,4,4,4,15,4,15,4,15,4,4" post="true"/>
-            <onHover name="imageOverlay" filename="slider/slider.png"
-                     imageMode="sprite-resize:23,23,18,4,15,4,4,4,15,4,15,4,15,4,4" post="true"/>
-            <onEnabled name="renderQuad" startColor="#2228" endColor="#2220" post="true" length="150"/>
-            <onDisabled name="renderQuad" startColor="#2220" endColor="#2228" post="true" length="150"/>
+            <onClick  name="imageOverlay" filename="imgs/pngs720p/Med3D-50.png" x="0px" y="0px" width="100%" height="22px" imageMode="normal" post="true" renderOrder="1001"/>
+            <onFocus name="imageOverlay" filename="imgs/pngs720p/Med3D-49.png" x="0px" y="0px" width="100%" height="22px" imageMode="normal" post="true"  renderOrder="1000" />
+            <onHover name="imageOverlay" filename="imgs/pngs720p/Med3D-50.png" x="0px" y="0px" width="100%" height="22px" imageMode="normal" post="true" renderOrder="1001"/>
         </effect>
     </style>
 </nifty-styles>

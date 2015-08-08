@@ -1,0 +1,58 @@
+# AngelCode Bitmap Font Generator configuration file
+fileVersion=1
+
+# font settings
+fontName=Aurulent Sans
+fontFile=../../../../../../AurulentSans-Regular.otf
+charSet=0
+fontSize=-16
+aa=1
+scaleH=100
+useSmoothing=1
+isBold=0
+isItalic=0
+useUnicode=1
+disableBoxChars=1
+outputInvalidCharGlyph=0
+dontIncludeKerningPairs=0
+useHinting=1
+renderFromOutline=0
+useClearType=1
+
+# character alignment
+paddingDown=0
+paddingUp=0
+paddingRight=0
+paddingLeft=0
+spacingHoriz=1
+spacingVert=1
+useFixedHeight=0
+forceZero=0
+
+# output file
+outWidth=512
+outHeight=512
+outBitDepth=8
+fontDescFormat=0
+fourChnlPacked=0
+textureFormat=png
+textureCompression=0
+alphaChnl=0
+redChnl=4
+greenChnl=4
+blueChnl=4
+invA=0
+invR=0
+invG=0
+invB=0
+
+# outline
+outlineThickness=0
+
+# selected chars
+chars=32-126,160,168,175,180,192-194,196-197,200-208,210-212,214,217-226,228-229,232-240,242-244,246,249
+chars=250-259,262-271,274-279,282-285,288-289,292-293,298-301,304-305,308-309,313-314,317-318,323-324
+chars=327-328,332-337,340-341,344-349,356-357,362-369,372-382,461-468,486-489,496,567,710-711,728-730
+chars=733,768,8216-8217,8220-8221,9251
+
+# imported icon images

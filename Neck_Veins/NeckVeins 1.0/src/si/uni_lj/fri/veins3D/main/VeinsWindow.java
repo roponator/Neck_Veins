@@ -171,7 +171,7 @@ public class VeinsWindow
 
 			// get screen controller
 			screenController = (NiftyScreenController) nifty.getScreen("GScreen0").getScreenController();
-
+		
 			// enable auto scale
 			// nifty.enableAutoScaling(1024,768);
 
@@ -372,12 +372,10 @@ public class VeinsWindow
 			m_wasMouseLeftUp = !Mouse.isButtonDown(0);
 
 			// Strange render loop
-			boolean done = false;
-
 
 			// renderer.setupView(); // raycast volume renderer changes some
 			// states, theys must be reset
-			// renderer.clearView();
+			 renderer.clearView();
 
 			// pollInput();
 			// hud.setClickedOn(clickedOn);
@@ -399,7 +397,7 @@ public class VeinsWindow
 				screenController.onMouseLeftDownClicked();
 
 			nifty.update();
-			nifty.render(true); // TODO: THROWS ERROR ON FIRST FRAME??
+			nifty.render(false); // TODO: THROWS ERROR ON FIRST FRAME??
 			Display.update();
 
 			Display.sync(settings.frequency); // TODO NIFTY
