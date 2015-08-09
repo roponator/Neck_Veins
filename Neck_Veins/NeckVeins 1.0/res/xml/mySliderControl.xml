@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty-controls xmlns="http://nifty-gui.lessvoid.com/nifty-gui">
+    <controlDefinition name="MyHorizontalSlider" style="nifty-vertical-slider">
+
+        	<!-- 
+        		WARNING!!!!!!!!!!!
+        		WARNING!!!!!!!!!!!
+        		The control 'SLIDER_CONTROL' must not have any "control" xml nodes as parents in this file.
+        		If it does you need to modify the 'FindMySliderParent' in my screen controller.
+        	 -->
+            <!--  a single slider (label, value label, slider) -->
+                     <panel id="a" childLayout="vertical" width="100%" height="100%" style="STYLE_COMMON_INVISIBLE" align="center" margin="10px,0px,0px,0px" >
+                           <panel id="b" childLayout="vertical" width="90%" height="100%" style="STYLE_COMMON_INVISIBLE" align="center" >
+                      
+		                         <!-- top panel: name label & value label -->
+		                         <panel childLayout="horizontal" width="100%" height="45%" style="STYLE_COMMON_INVISIBLE" align="left" >
+		                               	<control name="label" id="" style="STYLE_COMMON_INVISIBLE" width="50%" text="Setting1" textHAlign="left" height="100.0%" font="aurulent-sans-16.fnt"/>
+				               		    <control name="label" id="SLIDER_VALUE_LABEL" style="STYLE_COMMON_INVISIBLE" width="50%" text="10.45" textHAlign="right" height="100.0%"  font="aurulent-sans-16.fnt"/>                      		    
+		                    	  </panel>
+		                    	   	  
+		                           <!-- bottom slider -->
+		                           <control childLayout="horizontal" id="SLIDER_CONTROL" name="horizontalSlider" width="100%" />
+		                           
+		                    </panel>
+                     </panel>
+                     
+        
+    </controlDefinition>
+</nifty-controls>

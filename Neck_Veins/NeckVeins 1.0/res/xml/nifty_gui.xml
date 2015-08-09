@@ -2,144 +2,30 @@
 <nifty xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://nifty-gui.lessvoid.com/nifty-gui" xsi:schemaLocation="https://raw.githubusercontent.com/void256/nifty-gui/1.4/nifty-core/src/main/resources/nifty.xsd https://raw.githubusercontent.com/void256/nifty-gui/1.4/nifty-core/src/main/resources/nifty.xsd">
     <useControls filename="nifty-default-controls.xml"/>
     <useStyles filename="nifty-default-styles.xml"/>
+    <useStyles filename="xml/nifty_styles.xml"/>
  	<useStyles filename="xml/mySliderStyle.xml"/>
+ 	 <useControls filename="xml/mySliderControl.xml"/>
+    	 <useControls filename="xml/myOpenDialogControl.xml"/>
     	 
 	 <!-- base="nifty-panel-simple" -->
 	 
 	  <!-- PADDING ORDER: top,right,down,left -->
 	 
-	  <!-- ******************************************* -->
-	 <!--Common styles -->
-	 <!-- ******************************************* -->
-	   <style id="STYLE_COMMON_INVISIBLE"   >
-        <attributes 
-            backgroundColor="#00000000"
-           imageMode="normal"/>
-    </style>
-    
-	  <style id="STYLE_COMMON_RED"   >
-        <attributes 
-            backgroundColor="#ff0000ff"
-           imageMode="normal"/>
-    </style>
-	 
-	     <style id="STYLE_COMMON_GREEN"   >
-        <attributes 
-            backgroundColor="#00ff00ff"
-           imageMode="normal"/>
-    </style>
-    
-	         <style id="STYLE_COMMON_BLUE"   >
-        <attributes 
-            backgroundColor="#0000ffff"
-           imageMode="normal"/>
-    </style>
-    
-	             <style id="STYLE_COMMON_PINK"   >
-        <attributes 
-            backgroundColor="#ff00ffff"
-           imageMode="normal"/>
-    </style>
-	 
-	 
-	 <!-- ******************************************* -->
-	 <!-- Top menu bar styles -->
-	 <!-- ******************************************* -->
-	 
-	  <style id="STYLE_TOP_MENU_BAR_PANEL"   >
-        <attributes 
-           backgroundImage="imgs\new_gui\rect_gray_long_ver.png"  filter="true"
-           imageMode="normal"
-       
-           />
-    </style>
-    
-    
-     <style id="STYLE_TOP_MENU_BUTTON"   >
-        <attributes 
-            backgroundImage="" 
-            imageMode="normal"
-        	  	
-        />      
-       	<effect>
-			<onHover name="imageOverlay" filename="imgs/new_gui/rect_green_long.png" imageMode="normal" post="true" />
-		</effect>	        
-    </style>
-    
-    <style id="STYLE_TOP_MENU_BUTTON#text" base="button-font">
-   		<attributes 
-   		    align="center" valign="center" textHAlign="center"
-   		     textVAlign="center" visibleToMouse="false" color="#ffff" />
- 	</style>
- 	
-    
-     <style id="STYLE_TOP_MENU_DROPDOWN_BUTTON"   >
-        <attributes 
-            backgroundImage="imgs/new_gui/rect_gray_short_ver.png"  
-            imageMode="normal" 
-        />      
-       	<effect>
-			<onHover name="imageOverlay" filename="imgs/new_gui/rect_green_long.png" imageMode="normal" post="true" />
-		</effect>	        
-    </style>
-    
-     <style id="STYLE_TOP_MENU_DROPDOWN_BUTTON#text" base="button-font">
-   		<attributes align="left" valign="center" 
-   		    textHAlign="center" textVAlign="center"
-   		     visibleToMouse="false" color="#ffff"  
-   		       />
- 	</style>
-      
-  <style id="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" >
-   		<attributes 
-   		    margin = "0px,0px,0px,13px"
-   		    textHAlign="left" 
-   		     />
- 	</style> 	
- 	
-  <style id="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL_SMALL" >
-   		<attributes 
-   		    margin = "0px,0px,0px,13px"
-   		    textHAlign="left" 
-   		    color="#bbbbbbff"
-   		     />
- 	</style> 	
- 	
-        <style id="STYLE_TOP_MENU_WINDOW_BUTTONS"   >
-        <attributes 
-            backgroundImage="" 
-            imageMode="normal"
-        	  	
-        />            	        
-    </style>
-
-	 <!-- ******************************************* -->
-	 <!-- Settings side menu styles -->
-	 <!-- ******************************************* -->
-
-	  <style id="STYLE_SIDE_SETTINGS_MENU_LEFT_PANEL"   >
-        <attributes 
-            backgroundColor="#8d8d94ff"
-           imageMode="normal"/>
-    </style>
-    
-	 <style id="STYLE_SIDE_SETTINGS_MENU_RIGHT_PANEL_TOP"   >
-        <attributes 
-            backgroundImage="imgs\pngs720p\settings_top.png"  filter="true"
-           imageMode="normal" width="100%" height="69px"/>
-    </style>
-    
-	  <style id="STYLE_SIDE_SETTINGS_MENU_RIGHT_PANEL_BOTTOM"   >
-        <attributes 
-            backgroundImage="imgs\pngs720p\settings_bottom.png"  filter="true"
-           imageMode="normal" width="100%" height="100%"/>
-    </style>
-    
-	<screen id="GScreen0"  controller="si.uni_lj.fri.veins3D.gui.NiftyScreenController">
-    
 	
-        
-      
+  	<screen id="GScreen0"  controller="si.uni_lj.fri.veins3D.gui.NiftyScreenController">
+    
+  	              
+  	  <!-- ******************************************* -->
+	 <!-- TEMP: OPEN DIALOG -->
+	 <!-- ******************************************* -->
+  	      <layer id="LAYER_OPEN_DIALOG" childLayout="absolute" valign="top" align="left"  >
+            <control id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" x="200px" y="200px" childLayout="vertical" width="600px" height="300px" valign="top" align="left" >
+              
+     
+             </control>
+          </layer>
+  	    
+
         <!-- ******************************************* -->
 		<!-- LAYER: SETTINGS SIDE MENU -->
 		<!-- ******************************************* -->
@@ -175,61 +61,11 @@
 	               </panel>
 	               
                  <!--  settings sliders container -->
-                <panel childLayout="vertical" width="100%" height="*" style="STYLE_COMMON_INVISIBLE" align="left" backgroundColor="#76787bff">
+                <panel childLayout="vertical" width="100%" height="*" style="STYLE_COMMON_INVISIBLE" align="center" backgroundColor="#76787bff">
                     
-                    
-                    
-             
-                    <!--  a single slider (label, value label, slider) -->
-                     <panel childLayout="vertical" width="100%" height="50px" style="STYLE_COMMON_INVISIBLE" align="center" margin="10px,0px,0px,0px" >
-                           <panel childLayout="vertical" width="90%" height="100%" style="STYLE_COMMON_INVISIBLE" align="center" >
-                      
-		                         <!-- top panel: name label & value label -->
-		                         <panel childLayout="horizontal" width="100%" height="45%" style="STYLE_COMMON_INVISIBLE" align="left" >
-		                               	<control name="label" id="" style="STYLE_COMMON_INVISIBLE" width="50%" text="Setting1" textHAlign="left" height="100.0%" font="aurulent-sans-16.fnt"/>
-				               		    <control name="label" id="" style="STYLE_COMMON_INVISIBLE" width="50%" text="10.45" textHAlign="right" height="100.0%"  font="aurulent-sans-16.fnt"/>                      		    
-		                    	  </panel>
-		                    	   	  
-		                           <!-- bottom slider -->
-		                           <control childLayout="horizontal" id="sliderH" name="horizontalSlider" width="100%" />
-		                           
-		                    </panel>
-                     </panel>
-                     
-                      <!--  a single slider (label, value label, slider) -->
-                     <panel childLayout="vertical" width="100%" height="50px" style="STYLE_COMMON_INVISIBLE" align="center" margin="10px,0px,0px,0px" >
-                           <panel childLayout="vertical" width="90%" height="100%" style="STYLE_COMMON_INVISIBLE" align="center" >
-                      
-		                         <!-- top panel: name label & value label -->
-		                         <panel childLayout="horizontal" width="100%" height="45%" style="STYLE_COMMON_INVISIBLE" align="left" >
-		                               	<control name="label" id="" style="STYLE_COMMON_INVISIBLE" width="50%" text="Setting1" textHAlign="left" height="100.0%" font="aurulent-sans-16.fnt"/>
-				               		    <control name="label" id="" style="STYLE_COMMON_INVISIBLE" width="50%" text="10.45" textHAlign="right" height="100.0%"  font="aurulent-sans-16.fnt"/>                      		    
-		                    	  </panel>
-		                    	   	  
-		                           <!-- bottom slider -->
-		                           <control childLayout="horizontal" id="sliderH" name="horizontalSlider" width="100%" />
-		                           
-		                    </panel>
-                     </panel>
-                     
-                     
-                        <!--  a single slider (label, value label, slider) -->
-                     <panel childLayout="vertical" width="100%" height="50px" style="STYLE_COMMON_INVISIBLE" align="center" margin="10px,0px,0px,0px" >
-                           <panel childLayout="vertical" width="90%" height="100%" style="STYLE_COMMON_INVISIBLE" align="center" >
-                      
-		                         <!-- top panel: name label & value label -->
-		                         <panel childLayout="horizontal" width="100%" height="45%" style="STYLE_COMMON_INVISIBLE" align="left" >
-		                               	<control name="label" id="" style="STYLE_COMMON_INVISIBLE" width="50%" text="Setting1" textHAlign="left" height="100.0%" font="aurulent-sans-16.fnt"/>
-				               		    <control name="label" id="" style="STYLE_COMMON_INVISIBLE" width="50%" text="10.45" textHAlign="right" height="100.0%"  font="aurulent-sans-16.fnt"/>                      		    
-		                    	  </panel>
-		                    	   	  
-		                           <!-- bottom slider -->
-		                           <control childLayout="horizontal" id="sliderH" name="horizontalSlider" width="100%" />
-		                           
-		                    </panel>
-                     </panel>
-                     
-                    
+                     <control childLayout="vertical" id="sl1" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>
+                     <control childLayout="vertical" id="sl2" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>
+                                                        
                 </panel>
                       
                 	               
@@ -246,7 +82,7 @@
 		 
 		 
 		 
-        <!-- ******************************************* -->
+      <!-- ******************************************* -->
 	 <!-- LAYER: TOP MENU BAR-->
 	 <!-- ******************************************* -->
 
@@ -276,7 +112,7 @@
 	               		<panel id="" childLayout="vertical" width="100%" height="100%" style="STYLE_COMMON_INVISIBLE" valign="center" align="left"  >
 	               		  
 	               		    <!--  the Open button -->
-	               		    <panel id="" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
+	               		    <panel id="TOP_MENU_OPEN_PANEL" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
 	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" valign="center" label="" align="left" height="100.0%" width="100.0%">
 				                	<interact onClick="onBtn(bla)"/>        	
 				                </control>
@@ -287,7 +123,7 @@
 				            </panel>
 				            
 	               		    <!--  the Save As button -->
-	               		    <panel id="" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
+	               		    <panel id="TOP_MENU_SAVE_AS_PANEL" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
 	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" valign="center" label="" align="left" height="100.0%" width="100.0%">
 				                	<interact onClick="onBtn(bla)"/>        	
 				                </control>
@@ -298,7 +134,7 @@
 				            </panel>
 				            
 	               		      <!--  the Exit button -->
-	               		    <panel id="" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
+	               		    <panel id="TOP_MENU_EXIT_PANEL" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
 	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" valign="center" label="" align="left" height="100.0%" width="100.0%" >
 				                	<interact onClick="onBtn(bla)"/>        	
 				                </control>
@@ -407,6 +243,8 @@
                 </panel>
  
         </layer>
+        
+    
         
         
     </screen>

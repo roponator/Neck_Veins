@@ -15,16 +15,18 @@ public class NiftySettingsSideMenu
 	Element m_menuPanel = null;
 	Element m_closedMenuButtonPanel = null; // the thin button panel that is shown when this is closed
 
-	public NiftySettingsSideMenu(Screen screen)
+	public NiftySettingsSideMenu()
 	{
-		m_menuPanel = screen.findElementById("PANEL_SIDE_SETTINGS_MENU_LEFT");
-		m_closedMenuButtonPanel = screen.findElementById("PANEL_SIDE_SETTINGS_MENU_RIGHT_HOLDER");
+		m_menuPanel = NiftyScreenController.m_screen.findElementById("PANEL_SIDE_SETTINGS_MENU_LEFT");
+		m_closedMenuButtonPanel =  NiftyScreenController.m_screen.findElementById("PANEL_SIDE_SETTINGS_MENU_RIGHT_HOLDER");
 
 		// doesn't work in xml???
 		m_menuPanel.setRenderOrder(4000);
 		m_closedMenuButtonPanel.setRenderOrder(1100);
 		m_menuPanel.setVisible(false);
 		m_closedMenuButtonPanel.setVisible(true);
+		
+		
 	}
 
 	// If menu is open and mouse click is outside this: close
