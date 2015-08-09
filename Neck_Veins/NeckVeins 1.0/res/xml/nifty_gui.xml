@@ -4,8 +4,14 @@
     <useStyles filename="nifty-default-styles.xml"/>
     <useStyles filename="xml/nifty_styles.xml"/>
  	<useStyles filename="xml/mySliderStyle.xml"/>
+ 
  	 <useControls filename="xml/mySliderControl.xml"/>
-    	 <useControls filename="xml/myOpenDialogControl.xml"/>
+     <useControls filename="xml/myOpenDialogControl.xml"/>
+     
+    <useStyles filename="xml/myListboxStyle.xml"/>
+    <useControls filename="xml/myListboxControl.xml"/>
+    
+     <useStyles filename="xml/myScrollbarStyle.xml"/>
     	 
 	 <!-- base="nifty-panel-simple" -->
 	 
@@ -65,7 +71,13 @@
                     
                      <control childLayout="vertical" id="sl1" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>
                      <control childLayout="vertical" id="sl2" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>
-                                                        
+                     
+                     <panel childLayout="vertical" width="100%" height="50%" style="STYLE_COMMON_INVISIBLE" align="left" backgroundColor="#76787bff">
+                    		 <control  name="verticalSlider"  height="100px" />
+		              </panel>  
+		                   
+                     <control id="myListBox" name="MY_LISTBOX" vertical="on" horizontal="on" displayItems="5"/>
+     
                 </panel>
                       
                 	               

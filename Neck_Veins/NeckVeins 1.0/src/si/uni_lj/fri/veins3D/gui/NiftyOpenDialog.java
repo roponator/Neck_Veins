@@ -18,8 +18,9 @@ public class NiftyOpenDialog
 
 		m_mainOpenDailogElement = NiftyScreenController.m_screen.findElementById("MY_OPEN_DIALOG_ID");
 
-		TreeBox tb = m_mainOpenDailogElement.findNiftyControl("OPEN_DIALOG_FOLDER_TREE", TreeBox.class);
-		m_folderBrowser = new NiftyFolderBrowser(tb);
+		//TreeBox tb = m_mainOpenDailogElement.findNiftyControl("OPEN_DIALOG_FOLDER_TREE", TreeBox.class);
+		Element treeboxParentPanel = m_mainOpenDailogElement.findElementById("OPEN_DIALOG_FOLDER_TREEBOX_PANEL");
+		m_folderBrowser = new NiftyFolderBrowser(treeboxParentPanel);
 	}
 
 	public void OnCloseDialog()

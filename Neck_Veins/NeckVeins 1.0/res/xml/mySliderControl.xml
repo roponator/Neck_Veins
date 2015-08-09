@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nifty-controls xmlns="http://nifty-gui.lessvoid.com/nifty-gui">
+    
     <controlDefinition name="MyHorizontalSlider" style="nifty-vertical-slider">
-
         	<!-- 
         		WARNING!!!!!!!!!!!
         		WARNING!!!!!!!!!!!
@@ -20,10 +20,9 @@
 		                    	   	  
 		                           <!-- bottom slider -->
 		                           <control childLayout="horizontal" id="SLIDER_CONTROL" name="horizontalSlider" width="100%" />
-		                           
+		                                     
 		                    </panel>
                      </panel>
-                     
-        
     </controlDefinition>
+    
 </nifty-controls>

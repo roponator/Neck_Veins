@@ -3,10 +3,10 @@
     <!-- ++++++++ -->
     <!-- vertical -->
     <!-- ++++++++ -->
-    <style id="nifty-vertical-slider#panel">
+    <style id="nifty-vertical-scrollbar#panel">
         <attributes childLayout="vertical" width="15px" align="center" focusable="true"/>
     </style>
-    <style id="nifty-vertical-slider#up">
+    <style id="nifty-vertical-scrollbar#up">
         <attributes filename="imgs/pngs720p/slider_up.png" width="15px" height="13px" imageMode="normal"/>
         <effect>
             <onClick name="focus" targetElement="#parent"/>
@@ -16,13 +16,13 @@
 
         </effect>
     </style>
-    <style id="nifty-vertical-slider#background">
+    <style id="nifty-vertical-scrollbar#background">
         <attributes filename="imgs/pngs720p/Med3D-49.png" width="15px" height="*" childLayout="absolute"  imageMode="normal"/>
         <effect>
             <onClick name="focus" targetElement="#parent"/>
         </effect>
     </style>
-    <style id="nifty-vertical-slider#down">
+    <style id="nifty-vertical-scrollbar#down">
         <attributes filename="imgs/pngs720p/slider_down.png" width="15px" height="13px" imageMode="normal"/>
         <effect>
             <onClick name="focus" targetElement="#parent"/>
@@ -31,7 +31,7 @@
 
         </effect>
     </style>
-    <style id="nifty-vertical-slider#position">
+    <style id="nifty-vertical-scrollbar#position">
         <attributes filename="imgs/pngs720p/Med3D-49.png" x="0px" y="0px" width="15px" height="15px" imageMode="normal" childLayout="center"/>
         <effect>
              <onClick  name="imageOverlay" filename="imgs/pngs720p/Med3D-50.png" x="0px" y="0px" width="100%" height="15px" imageMode="normal" post="true" renderOrder="1001"/>
@@ -43,10 +43,10 @@
     <!-- ++++++++++ -->
     <!-- horizontal -->
     <!-- ++++++++++ -->
-    <style id="nifty-horizontal-slider#panel">
+    <style id="nifty-horizontal-scrollbar#panel">
         <attributes childLayout="horizontal" height="43px" align="center" focusable="true"/>
     </style>
-    <style id="nifty-horizontal-slider#left">
+    <style id="nifty-horizontal-scrollbar#left">
         <attributes filename="imgs/pngs720p/slider_left.png" width="13px" height="15px" imageMode="normal" filter="true"/>
         <effect>
             <onClick name="focus" targetElement="#parent"/>
@@ -55,7 +55,7 @@
           
         </effect>
     </style>
-    <style id="nifty-horizontal-slider#right">
+    <style id="nifty-horizontal-scrollbar#right">
         <attributes filename="imgs/pngs720p/slider_right.png" width="13px" height="15px" imageMode="normal" filter="true"/>
         <effect>
             <onClick name="focus" targetElement="#parent"/>
@@ -64,14 +64,14 @@
 
         </effect>
     </style>
-    <style id="nifty-horizontal-slider#background">
+    <style id="nifty-horizontal-scrollbar#background">
         <attributes filename="imgs/pngs720p/Med3D-49.png" width="*" height="15px" childLayout="absolute"
                     imageMode="normal" />
         <effect>
             <onClick name="focus" targetElement="#parent"/>
         </effect>
     </style>
-    <style id="nifty-horizontal-slider#position">
+    <style id="nifty-horizontal-scrollbar#position">
         <attributes filename="imgs/pngs720p/Med3D-49.png" x="0px" y="0px" width="30px" height="15px" imageMode="normal"/>
         <effect>
             <onClick  name="imageOverlay" filename="imgs/pngs720p/Med3D-50.png" x="0px" y="0px" width="100%" height="15px" imageMode="normal" post="true" renderOrder="1001"/>

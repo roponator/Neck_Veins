@@ -18,6 +18,7 @@ import de.lessvoid.nifty.NiftyMouse;
 import de.lessvoid.nifty.controls.ButtonClickedEvent;
 import de.lessvoid.nifty.controls.Controller;
 import de.lessvoid.nifty.controls.Label;
+import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.NiftyInputControl;
 import de.lessvoid.nifty.controls.Slider;
 import de.lessvoid.nifty.controls.SliderChangedEvent;
@@ -77,6 +78,10 @@ public class NiftyScreenController extends DefaultScreenController
 		InitSlider("sl1", -2.0f, 2.0f, 1.0f, 0.1f,"%.2f");
 		InitSlider("sl2", 0.0f, 10.0f, 1.0f, 0.1f,"%.0f");
 		
+		 ListBox listBox = m_screen.findNiftyControl("myListBox", ListBox.class);
+		  for(int i=0;i<10;++i)
+			  listBox.addItem(Integer.toString(i));
+		
 		// ---------------------------------------
 		// Top menu bars
 		// ---------------------------------------
@@ -85,6 +90,7 @@ public class NiftyScreenController extends DefaultScreenController
 		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_OPTIONS] = nifty.getScreen("GScreen0").findElementById("TOP_MENU_OPTIONS_DROP_DOWN_PANEL");
 
 		prepareForSomeMenuOpen();
+	
 	}
 
 	public void update()
