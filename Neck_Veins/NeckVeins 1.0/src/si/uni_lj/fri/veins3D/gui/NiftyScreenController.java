@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 
 import org.lwjgl.input.Mouse;
 
+import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyTreeItem;
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import de.lessvoid.nifty.EndNotify;
 import de.lessvoid.nifty.Nifty;
@@ -19,9 +20,11 @@ import de.lessvoid.nifty.controls.ButtonClickedEvent;
 import de.lessvoid.nifty.controls.Controller;
 import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.controls.NiftyInputControl;
 import de.lessvoid.nifty.controls.Slider;
 import de.lessvoid.nifty.controls.SliderChangedEvent;
+import de.lessvoid.nifty.controls.TreeItem;
 import de.lessvoid.nifty.controls.label.LabelControl;
 import de.lessvoid.nifty.controls.slider.SliderControl;
 import de.lessvoid.nifty.controls.slider.SliderImpl;
@@ -264,6 +267,15 @@ public class NiftyScreenController extends DefaultScreenController
 		m_openDialog.OnCloseDialog();
 	}
 
+	// ----------------------------------------------------
+	// Treebox events
+	// ----------------------------------------------------
+	@NiftyEventSubscriber(id="tree-box")
+    public void OnTreeboxSelectionChanged(String id, ListBoxSelectionChangedEvent<TreeItem<MyTreeItem>> event)
+    {
+		m_openDialog.OnTreeboxSelectionChanged(id,event);
+    }
+	
 	// ----------------------------------------------------
 	// Sliders
 	// ----------------------------------------------------

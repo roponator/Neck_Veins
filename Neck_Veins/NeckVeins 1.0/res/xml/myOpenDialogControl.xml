@@ -30,10 +30,8 @@
                   <panel id="" style="STYLE_COMMON_PINK" childLayout="vertical" width="100%" height="87%" valign="top" align="left" >
                   		<panel id="" style="STYLE_COMMON_GREEN" childLayout="horizontal" width="100%" height="100%" valign="top" align="left" >
                 			
-                  		    <!-- FOLDERS -->
-                			<panel id="OPEN_DIALOG_FOLDER_TREEBOX_PANEL" style="STYLE_COMMON_RED" childLayout="horizontal" width="30%" height="100%" valign="top" align="left" >
-                				<!-- <control id="OPEN_DIALOG_FOLDER_TREE" name="treeBox" width="100%" height="100%" /> -->
-                			</panel>
+                  		    <!-- FOLDERS, this panel contains the treebox-->
+                			<panel id="OPEN_DIALOG_FOLDER_TREEBOX_PANEL_CONTAINER" style="STYLE_COMMON_RED" childLayout="horizontal" width="30%" height="100%" valign="top" align="left" />s
                 			
                 			 <!-- FOLDER CONTENT & FILE -->
                 			<panel id="" style="STYLE_COMMON_BLUE" childLayout="horizontal" width="70%" height="100%" valign="top" align="left" >
