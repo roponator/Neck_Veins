@@ -136,10 +136,19 @@ public class VeinsWindow
 		this.title = Title;
 		loadSettings(filename);
 		createDisplay();
-		// GL gl = new LwjglGL();
 		initNiftyAndGUI();
 		initWindowElements();
 		setupWindow();
+		
+		/*try
+		{
+			renderer.loadModelRaw("C:\\Users\\ropo\\Desktop\\Zile\\Pat13_3D-DSA.mhd", 0.5,0.5);
+		}
+		catch (LWJGLException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 
 	}
 
@@ -152,17 +161,18 @@ public class VeinsWindow
 			// Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); // spams console a lot otherwise
 			inputSystem = new LwjglInputSystem();
 			inputSystem.startup();
-			// BatchRenderConfiguration.DEFAULT_USE_HIGH_QUALITY_TEXTURES=true;
-			BatchRenderBackendCoreProfileInternal niftyRenderFactory = (BatchRenderBackendCoreProfileInternal) LwjglBatchRenderBackendCoreProfileFactory.create();
+			
+			// MUST NOT USE CORE PROFILE, FOR COMPATIBILITY
+			BatchRenderBackend niftyRenderFactory =  LwjglBatchRenderBackendFactory.create();
 
-			niftyRenderFactory.useHighQualityTextures(true);
+			//niftyRenderFactory.useHighQualityTextures(true);
 
 			BatchRenderDevice niftyRenderer = new BatchRenderDevice(niftyRenderFactory);
-			niftyRenderFactory.useHighQualityTextures(true);
-			niftyRenderer.resetTextureAtlases();
+			//niftyRenderFactory.useHighQualityTextures(true);
+			//niftyRenderer.resetTextureAtlases();
 
 			nifty = new Nifty(niftyRenderer, new NullSoundDevice(), inputSystem, new AccurateTimeProvider());
-			niftyRenderFactory.useHighQualityTextures(true);
+			//niftyRenderFactory.useHighQualityTextures(true);
 	
 			// load our GUI
 			System.out.println("**NIFTY FROM XML*********************");
@@ -375,29 +385,28 @@ public class VeinsWindow
 
 			// renderer.setupView(); // raycast volume renderer changes some
 			// states, theys must be reset
-			 renderer.clearView();
+			renderer.clearView();
 
 			// pollInput();
 			// hud.setClickedOn(clickedOn);
 
-			// renderer.render();
+			 renderer.render();
 
 			// hud.drawHUD();
 			setTitle();
 
 			// TODO: PRESENT ORDER: BEFORE OR AFTER NIFTY.RENDER?
 			// Display.update();
-			// logic();
+			 logic();
 
-			glDisable(GL_CULL_FACE);
-			glDisable(GL_DEPTH_TEST);
 
 			// On down click after it was up (NOT DOWN->UP!)
 			if (wasLeftMouseDownClicked)
 				screenController.onMouseLeftDownClicked();
 
-			nifty.update();
-			nifty.render(false); // TODO: THROWS ERROR ON FIRST FRAME??
+			
+			renderNiftyGUI();
+			
 			Display.update();
 
 			Display.sync(settings.frequency); // TODO NIFTY
@@ -409,6 +418,42 @@ public class VeinsWindow
 				System.err.println(glerrmsg);
 			}
 		}
+	}
+	
+	// saves, sets and restores openGL states
+	void renderNiftyGUI()
+	{
+		glPushMatrix();
+		glPushAttrib(GL_ALL_ATTRIB_BITS);
+		
+		glEnable(GL_BLEND); 
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// set up GL state for Nifty rendering
+		GL11.glMatrixMode(GL11.GL_PROJECTION);
+		GL11.glLoadIdentity();
+		GL11.glOrtho(0, this.currentDisplayMode.getWidth(), this.currentDisplayMode.getHeight(), 0, -9999, 9999);
+
+		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+		GL11.glLoadIdentity();
+
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		glEnable(GL11.GL_BLEND);
+		GL11.glDisable(GL11.GL_CULL_FACE);
+
+		glEnable(GL11.GL_ALPHA_TEST);
+		GL11.glAlphaFunc(GL11.GL_NOTEQUAL, 0);
+
+		GL11.glDisable(GL11.GL_LIGHTING);
+		glEnable(GL11.GL_TEXTURE_2D);
+
+		nifty.update();
+		nifty.render(false); // TODO: THROWS ERROR ON FIRST FRAME??
+		
+		// restore your OpenGL state
+		glPopAttrib();
+		glPopMatrix();
+		
 	}
 
 	/**

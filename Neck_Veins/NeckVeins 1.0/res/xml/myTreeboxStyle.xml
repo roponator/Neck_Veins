@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty-styles xmlns="http://nifty-gui.lessvoid.com/nifty-gui">
+    
+   <!-- overwrote the the arrows for expand/collapse with empty -->
+   
+    <style id="nifty-treebox-item" base="nifty-listbox-item">
+        <attributes childLayout="horizontal" height="24px"/>
+    </style>
+    <style id="nifty-treebox-item#tree-item-icon-container">
+        <attributes childLayout="center" height="24px" width="24px"/>
+    </style>
+    <style id="nifty-treebox-item#content">
+        <attributes childLayout="horizontal" height="24px"/>
+    </style>
+    
+        <style id="nifty-treebox-item#closed">
+        <attributes filename="" visible="false"/>
+    </style>
+    <style id="nifty-treebox-item#opened">
+        <attributes filename="" visible="false" />
+    </style>
+    <style id="nifty-treebox-item#leaf">
+        <attributes height="0px" width="0px" visible="false"/>
+    </style>
+
+</nifty-styles>

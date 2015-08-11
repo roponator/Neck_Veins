@@ -53,7 +53,7 @@
     <!-- horizontal -->
     <!-- ++++++++++ -->
     <style id="nifty-horizontal-slider#panel">
-        <attributes childLayout="horizontal" height="43px" align="center" focusable="true"/>
+        <attributes childLayout="horizontal" height="23px" align="center" focusable="true"/>
     </style>
     <style id="nifty-horizontal-slider#left">
         <attributes filename="slider/slider.png" width="23px" height="23px" imageMode="sprite:23,23,6"/>

@@ -293,8 +293,7 @@ class ListBoxImpl<T> {
   }
 
   public void deselectItem(@Nonnull final T item) {
-	  deselectItemByIndex(items.indexOf(item)); // ROPO TODO
-	 // selection = null;
+    deselectItemByIndex(items.indexOf(item));
   }
 
   @Nonnull

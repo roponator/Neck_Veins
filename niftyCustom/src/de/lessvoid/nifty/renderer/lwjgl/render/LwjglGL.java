@@ -9,7 +9,8 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 public class LwjglGL implements GL {
   @Override
@@ -229,8 +230,6 @@ public class LwjglGL implements GL {
 
   @Override
   public int GL_TEXTURE_MIN_FILTER() {
-	  int a= GL11.GL_LINEAR_MIPMAP_NEAREST;
-	  int b=GL11.GL_LINEAR_MIPMAP_LINEAR;
     return GL11.GL_TEXTURE_MIN_FILTER;
   }
 
@@ -463,8 +462,4 @@ public class LwjglGL implements GL {
   public void glViewport(int x, int y, int width, int height) {
     GL11.glViewport(x, y, width, height);
   }
-
-
-
-
 }

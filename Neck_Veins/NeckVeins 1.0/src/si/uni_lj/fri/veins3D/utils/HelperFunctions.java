@@ -5,7 +5,8 @@ import java.io.FilenameFilter;
 
 public class HelperFunctions
 {
-	// Returns all directories in the given folder
+	// Returns all directories in the given folder, 
+	// returns null if no directories exist
 	public static String[] GetDirectoriesInFolder(String path)
 	{
 		File file = new File(path);
@@ -17,6 +18,7 @@ public class HelperFunctions
 				return new File(current, name).isDirectory();
 			}
 		});
+		
 		return directories;
 	}
 }

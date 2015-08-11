@@ -12,7 +12,9 @@
     <useControls filename="xml/myListboxControl.xml"/>
     
      <useStyles filename="xml/myScrollbarStyle.xml"/>
-    	 
+       <useStyles filename="xml/myTreeboxStyle.xml"/>
+ 
+ 
 	 <!-- base="nifty-panel-simple" -->
 	 
 	  <!-- PADDING ORDER: top,right,down,left -->

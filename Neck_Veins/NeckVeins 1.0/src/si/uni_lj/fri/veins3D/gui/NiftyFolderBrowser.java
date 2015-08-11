@@ -5,11 +5,14 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.newdawn.slick.util.ResourceLoader;
+
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import si.uni_lj.fri.veins3D.utils.HelperFunctions;
 import de.lessvoid.nifty.builder.ControlBuilder;
 import de.lessvoid.nifty.builder.ScreenBuilder;
 import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
+import de.lessvoid.nifty.controls.Scrollbar;
 import de.lessvoid.nifty.controls.TreeBox;
 import de.lessvoid.nifty.controls.TreeItem;
 import de.lessvoid.nifty.controls.treebox.TreeBoxControl;
@@ -38,11 +41,11 @@ public class NiftyFolderBrowser
 			return folderNameOnly;
 		}
 	}
-	
+
 	TreeBox m_treebox = null;
 	TreeItem<MyTreeItem> m_root = null;
 	TreeItem<MyTreeItem> m_currentlySelectedItem = null;
-
+ WORKS, CONTINOUE WORKING ON THE FILES PANEL
 	public NiftyFolderBrowser(Element parentPanel)
 	{
 		// nested annonymous inner classes black magic
@@ -62,10 +65,12 @@ public class NiftyFolderBrowser
 				});
 			}
 		};
-
+		
+	
+		
 		Element treeboxElement = builder.build(VeinsWindow.nifty, NiftyScreenController.m_screen, parentPanel);
 		m_treebox = (TreeBox) treeboxElement.getAttachedInputControl().getController();
-
+		
 		m_root = new TreeItem<MyTreeItem>();
 
 		createBranchesForFolder("C://", m_root);
@@ -81,52 +86,48 @@ public class NiftyFolderBrowser
 		if (event.getSelection().size() > 1)
 			System.out.println("ERROR: NiftyFolderBrowser: OnTreeboxSelectionChanged: multiselection is not supported in treebox/list");
 
-		deselectCurrentItem(); PROBLEM IN HERE
-
+		// if something was selected
 		if (event.getSelection().isEmpty() == false)
-			selectItem(event.getSelection().get(0));
+		{		
+			TreeItem<MyTreeItem> selectedTreeItem = event.getSelection().get(0);
 
-	}
-
-	// removes the children of the given item, hiding them
-	void deselectCurrentItem()
-	{
-		if (m_currentlySelectedItem == null)
-			return;
-
-		// remove all children
-		ArrayList<TreeItem<MyTreeItem>> children = getAllChildrenForBranch(m_currentlySelectedItem);
-		m_currentlySelectedItem.removeTreeItems(children);	
+			// save scrollbar value, is restored later so it doesn't jump because the treebox was update
+			float currentScrollbarValue = m_treebox.getVerticalScrollbar().getValue(); 
+			
+			// if a new item is selected, expand it (expand only if the item is not already selected or expanded)
+			if(m_currentlySelectedItem != selectedTreeItem && selectedTreeItem.isExpanded() == false) 
+			{
+				unexpandAllChildren(selectedTreeItem.getParentItem());	
+				selectItem(selectedTreeItem);			
+			}
+			else
+			{
+				// in case the same item was clicked, collapse it or expand it, depending on its current state
+				boolean isCurrentlyExpanded = selectedTreeItem.isExpanded();
+				selectedTreeItem.setExpanded(!isCurrentlyExpanded);
+				m_treebox.setTree(m_root); // update tree
+			}
+			
+			// restore scrollbar value so it doesn't jump after nodes have been added
+			m_treebox.getVerticalScrollbar().setValue(currentScrollbarValue); 
+		}
 		
-		m_currentlySelectedItem = null;
 	}
 
 	// select the given item, loading all of its folders and adding it to tree
 	void selectItem(TreeItem<MyTreeItem> selectedTreeItem)
 	{
 		m_currentlySelectedItem = selectedTreeItem;
-		int s1=m_treebox.getItems().size();
-		/*MyTreeItem myTreeItem = selectedTreeItem.getValue();
-		String selectedFolderPath = myTreeItem.path+"//"+myTreeItem.folderNameOnly;
-		createBranchesForFolder(selectedFolderPath,m_currentlySelectedItem);	*/
-		
-		TreeItem<MyTreeItem> newTreeItem = new TreeItem<MyTreeItem>(new MyTreeItem("blabla", "bie"));
-		newTreeItem.setExpanded(true);
-		m_currentlySelectedItem.addTreeItem(newTreeItem);
 		m_currentlySelectedItem.setExpanded(true);
-	//	m_treebox.deselectItem(0); // this is for multi-selection, so we just deselect the first item since we only have 1
-		
-		//m_root.setValue(m_root.getValue());
-		//m_treebox.removeItem(m_root);
-	//	m_treebox.setTree(m_root);
-		int s2=m_treebox.getItems().size();
-		int x=s2;
-		m_root.setExpanded(true);
-		//m_treebox.deselectItem(0); // this is for multi-selection, so we just deselect the first item since we only have 1
-		
-		m_treebox.setTree(m_root);
+
+		MyTreeItem myTreeItem = selectedTreeItem.getValue();
+		String selectedFolderPath = myTreeItem.path + "//" + myTreeItem.folderNameOnly;
+		removeAllChildrenFromBranch(m_currentlySelectedItem);
+		createBranchesForFolder(selectedFolderPath, m_currentlySelectedItem);
+
+		m_treebox.setTree(m_root);  // update tree
 	}
-	
+
 	static ArrayList<TreeItem<MyTreeItem>> getAllChildrenForBranch(TreeItem<MyTreeItem> branch)
 	{
 		Iterator<TreeItem<MyTreeItem>> iter = branch.iterator();
@@ -136,20 +137,42 @@ public class NiftyFolderBrowser
 			TreeItem<MyTreeItem> item = iter.next();
 			children.add(item);
 		}
-		
+
 		return children;
 	}
 
+	static void removeAllChildrenFromBranch(TreeItem<MyTreeItem> branch)
+	{
+		ArrayList<TreeItem<MyTreeItem>> children = getAllChildrenForBranch(branch);
+		branch.removeTreeItems(children);
+	}
+	
 	// Reads the given folder and sets all folders as children to the given branch
 	static void createBranchesForFolder(String path, TreeItem<MyTreeItem> branchToAddTo)
 	{
 		String[] folderNames = HelperFunctions.GetDirectoriesInFolder(path);
 
-		//for (int i = 0; i < folderNames.length; ++i)
-		for (int i = 0; i < 2; ++i)
+		if (folderNames == null) // if no subfolders
+			return;
+
+		for (int i = 0; i < folderNames.length; ++i)
+		// for (int i = 0; i < 2; ++i)
 		{
-			TreeItem<MyTreeItem> branch =  new TreeItem<MyTreeItem>(new MyTreeItem(path, folderNames[i]));
+			TreeItem<MyTreeItem> branch = new TreeItem<MyTreeItem>(new MyTreeItem(path, folderNames[i]));
 			branchToAddTo.addTreeItem(branch);
+		}
+	}
+
+	// recursively unexpand all children of this branch
+	static void unexpandAllChildren(TreeItem<MyTreeItem> parent)
+	{
+		Iterator<TreeItem<MyTreeItem>> iter = parent.iterator();
+		ArrayList<TreeItem<MyTreeItem>> children = new ArrayList<TreeItem<MyTreeItem>>();
+		while (iter.hasNext())
+		{
+			TreeItem<MyTreeItem> child = iter.next();
+			child.setExpanded(false);
+			unexpandAllChildren(child);
 		}
 	}
 

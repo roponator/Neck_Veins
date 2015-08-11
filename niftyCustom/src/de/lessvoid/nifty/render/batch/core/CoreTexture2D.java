@@ -12,11 +12,9 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.logging.Logger;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.lwjgl.opengl.*;
 /**
  * The CoreTexture2D represents a 2D texture in OpenGL space.
  * <p/>
@@ -514,22 +512,6 @@ public class CoreTexture2D {
     checkGLError("glTexParameteri", true);
     gl.glTexParameteri(target, gl.GL_TEXTURE_MAG_FILTER(), magFilter);
     checkGLError("glTexParameteri", true);
-   //GL11.glTexEnvf(GL14.GL_TEXTURE_FILTER_CONTROL, GL14.GL_TEXTURE_LOD_BIAS, 100.0f);
-  //  checkGLError("glTexEnvf", true);
-  //  gl.glTexParameterf(target, GL14.GL_TEXTURE_LOD_BIAS, 1000.0f);
-  //  checkGLError("glTexParameteri", true);
-    
-  /*  @Override
-    public int GL_TEXTURE_LOD_BIAS()
-    {
-    	return GL14.GL_TEXTURE_LOD_BIAS;
-    }
-
-    @Override
-    public int GL_TEXTURE_FILTER_CONTROL()
-    {
-    	return GL14.GL_TEXTURE_FILTER_CONTROL;
-    }*/
   }
 
   /**
