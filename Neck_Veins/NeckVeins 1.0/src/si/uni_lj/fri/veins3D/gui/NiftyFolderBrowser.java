@@ -45,7 +45,7 @@ public class NiftyFolderBrowser
 	TreeBox m_treebox = null;
 	TreeItem<MyTreeItem> m_root = null;
 	TreeItem<MyTreeItem> m_currentlySelectedItem = null;
- WORKS, CONTINOUE WORKING ON THE FILES PANEL
+
 	public NiftyFolderBrowser(Element parentPanel)
 	{
 		// nested annonymous inner classes black magic
@@ -59,6 +59,9 @@ public class NiftyFolderBrowser
 						{
 							{
 								displayItems(10);
+								margin("2%,2%,2%,2%");
+								width(new SizeValue(96,SizeValueType.Percent));
+								height(new SizeValue(96,SizeValueType.Percent));
 							}
 						});
 					}

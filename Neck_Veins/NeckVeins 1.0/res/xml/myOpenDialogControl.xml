@@ -7,7 +7,11 @@
                        
          <panel id="" style="STYLE_COMMON_RED" x="200px" y="200px" childLayout="vertical" width="500px" height="300px" valign="top" align="left" >
                <interact onClick="bringToFront()" onClickMouseMove="drag()" onRelease="dragStop()"/>
-                	
+            
+               <effect>
+			    <onActive name="border" border="1px,1px,1px,1px" color="#353535ff" timeType="infinite"/>
+			  </effect>
+			  	
      
              <!-- TOP BAR -->
                  <panel id="" backgroundImage="imgs\pngs720p\Med3D-40.png" imageMode="normal" childLayout="horizontal" width="100%" height="27px" valign="top" align="left" >      	
@@ -31,12 +35,14 @@
                   		<panel id="" style="STYLE_COMMON_GREEN" childLayout="horizontal" width="100%" height="100%" valign="top" align="left" >
                 			
                   		    <!-- FOLDERS, this panel contains the treebox-->
-                			<panel id="OPEN_DIALOG_FOLDER_TREEBOX_PANEL_CONTAINER" style="STYLE_COMMON_RED" childLayout="horizontal" width="30%" height="100%" valign="top" align="left" />s
+                			<panel id="OPEN_DIALOG_FOLDER_TREEBOX_PANEL_CONTAINER" style="STYLE_COMMON_RED" childLayout="horizontal" width="40%" height="100%" valign="top" align="left" />s
                 			
                 			 <!-- FOLDER CONTENT & FILE -->
-                			<panel id="" style="STYLE_COMMON_BLUE" childLayout="horizontal" width="70%" height="100%" valign="top" align="left" >
-                		
+                			<panel id="" style="STYLE_COMMON_BLUE" childLayout="vertical" width="60%" height="100%" valign="top" align="center" >
+                				<control id="OPEN_DIALOG_LIST_BOX" name="listBox" margin="2%,2%,2%,2%" width="96%" height = "85%" vertical="optional" horizontal="optional" displayItems="10" selection="Single"  />
+                				<control id="dropDown2" name="dropDown" margin="2%,2%,2%,2%" width="96%" height = "50%" />
                 			</panel>
+                			
                 		
                 		</panel>
                   </panel>

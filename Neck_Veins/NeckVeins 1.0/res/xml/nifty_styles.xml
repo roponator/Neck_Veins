@@ -4,6 +4,8 @@
       <!-- ******************************************* -->
 	 <!--Common styles -->
 	 <!-- ******************************************* -->
+	 
+		   <!-- if you don't specify a custom backgroundColor it will be invisible-->
 	   <style id="STYLE_COMMON_INVISIBLE"   >
         <attributes 
             backgroundColor="#00000000"
@@ -35,6 +37,19 @@
     </style>
 	 
 	 
+	 <!-- ******************************************* -->
+	 <!-- Label -->
+	 <!-- ******************************************* -->
+	     
+    <style id="STYLE_LABEL_DARK_TEXT">
+   		<attributes 
+   		     font="aurulent-sans-16.fnt" color="#333333ff"
+   		    align="center" valign="center" textHAlign="center"
+   		     textVAlign="center" visibleToMouse="false" />
+ 	</style>
+ 	
+	 
+	  
 	 <!-- ******************************************* -->
 	 <!-- Top menu bar styles -->
 	 <!-- ******************************************* -->

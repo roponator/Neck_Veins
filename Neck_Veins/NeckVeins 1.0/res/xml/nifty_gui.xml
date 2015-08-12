@@ -3,21 +3,28 @@
     <useControls filename="nifty-default-controls.xml"/>
     <useStyles filename="nifty-default-styles.xml"/>
     <useStyles filename="xml/nifty_styles.xml"/>
+     
+    <useStyles filename="xml/myCheckboxStyle.xml"/>
+    <useControls filename="xml/myCheckboxControl.xml"/>
+    
  	<useStyles filename="xml/mySliderStyle.xml"/>
- 
  	 <useControls filename="xml/mySliderControl.xml"/>
+ 	 
      <useControls filename="xml/myOpenDialogControl.xml"/>
      
     <useStyles filename="xml/myListboxStyle.xml"/>
     <useControls filename="xml/myListboxControl.xml"/>
     
      <useStyles filename="xml/myScrollbarStyle.xml"/>
-       <useStyles filename="xml/myTreeboxStyle.xml"/>
- 
+     <useStyles filename="xml/myTreeboxStyle.xml"/>
+      <useStyles filename="xml/myButtonStyle.xml"/>
+       <useStyles filename="xml/myDropdownListStyle.xml"/>
+       
+     <useControls filename="xml/myInputOptionsMenu.xml"/>
  
 	 <!-- base="nifty-panel-simple" -->
 	 
-	  <!-- PADDING ORDER: top,right,down,left -->
+	 <!-- PADDING ORDER: top,right,down,left -->
 	 
 	
   	<screen id="GScreen0"  controller="si.uni_lj.fri.veins3D.gui.NiftyScreenController">
@@ -27,12 +34,18 @@
 	 <!-- TEMP: OPEN DIALOG -->
 	 <!-- ******************************************* -->
   	      <layer id="LAYER_OPEN_DIALOG" childLayout="absolute" valign="top" align="left"  >
-            <control id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" x="200px" y="200px" childLayout="vertical" width="600px" height="300px" valign="top" align="left" >
+            <control id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" x="50px" y="200px" childLayout="vertical" width="600px" height="300px" valign="top" align="left" >
               
      
              </control>
           </layer>
   	    
+  	 <!-- ******************************************* -->
+	 <!-- TEMP: Input settings -->
+	 <!-- ******************************************* -->
+  	     <layer id="LAYER_OPEN_DIALOG" childLayout="absolute" valign="top" align="left"  >
+            <control id="MY_INPUT_OPTIONS_DIALOG" name="MY_INPUT_OPTIONS_CONTROL" x="700px" y="200px" childLayout="vertical" width="250px" height="300px" valign="top" align="left" />
+          </layer>   
 
         <!-- ******************************************* -->
 		<!-- LAYER: SETTINGS SIDE MENU -->
@@ -81,8 +94,7 @@
                      <control id="myListBox" name="MY_LISTBOX" vertical="on" horizontal="on" displayItems="5"/>
      
                 </panel>
-                      
-                	               
+                                 	               
 	                  
 		          <effect>
 		            	 <onCustom customKey="openSettingsSideMenu" name="move" direction="left" mode="in" length="100" timeType="exp" factor="3" />

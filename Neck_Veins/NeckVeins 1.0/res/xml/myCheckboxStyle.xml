@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty-styles xmlns="http://nifty-gui.lessvoid.com/nifty-gui">
+
+    <style id="STYLE_MY_CHECKBOX_PANEL">
+        <attributes width="15px" height="15px" backgroundImage="imgs/pngs720p/Med3D-50.png"
+             childLayout="center" valign="center" align="center"/>
+        <effect>
+            <onActive name="border" color="#222f" post="true" inset="1px"/>
+            <onHover name="border" color="#4cb4b3ff" post="true"/>
+        </effect>
+    </style>
+
+    <style id="STYLE_MY_CHECKBOX_PANEL_SELECT">
+        <attributes align="center" valign="center" width="15px" height="15px" backgroundImage="imgs/pngs720p/Med3D-51.png"/>
+        <effect>
+            <onEnabled name="fade" start="#4" end="#f" length="150" />
+            <onDisabled name="fade" start="#f" end="#4" length="150" />
+         </effect>
+    </style>
+</nifty-styles>

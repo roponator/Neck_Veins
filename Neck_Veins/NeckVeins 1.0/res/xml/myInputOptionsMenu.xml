@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty-controls xmlns="http://nifty-gui.lessvoid.com/nifty-gui">
+    <!-- WINDOW CONTROL -->
+    <controlDefinition name="MY_INPUT_OPTIONS_CONTROL" style="nifty-window" childRootId="#window-content"
+                       controller="de.lessvoid.nifty.controls.window.WindowControl" revert="false" drop="false"
+                       handle="#window-bar">
+                       
+         <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="100%" valign="top" align="left" >
+               <interact onClick="bringToFront()" onClickMouseMove="drag()" onRelease="dragStop()"/>
+                	
+			  <effect>
+			    <onActive name="border" border="1px,1px,1px,1px" color="#353535ff" timeType="infinite"/>
+			  </effect>
+			  
+             <!-- TOP BAR -->
+                 <panel id="" backgroundImage="imgs\pngs720p\Med3D-40.png" imageMode="normal" childLayout="horizontal" width="100%" height="27px" valign="top" align="left" >      	
+                	<image  childLayout="center" filename="imgs\pngs720p\Med3D-39.png" width="44px" height="100%" valign="center" align="left" filter="true"/>
+                	<control name="label" align = "left" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" margin="0px,0px,0px,0px" width="60px" text="Input Options" height="100.0%" font="aurulent-sans-16.fnt"/>
+		            <panel id="" childLayout="horizontal" width="*" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  />  
+		            <control name="button" id="" style="STYLE_TOP_MENU_WINDOW_BUTTONS" childLayout="center" valign="top" label="" align="right" height="15px" width="17px"  backgroundImage="imgs\pngs720p\Med3D-25.png"  filter="true" >
+						 <interact onClick="On_OpenDialog_Close(a)"/>        	
+						    <effect>
+								<onHover name="imageOverlay" filename="imgs/pngs720p/Med3D-33.png" imageMode="normal" post="true" />
+								<onClick name="imageOverlay" filename="imgs/pngs720p/Med3D-30.png" imageMode="normal" post="true" />
+							</effect>	
+					</control> 					
+           		 </panel> 
+           		 
+              <!-- MAIN CONTAINER PANEL -->
+              <panel id="" style="STYLE_COMMON_GREEN" childLayout="vertical" width="100%" height="*" valign="top" align="left" backgroundColor="#76787bff">
+                 
+                  <!-- SLIDERS PANEL -->
+				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="75%" valign="top" align="left" >
+                  	<panel childLayout="center" width="100%" height="100%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center" >
+                    	<panel childLayout="vertical" width="95%" height="95%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center"  backgroundColor="#a8a8a8ff">
+		                     <control childLayout="vertical" id="sl1" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>
+		                      <control childLayout="vertical" id="sl2" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>
+	                     	  <control childLayout="vertical" id="sl2" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>               
+	                     </panel> 
+               		 </panel>
+                </panel>
+                 
+				  <!-- CHECKBOXES PANEL -->
+				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="10%" valign="top" align="left" >
+				    <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
+				   		 <control id="simpleCheckBox" name="MY_CHECKBOX" width="50%" height="100%"/>
+				    </panel>
+				     <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
+				   		 <control id="simpleCheckBox" name="MY_CHECKBOX" width="50%" height="100%"/>
+				    </panel>
+                </panel>
+                 
+				  <!-- Buttons -->
+				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="15%" valign="top" align="left" >
+				    <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
+				   		 <control id="appendButton" name="button" label="Append" />
+				    </panel>
+				     <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
+				   		 <control id="appendButton" name="button" label="Append" />
+				    </panel>
+                </panel>
+                   
+              </panel>
+              		              
+ 		</panel>
+ 	
+    </controlDefinition>
+</nifty-controls>
