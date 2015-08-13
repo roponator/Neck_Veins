@@ -18,7 +18,8 @@
      <useStyles filename="xml/myScrollbarStyle.xml"/>
      <useStyles filename="xml/myTreeboxStyle.xml"/>
       <useStyles filename="xml/myButtonStyle.xml"/>
-       <useStyles filename="xml/myDropdownListStyle.xml"/>
+      
+      <useStyles filename="xml/myDropdownListStyle.xml"/>
        
      <useControls filename="xml/myInputOptionsMenu.xml"/>
  
@@ -34,7 +35,7 @@
 	 <!-- TEMP: OPEN DIALOG -->
 	 <!-- ******************************************* -->
   	      <layer id="LAYER_OPEN_DIALOG" childLayout="absolute" valign="top" align="left"  >
-            <control id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" x="50px" y="200px" childLayout="vertical" width="600px" height="300px" valign="top" align="left" >
+            <control id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" x="50px" y="200px" childLayout="vertical" width="600px" height="330px" valign="top" align="left" >
               
      
              </control>
@@ -92,7 +93,7 @@
 		              </panel>  
 		                   
                      <control id="myListBox" name="MY_LISTBOX" vertical="on" horizontal="on" displayItems="5"/>
-     
+     				
                 </panel>
                                  	               
 	                  
