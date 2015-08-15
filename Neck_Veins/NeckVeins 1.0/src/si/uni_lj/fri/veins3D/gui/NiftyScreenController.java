@@ -45,6 +45,8 @@ public class NiftyScreenController extends DefaultScreenController
 {
 	public static Screen m_screen = null;;
 
+	public static String[] m_supportedFileTypes = new String[]{"mhd","obj"};
+	
 	// -----------------------------------
 	// Top menu bar buttons
 	// -----------------------------------

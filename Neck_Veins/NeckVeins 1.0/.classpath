@@ -43,5 +43,6 @@
 	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/substance-7.2.1.jar"/>
 	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/trident-7.2.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/niftyCustom"/>
+	<classpathentry kind="lib" path="libs/commons-io-2.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -22,26 +22,11 @@ public class NiftyOpenDialog
 		// find open dialog in main gui
 		m_mainOpenDailogElement = NiftyScreenController.m_screen.findElementById("MY_OPEN_DIALOG_ID");
 
-		// get folder treebox
+		// get control panels and create folder browser
 		Element treeboxParentPanel = m_mainOpenDailogElement.findElementById("OPEN_DIALOG_FOLDER_TREEBOX_PANEL_CONTAINER");
-		m_folderBrowser = new NiftyFolderBrowser(treeboxParentPanel);
-		
-		
-		Element fileListListboxElement = m_mainOpenDailogElement.findElementById("OPEN_DIALOG_FILES_LIST_LISTBOX");
-		Element fileTypeDropdownElement = m_mainOpenDailogElement.findElementById("OPEN_DIALOG_FILE_TYPE_DROPDOWN");
-
-		de.lessvoid.nifty.controls.ListBox fileListControl = fileListListboxElement.getAttachedInputControl().getControl(ListBoxControl.class);
-		de.lessvoid.nifty.controls.DropDown fileTypeControl = fileTypeDropdownElement.getAttachedInputControl().getControl(DropDownControl.class);
-		
-		String space = " ";
-		fileTypeControl.addItem(space+".mdh");
-		fileTypeControl.addItem(space+".obj");
-		
-		fileListControl.addItem(space+"dfsfdff");
-		fileListControl.addItem(space+"234");
-		fileListControl.addItem(space+"df234ersfdff");
-		fileListControl.addItem(space+"t34");
-		fileListControl.addItem(space+"sdf");
+		Element fileListElement = m_mainOpenDailogElement.findElementById("OPEN_DIALOG_FILES_LIST_LISTBOX");
+		Element fileTypeElement = m_mainOpenDailogElement.findElementById("OPEN_DIALOG_FILE_TYPE_DROPDOWN");
+		m_folderBrowser = new NiftyFolderBrowser(treeboxParentPanel,fileListElement,fileTypeElement);
 		
 	}
 

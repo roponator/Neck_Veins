@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nifty-controls xmlns="http://nifty-gui.lessvoid.com/nifty-gui">
     <!-- WINDOW CONTROL -->
-    <controlDefinition name="MY_INPUT_OPTIONS_CONTROL" style="nifty-window" childRootId="#window-content"
+    <controlDefinition name="MY_STEREO_CONTROL" style="nifty-window" childRootId="#window-content"
                        controller="de.lessvoid.nifty.controls.window.WindowControl" revert="false" drop="false"
                        handle="#window-bar">
                        
@@ -30,25 +30,23 @@
               <panel id="" style="STYLE_COMMON_GREEN" childLayout="vertical" width="100%" height="*" valign="top" align="left" backgroundColor="#76787bff">
                  
                   <!-- SLIDERS PANEL -->
-				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="75%" valign="top" align="left" >
+				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="100%" height="55%" valign="center" align="center" >
                   	<panel childLayout="center" width="100%" height="100%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center" >
-                    	<panel childLayout="vertical" width="95%" height="95%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center"  backgroundColor="#a8a8a8ff">
-		                     <control childLayout="vertical" id="sl1" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>    
-		                     <control childLayout="vertical" id="sl2" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>    
-		                     <control childLayout="vertical" id="sl3" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>             
+                    	<panel childLayout="vertical" width="95%" height="80%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center"  backgroundColor="#a8a8a8ff">
+		                     <control childLayout="vertical" id="sl1" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>              
 	                     </panel> 
                		 </panel>
                 </panel>
                  
 				  <!-- CHECKBOXES PANEL -->
-				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="10%" valign="top" align="left" >
+				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="17%" valign="top" align="left" >
 				    <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
 				   		 <control id="simpleCheckBox" name="MY_CHECKBOX" width="50%" height="100%"/>
 				    </panel>
                 </panel>
                  
 				  <!-- Buttons -->
-				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="15%" valign="top" align="left" >
+				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="28%" valign="top" align="left" >
 				    <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
 				   		 <control id="appendButton" name="button" label="Cancel" />
 				    </panel>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty-controls xmlns="http://nifty-gui.lessvoid.com/nifty-gui">
+    <!-- WINDOW CONTROL -->
+    <controlDefinition name="MY_ABOUT_DIALOG_CONTROL" style="nifty-window" childRootId="#window-content"
+                       controller="de.lessvoid.nifty.controls.window.WindowControl" revert="false" drop="false"
+                       handle="#window-bar">
+                       
+         <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="100%" valign="top" align="left" >
+               <interact onClick="bringToFront()" onClickMouseMove="drag()" onRelease="dragStop()"/>
+                	
+			  <effect>
+			    <onActive name="border" border="1px,1px,1px,1px" color="#353535ff" timeType="infinite"/>
+			  </effect>
+			  
+             <!-- TOP BAR -->
+                 <panel id="" backgroundImage="imgs\pngs720p\Med3D-40.png" imageMode="normal" childLayout="horizontal" width="100%" height="27px" valign="top" align="left" >      	
+                	<image  childLayout="center" filename="imgs\pngs720p\Med3D-39.png" width="44px" height="100%" valign="center" align="left" filter="true"/>
+                	<control name="label" align = "left" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" margin="0px,0px,0px,0px" width="60px" text="About" height="100.0%" font="aurulent-sans-16.fnt"/>
+		            <panel id="" childLayout="horizontal" width="*" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  />  
+		            <control name="button" id="" style="STYLE_TOP_MENU_WINDOW_BUTTONS" childLayout="center" valign="top" label="" align="right" height="15px" width="17px"  backgroundImage="imgs\pngs720p\Med3D-25.png"  filter="true" >
+						 <interact onClick="On_OpenDialog_Close(a)"/>        	
+						    <effect>
+								<onHover name="imageOverlay" filename="imgs/pngs720p/Med3D-33.png" imageMode="normal" post="true" />
+								<onClick name="imageOverlay" filename="imgs/pngs720p/Med3D-30.png" imageMode="normal" post="true" />
+							</effect>	
+					</control> 					
+           		 </panel> 
+           		 
+              <!-- MAIN CONTAINER PANEL -->
+              <panel id="" style="STYLE_COMMON_GREEN" childLayout="center" width="100%" height="*" valign="top" align="left" backgroundColor="#76787bff">
+                 
+                      	  <image childLayout="center" filename="imgs\pngs720p\about.png" width="299px" height="281px" valign="center" align="center" filter="true"/> 
+	                 
+               
+                   
+              </panel>
+              		              
+ 		</panel>
+ 	
+    </controlDefinition>
+</nifty-controls>

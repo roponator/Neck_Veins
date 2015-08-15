@@ -22,6 +22,11 @@
       <useStyles filename="xml/myDropdownListStyle.xml"/>
        
      <useControls filename="xml/myInputOptionsMenu.xml"/>
+     <useControls filename="xml/myResolutionSettingsMenu.xml"/>
+     <useControls filename="xml/myStereoSettingsMenu.xml"/>
+     <useControls filename="xml/myAboutDialog.xml"/>
+     <useControls filename="xml/myLicenseControl.xml"/>
+     
  
 	 <!-- base="nifty-panel-simple" -->
 	 
@@ -35,19 +40,46 @@
 	 <!-- TEMP: OPEN DIALOG -->
 	 <!-- ******************************************* -->
   	      <layer id="LAYER_OPEN_DIALOG" childLayout="absolute" valign="top" align="left"  >
-            <control id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" x="50px" y="200px" childLayout="vertical" width="600px" height="330px" valign="top" align="left" >
-              
-     
-             </control>
+            <control id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" x="50px" y="200px" childLayout="vertical" width="600px" height="330px" valign="top" align="left" />
           </layer>
   	    
   	 <!-- ******************************************* -->
 	 <!-- TEMP: Input settings -->
 	 <!-- ******************************************* -->
-  	     <layer id="LAYER_OPEN_DIALOG" childLayout="absolute" valign="top" align="left"  >
+  	      <layer id="LAYER_INPUT_SETTINGS_DIALOG" childLayout="absolute" valign="top" align="left"  >
             <control id="MY_INPUT_OPTIONS_DIALOG" name="MY_INPUT_OPTIONS_CONTROL" x="700px" y="200px" childLayout="vertical" width="250px" height="300px" valign="top" align="left" />
+          </layer>    
+          
+  	 <!-- ******************************************* -->
+	 <!-- TEMP: resolution settings -->
+	 <!-- ******************************************* -->
+  	     <layer id="LAYER_RESOLUTION_CONTROL" childLayout="absolute" valign="top" align="left"  >
+          	<control id="MY_RESOLUTUION_OPTIONS_DIALOG" name="MY_RESOLUTION_CONTROL" x="600px" y="200px" childLayout="vertical" width="250px" height="280px" valign="top" align="left" />
           </layer>   
+  	     
 
+  	    <!-- ******************************************* -->
+	 <!-- TEMP: stereo settings -->
+	 <!-- ******************************************* -->
+  	     <layer id="LAYER_STEREO_CONTROL" childLayout="absolute" valign="top" align="left"  >
+          	<control id="MY_STEREO_OPTIONS_DIALOG" name="MY_STEREO_CONTROL" x="550px" y="300px" childLayout="vertical" width="250px" height="160px" valign="top" align="left" />
+          </layer>   
+          
+  	  <!-- ******************************************* -->
+	 <!-- TEMP: about dialog -->
+	 <!-- ******************************************* -->
+  	     <layer id="LAYER_ABOUT_CONTROL" childLayout="absolute" valign="top" align="left"  >
+          	<control id="" name="MY_ABOUT_DIALOG_CONTROL" x="350px" y="300px" childLayout="vertical" width="320px" height="330px" valign="top" align="left" />
+        </layer>   
+  	     
+  	     
+  	  <!-- ******************************************* -->
+	 <!-- TEMP: license dialog -->
+	 <!-- ******************************************* -->
+  	     <layer id="LAYER_LICENSE_CONTROL" childLayout="absolute" valign="top" align="left"  >
+          	<control id="" name="MY_LICENSE_DIALOG_CONTROL" x="150px" y="300px" childLayout="vertical" width="320px" height="330px" valign="top" align="left" />
+        </layer>   
+        
         <!-- ******************************************* -->
 		<!-- LAYER: SETTINGS SIDE MENU -->
 		<!-- ******************************************* -->
@@ -83,7 +115,7 @@
 	               </panel>
 	               
                  <!--  settings sliders container -->
-                <panel childLayout="vertical" width="100%" height="*" style="STYLE_COMMON_INVISIBLE" align="center" backgroundColor="#76787bff">
+                <panel childLayout="vertical" width="100%" height="*" style="STYLE_COMMON_INVISIBLE" align="center" backgroundColor="#393E4377">
                     
                      <control childLayout="vertical" id="sl1" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>
                      <control childLayout="vertical" id="sl2" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>

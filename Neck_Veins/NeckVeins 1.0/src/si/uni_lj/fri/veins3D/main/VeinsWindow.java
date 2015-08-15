@@ -70,6 +70,7 @@ import de.matthiasmann.twl.GUI;
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.HUD;
 import si.uni_lj.fri.veins3D.gui.GUIMain;
+import si.uni_lj.fri.veins3D.gui.MyFileChooser;
 import si.uni_lj.fri.veins3D.gui.NiftyScreenController;
 import si.uni_lj.fri.veins3D.gui.VeinsWindow23;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
@@ -150,6 +151,7 @@ public class VeinsWindow
 			e.printStackTrace();
 		}*/
 
+		//new MyFileChooser();
 	}
 
 	void initNiftyAndGUI()
