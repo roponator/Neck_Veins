@@ -9,9 +9,13 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Locale;
 
+import static org.lwjgl.opengl.ARBBufferObject.glBindBufferARB;
+import static org.lwjgl.opengl.ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB;
+import static org.lwjgl.opengl.ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
@@ -34,11 +38,17 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL40;
+import org.lwjgl.opengl.GL41;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.util.ResourceLoader;
@@ -70,7 +80,6 @@ import de.matthiasmann.twl.GUI;
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.HUD;
 import si.uni_lj.fri.veins3D.gui.GUIMain;
-import si.uni_lj.fri.veins3D.gui.MyFileChooser;
 import si.uni_lj.fri.veins3D.gui.NiftyScreenController;
 import si.uni_lj.fri.veins3D.gui.VeinsWindow23;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
@@ -93,7 +102,7 @@ public class VeinsWindow
 
 	public static NeckVeinsSettings settings;
 
-	private VeinsRenderer renderer;
+	public static VeinsRenderer renderer;
 	LwjglInputSystem inputSystem;
 	private HUD hud;
 	private boolean isRunning;
@@ -285,14 +294,14 @@ public class VeinsWindow
 			final Canvas canvas = new Canvas();
 			frame.add(canvas, BorderLayout.CENTER);
 
-			Display.setParent(canvas);
+			
 			frame.setPreferredSize(new Dimension(currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
 			frame.setSize(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
 			frame.setUndecorated(true);  //here
-		
+
 			frame.pack();
 			frame.setVisible(true);
-			
+			Display.setParent(canvas);
 			//-Dorg.lwjgl.opengl.Window.undecorated=true
 
 			// DisplayMode dm=new DisplayMode(800, 800);
@@ -304,10 +313,6 @@ public class VeinsWindow
 			// Display.create(new PixelFormat().withStencilBits(1));
 
 			Display.create(new PixelFormat(), new ContextAttribs(2, 0));
-			Canvas c = Display.getParent();
-
-			int x = 0;
-			// Display.create();
 		}
 		catch (LWJGLException e)
 		{
@@ -366,6 +371,7 @@ public class VeinsWindow
 
 	boolean m_wasMouseLeftUp = true;
 
+
 	public void mainLoop()
 	{
 		fps = 0;
@@ -376,6 +382,7 @@ public class VeinsWindow
 		while (isRunning)
 		{
 
+			
 			// Detect on down click after it was up (NOT DOWN->UP!)
 			boolean wasLeftMouseDownClicked = false;
 			if (Mouse.isButtonDown(0) == true && m_wasMouseLeftUp == true)
@@ -393,7 +400,7 @@ public class VeinsWindow
 			// hud.setClickedOn(clickedOn);
 
 			 renderer.render();
-
+			
 			// hud.drawHUD();
 			setTitle();
 
@@ -401,16 +408,16 @@ public class VeinsWindow
 			// Display.update();
 			 logic();
 
-
 			// On down click after it was up (NOT DOWN->UP!)
 			if (wasLeftMouseDownClicked)
 				screenController.onMouseLeftDownClicked();
-
 			
 			renderNiftyGUI();
 			
 			Display.update();
 
+			IMPLEMENT NAVIGATION
+			
 			Display.sync(settings.frequency); // TODO NIFTY
 
 			int error = GL11.glGetError();
@@ -425,8 +432,13 @@ public class VeinsWindow
 	// saves, sets and restores openGL states
 	void renderNiftyGUI()
 	{
+
 		glPushMatrix();
 		glPushAttrib(GL_ALL_ATTRIB_BITS);
+	
+	
+		//ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
+		//ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 		
 		glEnable(GL_BLEND); 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

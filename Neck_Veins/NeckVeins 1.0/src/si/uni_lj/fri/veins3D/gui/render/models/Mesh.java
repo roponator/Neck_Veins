@@ -316,6 +316,7 @@ public class Mesh {
 
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, verticesAndNormalsIDs.get(maxSubDepth));
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, indicesIDs.get(maxSubDepth));
+	
 		if(normals == null){
 			System.out.println("No normals given, calculating normals.");
 			normals = getNormals(vertices, faces);
@@ -382,6 +383,11 @@ public class Mesh {
 				e.printStackTrace();
 			}
 		}
+		
+		// must be disabled!
+		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+		
 	}
 
 	public void render(int subDepth) {
@@ -389,16 +395,12 @@ public class Mesh {
 			return;
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, verticesAndNormalsIDs.get(subDepth));
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, indicesIDs.get(subDepth));
-
 		
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_FLOAT, 0, 0);
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glNormalPointer(GL_FLOAT, 0, (4 * verticesCounters.get(subDepth)));
-		
-		
-		 
-		
+			
 		boolean pointCloud = false;
 		
 		if(pointCloud){
@@ -410,8 +412,7 @@ public class Mesh {
 			
 		}
 		
-	
-
+		// must be disabled!
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 

@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.filechooser.FileSystemView;
 
 import org.apache.commons.io.FilenameUtils;
 import org.newdawn.slick.util.ResourceLoader;
@@ -12,6 +15,7 @@ import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import si.uni_lj.fri.veins3D.utils.HelperFunctions;
 import de.lessvoid.nifty.builder.ControlBuilder;
 import de.lessvoid.nifty.builder.ScreenBuilder;
+import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.controls.Scrollbar;
 import de.lessvoid.nifty.controls.TreeBox;
@@ -27,12 +31,12 @@ import de.lessvoid.nifty.tools.SizeValueType;
 public class NiftyFolderBrowser
 {
 	// Represents a folder in the folder treebox
-	static class MyTreeItem
+	static class MyTreeFolderItem
 	{
 		public String path;
 		public String folderNameOnly;
 
-		public MyTreeItem(String Path, String FolderNameOnly)
+		public MyTreeFolderItem(String Path, String FolderNameOnly)
 		{
 			this.path = Path;
 			this.folderNameOnly = FolderNameOnly;
@@ -64,13 +68,27 @@ public class NiftyFolderBrowser
 		}
 	}
 	
+	static class SelectedFile
+	{
+		public String fullFilePathAndName;
+		public String extensionOnly;
+		
+		public SelectedFile(String FullFilePathAndName,String ExtensionOnly)
+		{
+			fullFilePathAndName = FullFilePathAndName;
+			extensionOnly = ExtensionOnly;
+		}
+	}
+	
 	de.lessvoid.nifty.controls.ListBox m_fileListboxControl = null;
 	de.lessvoid.nifty.controls.DropDown<MyFileExtensionItem> m_fileTypeDropdownControl = null;
 
 	TreeBox m_treebox = null;
-	TreeItem<MyTreeItem> m_root = null;
-	TreeItem<MyTreeItem> m_currentlySelectedItem = null;
+	TreeItem<MyTreeFolderItem> m_root = null;
+	TreeItem<MyTreeFolderItem> m_currentlySelectedFolder = null;
 
+	public static String m_lastOpenedFilePath = null; // stores the path to the folder where the last opened file is (if any)
+	
 	// The constructor param elements are the one that actualy contain the control(er).
 	public NiftyFolderBrowser(Element folderBrowserParentPanel, Element fileListboxElement, Element fileTypeElement)
 	{
@@ -112,15 +130,40 @@ public class NiftyFolderBrowser
 			m_fileTypeDropdownControl.addItem(new MyFileExtensionItem(supportedFileFormats[i]));
 
 		// init foldertree
-		m_root = new TreeItem<MyTreeItem>();
+		m_root = new TreeItem<MyTreeFolderItem>();
 		createBranchesForFolder("C://", m_root);
 		m_treebox.setTree(m_root);
 
+		
+		/*File[] drives = File.listRoots();
+		if (drives != null && drives.length > 0) {
+		    for (File aDrive : drives) {
+		        System.out.println(aDrive);
+		    }
+		}*/
 	}
 
+	// Returns null if nothing is selected
+	public SelectedFile TryOpeningSelectedFile()
+	{
+		if(m_currentlySelectedFolder==null)
+			return null;
+		
+		// is single selection
+		List<String> selectedItems = m_fileListboxControl.getSelection();
+		
+		if(selectedItems.size()<1 || selectedItems.size()>1)
+			return null;
+		
+		String selectedFileName = selectedItems.get(0);
+		String fullPath = m_currentlySelectedFolder.getValue().path+"//"+m_currentlySelectedFolder.getValue().folderNameOnly+"//"+selectedFileName;
+		String extension = FilenameUtils.getExtension(fullPath);
+		
+		return new SelectedFile(fullPath, extension);
+	}
+	
 	// On selection changed
-
-	public void OnTreeboxSelectionChanged(String id, ListBoxSelectionChangedEvent<TreeItem<MyTreeItem>> event)
+	public void OnTreeboxSelectionChanged(String id, ListBoxSelectionChangedEvent<TreeItem<MyTreeFolderItem>> event)
 	{
 		if (event.getSelection().size() > 1)
 			System.out.println("ERROR: NiftyFolderBrowser: OnTreeboxSelectionChanged: multiselection is not supported in treebox/list");
@@ -128,13 +171,13 @@ public class NiftyFolderBrowser
 		// if something was selected
 		if (event.getSelection().isEmpty() == false)
 		{
-			TreeItem<MyTreeItem> selectedTreeItem = event.getSelection().get(0);
+			TreeItem<MyTreeFolderItem> selectedTreeItem = event.getSelection().get(0);
 
 			// save scrollbar value, is restored later so it doesn't jump because the treebox was update
 			float currentScrollbarValue = m_treebox.getVerticalScrollbar().getValue();
 
 			// if a new item is selected, expand it (expand only if the item is not already selected or expanded)
-			if (m_currentlySelectedItem != selectedTreeItem && selectedTreeItem.isExpanded() == false)
+			if (m_currentlySelectedFolder != selectedTreeItem && selectedTreeItem.isExpanded() == false)
 			{
 				unexpandAllChildren(selectedTreeItem.getParentItem());
 				selectItem(selectedTreeItem);
@@ -154,24 +197,34 @@ public class NiftyFolderBrowser
 
 	}
 
-	// select the given item, loading all of its folders and adding it to tree
-	void selectItem(TreeItem<MyTreeItem> selectedTreeItem)
+	public void OnFileTypeSelectionChanged(DropDownSelectionChangedEvent<MyFileExtensionItem> event)
 	{
-		m_currentlySelectedItem = selectedTreeItem;
-		m_currentlySelectedItem.setExpanded(true);
+		changeFileListboxContent(m_currentlySelectedFolder);
+	}
+	
+	// select the given item, loading all of its folders and adding it to tree
+	void selectItem(TreeItem<MyTreeFolderItem> selectedTreeItem)
+	{
+		m_currentlySelectedFolder = selectedTreeItem;
+		m_currentlySelectedFolder.setExpanded(true);
 
-		MyTreeItem myTreeItem = selectedTreeItem.getValue();
+		MyTreeFolderItem myTreeItem = selectedTreeItem.getValue();
 		String selectedFolderPath = myTreeItem.path + "//" + myTreeItem.folderNameOnly;
-		removeAllChildrenFromBranch(m_currentlySelectedItem);
-		createBranchesForFolder(selectedFolderPath, m_currentlySelectedItem);
+		removeAllChildrenFromBranch(m_currentlySelectedFolder);
+		createBranchesForFolder(selectedFolderPath, m_currentlySelectedFolder);
 
 		m_treebox.setTree(m_root); // update tree
 	}
 
-	void changeFileListboxContent(TreeItem<MyTreeItem> selectedTreeItem)
+	void changeFileListboxContent(TreeItem<MyTreeFolderItem> selectedTreeItem)
 	{
+		m_fileListboxControl.clear();
+		
+		if(selectedTreeItem==null)
+			return;
+		
 		// get files with correct type in the selected folder
-		MyTreeItem myTreeItem = selectedTreeItem.getValue();
+		MyTreeFolderItem myTreeItem = selectedTreeItem.getValue();
 		String selectedFolderPath = myTreeItem.path + "//" + myTreeItem.folderNameOnly;
 
 		// get which file type is selected, select all in case none is selected
@@ -187,35 +240,37 @@ public class NiftyFolderBrowser
 		String[] filesWithCorrectExtensions = HelperFunctions.GetFilesInFolder(selectedFolderPath, selectedExtensions);
 
 		// add files to listbox
-		m_fileListboxControl.clear();
 		if (filesWithCorrectExtensions != null)
 		{
 			for (int i = 0; i < filesWithCorrectExtensions.length; ++i)
 				m_fileListboxControl.addItem(filesWithCorrectExtensions[i]);
 		}
+		
+		if(filesWithCorrectExtensions!=null && filesWithCorrectExtensions.length>0)
+			m_lastOpenedFilePath=selectedTreeItem.getValue().path+"//"+selectedTreeItem.getValue().folderNameOnly;
 	}
 
-	static ArrayList<TreeItem<MyTreeItem>> getAllChildrenForBranch(TreeItem<MyTreeItem> branch)
+	static ArrayList<TreeItem<MyTreeFolderItem>> getAllChildrenForBranch(TreeItem<MyTreeFolderItem> branch)
 	{
-		Iterator<TreeItem<MyTreeItem>> iter = branch.iterator();
-		ArrayList<TreeItem<MyTreeItem>> children = new ArrayList<TreeItem<MyTreeItem>>();
+		Iterator<TreeItem<MyTreeFolderItem>> iter = branch.iterator();
+		ArrayList<TreeItem<MyTreeFolderItem>> children = new ArrayList<TreeItem<MyTreeFolderItem>>();
 		while (iter.hasNext())
 		{
-			TreeItem<MyTreeItem> item = iter.next();
+			TreeItem<MyTreeFolderItem> item = iter.next();
 			children.add(item);
 		}
 
 		return children;
 	}
 
-	static void removeAllChildrenFromBranch(TreeItem<MyTreeItem> branch)
+	static void removeAllChildrenFromBranch(TreeItem<MyTreeFolderItem> branch)
 	{
-		ArrayList<TreeItem<MyTreeItem>> children = getAllChildrenForBranch(branch);
+		ArrayList<TreeItem<MyTreeFolderItem>> children = getAllChildrenForBranch(branch);
 		branch.removeTreeItems(children);
 	}
 
 	// Reads the given folder and sets all folders as children to the given branch
-	static void createBranchesForFolder(String path, TreeItem<MyTreeItem> branchToAddTo)
+	static void createBranchesForFolder(String path, TreeItem<MyTreeFolderItem> branchToAddTo)
 	{
 		String[] folderNames = HelperFunctions.GetDirectoriesInFolder(path);
 
@@ -225,19 +280,19 @@ public class NiftyFolderBrowser
 		for (int i = 0; i < folderNames.length; ++i)
 		// for (int i = 0; i < 2; ++i)
 		{
-			TreeItem<MyTreeItem> branch = new TreeItem<MyTreeItem>(new MyTreeItem(path, folderNames[i]));
+			TreeItem<MyTreeFolderItem> branch = new TreeItem<MyTreeFolderItem>(new MyTreeFolderItem(path, folderNames[i]));
 			branchToAddTo.addTreeItem(branch);
 		}
 	}
 
 	// recursively unexpand all children of this branch
-	static void unexpandAllChildren(TreeItem<MyTreeItem> parent)
+	static void unexpandAllChildren(TreeItem<MyTreeFolderItem> parent)
 	{
-		Iterator<TreeItem<MyTreeItem>> iter = parent.iterator();
-		ArrayList<TreeItem<MyTreeItem>> children = new ArrayList<TreeItem<MyTreeItem>>();
+		Iterator<TreeItem<MyTreeFolderItem>> iter = parent.iterator();
+		ArrayList<TreeItem<MyTreeFolderItem>> children = new ArrayList<TreeItem<MyTreeFolderItem>>();
 		while (iter.hasNext())
 		{
-			TreeItem<MyTreeItem> child = iter.next();
+			TreeItem<MyTreeFolderItem> child = iter.next();
 			child.setExpanded(false);
 			unexpandAllChildren(child);
 		}

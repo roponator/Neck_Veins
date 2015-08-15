@@ -47,7 +47,7 @@
                 		</panel>
                   </panel>
                   
-                  <!-- PADDING DUMMY-->
+                  <!-- PADDING DUMMY -->
                      <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="*" valign="top" align="left" />
                   
                      <!-- BUTTON BUTTONS ROW-->
@@ -55,9 +55,13 @@
                        
                         <control id="appendButton" name="button" label="Options" margin="0px,0px,0px,0px"/>
                      	<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="*" height="100%" valign="top" align="left" />
-                         <control id="appendButton" name="button" label="Cancel" />
+                         <control id="" name="button" label="Cancel" >
+                             <interact onClick="onButton_OpenDialog_Cancel()"/> 
+                         </control>
                          <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="5%" height="100%" valign="top" align="left" />
-                          <control id="appendButton" name="button" label="Save" />
+                          <control id="appendButton" name="button" label="Open" >
+                               <interact onClick="onButton_OpenDialog_Open()"/> 
+                         </control>
                   </panel>
                    
               </panel>

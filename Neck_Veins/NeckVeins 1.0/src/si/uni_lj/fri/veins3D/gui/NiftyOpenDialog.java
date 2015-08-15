@@ -1,6 +1,7 @@
 package si.uni_lj.fri.veins3D.gui;
 
 import de.lessvoid.nifty.controls.Controller;
+import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.controls.TreeBox;
 import de.lessvoid.nifty.controls.TreeItem;
@@ -9,13 +10,13 @@ import de.lessvoid.nifty.controls.dropdown.DropDownControl;
 import de.lessvoid.nifty.controls.listbox.ListBoxControl;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.render.NiftyImage;
-import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyTreeItem;
+import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyTreeFolderItem;
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 
 public class NiftyOpenDialog
 {
 	de.lessvoid.nifty.elements.Element m_mainOpenDailogElement = null;
-	NiftyFolderBrowser m_folderBrowser = null;
+	public NiftyFolderBrowser m_folderBrowser = null;
 
 	public NiftyOpenDialog()
 	{
@@ -29,14 +30,15 @@ public class NiftyOpenDialog
 		m_folderBrowser = new NiftyFolderBrowser(treeboxParentPanel,fileListElement,fileTypeElement);
 		
 	}
+	
+	public void OnOpenDialog()
+	{
+		m_mainOpenDailogElement.setVisible(true);
+	}
 
 	public void OnCloseDialog()
 	{
 		m_mainOpenDailogElement.setVisible(false);
 	}
 	
-	public void OnTreeboxSelectionChanged(String id,ListBoxSelectionChangedEvent<TreeItem<MyTreeItem>> event)
-	{
-		m_folderBrowser.OnTreeboxSelectionChanged(id,event);
-	}
 }

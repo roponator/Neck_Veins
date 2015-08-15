@@ -7,9 +7,13 @@ import java.util.Locale;
 
 import javax.swing.JFrame;
 
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
 
-import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyTreeItem;
+import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyFileExtensionItem;
+import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyTreeFolderItem;
+import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyTreeFolderItem;
+import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.SelectedFile;
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import de.lessvoid.nifty.EndNotify;
 import de.lessvoid.nifty.Nifty;
@@ -18,6 +22,7 @@ import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.NiftyMouse;
 import de.lessvoid.nifty.controls.ButtonClickedEvent;
 import de.lessvoid.nifty.controls.Controller;
+import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
@@ -98,8 +103,6 @@ public class NiftyScreenController extends DefaultScreenController
 	{
 		m_settingsSideMenu = new NiftySettingsSideMenu();
 
-		 WORK ON 3D NAVIGATION WIDGET
-		
 		InitSlider("sl1", -2.0f, 2.0f, 1.0f, 0.1f, "%.2f");
 		InitSlider("sl2", 0.0f, 10.0f, 1.0f, 0.1f, "%.0f");
 
@@ -333,16 +336,54 @@ public class NiftyScreenController extends DefaultScreenController
 	// ----------------------------------------------------
 	public void onButton_TopMenu_File_Open()
 	{
-
+		setState(GUI_STATE.DIALOG_OPEN);
+		m_openDialog.OnOpenDialog();
 	}
 
 	public void On_OpenDialog_Close(String a)
 	{
 		setState(GUI_STATE.DEFAULT);
-
 		m_openDialog.OnCloseDialog();
 	}
 
+	public void onButton_OpenDialog_Cancel()
+	{
+		On_OpenDialog_Close("");
+	}
+	
+	public void onButton_OpenDialog_Open()
+	{
+		SelectedFile file = m_openDialog.m_folderBrowser.TryOpeningSelectedFile();
+
+		On_OpenDialog_Close("");
+
+		if(file.extensionOnly.compareTo("mhd")==0)
+		{
+			double sigma = 0.5f;
+			double threshold = 0.5f;
+			
+			// try loading on gpu, then cpu
+			try
+			{
+				VeinsWindow.renderer.loadModelRaw(file.fullFilePathAndName, sigma, threshold);
+			}
+			catch (LWJGLException e)
+			{
+				System.out.println("onButton_OpenDialog_Open: exceptions: "+e.getMessage());
+				e.printStackTrace();
+				
+				// try safe mode
+				VeinsWindow.renderer.loadModelRawSafeMode(file.fullFilePathAndName, sigma, threshold);
+			}
+		}
+		else if(file.extensionOnly.compareTo("obj")==0)
+		{
+			
+		}
+		else
+			System.out.println("onButton_OpenDialog_Open: invalid file extensions: "+file.extensionOnly+", file: "+file.fullFilePathAndName);
+	}
+	
 	// ----------------------------------------------------
 	// About dialog
 	// ----------------------------------------------------
@@ -430,9 +471,19 @@ public class NiftyScreenController extends DefaultScreenController
 	// Treebox events
 	// ----------------------------------------------------
 	@NiftyEventSubscriber(id = "tree-box")
-	public void OnTreeboxSelectionChanged(String id, ListBoxSelectionChangedEvent<TreeItem<MyTreeItem>> event)
+	public void OnTreeboxSelectionChanged(String id, ListBoxSelectionChangedEvent<TreeItem<MyTreeFolderItem>> event)
 	{
-		m_openDialog.OnTreeboxSelectionChanged(id, event);
+		m_openDialog.m_folderBrowser.OnTreeboxSelectionChanged(id, event);
+	}
+	
+	// ----------------------------------------------------
+	// Drop-down list events
+	// ----------------------------------------------------
+	
+	@NiftyEventSubscriber(id = "OPEN_DIALOG_FILE_TYPE_DROPDOWN")
+	public void OnFileTypeDropdownSelectionChanged(String id, DropDownSelectionChangedEvent<MyFileExtensionItem> event)
+	{
+		m_openDialog.m_folderBrowser.OnFileTypeSelectionChanged(event);
 	}
 
 	// ----------------------------------------------------
