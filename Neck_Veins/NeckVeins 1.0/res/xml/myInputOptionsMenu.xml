@@ -18,7 +18,7 @@
                 	<control name="label" align = "left" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" margin="0px,0px,0px,0px" width="60px" text="Input Options" height="100.0%" font="aurulent-sans-16.fnt"/>
 		            <panel id="" childLayout="horizontal" width="*" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  />  
 		            <control name="button" id="" style="STYLE_TOP_MENU_WINDOW_BUTTONS" childLayout="center" valign="top" label="" align="right" height="15px" width="17px"  backgroundImage="imgs\pngs720p\Med3D-25.png"  filter="true" >
-						 <interact onClick="On_OpenDialog_Close(a)"/>        	
+						 <interact onClick="On_InputOptionsDialog_Close()"/>        	
 						    <effect>
 								<onHover name="imageOverlay" filename="imgs/pngs720p/Med3D-33.png" imageMode="normal" post="true" />
 								<onClick name="imageOverlay" filename="imgs/pngs720p/Med3D-30.png" imageMode="normal" post="true" />

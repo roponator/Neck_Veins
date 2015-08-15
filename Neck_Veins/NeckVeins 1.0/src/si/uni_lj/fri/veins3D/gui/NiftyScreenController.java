@@ -44,14 +44,26 @@ import de.lessvoid.nifty.tools.SizeValueType;
 public class NiftyScreenController extends DefaultScreenController
 {
 	public static Screen m_screen = null;;
+	public static String[] m_supportedFileTypes = new String[]
+	{ "mhd", "obj" };
 
-	public static String[] m_supportedFileTypes = new String[]{"mhd","obj"};
-	
+	// -----------------------------------
+	// GUI state
+	// -----------------------------------
+	public enum GUI_STATE
+	{
+		DEFAULT, DIALOG_OPEN, // if this state is enabled then all clicks except for that dialog are disabled, only one dialog can be open at a time?
+	};
+
+	// use getState/setState functions, do not access this directly!
+	public static GUI_STATE __m_guiState_doNotAccessThisDirectly = GUI_STATE.DEFAULT;
+
 	// -----------------------------------
 	// Top menu bar buttons
 	// -----------------------------------
 	static final int TOPMENU_DROPDOWN_FILE = 0;
 	static final int TOPMENU_DROPDOWN_OPTIONS = 1;
+	static final int TOPMENU_DROPDOWN_HELP = 2;
 	Element[] m_panel_topMenu_DropDownMenus;
 
 	// -----------------------------------
@@ -63,43 +75,60 @@ public class NiftyScreenController extends DefaultScreenController
 	// -----------------------------------
 	// Sliders
 	// -----------------------------------
-	static HashMap<Element, String> m_sliderOutputTextFormat =new HashMap<Element, String>(); // stores how the slider value label is printed for every slider(eg one decimal, int ,...)
-	
+	static HashMap<Element, String> m_sliderOutputTextFormat = new HashMap<Element, String>(); // stores how the slider value label is printed for every slider(eg one decimal, int ,...)
+
 	// -----------------------------------
-	// Open Dialog
+	// Dialogs
 	// -----------------------------------
 	static NiftyOpenDialog m_openDialog = null;
-	// -----------------------------------
-		// u
-		// -----------------------------------
+	static Element m_aboutDialog = null;
+	static Element m_inputOptionsDialog = null;
+	static Element m_resolutionDialog = null;
+	static Element m_stereoDialog = null;
+	static Element m_licenseDialog = null;
 
-	
+	static Element m_darkeningPanelForDialog = null;
+
+	// -----------------------------------
+	// Init
+	// -----------------------------------
+
 	// This is called when the screen is created
 	private void init()
 	{
 		m_settingsSideMenu = new NiftySettingsSideMenu();
+
+		 WORK ON 3D NAVIGATION WIDGET
+		
+		InitSlider("sl1", -2.0f, 2.0f, 1.0f, 0.1f, "%.2f");
+		InitSlider("sl2", 0.0f, 10.0f, 1.0f, 0.1f, "%.0f");
+
+		ListBox listBox = m_screen.findNiftyControl("myListBox", ListBox.class);
+		for (int i = 0; i < 10; ++i)
+			listBox.addItem(Integer.toString(i));
+
+		// ---------------------------------------
+		// Create/get dialogs
+		// ---------------------------------------
 		m_openDialog = new NiftyOpenDialog();
-		
-		InitSlider("sl1", -2.0f, 2.0f, 1.0f, 0.1f,"%.2f");
-		InitSlider("sl2", 0.0f, 10.0f, 1.0f, 0.1f,"%.0f");
-		
-		 ListBox listBox = m_screen.findNiftyControl("myListBox", ListBox.class);
-		  for(int i=0;i<10;++i)
-			  listBox.addItem(Integer.toString(i));
-		
+
+		m_aboutDialog = nifty.getScreen("GScreen0").findElementById("MY_ABOUT_DIALOG");
+		m_inputOptionsDialog = nifty.getScreen("GScreen0").findElementById("MY_INPUT_OPTIONS_DIALOG");
+		m_resolutionDialog = nifty.getScreen("GScreen0").findElementById("MY_RESOLUTUION_OPTIONS_DIALOG");
+		m_stereoDialog = nifty.getScreen("GScreen0").findElementById("MY_STEREO_OPTIONS_DIALOG");
+		m_licenseDialog = nifty.getScreen("GScreen0").findElementById("MY_LICENSE_DIALOG");
+
+		m_darkeningPanelForDialog = nifty.getScreen("GScreen0").findElementById("DARKENING_PANEL_FOR_DIALOG");
+
 		// ---------------------------------------
 		// Top menu bars
 		// ---------------------------------------
-		m_panel_topMenu_DropDownMenus = new Element[2];
+		m_panel_topMenu_DropDownMenus = new Element[3];
 		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_FILE] = nifty.getScreen("GScreen0").findElementById("TOP_MENU_FILE_DROP_DOWN_PANEL");
 		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_OPTIONS] = nifty.getScreen("GScreen0").findElementById("TOP_MENU_OPTIONS_DROP_DOWN_PANEL");
+		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_HELP] = nifty.getScreen("GScreen0").findElementById("TOP_MENU_HELP_DROP_DOWN_PANEL");
 
 		prepareForSomeMenuOpen();
-	
-	}
-
-	public void update()
-	{
 
 	}
 
@@ -157,12 +186,17 @@ public class NiftyScreenController extends DefaultScreenController
 	// ----------------------------------------------------
 	public void onButton_TopMenu_Minimize(String a)
 	{
+		if (getState() != GUI_STATE.DEFAULT)
+			return;
+
 		prepareForSomeMenuOpen();
 		VeinsWindow.frame.setState(Frame.ICONIFIED);
 	}
 
 	public void onButton_TopMenu_Maximize(String a)
 	{
+		if (getState() != GUI_STATE.DEFAULT)
+			return;
 
 		prepareForSomeMenuOpen();
 		VeinsWindow.veinsWindow.ResizeWindow(true);
@@ -170,6 +204,9 @@ public class NiftyScreenController extends DefaultScreenController
 
 	public void onButton_TopMenu_Close(String a)
 	{
+		if (getState() != GUI_STATE.DEFAULT)
+			return;
+
 		prepareForSomeMenuOpen();
 		VeinsWindow.veinsWindow.exitProgram(0);
 
@@ -178,26 +215,55 @@ public class NiftyScreenController extends DefaultScreenController
 	// ----------------------------------------------------
 	// Top menu bar & its drop-down menu: File,Options,...
 	// ----------------------------------------------------
-	public void onButton_TopMenu_File(String a)
+	public void onButton_TopMenu_File()
 	{
+		if (getState() != GUI_STATE.DEFAULT)
+			return;
+
 		prepareForSomeMenuOpen();
 		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_FILE].setVisible(true);
 	}
 
-	public void onHover_TopMenu_File(String a)
+	public void onHover_TopMenu_File()
 	{
+		if (getState() != GUI_STATE.DEFAULT)
+			return;
+
 		tryOpeningDropDownOnHover(TOPMENU_DROPDOWN_FILE);
 	}
 
-	public void onButton_TopMenu_Options(String a)
+	public void onButton_TopMenu_Options()
 	{
+		if (getState() != GUI_STATE.DEFAULT)
+			return;
+
 		prepareForSomeMenuOpen();
 		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_OPTIONS].setVisible(true);
 	}
 
-	public void onHover_TopMenu_Options(String a)
+	public void onHover_TopMenu_Options()
 	{
+		if (getState() != GUI_STATE.DEFAULT)
+			return;
+
 		tryOpeningDropDownOnHover(TOPMENU_DROPDOWN_OPTIONS);
+	}
+
+	public void onButton_TopMenu_Help()
+	{
+		if (getState() != GUI_STATE.DEFAULT)
+			return;
+
+		prepareForSomeMenuOpen();
+		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_HELP].setVisible(true);
+	}
+
+	public void onHover_TopMenu_Help()
+	{
+		if (getState() != GUI_STATE.DEFAULT)
+			return;
+
+		tryOpeningDropDownOnHover(TOPMENU_DROPDOWN_HELP);
 	}
 
 	boolean isAnyTopMenuDropDownOpen()
@@ -241,12 +307,18 @@ public class NiftyScreenController extends DefaultScreenController
 	// ----------------------------------------------------
 	public void onButton_SettingsSideMenu_Open(String a)
 	{
+		if (getState() != GUI_STATE.DEFAULT)
+			return;
+
 		prepareForSomeMenuOpen();
 		m_settingsSideMenu.OpenMenu();
 	}
 
 	public void onButton_SettingsSideMenu_Close(String a)
 	{
+		if (getState() != GUI_STATE.DEFAULT)
+			return;
+
 		m_settingsSideMenu.CloseMenu();
 		prepareForSomeMenuOpen();
 	}
@@ -256,28 +328,113 @@ public class NiftyScreenController extends DefaultScreenController
 		m_settingsSideMenu.OnMenuCloseAnimationFinished();
 	}
 
-	public void onButton_SettingsSideMenu_BackPanelClicked(String a)
-	{
-		System.out.println("hhh");
-	}
-
 	// ----------------------------------------------------
 	// Open dialog
 	// ----------------------------------------------------
+	public void onButton_TopMenu_File_Open()
+	{
+
+	}
+
 	public void On_OpenDialog_Close(String a)
 	{
+		setState(GUI_STATE.DEFAULT);
+
 		m_openDialog.OnCloseDialog();
+	}
+
+	// ----------------------------------------------------
+	// About dialog
+	// ----------------------------------------------------
+	public void onButton_TopMenu_Help_About()
+	{
+		setState(GUI_STATE.DIALOG_OPEN);
+		m_aboutDialog.setVisible(true);
+	}
+
+	public void On_AboutDialog_Close()
+	{
+		setState(GUI_STATE.DEFAULT);
+		m_aboutDialog.setVisible(false);
+	}
+
+	// ----------------------------------------------------
+	// Input options dialog
+	// ----------------------------------------------------
+	public void onButton_TopMenu_Options_Inputs()
+	{
+		setState(GUI_STATE.DIALOG_OPEN);
+		m_inputOptionsDialog.setVisible(true);
+	}
+
+	public void On_InputOptionsDialog_Close()
+	{
+		setState(GUI_STATE.DEFAULT);
+		m_inputOptionsDialog.setVisible(false);
+	}
+
+	// ----------------------------------------------------
+	// License options dialog
+	// ----------------------------------------------------
+	public void onButton_TopMenu_Help_License()
+	{
+		setState(GUI_STATE.DIALOG_OPEN);
+		m_licenseDialog.setVisible(true);
+	}
+
+	public void On_LicenseDialog_Close()
+	{
+		setState(GUI_STATE.DEFAULT);
+		m_licenseDialog.setVisible(false);
+	}
+
+	// ----------------------------------------------------
+	// Resolution options dialog
+	// ----------------------------------------------------
+	public void onButton_TopMenu_Options_Resolution()
+	{
+		setState(GUI_STATE.DIALOG_OPEN);
+		m_resolutionDialog.setVisible(true);
+	}
+
+	public void On_ResolutionDialog_Close()
+	{
+		setState(GUI_STATE.DEFAULT);
+		m_resolutionDialog.setVisible(false);
+	}
+
+	// ----------------------------------------------------
+	// Stereo options dialog
+	// ----------------------------------------------------
+	public void onButton_TopMenu_Options_Stereo()
+	{
+		setState(GUI_STATE.DIALOG_OPEN);
+		m_stereoDialog.setVisible(true);
+	}
+
+	public void On_StereoDialog_Close()
+	{
+		setState(GUI_STATE.DEFAULT);
+		m_stereoDialog.setVisible(false);
+	}
+
+	// ----------------------------------------------------
+	// Other top menu buttons
+	// ----------------------------------------------------
+	public void onButton_TopMenu_File_Exit()
+	{
+		onButton_TopMenu_Close("");
 	}
 
 	// ----------------------------------------------------
 	// Treebox events
 	// ----------------------------------------------------
-	@NiftyEventSubscriber(id="tree-box")
-    public void OnTreeboxSelectionChanged(String id, ListBoxSelectionChangedEvent<TreeItem<MyTreeItem>> event)
-    {
-		m_openDialog.OnTreeboxSelectionChanged(id,event);
-    }
-	
+	@NiftyEventSubscriber(id = "tree-box")
+	public void OnTreeboxSelectionChanged(String id, ListBoxSelectionChangedEvent<TreeItem<MyTreeItem>> event)
+	{
+		m_openDialog.OnTreeboxSelectionChanged(id, event);
+	}
+
 	// ----------------------------------------------------
 	// Sliders
 	// ----------------------------------------------------
@@ -336,14 +493,42 @@ public class NiftyScreenController extends DefaultScreenController
 
 	public static void InitSlider(String mySliderControlId, float min, float max, float initialValue, float step, String valueLabelFormat)
 	{
-		
+
 		Element mySliderElement = VeinsWindow.nifty.getScreen("GScreen0").findElementById(mySliderControlId);
 		m_sliderOutputTextFormat.put(mySliderElement, valueLabelFormat);
-		
+
 		Element niftySliderElement = mySliderElement.findElementById("SLIDER_CONTROL");
 		de.lessvoid.nifty.controls.Slider sliderControl = niftySliderElement.getControl(de.lessvoid.nifty.controls.slider.SliderControl.class);
 		sliderControl.setup(min, max, initialValue, step, step);
 		updateSliderValueLabel(mySliderElement, initialValue);
+	}
+
+	// ----------------------------------------------------
+	// State handling
+	// ----------------------------------------------------
+	GUI_STATE getState()
+	{
+		return __m_guiState_doNotAccessThisDirectly;
+	}
+	
+	void setState(GUI_STATE state)
+	{
+		if (state == GUI_STATE.DEFAULT)
+		{
+			m_darkeningPanelForDialog.setVisible(false);
+		}
+		else if (state == GUI_STATE.DIALOG_OPEN)
+		{
+			prepareForSomeMenuOpen();
+			m_darkeningPanelForDialog.setVisible(true);
+		}
+		else
+		{
+			// warning in case a new state is added and you forget to implement it
+			System.out.println("NiftyScreenController::setState: invalid GUI_STATE: " + state.toString());
+		}
+
+		__m_guiState_doNotAccessThisDirectly = state;
 	}
 
 	// ----------------------------------------------------

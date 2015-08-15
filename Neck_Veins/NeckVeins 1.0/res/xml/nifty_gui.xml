@@ -34,52 +34,8 @@
 	 
 	
   	<screen id="GScreen0"  controller="si.uni_lj.fri.veins3D.gui.NiftyScreenController">
-    
-  	              
-  	  <!-- ******************************************* -->
-	 <!-- TEMP: OPEN DIALOG -->
-	 <!-- ******************************************* -->
-  	      <layer id="LAYER_OPEN_DIALOG" childLayout="absolute" valign="top" align="left"  >
-            <control id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" x="50px" y="200px" childLayout="vertical" width="600px" height="330px" valign="top" align="left" />
-          </layer>
-  	    
-  	 <!-- ******************************************* -->
-	 <!-- TEMP: Input settings -->
-	 <!-- ******************************************* -->
-  	      <layer id="LAYER_INPUT_SETTINGS_DIALOG" childLayout="absolute" valign="top" align="left"  >
-            <control id="MY_INPUT_OPTIONS_DIALOG" name="MY_INPUT_OPTIONS_CONTROL" x="700px" y="200px" childLayout="vertical" width="250px" height="300px" valign="top" align="left" />
-          </layer>    
-          
-  	 <!-- ******************************************* -->
-	 <!-- TEMP: resolution settings -->
-	 <!-- ******************************************* -->
-  	     <layer id="LAYER_RESOLUTION_CONTROL" childLayout="absolute" valign="top" align="left"  >
-          	<control id="MY_RESOLUTUION_OPTIONS_DIALOG" name="MY_RESOLUTION_CONTROL" x="600px" y="200px" childLayout="vertical" width="250px" height="280px" valign="top" align="left" />
-          </layer>   
-  	     
-
-  	    <!-- ******************************************* -->
-	 <!-- TEMP: stereo settings -->
-	 <!-- ******************************************* -->
-  	     <layer id="LAYER_STEREO_CONTROL" childLayout="absolute" valign="top" align="left"  >
-          	<control id="MY_STEREO_OPTIONS_DIALOG" name="MY_STEREO_CONTROL" x="550px" y="300px" childLayout="vertical" width="250px" height="160px" valign="top" align="left" />
-          </layer>   
-          
-  	  <!-- ******************************************* -->
-	 <!-- TEMP: about dialog -->
-	 <!-- ******************************************* -->
-  	     <layer id="LAYER_ABOUT_CONTROL" childLayout="absolute" valign="top" align="left"  >
-          	<control id="" name="MY_ABOUT_DIALOG_CONTROL" x="350px" y="300px" childLayout="vertical" width="320px" height="330px" valign="top" align="left" />
-        </layer>   
-  	     
-  	     
-  	  <!-- ******************************************* -->
-	 <!-- TEMP: license dialog -->
-	 <!-- ******************************************* -->
-  	     <layer id="LAYER_LICENSE_CONTROL" childLayout="absolute" valign="top" align="left"  >
-          	<control id="" name="MY_LICENSE_DIALOG_CONTROL" x="150px" y="300px" childLayout="vertical" width="320px" height="330px" valign="top" align="left" />
-        </layer>   
-        
+  
+          	
         <!-- ******************************************* -->
 		<!-- LAYER: SETTINGS SIDE MENU -->
 		<!-- ******************************************* -->
@@ -161,8 +117,8 @@
            
                      <!--  the File button -->
 	                <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center"  valign="center" label="File" align="left" height="100.0%" width="100.0%">
-	                	<interact onClick="onButton_TopMenu_File(a)"
-	                	    		 onMouseOver="onHover_TopMenu_File(a)"/>   
+	                	<interact onClick="onButton_TopMenu_File()"
+	                	    	  onMouseOver="onHover_TopMenu_File()"/>   
 	                   	
 	                </control>
 	                
@@ -173,7 +129,7 @@
 	               		    <!--  the Open button -->
 	               		    <panel id="TOP_MENU_OPEN_PANEL" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
 	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" valign="center" label="" align="left" height="100.0%" width="100.0%">
-				                	<interact onClick="onBtn(bla)"/>        	
+				                	<interact onClick="onButton_TopMenu_File_Open()"/>        	
 				                </control>
 	               		        <panel id="" childLayout="horizontal" width="100.0%" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  >
 									<control name="label" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" width="80px" text="Open" height="100.0%" font="aurulent-sans-16.fnt"/>
@@ -184,7 +140,7 @@
 	               		    <!--  the Save As button -->
 	               		    <panel id="TOP_MENU_SAVE_AS_PANEL" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
 	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" valign="center" label="" align="left" height="100.0%" width="100.0%">
-				                	<interact onClick="onBtn(bla)"/>        	
+				                	<interact onClick="onButton_TopMenu_File_SaveAs()"/>        	
 				                </control>
 	               		        <panel id="" childLayout="horizontal" width="100.0%" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  >
 									<control name="label" align = "left" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" width="80px" text="Save As" height="100.0%" font="aurulent-sans-16.fnt"/>
@@ -195,7 +151,7 @@
 	               		      <!--  the Exit button -->
 	               		    <panel id="TOP_MENU_EXIT_PANEL" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
 	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" valign="center" label="" align="left" height="100.0%" width="100.0%" >
-				                	<interact onClick="onBtn(bla)"/>        	
+				                	<interact onClick="onButton_TopMenu_File_Exit()"/>        	
 				                </control>
 	               		        <panel id="" childLayout="horizontal" width="100.0%" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  >
 									<control name="label" align = "left" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL"  width="60px" text="Exit" height="100.0%" font="aurulent-sans-16.fnt"/>     		
@@ -215,8 +171,8 @@
            
                      <!--  the File button -->
 	                <control name="button" id="DFFR3FR3" style="STYLE_TOP_MENU_BUTTON" childLayout="center"  valign="center" label="Options" align="left" height="100.0%" width="100.0%">
-	                	<interact onClick="onButton_TopMenu_Options(a)"
-	                	    	onMouseOver="onHover_TopMenu_Options(a)"/>       	
+	                	<interact onClick="onButton_TopMenu_Options()"
+	                	    	  onMouseOver="onHover_TopMenu_Options()"/>       	
 	                </control>
 	                
 	                 <!--  Drop-down menu, which is offseted a bit down -->
@@ -226,7 +182,7 @@
 	               		    <!--  the Inputs button -->
 	               		    <panel id="" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
 	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" valign="center" label="" align="left" height="100.0%" width="100.0%">
-				                	<interact onClick="onBtn(bla)"/>        	
+				                	<interact onClick="onButton_TopMenu_Options_Inputs()"/>        	
 				                </control>
 	               		        <panel id="" childLayout="horizontal" width="100.0%" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  >
 									<control name="label" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" width="80px" text="Inputs" height="100.0%" font="aurulent-sans-16.fnt"/>
@@ -237,7 +193,7 @@
 	               		    <!--  the Resolution button -->
 	               		    <panel id="" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
 	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" valign="center" label="" align="left" height="100.0%" width="100.0%">
-				                	<interact onClick="onBtn(bla)"/>        	
+				                	<interact onClick="onButton_TopMenu_Options_Resolution()"/>        	
 				                </control>
 	               		        <panel id="" childLayout="horizontal" width="100.0%" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  >
 									<control name="label" align = "left" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" width="60px" text="Resolution" height="100.0%" font="aurulent-sans-16.fnt"/>
@@ -247,7 +203,7 @@
 	               		      <!--  the Stereo button -->
 	               		    <panel id="" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
 	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" valign="center" label="" align="left" height="100.0%" width="100.0%">
-				                	<interact onClick="onBtn(bla)"/>        	
+				                	<interact onClick="onButton_TopMenu_Options_Stereo()"/>        	
 				                </control>
 	               		        <panel id="" childLayout="horizontal" width="100.0%" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  >
 									<control name="label" align = "left" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL"  width="60px" text="Stereo" height="100.0%" font="aurulent-sans-16.fnt"/>     		
@@ -258,6 +214,59 @@
 	       			</panel>      
                  </panel>
                 <!--  ******** END BUTTON ********** -->
+                
+                 <!--  ********************************** -->
+                 <!-- button Help & its dropdown menu -->
+                 <!--  ********************************** -->
+                 <panel id=""  style="STYLE_TOP_MENU_BUTTON" childLayout="vertical" valign="center" align="left" height="100%" width="70px">
+           
+                     <!--  the Help button -->
+	                <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center"  valign="center" label="Help" align="left" height="100.0%" width="100.0%">
+	                	<interact onClick="onButton_TopMenu_Help()"
+	                	    	  onMouseOver="onHover_TopMenu_Help()"/>       	
+	                </control>
+	                
+	                 <!--  Drop-down menu, which is offseted a bit down -->
+	                 <panel id="TOP_MENU_HELP_DROP_DOWN_PANEL"  style="STYLE_COMMON_INVISIBLE" width="160.0px" height="100%" childLayout="vertical"align="left" >
+	               		<panel id="" childLayout="vertical" width="100%" height="100%" style="STYLE_COMMON_INVISIBLE" valign="center" align="left"  >
+	               		  
+	               		    <!--  the About button -->
+	               		    <panel id="" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
+	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" valign="center" label="" align="left" height="100.0%" width="100.0%">
+				                	<interact onClick="onButton_TopMenu_Help_About()"/>        	
+				                </control>
+	               		        <panel id="" childLayout="horizontal" width="100.0%" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  >
+									<control name="label" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" width="80px" text="About" height="100.0%" font="aurulent-sans-16.fnt"/>
+		               		 		<control name="label" align = "left" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL_SMALL" width="60px" text="CTRL + I" height="100.0%" font="fonts/aurulent-sans_small.fnt"/>      		
+				                 </panel>  		             
+				            </panel>
+				            
+	               		    <!--  the Manual button -->
+	               		    <panel id="" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
+	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" valign="center" label="" align="left" height="100.0%" width="100.0%">
+				                	<interact onClick="onBtn(bla)"/>        	
+				                </control>
+	               		         <panel id="" childLayout="horizontal" width="100.0%" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  >
+									<control name="label" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" width="80px" text="User Manual" height="100.0%" font="aurulent-sans-16.fnt"/>
+		               		 		<control name="label" align = "left" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL_SMALL" width="60px" text="F1" height="100.0%" font="fonts/aurulent-sans_small.fnt"/>      		
+				                 </panel>  		                   
+				            </panel>
+				            
+	               		      <!--  the License button -->
+	               		    <panel id="" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
+	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" valign="center" label="" align="left" height="100.0%" width="100.0%">
+				                	<interact onClick="onButton_TopMenu_Help_License()"/>        	
+				                </control>
+	               		        <panel id="" childLayout="horizontal" width="100.0%" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  >
+									<control name="label" align = "left" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL"  width="60px" text="License" height="100.0%" font="aurulent-sans-16.fnt"/>     		
+				                 </panel>  		             
+				            </panel>
+				             		    
+	               		</panel>
+	       			</panel>      
+                 </panel>
+                <!--  ******** END BUTTON ********** -->
+                
                  
                 <!-- ******************************************* -->
 				<!-- minimize, maxmimize, close buttons on top menu bar-->
@@ -303,8 +312,63 @@
  
         </layer>
         
-    
-        
+    <!-- ******************************************* -->
+	<!-- LAYER: DARKENING FOR DIALOGS -->
+	<!-- ******************************************* -->
+	<layer id="LAYER_DARKENING_FOR_DIALOG" childLayout="absolute">
+	     <panel id="DARKENING_PANEL_FOR_DIALOG"  style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" visible="false" valign="top" align="right" height="100%" width="100%" backgroundColor="#000000aa"/>
+	</layer>
+          
+  	<!-- ******************************************* -->
+	<!-- LAYER: DIALOGS -->
+	<!-- ******************************************* -->
+	<layer id="LAYER_DIALOGS_MENU" childLayout="absolute" >
+  	  
+	  	 <!-- ******************************************* -->
+		 <!--  OPEN DIALOG -->
+		 <!-- ******************************************* -->
+	
+	            <control id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" visible="false" x="40%" y="30%" childLayout="vertical" width="600px" height="330px" valign="center" align="center" />
+	      
+	  	    
+	  	 <!-- ******************************************* -->
+		 <!--  Input settings dialog -->
+		 <!-- ******************************************* -->
+	
+	            <control id="MY_INPUT_OPTIONS_DIALOG" name="MY_INPUT_OPTIONS_CONTROL" x="40%" y="30%"  visible="false" childLayout="vertical" width="250px" height="300px" valign="center" align="center" />
+	
+	          
+	  	 <!-- ******************************************* -->
+		 <!-- resolution settings dialog -->
+		 <!-- ******************************************* -->
+	  	  
+	          	<control id="MY_RESOLUTUION_OPTIONS_DIALOG" name="MY_RESOLUTION_CONTROL" x="40%" y="30%"  visible="false" childLayout="vertical" width="250px" height="280px" valign="center" align="center" />
+	  	     
+	
+	  	 <!-- ******************************************* -->
+		 <!-- stereo settings dialog-->
+		 <!-- ******************************************* -->
+	  
+	          	<control id="MY_STEREO_OPTIONS_DIALOG" name="MY_STEREO_CONTROL" x="40%" y="30%" visible="false" childLayout="vertical" width="250px" height="160px" valign="center" align="center" />
+	    
+	          
+	  	 <!-- ******************************************* -->
+		 <!--  about dialog -->
+		 <!-- ******************************************* -->
+	  	 
+	          	<control id="MY_ABOUT_DIALOG" name="MY_ABOUT_DIALOG_CONTROL" x="40%" y="30%" visible="false" childLayout="vertical" width="320px" height="330px" valign="center" align="center" />
+	        
+	  	     
+	  	     
+	  	 <!-- ******************************************* -->
+		 <!-- TEMP: license dialog -->
+		 <!-- ******************************************* -->
+	  	   
+	      <control id="MY_LICENSE_DIALOG" name="MY_LICENSE_DIALOG_CONTROL" x="40%" y="30%" visible="false"  childLayout="vertical" width="320px" height="330px" valign="center" align="center" />
+	     
+
+      <!-- END DIALOG LAYER -->
+      </layer>   
         
     </screen>
 </nifty>
