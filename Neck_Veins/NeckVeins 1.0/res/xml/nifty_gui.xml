@@ -26,6 +26,8 @@
      <useControls filename="xml/myStereoSettingsMenu.xml"/>
      <useControls filename="xml/myAboutDialog.xml"/>
      <useControls filename="xml/myLicenseControl.xml"/>
+     <useControls filename="xml/myNavigationWidgetControl_UDLR.xml"/>
+     <useControls filename="xml/myNavigationWidgetControl_WASD.xml"/>
      
  
 	 <!-- base="nifty-panel-simple" -->
@@ -35,7 +37,17 @@
 	
   	<screen id="GScreen0"  controller="si.uni_lj.fri.veins3D.gui.NiftyScreenController">
   
-          	
+  	         	
+        <!-- ******************************************* -->
+		<!-- LAYER: NAVIGATION WIDGETS -->
+		<!-- ******************************************* -->
+		 <layer id="LAYER_NAVIGATION_WIDGETS" childLayout="absolute">
+		     <!-- width MUST be in pixels, NOT percent!!! -->
+		     	<control id="NAVIGATION_WIDGET_WASD" name="MY_NAVIGATION_WIDGET_WASD_CONTROL" childLayout="center" style="STYLE_COMMON_INVISIBLE" width="110px" height="91px"  x="70%" y="200px" />          
+				<control id="NAVIGATION_WIDGET_UDLR" name="MY_NAVIGATION_WIDGET_UDLR_CONTROL" childLayout="center" style="STYLE_COMMON_INVISIBLE" width="110px" height="91px"  x="70%" y="400px" />          
+		     	
+		 </layer>
+  	    	
         <!-- ******************************************* -->
 		<!-- LAYER: SETTINGS SIDE MENU -->
 		<!-- ******************************************* -->

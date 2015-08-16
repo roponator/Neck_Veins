@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty-controls xmlns="http://nifty-gui.lessvoid.com/nifty-gui">
+    <!-- WINDOW CONTROL -->
+    <controlDefinition name="MY_NAVIGATION_WIDGET_UDLR_CONTROL" style="nifty-window" childRootId="#window-content"
+                       controller="de.lessvoid.nifty.controls.window.WindowControl" revert="false" drop="false"
+                       handle="#window-bar">
+       		 
+        <image id="" width="100%" height="100%"    childLayout="vertical" filename="imgs\pngs720p\Med3D-42.png" valign="center" align="center" filter="true" visibleToMouse="true">                  	
+	           <interact onMouseOver="onButton_NavigationWidgetUDLR_OnMouseOver()" onRelease="dragStop()"/>
+        </image>
+            
+    </controlDefinition>
+</nifty-controls>

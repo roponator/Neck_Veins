@@ -33,10 +33,13 @@ import de.lessvoid.nifty.controls.TreeItem;
 import de.lessvoid.nifty.controls.label.LabelControl;
 import de.lessvoid.nifty.controls.slider.SliderControl;
 import de.lessvoid.nifty.controls.slider.SliderImpl;
+import de.lessvoid.nifty.controls.window.WindowControl;
 import de.lessvoid.nifty.effects.EffectEventId;
 import de.lessvoid.nifty.effects.impl.Move;
 import de.lessvoid.nifty.elements.Element;
+import de.lessvoid.nifty.elements.render.ImageRenderer;
 import de.lessvoid.nifty.input.NiftyInputEvent;
+import de.lessvoid.nifty.input.NiftyMouseInputEvent;
 import de.lessvoid.nifty.screen.DefaultScreenController;
 import de.lessvoid.nifty.screen.KeyInputHandler;
 import de.lessvoid.nifty.screen.Screen;
@@ -60,8 +63,17 @@ public class NiftyScreenController extends DefaultScreenController
 		DEFAULT, DIALOG_OPEN, // if this state is enabled then all clicks except for that dialog are disabled, only one dialog can be open at a time?
 	};
 
+	public enum NAVIGATION_WIDGET_BUTTON
+	{
+		NONE, CENTER_CIRCLE_LEFT, CENTER_CIRCLE_RIGHT, CENTER_CIRCLE_UP, CENTER_CIRCLE_DOWN, SIDE_CIRCLE_LEFT, SIDE_CIRCLE_RIGHT, CLOSE_CIRCLE, MOVE_WIDGET_CIRCLE
+	}
+
 	// use getState/setState functions, do not access this directly!
 	public static GUI_STATE __m_guiState_doNotAccessThisDirectly = GUI_STATE.DEFAULT;
+
+	// -----------------------------------
+	// Mouse
+	// -----------------------------------
 
 	// -----------------------------------
 	// Top menu bar buttons
@@ -76,6 +88,50 @@ public class NiftyScreenController extends DefaultScreenController
 	// -----------------------------------
 	NiftySettingsSideMenu m_settingsSideMenu = null;
 	boolean m_isSettginsSideMenuOpened = false;
+
+	// -----------------------------------
+	// Navigation widgets
+	// -----------------------------------
+	static class NavigationWidget
+	{
+		public Element m_navigationWidget = null;
+
+		boolean m_moveNavigationWidget = false;
+
+		public NavigationWidget(Element element)
+		{
+			m_navigationWidget = element;
+		}
+
+		public boolean IsWidgetInMoveState()
+		{
+			return m_moveNavigationWidget;
+		}
+
+		public void StartMoving()
+		{
+			m_moveNavigationWidget = true;
+		}
+
+		public void Move()
+		{
+			if (m_moveNavigationWidget)
+			{
+				WindowControl wc = this.m_navigationWidget.getControl(de.lessvoid.nifty.controls.window.WindowControl.class);
+				NiftyMouse mouse = VeinsWindow.nifty.getNiftyMouse();
+				wc.drag(mouse.getX(), mouse.getY());
+			}
+		}
+
+		public void StopMoving()
+		{
+			m_moveNavigationWidget = false;
+		}
+
+	}
+
+	public static NavigationWidget m_navWidgetWASD = null; // the one with WASD
+	public static NavigationWidget m_navWidgetUDLR = null; // the one with arrows
 
 	// -----------------------------------
 	// Sliders
@@ -124,6 +180,23 @@ public class NiftyScreenController extends DefaultScreenController
 		m_darkeningPanelForDialog = nifty.getScreen("GScreen0").findElementById("DARKENING_PANEL_FOR_DIALOG");
 
 		// ---------------------------------------
+		// Nav widgets
+		// ---------------------------------------
+		m_navWidgetWASD = new NavigationWidget(nifty.getScreen("GScreen0").findElementById("NAVIGATION_WIDGET_WASD"));
+		m_navWidgetUDLR = new NavigationWidget(nifty.getScreen("GScreen0").findElementById("NAVIGATION_WIDGET_UDLR"));
+		
+		// place them to the right edge of the screen
+		int widgetWidthInPixels = m_navWidgetWASD.m_navigationWidget.getConstraintWidth().getValueAsInt(1.0f);
+		int widgetXPos = VeinsWindow.currentDisplayMode.getWidth()-widgetWidthInPixels-20;
+		
+		m_navWidgetWASD.m_navigationWidget.setConstraintX(new SizeValue(widgetXPos,SizeValueType.Pixel));
+		m_navWidgetUDLR.m_navigationWidget.setConstraintX(new SizeValue(widgetXPos,SizeValueType.Pixel));		
+		
+		// must call this to actualy apply the new position
+		m_navWidgetWASD.m_navigationWidget.getControl(de.lessvoid.nifty.controls.window.WindowControl.class).dragStop();
+		m_navWidgetUDLR.m_navigationWidget.getControl(de.lessvoid.nifty.controls.window.WindowControl.class).dragStop();
+		
+		// ---------------------------------------
 		// Top menu bars
 		// ---------------------------------------
 		m_panel_topMenu_DropDownMenus = new Element[3];
@@ -132,12 +205,17 @@ public class NiftyScreenController extends DefaultScreenController
 		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_HELP] = nifty.getScreen("GScreen0").findElementById("TOP_MENU_HELP_DROP_DOWN_PANEL");
 
 		prepareForSomeMenuOpen();
-
+		IMPLEMENT CAMERA 
 	}
 
-	// Detects mouse down click (after it was up)
+	// -----------------------------------
+	// Mouse common
+	// -----------------------------------
+
+	// Detects mouse down click (after it was up), so clicks
 	public void onMouseLeftDownClicked()
 	{
+
 		// Hide all top menu drop down menus if mouse clicked on none of them
 		if (isMouseOnAnyDropDownMenu() == false)
 			closeAllTopMenuDropDownMenus();
@@ -183,6 +261,179 @@ public class NiftyScreenController extends DefaultScreenController
 		else
 			return null;
 	}
+
+	// ----------------------------------------------------
+	// Navigation widgets
+	// ----------------------------------------------------
+
+	public void onButton_NavigationWidgetWASD_OnMouseOver(Element element, NiftyMouseInputEvent event)
+	{		
+		processNavWidgetInput(m_navWidgetWASD,event);
+	}
+	
+	public void onButton_NavigationWidgetUDLR_OnMouseOver(Element element, NiftyMouseInputEvent event)
+	{
+		processNavWidgetInput(m_navWidgetUDLR,event);
+	}
+
+	public static void processNavWidgetInput(NavigationWidget widget,NiftyMouseInputEvent event)
+	{
+		// move widget, must be done outside the buttons if-else thingy
+		if (widget.IsWidgetInMoveState())
+			widget.Move();
+
+		NAVIGATION_WIDGET_BUTTON pressedButton = GetNavigationWidgetPressedButton(widget.m_navigationWidget);
+		
+		// handle input based on click/drag
+		if (event.isButton0Release()) // button click
+		{
+			NiftyMouse mouse = VeinsWindow.nifty.getNiftyMouse();
+			
+			widget.StopMoving();
+			System.out.println("cll");
+			// close if close circled was pressed
+			if(pressedButton==NAVIGATION_WIDGET_BUTTON.CLOSE_CIRCLE)
+				widget.m_navigationWidget.setVisible(false);
+		}
+		else if (event.isButton0Down()) // drag
+		{
+			// start moving widget if clicked on move circle
+			if (pressedButton == NAVIGATION_WIDGET_BUTTON.MOVE_WIDGET_CIRCLE)
+			{
+				System.out.println("drag");
+				widget.StartMoving();
+			}
+				
+
+		}
+		else if (event.isButton0Release())
+		{
+			widget.StopMoving();
+		}
+	}
+
+	// computes which button was pressed
+	public static NAVIGATION_WIDGET_BUTTON GetNavigationWidgetPressedButton(Element navWidgetElement)
+	{
+		float widgetXPos = navWidgetElement.getConstraintX().getValueAsInt(VeinsWindow.currentDisplayMode.getWidth());	
+		float widgetYPos = navWidgetElement.getConstraintY().getValueAsInt(VeinsWindow.currentDisplayMode.getHeight());
+		
+		System.out.println(widgetXPos+", "+widgetYPos);
+		
+		// the image local coords have origin in top-left corner
+		NiftyMouse mouse = VeinsWindow.nifty.getNiftyMouse();
+		ImageRenderer imgRenderer = ((ImageRenderer) navWidgetElement.getElementRenderer()[0]);
+		float mouseLocalX = (float) (mouse.getX() - widgetXPos);
+		float mouseLocalY = (float) (mouse.getY() - widgetYPos);
+		float imageWidth = (float) imgRenderer.getImage().getWidth();
+		float imageHeight = (float) imgRenderer.getImage().getHeight();
+		float imageScaleFactor = imageWidth / 110.0f; // how much larger this image is compared to the 720p version
+
+		// these are computed from 720p and scaled up based on image size, so no need for different values if gui image changes size.
+		float centerCircleRadius = 39.0f * imageScaleFactor;
+		float sideCircleRadius = 27.0f * imageScaleFactor;
+		float diagonalCircleRadius = 15.0f * imageScaleFactor;
+
+		float centerCircleDiagonalWidth = (float) Math.sqrt(centerCircleRadius * centerCircleRadius * 0.5f);
+
+		// in coords relative to top-left corner
+		float centerCircleXPos = imageWidth * 0.5f;
+		float centerCircleYPos = imageHeight * 0.5f;
+
+		float sideCircleLeftXPos = imageWidth * 0.5f - centerCircleRadius;
+		float sideCircleLeftYPos = imageHeight * 0.5f;
+
+		float sideCircleRightXPos = imageWidth * 0.5f + centerCircleRadius;
+		float sideCircleRightYPos = imageHeight * 0.5f;
+
+		float closeCircleXPos = imageWidth * 0.5f + centerCircleDiagonalWidth;
+		float closeCircleYPos = imageHeight * 0.5f - centerCircleDiagonalWidth;
+
+		float moveWidgetButtonXPos = imageWidth * 0.5f + centerCircleDiagonalWidth;
+		float moveWidgetButtonYPos = imageHeight * 0.5f + centerCircleDiagonalWidth;
+
+		// compute clicks by priority, to prevent clicking on circles below other circles:
+		// the center circle first, then side circles, then diagonal circles
+
+		// center circle
+		{
+			float dx = mouseLocalX - centerCircleXPos;
+			float dy = mouseLocalY - centerCircleYPos;
+			if ((dx * dx + dy * dy) <= centerCircleRadius * centerCircleRadius)
+			{
+				float angleInDegrees = (float) Math.atan2(-dy, dx) * 180.0f / (float) Math.PI;
+
+				if (angleInDegrees <= 45.0f && angleInDegrees >= -45.0f)
+				{
+					// System.out.println("inner circle: right");
+					return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_RIGHT; // prevent click through to circles below
+				}
+				else if (angleInDegrees >= 45.0f && angleInDegrees <= 135.0f)
+				{
+					// System.out.println("inner circle: up");
+					return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_UP; // prevent click through to circles below
+				}
+
+				else if (angleInDegrees <= -45.0f && angleInDegrees >= -135.0f)
+				{
+					// System.out.println("inner circle: down");
+					return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_DOWN; // prevent click through to circles below
+				}
+				else
+				{
+					// System.out.println("inner circle: left");
+					return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_LEFT; // prevent click through to circles below
+				}
+			}
+		}
+
+		// left side circle
+		{
+			float dx = mouseLocalX - sideCircleLeftXPos;
+			float dy = mouseLocalY - sideCircleLeftYPos;
+			if ((dx * dx + dy * dy) <= sideCircleRadius * sideCircleRadius)
+			{
+				// System.out.println("side circle left");
+				return NAVIGATION_WIDGET_BUTTON.SIDE_CIRCLE_LEFT; // prevent click through to circles below
+			}
+		}
+
+		// right side circle
+		{
+			float dx = mouseLocalX - sideCircleRightXPos;
+			float dy = mouseLocalY - sideCircleRightYPos;
+			if ((dx * dx + dy * dy) <= sideCircleRadius * sideCircleRadius)
+			{
+				// System.out.println("side circle right");
+				return NAVIGATION_WIDGET_BUTTON.SIDE_CIRCLE_RIGHT; // prevent click through to circles below
+			}
+		}
+
+		// close circle
+		{
+			float dx = mouseLocalX - closeCircleXPos;
+			float dy = mouseLocalY - closeCircleYPos;
+			if ((dx * dx + dy * dy) <= diagonalCircleRadius * diagonalCircleRadius)
+			{
+				// System.out.println("close circle");
+				return NAVIGATION_WIDGET_BUTTON.CLOSE_CIRCLE; // prevent click through to circles below
+			}
+		}
+
+		// move circle
+		{
+			float dx = mouseLocalX - moveWidgetButtonXPos;
+			float dy = mouseLocalY - moveWidgetButtonYPos;
+			if ((dx * dx + dy * dy) <= diagonalCircleRadius * diagonalCircleRadius)
+			{
+				// System.out.println("move circle");
+				return NAVIGATION_WIDGET_BUTTON.MOVE_WIDGET_CIRCLE; // prevent click through to circles below
+			}
+		}
+
+		return NAVIGATION_WIDGET_BUTTON.NONE;
+	}
+
 
 	// ----------------------------------------------------
 	// Minimize,maximize,close buttons
@@ -350,18 +601,18 @@ public class NiftyScreenController extends DefaultScreenController
 	{
 		On_OpenDialog_Close("");
 	}
-	
+
 	public void onButton_OpenDialog_Open()
 	{
 		SelectedFile file = m_openDialog.m_folderBrowser.TryOpeningSelectedFile();
 
 		On_OpenDialog_Close("");
 
-		if(file.extensionOnly.compareTo("mhd")==0)
+		if (file.extensionOnly.compareTo("mhd") == 0)
 		{
 			double sigma = 0.5f;
 			double threshold = 0.5f;
-			
+
 			// try loading on gpu, then cpu
 			try
 			{
@@ -369,21 +620,21 @@ public class NiftyScreenController extends DefaultScreenController
 			}
 			catch (LWJGLException e)
 			{
-				System.out.println("onButton_OpenDialog_Open: exceptions: "+e.getMessage());
+				System.out.println("onButton_OpenDialog_Open: exceptions: " + e.getMessage());
 				e.printStackTrace();
-				
+
 				// try safe mode
 				VeinsWindow.renderer.loadModelRawSafeMode(file.fullFilePathAndName, sigma, threshold);
 			}
 		}
-		else if(file.extensionOnly.compareTo("obj")==0)
+		else if (file.extensionOnly.compareTo("obj") == 0)
 		{
-			
+
 		}
 		else
-			System.out.println("onButton_OpenDialog_Open: invalid file extensions: "+file.extensionOnly+", file: "+file.fullFilePathAndName);
+			System.out.println("onButton_OpenDialog_Open: invalid file extensions: " + file.extensionOnly + ", file: " + file.fullFilePathAndName);
 	}
-	
+
 	// ----------------------------------------------------
 	// About dialog
 	// ----------------------------------------------------
@@ -475,11 +726,11 @@ public class NiftyScreenController extends DefaultScreenController
 	{
 		m_openDialog.m_folderBrowser.OnTreeboxSelectionChanged(id, event);
 	}
-	
+
 	// ----------------------------------------------------
 	// Drop-down list events
 	// ----------------------------------------------------
-	
+
 	@NiftyEventSubscriber(id = "OPEN_DIALOG_FILE_TYPE_DROPDOWN")
 	public void OnFileTypeDropdownSelectionChanged(String id, DropDownSelectionChangedEvent<MyFileExtensionItem> event)
 	{
@@ -561,7 +812,7 @@ public class NiftyScreenController extends DefaultScreenController
 	{
 		return __m_guiState_doNotAccessThisDirectly;
 	}
-	
+
 	void setState(GUI_STATE state)
 	{
 		if (state == GUI_STATE.DEFAULT)

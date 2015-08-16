@@ -113,7 +113,7 @@ public class VeinsWindow
 	private int fpsToDisplay;
 	private int clickedOn;
 	private DisplayMode[] displayModes;
-	private DisplayMode currentDisplayMode;
+	public static DisplayMode currentDisplayMode;
 	public static Mouse3D joystick;
 
 	public static Nifty nifty = null; // So it can be accessed from outside
@@ -169,7 +169,7 @@ public class VeinsWindow
 		try
 		{
 
-			// Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); // spams console a lot otherwise
+			//Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); // spams console a lot otherwise
 			inputSystem = new LwjglInputSystem();
 			inputSystem.startup();
 			
@@ -371,7 +371,6 @@ public class VeinsWindow
 
 	boolean m_wasMouseLeftUp = true;
 
-
 	public void mainLoop()
 	{
 		fps = 0;
@@ -380,9 +379,7 @@ public class VeinsWindow
 		fpsToDisplay = 0;
 
 		while (isRunning)
-		{
-
-			
+		{		
 			// Detect on down click after it was up (NOT DOWN->UP!)
 			boolean wasLeftMouseDownClicked = false;
 			if (Mouse.isButtonDown(0) == true && m_wasMouseLeftUp == true)
@@ -411,13 +408,11 @@ public class VeinsWindow
 			// On down click after it was up (NOT DOWN->UP!)
 			if (wasLeftMouseDownClicked)
 				screenController.onMouseLeftDownClicked();
-			
+		
 			renderNiftyGUI();
 			
 			Display.update();
 
-			IMPLEMENT NAVIGATION
-			
 			Display.sync(settings.frequency); // TODO NIFTY
 
 			int error = GL11.glGetError();
