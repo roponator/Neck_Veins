@@ -388,14 +388,14 @@ public class VeinsWindow
 			m_wasMouseLeftUp = !Mouse.isButtonDown(0);
 
 			// Strange render loop
-
+			
 			// renderer.setupView(); // raycast volume renderer changes some
 			// states, theys must be reset
-			renderer.clearView();
-
-			// pollInput();
+		
+			pollInput();
 			// hud.setClickedOn(clickedOn);
-
+			renderer.setupView(); // raycast volume renderer changes some states, theys must be reset		
+			renderer.clearView();
 			 renderer.render();
 			
 			// hud.drawHUD();
@@ -504,9 +504,9 @@ public class VeinsWindow
 	 */
 	public void pollInput()
 	{
-		// pollKeyboardInput();
+		 pollKeyboardInput();
 		// pollMouseInput();
-		// poll3DMouseInput(); TODO NIFTY
+		// poll3DMouseInput(); 
 	}
 
 	/**

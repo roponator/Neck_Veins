@@ -51,6 +51,8 @@ import de.lessvoid.nifty.tools.SizeValueType;
  */
 public class NiftyScreenController extends DefaultScreenController
 {
+	// CUSTOM CONTROL IMPORTANT INSTRUCTION: SEE COMMENT IN FILE myNavigationWidgetControl_WASD.xml
+	
 	public static Screen m_screen = null;;
 	public static String[] m_supportedFileTypes = new String[]
 	{ "mhd", "obj" };
@@ -184,18 +186,18 @@ public class NiftyScreenController extends DefaultScreenController
 		// ---------------------------------------
 		m_navWidgetWASD = new NavigationWidget(nifty.getScreen("GScreen0").findElementById("NAVIGATION_WIDGET_WASD"));
 		m_navWidgetUDLR = new NavigationWidget(nifty.getScreen("GScreen0").findElementById("NAVIGATION_WIDGET_UDLR"));
-		
+
 		// place them to the right edge of the screen
 		int widgetWidthInPixels = m_navWidgetWASD.m_navigationWidget.getConstraintWidth().getValueAsInt(1.0f);
-		int widgetXPos = VeinsWindow.currentDisplayMode.getWidth()-widgetWidthInPixels-20;
-		
-		m_navWidgetWASD.m_navigationWidget.setConstraintX(new SizeValue(widgetXPos,SizeValueType.Pixel));
-		m_navWidgetUDLR.m_navigationWidget.setConstraintX(new SizeValue(widgetXPos,SizeValueType.Pixel));		
-		
+		int widgetXPos = VeinsWindow.currentDisplayMode.getWidth() - widgetWidthInPixels - 20;
+
+		m_navWidgetWASD.m_navigationWidget.setConstraintX(new SizeValue(widgetXPos, SizeValueType.Pixel));
+		m_navWidgetUDLR.m_navigationWidget.setConstraintX(new SizeValue(widgetXPos, SizeValueType.Pixel));
+
 		// must call this to actualy apply the new position
 		m_navWidgetWASD.m_navigationWidget.getControl(de.lessvoid.nifty.controls.window.WindowControl.class).dragStop();
 		m_navWidgetUDLR.m_navigationWidget.getControl(de.lessvoid.nifty.controls.window.WindowControl.class).dragStop();
-		
+
 		// ---------------------------------------
 		// Top menu bars
 		// ---------------------------------------
@@ -205,7 +207,7 @@ public class NiftyScreenController extends DefaultScreenController
 		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_HELP] = nifty.getScreen("GScreen0").findElementById("TOP_MENU_HELP_DROP_DOWN_PANEL");
 
 		prepareForSomeMenuOpen();
-		IMPLEMENT CAMERA 
+
 	}
 
 	// -----------------------------------
@@ -267,32 +269,81 @@ public class NiftyScreenController extends DefaultScreenController
 	// ----------------------------------------------------
 
 	public void onButton_NavigationWidgetWASD_OnMouseOver(Element element, NiftyMouseInputEvent event)
-	{		
-		processNavWidgetInput(m_navWidgetWASD,event);
-	}
-	
-	public void onButton_NavigationWidgetUDLR_OnMouseOver(Element element, NiftyMouseInputEvent event)
 	{
-		processNavWidgetInput(m_navWidgetUDLR,event);
+		// process widget input and move camera
+		NAVIGATION_WIDGET_BUTTON pressedButton = processNavWidgetInput(m_navWidgetWASD, event);
+		switch (pressedButton)
+		{
+		case CENTER_CIRCLE_DOWN:
+			VeinsWindow.renderer.getCamera().lookDown();
+			break;
+		case CENTER_CIRCLE_UP:
+			VeinsWindow.renderer.getCamera().lookUp();
+			break;
+		case CENTER_CIRCLE_LEFT:
+			VeinsWindow.renderer.getCamera().lookRight();
+			break;
+		case CENTER_CIRCLE_RIGHT:
+			VeinsWindow.renderer.getCamera().lookLeft();
+			break;
+		case SIDE_CIRCLE_LEFT:
+			VeinsWindow.renderer.getCamera().rotateCounterClockwise();
+			break;
+		case SIDE_CIRCLE_RIGHT:
+			VeinsWindow.renderer.getCamera().rotateClockwise();
+			break;
+		}
 	}
 
-	public static void processNavWidgetInput(NavigationWidget widget,NiftyMouseInputEvent event)
+	public void onButton_NavigationWidgetUDLR_OnMouseOver(Element element, NiftyMouseInputEvent event)
 	{
+		// process widget input and move camera
+		NAVIGATION_WIDGET_BUTTON pressedButton = processNavWidgetInput(m_navWidgetUDLR, event);
+		switch (pressedButton)
+		{
+		case CENTER_CIRCLE_DOWN:
+			VeinsWindow.renderer.getCamera().moveBackwards();
+			break;
+		case CENTER_CIRCLE_UP:
+			VeinsWindow.renderer.getCamera().moveForward();
+			break;
+		case CENTER_CIRCLE_LEFT:
+			VeinsWindow.renderer.getCamera().moveLeft();
+			break;
+		case CENTER_CIRCLE_RIGHT:
+			VeinsWindow.renderer.getCamera().moveRight();
+			break;
+		case SIDE_CIRCLE_LEFT:
+			VeinsWindow.renderer.getCamera().moveDown();
+			break;
+		case SIDE_CIRCLE_RIGHT:
+			VeinsWindow.renderer.getCamera().moveUp();
+			break;
+		}
+	}
+
+	// returns the hold down button
+	public static NAVIGATION_WIDGET_BUTTON processNavWidgetInput(NavigationWidget widget, NiftyMouseInputEvent event)
+	{
+	
 		// move widget, must be done outside the buttons if-else thingy
 		if (widget.IsWidgetInMoveState())
 			widget.Move();
 
 		NAVIGATION_WIDGET_BUTTON pressedButton = GetNavigationWidgetPressedButton(widget.m_navigationWidget);
-		
+		NAVIGATION_WIDGET_BUTTON resultButton = NAVIGATION_WIDGET_BUTTON.NONE;
+
+		NAV WIDGETS DONE, WORK ON SOMETHING ELSE
+
 		// handle input based on click/drag
 		if (event.isButton0Release()) // button click
 		{
 			NiftyMouse mouse = VeinsWindow.nifty.getNiftyMouse();
-			
+
 			widget.StopMoving();
-			System.out.println("cll");
+			//System.out.println("cll");
 			// close if close circled was pressed
-			if(pressedButton==NAVIGATION_WIDGET_BUTTON.CLOSE_CIRCLE)
+			if (pressedButton == NAVIGATION_WIDGET_BUTTON.CLOSE_CIRCLE)
 				widget.m_navigationWidget.setVisible(false);
 		}
 		else if (event.isButton0Down()) // drag
@@ -300,29 +351,34 @@ public class NiftyScreenController extends DefaultScreenController
 			// start moving widget if clicked on move circle
 			if (pressedButton == NAVIGATION_WIDGET_BUTTON.MOVE_WIDGET_CIRCLE)
 			{
-				System.out.println("drag");
+				//System.out.println("drag");
 				widget.StartMoving();
 			}
-				
+			else
+			{
+				resultButton = pressedButton;
+			}
 
 		}
 		else if (event.isButton0Release())
 		{
 			widget.StopMoving();
 		}
+
+		return resultButton;
 	}
 
 	// computes which button was pressed
 	public static NAVIGATION_WIDGET_BUTTON GetNavigationWidgetPressedButton(Element navWidgetElement)
 	{
-		float widgetXPos = navWidgetElement.getConstraintX().getValueAsInt(VeinsWindow.currentDisplayMode.getWidth());	
+		float widgetXPos = navWidgetElement.getConstraintX().getValueAsInt(VeinsWindow.currentDisplayMode.getWidth());
 		float widgetYPos = navWidgetElement.getConstraintY().getValueAsInt(VeinsWindow.currentDisplayMode.getHeight());
-		
-		System.out.println(widgetXPos+", "+widgetYPos);
-		
+
+		//System.out.println(widgetXPos + ", " + widgetYPos);
+
 		// the image local coords have origin in top-left corner
 		NiftyMouse mouse = VeinsWindow.nifty.getNiftyMouse();
-		ImageRenderer imgRenderer = ((ImageRenderer) navWidgetElement.getElementRenderer()[0]);
+		ImageRenderer imgRenderer = ((ImageRenderer) navWidgetElement.findElementById("IMAGE_ELEMENT").getElementRenderer()[0]);
 		float mouseLocalX = (float) (mouse.getX() - widgetXPos);
 		float mouseLocalY = (float) (mouse.getY() - widgetYPos);
 		float imageWidth = (float) imgRenderer.getImage().getWidth();
@@ -433,7 +489,6 @@ public class NiftyScreenController extends DefaultScreenController
 
 		return NAVIGATION_WIDGET_BUTTON.NONE;
 	}
-
 
 	// ----------------------------------------------------
 	// Minimize,maximize,close buttons

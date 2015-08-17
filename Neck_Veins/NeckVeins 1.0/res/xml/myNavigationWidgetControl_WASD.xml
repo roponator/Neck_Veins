@@ -5,9 +5,21 @@
                        controller="de.lessvoid.nifty.controls.window.WindowControl" revert="false" drop="false"
                        handle="#window-bar">
        		 
-        <image id="" width="100%" height="100%"    childLayout="vertical" filename="imgs\pngs720p\Med3D-41.png" valign="center" align="center" filter="true" visibleToMouse="true">                  	
-	           <interact onMouseOver="onButton_NavigationWidgetWASD_OnMouseOver()" onRelease="dragStop()"/>
-        </image>
+        <!-- MUST HAVE A PANEL WITH #window-content id as first(top) element and the controlDefition must have attribute childRootId="#window-content" or you cant access children  in java -->
+         
+          <panel id="#window-content" width="100%" height="100%" style="STYLE_COMMON_INVISIBLE" childLayout="vertical">
+            <interact onMouseOver="onButton_NavigationWidgetWASD_OnMouseOver()"  onRelease="dragStop()"/>
+	       
+            <image id="IMAGE_ELEMENT" width="100%" height="100%"    childLayout="vertical" filename="imgs\pngs720p\Med3D-41.png" valign="center" align="center" filter="true" visibleToMouse="true">                  	
+	          <interact onMouseOver="onButton_NavigationWidgetWASD_OnMouseOver()"   onRelease="dragStop()"/>
+	      
+	          	<effect>	
+						<onStartScreen  name="fade" start="#f" end="#6" length="0" neverStopRendering="true"  />
+						<onHover  name="fade" start="#6" end="#f" neverStopRendering="true" />
+				</effect>
+				
+	          </image>
+         </panel>
             
     </controlDefinition>
 </nifty-controls>
