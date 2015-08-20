@@ -42,8 +42,8 @@
 		<!-- ******************************************* -->
 		 <layer id="LAYER_NAVIGATION_WIDGETS" childLayout="absolute">
 		     <!-- width MUST be in pixels, NOT percent!!! -->
-		     	<control id="NAVIGATION_WIDGET_WASD" name="MY_NAVIGATION_WIDGET_WASD_CONTROL" childLayout="center" style="STYLE_COMMON_INVISIBLE" width="110px" height="91px"  x="70%" y="200px" />          
-				<control id="NAVIGATION_WIDGET_UDLR" name="MY_NAVIGATION_WIDGET_UDLR_CONTROL" childLayout="center" style="STYLE_COMMON_INVISIBLE" width="110px" height="91px"  x="70%" y="400px" />          
+		     	<control id="NAVIGATION_WIDGET_WASD" name="MY_NAVIGATION_WIDGET_WASD_CONTROL" childLayout="center" style="STYLE_COMMON_INVISIBLE" width="110px" height="91px"  x="70%" y="50px" />          
+				<control id="NAVIGATION_WIDGET_UDLR" name="MY_NAVIGATION_WIDGET_UDLR_CONTROL" childLayout="center" style="STYLE_COMMON_INVISIBLE" width="110px" height="91px"  x="70%" y="200px" />          
 		     	
 		 </layer>
   	    	
@@ -339,7 +339,7 @@
 		 <!--  OPEN DIALOG -->
 		 <!-- ******************************************* -->
 	
-	            <control id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" visible="false" x="40%" y="30%" childLayout="vertical" width="600px" height="330px" valign="center" align="center" />
+	            <control id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" visible="false" x="10%" y="10%" childLayout="vertical" width="600px" height="330px" valign="center" align="center" />
 	      
 	  	    
 	  	 <!-- ******************************************* -->

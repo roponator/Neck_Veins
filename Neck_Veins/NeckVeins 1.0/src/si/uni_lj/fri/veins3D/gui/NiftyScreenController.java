@@ -97,6 +97,12 @@ public class NiftyScreenController extends DefaultScreenController
 	// Resolution menu
 	// -----------------------------------
 	NiftyResolutionMenu m_resolutionMenu = null;
+	//DisplayMode m_lastWindowedResoltuon = null;
+
+	// -----------------------------------
+	// Stereo menu
+	// -----------------------------------
+	NiftyStereoMenu m_stereoMenu = null;
 
 	// -----------------------------------
 	// Navigation widgets
@@ -153,7 +159,6 @@ public class NiftyScreenController extends DefaultScreenController
 	static NiftyOpenDialog m_openDialog = null;
 	static Element m_aboutDialog = null;
 	static Element m_inputOptionsDialog = null;
-	static Element m_stereoDialog = null;
 	static Element m_licenseDialog = null;
 
 	static Element m_darkeningPanelForDialog = null;
@@ -167,8 +172,8 @@ public class NiftyScreenController extends DefaultScreenController
 	{
 		m_settingsSideMenu = new NiftySettingsSideMenu();
 
-		InitSlider("sl1", -2.0f, 2.0f, 1.0f, 0.1f, "%.2f");
-		InitSlider("sl2", 0.0f, 10.0f, 1.0f, 0.1f, "%.0f");
+		// InitSlider("sl1", -2.0f, 2.0f, 1.0f, 0.1f, "%.2f");
+		// InitSlider("sl2", 0.0f, 10.0f, 1.0f, 0.1f, "%.0f");
 
 		ListBox listBox = m_screen.findNiftyControl("myListBox", ListBox.class);
 		for (int i = 0; i < 10; ++i)
@@ -181,16 +186,20 @@ public class NiftyScreenController extends DefaultScreenController
 
 		m_aboutDialog = nifty.getScreen("GScreen0").findElementById("MY_ABOUT_DIALOG");
 		m_inputOptionsDialog = nifty.getScreen("GScreen0").findElementById("MY_INPUT_OPTIONS_DIALOG");
-		m_stereoDialog = nifty.getScreen("GScreen0").findElementById("MY_STEREO_OPTIONS_DIALOG");
 		m_licenseDialog = nifty.getScreen("GScreen0").findElementById("MY_LICENSE_DIALOG");
 
 		m_darkeningPanelForDialog = nifty.getScreen("GScreen0").findElementById("DARKENING_PANEL_FOR_DIALOG");
 
 		// ---------------------------------------
+		// Stereo menu
+		// ---------------------------------------
+		m_stereoMenu = new NiftyStereoMenu(nifty.getScreen("GScreen0").findElementById("MY_STEREO_OPTIONS_DIALOG"));
+
+		// ---------------------------------------
 		// Resolution menu
 		// ---------------------------------------
 		m_resolutionMenu = new NiftyResolutionMenu(nifty.getScreen("GScreen0").findElementById("MY_RESOLUTUION_OPTIONS_DIALOG"));
-		
+
 		// ---------------------------------------
 		// Nav widgets
 		// ---------------------------------------
@@ -272,6 +281,35 @@ public class NiftyScreenController extends DefaultScreenController
 		}
 		else
 			return null;
+	}
+
+	// ----------------------------------------------------
+	// On resize: fix widgets that need to be handled on resize in here
+	// ----------------------------------------------------
+	public void OnResize(DisplayMode displayMode)
+	{
+		m_openDialog.ResetPosition(); // this one definitely needs this, to be safe for others also
+		m_resolutionMenu.ResetPosition();
+		m_stereoMenu.ResetPosition();
+		
+		int percX = 10;
+		int percY = 10;
+	
+		m_aboutDialog.setConstraintX(new SizeValue(percX, SizeValueType.PercentWidth));
+		m_aboutDialog.setConstraintY(new SizeValue(percY, SizeValueType.PercentHeight));
+		m_licenseDialog.setConstraintX(new SizeValue(percX, SizeValueType.PercentWidth));
+		m_licenseDialog.setConstraintY(new SizeValue(percY, SizeValueType.PercentHeight));	
+		
+		// reposition navigation widgets
+		int navWidgetWithd = m_navWidgetUDLR.m_navigationWidget.getConstraintWidth().getValueAsInt(1.0f);
+		int navWidgetHeight = m_navWidgetUDLR.m_navigationWidget.getConstraintHeight().getValueAsInt(1.0f);
+		int newXPos = displayMode.getWidth() - navWidgetWithd - 10;
+
+		m_navWidgetUDLR.m_navigationWidget.setConstraintX(new SizeValue(newXPos, SizeValueType.Pixel));
+		m_navWidgetUDLR.m_navigationWidget.setConstraintY(new SizeValue(navWidgetHeight, SizeValueType.Pixel));
+		HTML
+		m_navWidgetWASD.m_navigationWidget.setConstraintX(new SizeValue(newXPos, SizeValueType.Pixel));
+		m_navWidgetWASD.m_navigationWidget.setConstraintY(new SizeValue(navWidgetHeight * 2 + 50, SizeValueType.Pixel));
 	}
 
 	// ----------------------------------------------------
@@ -516,38 +554,45 @@ public class NiftyScreenController extends DefaultScreenController
 			return;
 
 		prepareForSomeMenuOpen();
-		
+
 		// get display mode with largest height
-		
+
 		// maximize it or make it smaller
-		if(VeinsWindow.IsMaximized() == false)
+		if (VeinsWindow.IsMaximized() == false)
 		{
 			VeinsWindow.veinsWindow.ResizeWindow(VeinsWindow.GetLargestDisplayMode(), true);
 		}
 		else
 		{
 			// get a half smaller resolution if clicked on a maxmize button when maximize
-			DisplayMode dm = VeinsWindow.GetLargestDisplayMode();		
-			try
+			// and no last resolution is saved
+			DisplayMode dm = VeinsWindow.m_lastWindowedResoltuon;
+
+			if (dm == null)
 			{
-				DisplayMode displayModes[] = Display.getAvailableDisplayModes();
-				for(int i=0;i<displayModes.length;++i)
+				dm = VeinsWindow.GetLargestDisplayMode();
+
+				try
 				{
-					if(displayModes[i].getWidth()/2 < dm.getWidth())
+					DisplayMode displayModes[] = Display.getAvailableDisplayModes();
+					for (int i = 0; i < displayModes.length; ++i)
 					{
-						dm=displayModes[i];
-						break;
+						if (displayModes[i].getWidth() / 2 < dm.getWidth())
+						{
+							dm = displayModes[i];
+							break;
+						}
 					}
+
 				}
-				
+				catch (LWJGLException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					dm = VeinsWindow.currentDisplayMode;
+				}
 			}
-			catch (LWJGLException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				dm = VeinsWindow.currentDisplayMode;
-			}
-			
+
 			VeinsWindow.veinsWindow.ResizeWindow(dm, false);
 		}
 	}
@@ -796,26 +841,37 @@ public class NiftyScreenController extends DefaultScreenController
 	{
 		On_ResolutionDialog_Close();
 	}
-	
+
 	public void onButton_ResolutionDialog_OK()
 	{
 		m_resolutionMenu.OnButton_OK();
 		setState(GUI_STATE.DEFAULT);
 	}
-	
+
 	// ----------------------------------------------------
 	// Stereo options dialog
 	// ----------------------------------------------------
 	public void onButton_TopMenu_Options_Stereo()
 	{
 		setState(GUI_STATE.DIALOG_OPEN);
-		m_stereoDialog.setVisible(true);
+		m_stereoMenu.OnButton_ShowDialog();
 	}
 
 	public void On_StereoDialog_Close()
 	{
 		setState(GUI_STATE.DEFAULT);
-		m_stereoDialog.setVisible(false);
+		m_stereoMenu.OnButton_CloseOrCancel();
+	}
+
+	public void OnButton_StereoMenu_Cancel()
+	{
+		On_StereoDialog_Close();
+	}
+
+	public void OnButton_StereoMenu_OK()
+	{
+		m_stereoMenu.OnButton_OK();
+		setState(GUI_STATE.DEFAULT);
 	}
 
 	// ----------------------------------------------------
@@ -857,15 +913,11 @@ public class NiftyScreenController extends DefaultScreenController
 		// modifty the value of the changed slider
 		updateSliderValueLabel(modifiedSlider, event.getValue());
 
-		if (modifiedSlider.getId().compareTo("sl1") == 0)
-		{
-
-		}
-		else
-		{
-			java.awt.Toolkit.getDefaultToolkit().beep();
-			System.out.println("Error: onSliderChangedEvent: invalid slider, implement it");
-		}
+		/*
+		 * if (modifiedSlider.getId().compareTo("sl1") == 0) {
+		 * 
+		 * } else { java.awt.Toolkit.getDefaultToolkit().beep(); System.out.println("Error: onSliderChangedEvent: invalid slider, implement it"); }
+		 */
 	}
 
 	// A hacky way to get slider events to work: the slider inside my control makes an event, this function
@@ -901,16 +953,21 @@ public class NiftyScreenController extends DefaultScreenController
 		label.setText(String.format(Locale.US, printFormat, value));
 	}
 
-	public static void InitSlider(String mySliderControlId, float min, float max, float initialValue, float step, String valueLabelFormat)
+	// Sets all slider values, format example: "%.2f", "%.0f" (how many decimals are printed)
+	public static void InitSlider(Element mySliderControl, float min, float max, float initialValue, float step, String sliderLabel, String valueLabelFormat)
 	{
+		m_sliderOutputTextFormat.put(mySliderControl, valueLabelFormat);
 
-		Element mySliderElement = VeinsWindow.nifty.getScreen("GScreen0").findElementById(mySliderControlId);
-		m_sliderOutputTextFormat.put(mySliderElement, valueLabelFormat);
-
-		Element niftySliderElement = mySliderElement.findElementById("SLIDER_CONTROL");
+		// slider
+		Element niftySliderElement = mySliderControl.findElementById("SLIDER_CONTROL");
 		de.lessvoid.nifty.controls.Slider sliderControl = niftySliderElement.getControl(de.lessvoid.nifty.controls.slider.SliderControl.class);
 		sliderControl.setup(min, max, initialValue, step, step);
-		updateSliderValueLabel(mySliderElement, initialValue);
+
+		// label
+		Label labelControl = mySliderControl.findElementById("SLIDER_TEXT_LABEL").getAttachedInputControl().getControl(LabelControl.class);
+		labelControl.setText(sliderLabel);
+
+		updateSliderValueLabel(mySliderControl, initialValue);
 	}
 
 	// ----------------------------------------------------

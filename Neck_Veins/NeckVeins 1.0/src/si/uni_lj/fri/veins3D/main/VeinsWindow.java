@@ -116,6 +116,7 @@ public class VeinsWindow
 	private int clickedOn;
 	public static DisplayMode[] displayModes;
 	public static DisplayMode currentDisplayMode;
+	public static DisplayMode m_lastWindowedResoltuon = null;
 	public static Mouse3D joystick;
 
 	public static Nifty nifty = null; // So it can be accessed from outside
@@ -241,6 +242,10 @@ public class VeinsWindow
 	{
 		renderer = (VeinsRenderer) renderer;
 		currentDisplayMode = displayMode;
+		
+		if(fullscreen == false)
+			m_lastWindowedResoltuon = displayMode;
+
 		try
 		{
 			Display.setDisplayMode(currentDisplayMode);
@@ -258,6 +263,8 @@ public class VeinsWindow
 		frame.setSize(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
 		frame.pack();
 		nifty.resolutionChanged();
+		
+		screenController.OnResize(currentDisplayMode);
 	}
 
 	void loadSettings(String fileName)
@@ -300,7 +307,10 @@ public class VeinsWindow
 			settings.frequency = currentDisplayMode.getFrequency();
 			
 			Display.setFullscreen(settings.fullscreen);
-			Display.setVSyncEnabled(true);		
+			Display.setVSyncEnabled(true);	
+			
+			if(settings.fullscreen == false)
+				m_lastWindowedResoltuon = currentDisplayMode;
 				
 		}
 		catch (LWJGLException e)

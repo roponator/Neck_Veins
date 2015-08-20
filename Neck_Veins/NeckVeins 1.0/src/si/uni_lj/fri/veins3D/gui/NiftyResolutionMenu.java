@@ -10,6 +10,8 @@ import de.lessvoid.nifty.controls.checkbox.CheckboxControl;
 import de.lessvoid.nifty.controls.label.LabelControl;
 import de.lessvoid.nifty.controls.listbox.ListBoxControl;
 import de.lessvoid.nifty.elements.Element;
+import de.lessvoid.nifty.tools.SizeValue;
+import de.lessvoid.nifty.tools.SizeValueType;
 
 public class NiftyResolutionMenu
 {
@@ -78,6 +80,12 @@ public class NiftyResolutionMenu
 		// close this menu
 		OnButton_CloseOrCancel();
 
+	}
+	
+	public void ResetPosition()
+	{
+		m_controlElement.setConstraintX(new SizeValue(10, SizeValueType.PercentWidth));		
+		m_controlElement.setConstraintY(new SizeValue(10, SizeValueType.PercentHeight));	
 	}
 
 }

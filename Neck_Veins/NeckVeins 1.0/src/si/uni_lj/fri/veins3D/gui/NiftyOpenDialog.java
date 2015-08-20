@@ -10,6 +10,8 @@ import de.lessvoid.nifty.controls.dropdown.DropDownControl;
 import de.lessvoid.nifty.controls.listbox.ListBoxControl;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.render.NiftyImage;
+import de.lessvoid.nifty.tools.SizeValue;
+import de.lessvoid.nifty.tools.SizeValueType;
 import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyTreeFolderItem;
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 
@@ -39,6 +41,12 @@ public class NiftyOpenDialog
 	public void OnCloseDialog()
 	{
 		m_mainOpenDailogElement.setVisible(false);
+	}
+	
+	public void ResetPosition()
+	{
+		m_mainOpenDailogElement.setConstraintX(new SizeValue(10, SizeValueType.PercentWidth));		
+		m_mainOpenDailogElement.setConstraintY(new SizeValue(10, SizeValueType.PercentHeight));	
 	}
 	
 }
