@@ -13,7 +13,6 @@
      <useControls filename="xml/myOpenDialogControl.xml"/>
      
     <useStyles filename="xml/myListboxStyle.xml"/>
-    <useControls filename="xml/myListboxControl.xml"/>
     
      <useStyles filename="xml/myScrollbarStyle.xml"/>
      <useStyles filename="xml/myTreeboxStyle.xml"/>
@@ -92,7 +91,7 @@
                     		 <control  name="verticalSlider"  height="100px" />
 		              </panel>  
 		                   
-                     <control id="myListBox" name="MY_LISTBOX" vertical="on" horizontal="on" displayItems="5"/>
+                     <control id="" name="listBox" vertical="on" horizontal="on" displayItems="5"/>
      				
                 </panel>
                                  	               

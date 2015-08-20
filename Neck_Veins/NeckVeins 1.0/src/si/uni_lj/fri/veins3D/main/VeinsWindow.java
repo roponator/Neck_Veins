@@ -5,6 +5,8 @@ import java.awt.Canvas;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -112,7 +114,7 @@ public class VeinsWindow
 	private long timePastFps;
 	private int fpsToDisplay;
 	private int clickedOn;
-	private DisplayMode[] displayModes;
+	public static DisplayMode[] displayModes;
 	public static DisplayMode currentDisplayMode;
 	public static Mouse3D joystick;
 
@@ -149,18 +151,12 @@ public class VeinsWindow
 		initNiftyAndGUI();
 		initWindowElements();
 		setupWindow();
-		
-		/*try
-		{
-			renderer.loadModelRaw("C:\\Users\\ropo\\Desktop\\Zile\\Pat13_3D-DSA.mhd", 0.5,0.5);
-		}
-		catch (LWJGLException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
 
-		//new MyFileChooser();
+		/*
+		 * try { renderer.loadModelRaw("C:\\Users\\ropo\\Desktop\\Zile\\Pat13_3D-DSA.mhd", 0.5,0.5); } catch (LWJGLException e) { // TODO Auto-generated catch block e.printStackTrace(); }
+		 */
+
+		// new MyFileChooser();
 	}
 
 	void initNiftyAndGUI()
@@ -169,22 +165,22 @@ public class VeinsWindow
 		try
 		{
 
-			//Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); // spams console a lot otherwise
+			// Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); // spams console a lot otherwise
 			inputSystem = new LwjglInputSystem();
 			inputSystem.startup();
-			
-			// MUST NOT USE CORE PROFILE, FOR COMPATIBILITY
-			BatchRenderBackend niftyRenderFactory =  LwjglBatchRenderBackendFactory.create();
 
-			//niftyRenderFactory.useHighQualityTextures(true);
+			// MUST NOT USE CORE PROFILE, FOR COMPATIBILITY
+			BatchRenderBackend niftyRenderFactory = LwjglBatchRenderBackendFactory.create();
+
+			// niftyRenderFactory.useHighQualityTextures(true);
 
 			BatchRenderDevice niftyRenderer = new BatchRenderDevice(niftyRenderFactory);
-			//niftyRenderFactory.useHighQualityTextures(true);
-			//niftyRenderer.resetTextureAtlases();
+			// niftyRenderFactory.useHighQualityTextures(true);
+			// niftyRenderer.resetTextureAtlases();
 
 			nifty = new Nifty(niftyRenderer, new NullSoundDevice(), inputSystem, new AccurateTimeProvider());
-			//niftyRenderFactory.useHighQualityTextures(true);
-	
+			// niftyRenderFactory.useHighQualityTextures(true);
+
 			// load our GUI
 			System.out.println("**NIFTY FROM XML*********************");
 			nifty.fromXml("0", ResourceLoader.getResourceAsStream("xml/nifty_gui.xml"), "GScreen0");
@@ -192,7 +188,7 @@ public class VeinsWindow
 
 			// get screen controller
 			screenController = (NiftyScreenController) nifty.getScreen("GScreen0").getScreenController();
-		
+
 			// enable auto scale
 			// nifty.enableAutoScaling(1024,768);
 
@@ -205,35 +201,70 @@ public class VeinsWindow
 
 	}
 
+	public static boolean IsMaximized()
+	{
+		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		int width = gd.getDisplayMode().getWidth();
+		int height = gd.getDisplayMode().getHeight();
+		return currentDisplayMode.getWidth() == width && currentDisplayMode.getHeight() == height;
+	}
+	
+	// Returns largest display mode or returns the first one if it fails.
+	public static DisplayMode GetLargestDisplayMode()
+	{	
+		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		int width = gd.getDisplayMode().getWidth();
+		int height = gd.getDisplayMode().getHeight();
+		
+		DisplayMode displayModes[];
+		try
+		{
+			displayModes = Display.getAvailableDisplayModes();
+			for(int i=0;i<displayModes.length;++i)
+			{
+				if(displayModes[i].getWidth() == width && displayModes[i].getHeight()==height)
+					return displayModes[i];
+			}
+			return displayModes[0];
+		}
+		catch (LWJGLException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return currentDisplayMode; // hacky, but should always return a valid display mode		
+	}
+	
 	// Contains all logic to resize window, renderer and niftyGUI
-	public void ResizeWindow(boolean fullscreen)
+	public static void ResizeWindow(DisplayMode displayMode, boolean fullscreen)
 	{
 		renderer = (VeinsRenderer) renderer;
-		DisplayMode[] displayModes = getDisplayModes();
-
-			currentDisplayMode = displayModes[0];
-			try
-			{
-				Display.setDisplayMode(currentDisplayMode);
-				VeinsWindow.settings.resWidth = currentDisplayMode.getWidth();
-				VeinsWindow.settings.resHeight = currentDisplayMode.getHeight();
-			}
-			catch (LWJGLException e)
-			{
-				e.printStackTrace();
-			}
-			renderer.setupView();
-			frame.setPreferredSize(new Dimension(currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
-			frame.setSize(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
-			frame.pack();
-			
-			nifty.resolutionChanged();
+		currentDisplayMode = displayMode;
+		try
+		{
+			Display.setDisplayMode(currentDisplayMode);
+			Display.setFullscreen(fullscreen);
+			VeinsWindow.settings.resWidth = currentDisplayMode.getWidth();
+			VeinsWindow.settings.resHeight = currentDisplayMode.getHeight();
+			VeinsWindow.settings.fullscreen = fullscreen;
+		}
+		catch (LWJGLException e)
+		{
+			e.printStackTrace();
+		}
+		renderer.setupView();
+		frame.setPreferredSize(new Dimension(currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
+		frame.setSize(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
+		frame.pack();
+		nifty.resolutionChanged();
 	}
 
 	void loadSettings(String fileName)
 	{
 		try
 		{
+			
 			displayModes = Display.getAvailableDisplayModes();
 			// displayModeStrings = new String[displayModes.length];
 			currentDisplayMode = Display.getDesktopDisplayMode();
@@ -261,18 +292,16 @@ public class VeinsWindow
 			}
 
 			// ADD TO VM ARGS: -Dorg.lwjgl.opengl.Window.undecorated=true
-			currentDisplayMode = displayModes[6]; // TODO: REMOVE LATER ON
+		//	currentDisplayMode = displayModes[6]; // TODO: REMOVE LATER ON
 			// settings.fullscreen = true;
 			settings.resWidth = currentDisplayMode.getWidth();
 			settings.resHeight = currentDisplayMode.getHeight();
 			settings.bitsPerPixel = currentDisplayMode.getBitsPerPixel();
 			settings.frequency = currentDisplayMode.getFrequency();
-
-			if (settings.fullscreen)
-			{
-				Display.setFullscreen(true);
-				Display.setVSyncEnabled(true);
-			}
+			
+			Display.setFullscreen(settings.fullscreen);
+			Display.setVSyncEnabled(true);		
+				
 		}
 		catch (LWJGLException e)
 		{
@@ -294,15 +323,14 @@ public class VeinsWindow
 			final Canvas canvas = new Canvas();
 			frame.add(canvas, BorderLayout.CENTER);
 
-			
 			frame.setPreferredSize(new Dimension(currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
 			frame.setSize(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
-			frame.setUndecorated(true);  //here
+			frame.setUndecorated(true); // here
 
 			frame.pack();
 			frame.setVisible(true);
 			Display.setParent(canvas);
-			//-Dorg.lwjgl.opengl.Window.undecorated=true
+			// -Dorg.lwjgl.opengl.Window.undecorated=true
 
 			// DisplayMode dm=new DisplayMode(800, 800);
 			// currentDisplayMode = dm;
@@ -379,7 +407,7 @@ public class VeinsWindow
 		fpsToDisplay = 0;
 
 		while (isRunning)
-		{		
+		{
 			// Detect on down click after it was up (NOT DOWN->UP!)
 			boolean wasLeftMouseDownClicked = false;
 			if (Mouse.isButtonDown(0) == true && m_wasMouseLeftUp == true)
@@ -388,29 +416,29 @@ public class VeinsWindow
 			m_wasMouseLeftUp = !Mouse.isButtonDown(0);
 
 			// Strange render loop
-			
+
 			// renderer.setupView(); // raycast volume renderer changes some
 			// states, theys must be reset
-		
+
 			pollInput();
 			// hud.setClickedOn(clickedOn);
-			renderer.setupView(); // raycast volume renderer changes some states, theys must be reset		
+			renderer.setupView(); // raycast volume renderer changes some states, theys must be reset
 			renderer.clearView();
-			 renderer.render();
-			
+			renderer.render();
+
 			// hud.drawHUD();
 			setTitle();
 
 			// TODO: PRESENT ORDER: BEFORE OR AFTER NIFTY.RENDER?
 			// Display.update();
-			 logic();
+			logic();
 
 			// On down click after it was up (NOT DOWN->UP!)
 			if (wasLeftMouseDownClicked)
 				screenController.onMouseLeftDownClicked();
-		
+
 			renderNiftyGUI();
-			
+
 			Display.update();
 
 			Display.sync(settings.frequency); // TODO NIFTY
@@ -423,19 +451,18 @@ public class VeinsWindow
 			}
 		}
 	}
-	
+
 	// saves, sets and restores openGL states
 	void renderNiftyGUI()
 	{
 
 		glPushMatrix();
 		glPushAttrib(GL_ALL_ATTRIB_BITS);
-	
-	
-		//ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
-		//ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-		
-		glEnable(GL_BLEND); 
+
+		// ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
+		// ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+
+		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// set up GL state for Nifty rendering
@@ -458,11 +485,11 @@ public class VeinsWindow
 
 		nifty.update();
 		nifty.render(false); // TODO: THROWS ERROR ON FIRST FRAME??
-		
+
 		// restore your OpenGL state
 		glPopAttrib();
 		glPopMatrix();
-		
+
 	}
 
 	/**
@@ -504,9 +531,9 @@ public class VeinsWindow
 	 */
 	public void pollInput()
 	{
-		 pollKeyboardInput();
+		pollKeyboardInput();
 		// pollMouseInput();
-		// poll3DMouseInput(); 
+		// poll3DMouseInput();
 	}
 
 	/**

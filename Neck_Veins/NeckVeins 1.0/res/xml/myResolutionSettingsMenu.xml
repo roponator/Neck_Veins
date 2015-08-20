@@ -5,7 +5,7 @@
                        controller="de.lessvoid.nifty.controls.window.WindowControl" revert="false" drop="false"
                        handle="#window-bar">
                        
-         <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="100%" valign="top" align="left" >
+         <panel id="#window-content" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="100%" valign="top" align="left" >
                <interact onClick="bringToFront()" onClickMouseMove="drag()" onRelease="dragStop()"/>
                 	
 			  <effect>
@@ -33,7 +33,7 @@
 				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="76%" valign="top" align="left" >
                   	<panel childLayout="center" width="100%" height="100%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center" >
                     	<panel childLayout="vertical" width="95%" height="95%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center">
-		                       <control id="myListBox" name="MY_LISTBOX" width="100%" height="100%" vertical="on" horizontal="off" displayItems="8"/>
+		                       <control id="myListBox" name="listBox" width="100%" height="100%" vertical="on" horizontal="off" displayItems="8"/>
      				       
 	                     </panel> 
                		 </panel>
@@ -42,20 +42,22 @@
 				  <!-- CHECKBOXES PANEL -->
 				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="10%" valign="top" align="left" >
 				    <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
-				   		 <control id="simpleCheckBox" name="MY_CHECKBOX" width="50%" height="100%"/>
+				   		 <control id="checkboxFullscreen" name="MY_CHECKBOX" width="50%" height="100%"/>
 				    </panel>
-				     <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
-				   		 <control id="simpleCheckBox" name="MY_CHECKBOX" width="50%" height="100%"/>
-				    </panel>
+				    
                 </panel>
                  
 				  <!-- Buttons -->
 				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="14%" valign="top" align="left" >
 				    <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
-				   		 <control id="appendButton" name="button" label="Cancel" />
+				   		 <control id="appendButton" name="button" label="Cancel" >
+				   		      	<interact onClick="onButton_ResolutionDialog_Cancel()"/> 
+				   		 </control>
 				    </panel>
 				     <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
-				   		 <control id="appendButton" name="button" label="OK" />
+				   		 <control id="appendButton" name="button" label="OK" >
+				   		          <interact onClick="onButton_ResolutionDialog_OK()"/> 
+				   		 </control>
 				    </panel>
                 </panel>
                    

@@ -9,7 +9,7 @@
 	            <panel id="#select" style="STYLE_MY_CHECKBOX_PANEL_SELECT"/>
 	        </panel>
 	        	         
-	        <control name="label" id="" style="STYLE_LABEL_DARK_TEXT" width="50%" text="Setting1" textHAlign="left" height="100.0%"/>
+	        <control name="label" id="checkboxLabel" style="STYLE_LABEL_DARK_TEXT" width="50%" text="Setting1" textHAlign="left" height="100.0%"/>
 				               		
         
         </panel>

@@ -9,6 +9,8 @@ import javax.swing.JFrame;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 
 import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyFileExtensionItem;
 import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyTreeFolderItem;
@@ -52,7 +54,7 @@ import de.lessvoid.nifty.tools.SizeValueType;
 public class NiftyScreenController extends DefaultScreenController
 {
 	// CUSTOM CONTROL IMPORTANT INSTRUCTION: SEE COMMENT IN FILE myNavigationWidgetControl_WASD.xml
-	
+
 	public static Screen m_screen = null;;
 	public static String[] m_supportedFileTypes = new String[]
 	{ "mhd", "obj" };
@@ -90,6 +92,11 @@ public class NiftyScreenController extends DefaultScreenController
 	// -----------------------------------
 	NiftySettingsSideMenu m_settingsSideMenu = null;
 	boolean m_isSettginsSideMenuOpened = false;
+
+	// -----------------------------------
+	// Resolution menu
+	// -----------------------------------
+	NiftyResolutionMenu m_resolutionMenu = null;
 
 	// -----------------------------------
 	// Navigation widgets
@@ -146,7 +153,6 @@ public class NiftyScreenController extends DefaultScreenController
 	static NiftyOpenDialog m_openDialog = null;
 	static Element m_aboutDialog = null;
 	static Element m_inputOptionsDialog = null;
-	static Element m_resolutionDialog = null;
 	static Element m_stereoDialog = null;
 	static Element m_licenseDialog = null;
 
@@ -175,12 +181,16 @@ public class NiftyScreenController extends DefaultScreenController
 
 		m_aboutDialog = nifty.getScreen("GScreen0").findElementById("MY_ABOUT_DIALOG");
 		m_inputOptionsDialog = nifty.getScreen("GScreen0").findElementById("MY_INPUT_OPTIONS_DIALOG");
-		m_resolutionDialog = nifty.getScreen("GScreen0").findElementById("MY_RESOLUTUION_OPTIONS_DIALOG");
 		m_stereoDialog = nifty.getScreen("GScreen0").findElementById("MY_STEREO_OPTIONS_DIALOG");
 		m_licenseDialog = nifty.getScreen("GScreen0").findElementById("MY_LICENSE_DIALOG");
 
 		m_darkeningPanelForDialog = nifty.getScreen("GScreen0").findElementById("DARKENING_PANEL_FOR_DIALOG");
 
+		// ---------------------------------------
+		// Resolution menu
+		// ---------------------------------------
+		m_resolutionMenu = new NiftyResolutionMenu(nifty.getScreen("GScreen0").findElementById("MY_RESOLUTUION_OPTIONS_DIALOG"));
+		
 		// ---------------------------------------
 		// Nav widgets
 		// ---------------------------------------
@@ -325,7 +335,7 @@ public class NiftyScreenController extends DefaultScreenController
 	// returns the hold down button
 	public static NAVIGATION_WIDGET_BUTTON processNavWidgetInput(NavigationWidget widget, NiftyMouseInputEvent event)
 	{
-	
+
 		// move widget, must be done outside the buttons if-else thingy
 		if (widget.IsWidgetInMoveState())
 			widget.Move();
@@ -333,15 +343,13 @@ public class NiftyScreenController extends DefaultScreenController
 		NAVIGATION_WIDGET_BUTTON pressedButton = GetNavigationWidgetPressedButton(widget.m_navigationWidget);
 		NAVIGATION_WIDGET_BUTTON resultButton = NAVIGATION_WIDGET_BUTTON.NONE;
 
-		NAV WIDGETS DONE, WORK ON SOMETHING ELSE
-
 		// handle input based on click/drag
 		if (event.isButton0Release()) // button click
 		{
 			NiftyMouse mouse = VeinsWindow.nifty.getNiftyMouse();
 
 			widget.StopMoving();
-			//System.out.println("cll");
+			// System.out.println("cll");
 			// close if close circled was pressed
 			if (pressedButton == NAVIGATION_WIDGET_BUTTON.CLOSE_CIRCLE)
 				widget.m_navigationWidget.setVisible(false);
@@ -351,7 +359,7 @@ public class NiftyScreenController extends DefaultScreenController
 			// start moving widget if clicked on move circle
 			if (pressedButton == NAVIGATION_WIDGET_BUTTON.MOVE_WIDGET_CIRCLE)
 			{
-				//System.out.println("drag");
+				// System.out.println("drag");
 				widget.StartMoving();
 			}
 			else
@@ -374,7 +382,7 @@ public class NiftyScreenController extends DefaultScreenController
 		float widgetXPos = navWidgetElement.getConstraintX().getValueAsInt(VeinsWindow.currentDisplayMode.getWidth());
 		float widgetYPos = navWidgetElement.getConstraintY().getValueAsInt(VeinsWindow.currentDisplayMode.getHeight());
 
-		//System.out.println(widgetXPos + ", " + widgetYPos);
+		// System.out.println(widgetXPos + ", " + widgetYPos);
 
 		// the image local coords have origin in top-left corner
 		NiftyMouse mouse = VeinsWindow.nifty.getNiftyMouse();
@@ -508,7 +516,40 @@ public class NiftyScreenController extends DefaultScreenController
 			return;
 
 		prepareForSomeMenuOpen();
-		VeinsWindow.veinsWindow.ResizeWindow(true);
+		
+		// get display mode with largest height
+		
+		// maximize it or make it smaller
+		if(VeinsWindow.IsMaximized() == false)
+		{
+			VeinsWindow.veinsWindow.ResizeWindow(VeinsWindow.GetLargestDisplayMode(), true);
+		}
+		else
+		{
+			// get a half smaller resolution if clicked on a maxmize button when maximize
+			DisplayMode dm = VeinsWindow.GetLargestDisplayMode();		
+			try
+			{
+				DisplayMode displayModes[] = Display.getAvailableDisplayModes();
+				for(int i=0;i<displayModes.length;++i)
+				{
+					if(displayModes[i].getWidth()/2 < dm.getWidth())
+					{
+						dm=displayModes[i];
+						break;
+					}
+				}
+				
+			}
+			catch (LWJGLException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				dm = VeinsWindow.currentDisplayMode;
+			}
+			
+			VeinsWindow.veinsWindow.ResizeWindow(dm, false);
+		}
 	}
 
 	public void onButton_TopMenu_Close(String a)
@@ -741,15 +782,27 @@ public class NiftyScreenController extends DefaultScreenController
 	public void onButton_TopMenu_Options_Resolution()
 	{
 		setState(GUI_STATE.DIALOG_OPEN);
-		m_resolutionDialog.setVisible(true);
+		m_resolutionMenu.SetResolutions(VeinsWindow.displayModes);
+		m_resolutionMenu.OnButton_ShowDialog();
 	}
 
 	public void On_ResolutionDialog_Close()
 	{
 		setState(GUI_STATE.DEFAULT);
-		m_resolutionDialog.setVisible(false);
+		m_resolutionMenu.OnButton_CloseOrCancel();
 	}
 
+	public void onButton_ResolutionDialog_Cancel()
+	{
+		On_ResolutionDialog_Close();
+	}
+	
+	public void onButton_ResolutionDialog_OK()
+	{
+		m_resolutionMenu.OnButton_OK();
+		setState(GUI_STATE.DEFAULT);
+	}
+	
 	// ----------------------------------------------------
 	// Stereo options dialog
 	// ----------------------------------------------------
