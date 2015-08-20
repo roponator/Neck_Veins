@@ -2,6 +2,10 @@ package si.uni_lj.fri.veins3D.gui;
 
 import java.awt.Frame;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -40,6 +44,7 @@ import de.lessvoid.nifty.effects.EffectEventId;
 import de.lessvoid.nifty.effects.impl.Move;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.ImageRenderer;
+import de.lessvoid.nifty.html.NiftyHtmlGenerator;
 import de.lessvoid.nifty.input.NiftyInputEvent;
 import de.lessvoid.nifty.input.NiftyMouseInputEvent;
 import de.lessvoid.nifty.screen.DefaultScreenController;
@@ -76,6 +81,11 @@ public class NiftyScreenController extends DefaultScreenController
 	public static GUI_STATE __m_guiState_doNotAccessThisDirectly = GUI_STATE.DEFAULT;
 
 	// -----------------------------------
+	// HTML
+	// -----------------------------------
+	private NiftyHtmlGenerator m_htmlGenerator;
+
+	// -----------------------------------
 	// Mouse
 	// -----------------------------------
 
@@ -97,7 +107,7 @@ public class NiftyScreenController extends DefaultScreenController
 	// Resolution menu
 	// -----------------------------------
 	NiftyResolutionMenu m_resolutionMenu = null;
-	//DisplayMode m_lastWindowedResoltuon = null;
+	// DisplayMode m_lastWindowedResoltuon = null;
 
 	// -----------------------------------
 	// Stereo menu
@@ -225,9 +235,46 @@ public class NiftyScreenController extends DefaultScreenController
 		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_OPTIONS] = nifty.getScreen("GScreen0").findElementById("TOP_MENU_OPTIONS_DROP_DOWN_PANEL");
 		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_HELP] = nifty.getScreen("GScreen0").findElementById("TOP_MENU_HELP_DROP_DOWN_PANEL");
 
+		// ---------------------------------------
+		// HTML
+		// ---------------------------------------
+		m_htmlGenerator = new NiftyHtmlGenerator(nifty);
+		m_htmlGenerator.setDefaultFont("fonts/aurulent-sans-16.fnt");
+		m_htmlGenerator.setDefaultBoldFont("fonts/aurulent-sans-16-bold.fnt");
+		
+		Element userManualElement = nifty.getScreen("GScreen0").findElementById("MY_USER_MANUAL_DIALOG");
+		WindowControl userManualControl = userManualElement.getAttachedInputControl().getControl(WindowControl.class);
+		Element htmlElement = userManualControl.getElement().findElementById("BLABLA");
+		try
+		{
+			JUST ONE TEXT IS BUILD BY GENERATOR? MAYBE WRONG VERSION OF NIFTY, TRY THE 1.4 BRANCH
+			String htmlFileContent = readHTMLFile("/html/test-22.html");
+			m_htmlGenerator.generate(htmlFileContent, m_screen, htmlElement);
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error HTML: "+e.getMessage()+", "+e.toString());
+			e.printStackTrace();
+		}
+		
 		prepareForSomeMenuOpen();
 
 	}
+	
+	private static String readHTMLFile(final String filename) throws IOException
+{
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+				VeinsWindow.class.getResourceAsStream(filename)));
+	  //  InputStreamReader reader = new InputStreamReader(new FileInputStream(filename), "ISO-8859-1");
+	    StringBuffer result = new StringBuffer();
+	    char[] buffer = new char[1024];
+	    int read = -1;
+	    while ((read = reader.read(buffer)) > 0) {
+	      result.append(buffer, 0, read);
+	    }
+	    return result.toString();
+	  }
+
 
 	// -----------------------------------
 	// Mouse common
@@ -291,15 +338,15 @@ public class NiftyScreenController extends DefaultScreenController
 		m_openDialog.ResetPosition(); // this one definitely needs this, to be safe for others also
 		m_resolutionMenu.ResetPosition();
 		m_stereoMenu.ResetPosition();
-		
+
 		int percX = 10;
 		int percY = 10;
-	
+
 		m_aboutDialog.setConstraintX(new SizeValue(percX, SizeValueType.PercentWidth));
 		m_aboutDialog.setConstraintY(new SizeValue(percY, SizeValueType.PercentHeight));
 		m_licenseDialog.setConstraintX(new SizeValue(percX, SizeValueType.PercentWidth));
-		m_licenseDialog.setConstraintY(new SizeValue(percY, SizeValueType.PercentHeight));	
-		
+		m_licenseDialog.setConstraintY(new SizeValue(percY, SizeValueType.PercentHeight));
+
 		// reposition navigation widgets
 		int navWidgetWithd = m_navWidgetUDLR.m_navigationWidget.getConstraintWidth().getValueAsInt(1.0f);
 		int navWidgetHeight = m_navWidgetUDLR.m_navigationWidget.getConstraintHeight().getValueAsInt(1.0f);
@@ -307,7 +354,7 @@ public class NiftyScreenController extends DefaultScreenController
 
 		m_navWidgetUDLR.m_navigationWidget.setConstraintX(new SizeValue(newXPos, SizeValueType.Pixel));
 		m_navWidgetUDLR.m_navigationWidget.setConstraintY(new SizeValue(navWidgetHeight, SizeValueType.Pixel));
-		HTML
+
 		m_navWidgetWASD.m_navigationWidget.setConstraintX(new SizeValue(newXPos, SizeValueType.Pixel));
 		m_navWidgetWASD.m_navigationWidget.setConstraintY(new SizeValue(navWidgetHeight * 2 + 50, SizeValueType.Pixel));
 	}

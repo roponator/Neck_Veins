@@ -27,6 +27,7 @@
      <useControls filename="xml/myLicenseControl.xml"/>
      <useControls filename="xml/myNavigationWidgetControl_UDLR.xml"/>
      <useControls filename="xml/myNavigationWidgetControl_WASD.xml"/>
+      <useControls filename="xml/myUserManualDialog.xml"/>
      
  
 	 <!-- base="nifty-panel-simple" -->
@@ -368,7 +369,14 @@
 		 <!-- ******************************************* -->
 	  	 
 	          	<control id="MY_ABOUT_DIALOG" name="MY_ABOUT_DIALOG_CONTROL" x="40%" y="30%" visible="false" childLayout="vertical" width="320px" height="330px" valign="center" align="center" />
-	        
+	      
+	     <!-- ******************************************* -->
+		 <!--  user manual dialog -->
+		 <!-- ******************************************* -->
+	  	 
+	          	<control id="MY_USER_MANUAL_DIALOG" name="MY_USER_MANUAL_DIALOG_CONTROL" x="40%" y="30%" visible="true" childLayout="vertical" width="320px" height="330px" valign="center" align="center" />
+	         	
+	          	
 	  	     
 	  	     
 	  	 <!-- ******************************************* -->
