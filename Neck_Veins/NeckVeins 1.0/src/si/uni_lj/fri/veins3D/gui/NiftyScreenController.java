@@ -69,7 +69,9 @@ public class NiftyScreenController extends DefaultScreenController
 	// -----------------------------------
 	public enum GUI_STATE
 	{
-		DEFAULT, DIALOG_OPEN, // if this state is enabled then all clicks except for that dialog are disabled, only one dialog can be open at a time?
+		DEFAULT,
+		DIALOG_OPEN, // if this state is enabled then all clicks except for that dialog are disabled, only one dialog can be open at a time?
+		DIALOG_SUBDIALOG_OPEN, // if a dialog is already open and we open another dialog in it (eg the Options dialog in the Open File dialog)
 	};
 
 	public enum NAVIGATION_WIDGET_BUTTON
@@ -798,15 +800,18 @@ public class NiftyScreenController extends DefaultScreenController
 
 	public void On_OpenDialog_Close(String a)
 	{
+		if(getState()==GUI_STATE.DIALOG_SUBDIALOG_OPEN)
+			return;
+		
 		setState(GUI_STATE.DEFAULT);
 		m_openDialog.OnCloseDialog();
 	}
 
 	public void onButton_OpenDialog_Cancel()
-	{
+	{		
 		On_OpenDialog_Close("");
 	}
-
+		
 	public void onButton_OpenDialog_Open()
 	{
 		SelectedFile file = m_openDialog.m_folderBrowser.TryOpeningSelectedFile();
@@ -841,6 +846,28 @@ public class NiftyScreenController extends DefaultScreenController
 				System.out.println("onButton_OpenDialog_Open: invalid file extensions: " + file.extensionOnly + ", file: " + file.fullFilePathAndName);
 	}
 
+	// Options subdialog dialog callbacks
+	public void onButton_OpenDialog_OptionsDialog_Open()
+	{
+		if(getState()==GUI_STATE.DIALOG_SUBDIALOG_OPEN)
+			return;
+		
+		setState(GUI_STATE.DIALOG_SUBDIALOG_OPEN);
+		m_openDialog.On_SettingsDialog_Open();
+	}
+	
+	public void On_OpenDialog_OptionsDialog_Close()
+	{
+		setState(GUI_STATE.DIALOG_OPEN);
+		m_openDialog.On_SettingsDialog_CloseOrCancel();
+	}
+	
+	public void On_OpenDialog_OptionsDialog_OK()
+	{
+		setState(GUI_STATE.DIALOG_OPEN);
+		m_openDialog.On_SettingsDialog_OK();
+	}
+	
 	// ----------------------------------------------------
 	// About dialog
 	// ----------------------------------------------------

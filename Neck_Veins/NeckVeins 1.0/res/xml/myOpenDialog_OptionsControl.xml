@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty-controls xmlns="http://nifty-gui.lessvoid.com/nifty-gui">
+    <!-- WINDOW CONTROL -->
+    <controlDefinition name="MY_OPEN_DIALOG_OPTIONS_CONTROL" style="nifty-window" childRootId="#window-content"
+                       controller="de.lessvoid.nifty.controls.window.WindowControl" revert="false" drop="false"
+                       handle="#window-bar">
+                       
+         <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="100%" valign="top" align="left" >
+               <interact onClick="bringToFront()" onClickMouseMove="drag()" onRelease="dragStop()"/>
+                	
+			  <effect>
+			    <onActive name="border" border="1px,1px,1px,1px" color="#353535ff" timeType="infinite"/>
+			  </effect>
+			  
+             <!-- TOP BAR -->
+                 <panel id="" backgroundImage="imgs\pngs720p\Med3D-40.png" imageMode="normal" childLayout="horizontal" width="100%" height="27px" valign="top" align="left" >      	
+                	<image  childLayout="center" filename="imgs\pngs720p\Med3D-39.png" width="44px" height="100%" valign="center" align="left" filter="true"/>
+                	<control name="label" align = "left" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" margin="0px,0px,0px,0px" width="60px" text="Input Options" height="100.0%" font="aurulent-sans-16.fnt"/>
+		            <panel id="" childLayout="horizontal" width="*" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  />  
+		            <control name="button" id="" style="STYLE_TOP_MENU_WINDOW_BUTTONS" childLayout="center" valign="top" label="" align="right" height="15px" width="17px"  backgroundImage="imgs\pngs720p\Med3D-25.png"  filter="true" >
+						 <interact onClick="On_OpenDialog_OptionsDialog_Close()"/>        	
+						    <effect>
+								<onHover name="imageOverlay" filename="imgs/pngs720p/Med3D-33.png" imageMode="normal" post="true" />
+								<onClick name="imageOverlay" filename="imgs/pngs720p/Med3D-30.png" imageMode="normal" post="true" />
+							</effect>	
+					</control> 					
+           		 </panel> 
+           		 
+              <!-- MAIN CONTAINER PANEL -->
+              <panel id="" style="STYLE_COMMON_GREEN" childLayout="vertical" width="100%" height="*" valign="top" align="left" backgroundColor="#76787bff">
+                 
+      
+                  <!-- METHOD TYPE & SLIDERS PANEL -->
+				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="85%" valign="top" align="left" >
+                  	<panel childLayout="center" width="100%" height="100%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center" >
+                    	<panel childLayout="vertical" width="95%" height="95%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center"  backgroundColor="#a8a8a8ff">
+		                     <control name="label" id="" style="STYLE_LABEL_DARK_TEXT"  margin="3%,2%,2%,2%" width="96%" text="Method Type:" textHAlign="left" height="16px" />
+				             <control id="OPEN_DIALOG_FILE_TYPE_DROPDOWN" name="dropDown" margin="2%,4%,5%,4%" width="92%" height = "20px" vertical="optional" horizontal="optional" />
+   		                     <control childLayout="vertical" id="slGaussFilterSigma" name="MyHorizontalSlider" align="center" width="100%" height="40px" margin="10px,0px,0px,0px"/>    
+		                     <control childLayout="vertical" id="slThresholdLevel" name="MyHorizontalSlider" align="center" width="100%" height="40px" margin="10px,0px,0px,0px"/>    
+                        </panel> 
+               		 </panel>
+                </panel>
+                
+              
+				  <!-- Buttons -->
+				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="*" valign="center" align="left" >
+				      			
+						    <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
+						   		 <control id="appendButton" name="button" label="Cancel" valign="center"  >
+						   		 	<interact onClick="On_OpenDialog_OptionsDialog_Close()"/>     
+						   		 </control>
+						    </panel>
+						     <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
+						   		 <control id="appendButton" name="button" label="OK" valign="center" >
+						   		 	<interact onClick="On_OpenDialog_OptionsDialog_OK()"/>     
+						   		 </control>
+						    </panel>
+					    
+				    
+                </panel>
+                   
+              </panel>
+              		              
+ 		</panel>
+ 	
+    </controlDefinition>
+</nifty-controls>

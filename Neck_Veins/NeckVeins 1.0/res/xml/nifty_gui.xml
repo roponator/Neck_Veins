@@ -27,12 +27,13 @@
      <useControls filename="xml/myLicenseControl.xml"/>
      <useControls filename="xml/myNavigationWidgetControl_UDLR.xml"/>
      <useControls filename="xml/myNavigationWidgetControl_WASD.xml"/>
-      <useControls filename="xml/myUserManualDialog.xml"/>
+     <useControls filename="xml/myUserManualDialog.xml"/>
+     <useControls filename="xml/myOpenDialog_OptionsControl.xml"/>
      
  
 	 <!-- base="nifty-panel-simple" -->
 	 
-	 <!-- PADDING ORDER: top,right,down,left -->
+	 <!-- PADDING ORDER: top,right,bottom,left -->
 	 
 	
   	<screen id="GScreen0"  controller="si.uni_lj.fri.veins3D.gui.NiftyScreenController">
@@ -340,7 +341,9 @@
 		 <!--  OPEN DIALOG -->
 		 <!-- ******************************************* -->
 	
-	            <control id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" visible="false" x="10%" y="10%" childLayout="vertical" width="600px" height="330px" valign="center" align="center" />
+	       <control id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" visible="false" x="10%" y="10%" childLayout="vertical" width="600px" height="330px" valign="center" align="center" />
+	       
+	       <control id="MY_OPEN_DIALOG_OPTION_DIALOG_ID" name="MY_OPEN_DIALOG_OPTIONS_CONTROL" visible="false" x="15%" y="15%" childLayout="vertical" width="300px" height="240px" valign="center" align="center" />
 	      
 	  	    
 	  	 <!-- ******************************************* -->

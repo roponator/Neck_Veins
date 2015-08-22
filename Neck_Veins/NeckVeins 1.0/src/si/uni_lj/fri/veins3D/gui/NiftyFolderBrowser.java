@@ -128,7 +128,9 @@ public class NiftyFolderBrowser
 		String[] supportedFileFormats = NiftyScreenController.m_supportedFileTypes;
 		for (int i = 0; i < supportedFileFormats.length; ++i)
 			m_fileTypeDropdownControl.addItem(new MyFileExtensionItem(supportedFileFormats[i]));
-
+		
+		//m_fileTypeDropdownControl.selectItemByIndex(0);
+		
 		// init foldertree
 		m_root = new TreeItem<MyTreeFolderItem>();
 		createBranchesForFolder("C://", m_root);

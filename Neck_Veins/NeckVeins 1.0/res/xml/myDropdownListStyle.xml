@@ -16,7 +16,7 @@
     </style>
 
     <style id="nifty-drop-down#text" base="base-font">
-        <attributes color="#000f" selectionColor="#f00f" visibleToMouse="false" align="left" valign="center"
+        <attributes color="#ffffffff" selectionColor="#f00f" visibleToMouse="false" align="left" valign="center"
                     textHAlign="left" height="100%"/>
         <effect>
             <onFocus name="textColor" post="false" color="#ffffffff"/>
@@ -28,13 +28,12 @@
     </style>
 
     <style id="nifty-drop-down#icon">
-        <attributes filename="imgs\pngs720p\dropdown_list_arrow.png" width="20px" height="20px" imageMode="normal"/>
+        <attributes filename="imgs\pngs720p\dropdown_list_arrow.png" width="15px" height="20px" imageMode="normal"/>
         <effect>
             <onClick name="focus" targetElement="#parent"/>
             <onClick name="imageOverlay" filename="imgs\pngs720p\dropdown_list_arrow.png" imageMode="normal" post="true"/>
             <onFocus name="imageOverlay" filename="imgs\pngs720p\dropdown_list_arrow.png" imageMode="normal" post="true"/>
-            <onEnabled name="renderQuad" startColor="#ffffffff" endColor="#ffffffff" post="true" length="150"/>
-            <onDisabled name="renderQuad" startColor="#ffffffff" endColor="#ffffffff" post="true" length="150"/>
+           
         </effect>
     </style>
 
