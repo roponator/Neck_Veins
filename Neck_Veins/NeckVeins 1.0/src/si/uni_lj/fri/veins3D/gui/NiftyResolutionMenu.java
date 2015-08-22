@@ -1,8 +1,12 @@
 package si.uni_lj.fri.veins3D.gui;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.lwjgl.opengl.DisplayMode;
+
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import de.lessvoid.nifty.controls.ListBox;
@@ -16,7 +20,7 @@ import de.lessvoid.nifty.tools.SizeValueType;
 public class NiftyResolutionMenu
 {
 	// Represents one resolution line
-	public static class ResolutionItem
+	public static class ResolutionItem implements Comparable<ResolutionItem>
 	{
 		public DisplayMode displayMode;
 
@@ -29,6 +33,19 @@ public class NiftyResolutionMenu
 		public String toString()
 		{
 			return displayMode.toString();
+		}
+
+		@Override
+		public int compareTo(ResolutionItem arg0)
+		{
+			if(displayMode.getWidth() > arg0.displayMode.getWidth())
+				return 1;
+			else if(displayMode.getHeight()> arg0.displayMode.getHeight())
+				return 1;
+			else if(displayMode.getWidth() == arg0.displayMode.getWidth() && displayMode.getHeight() == arg0.displayMode.getHeight())
+				return 0;
+			else
+				return -1;
 		}
 	}
 
@@ -50,9 +67,16 @@ public class NiftyResolutionMenu
 	// Clears old and sets new
 	public void SetResolutions(DisplayMode[] displayModes)
 	{
-		m_listboxControl.clear();
+		// sort display modes
+		ResolutionItem sorted[] = new ResolutionItem[displayModes.length];
 		for (int i = 0; i < displayModes.length; ++i)
-			m_listboxControl.addItem(new ResolutionItem(displayModes[i]));
+			sorted[i] = new ResolutionItem(displayModes[i]);
+		
+		Arrays.sort(sorted);
+		
+		m_listboxControl.clear();
+		for (int i = 0; i < sorted.length; ++i)
+			m_listboxControl.addItem(sorted[i]);
 
 	}
 

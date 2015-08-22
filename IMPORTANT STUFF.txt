@@ -1,0 +1,10 @@
+1) Adding new fonts
+When adding custom fonts make sure that the name of the font in 
+the .fnt file is unique, otherwise Nifty will use some other font.
+To fix this open your font .fnt file and change this:
+ - info face="Your font name here which must be unique"
+
+
+2) HTML
+Not much HTML is supported, see examples here of 
+what you can use: https://github.com/void256/nifty-gui/tree/1.3/nifty-html/src/test/resources/html

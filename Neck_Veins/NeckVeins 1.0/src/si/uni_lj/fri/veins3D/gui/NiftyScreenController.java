@@ -170,7 +170,7 @@ public class NiftyScreenController extends DefaultScreenController
 	static Element m_aboutDialog = null;
 	static Element m_inputOptionsDialog = null;
 	static Element m_licenseDialog = null;
-
+	static Element m_userManualDialog = null;
 	static Element m_darkeningPanelForDialog = null;
 
 	// -----------------------------------
@@ -236,45 +236,49 @@ public class NiftyScreenController extends DefaultScreenController
 		m_panel_topMenu_DropDownMenus[TOPMENU_DROPDOWN_HELP] = nifty.getScreen("GScreen0").findElementById("TOP_MENU_HELP_DROP_DOWN_PANEL");
 
 		// ---------------------------------------
-		// HTML
+		// User manual HTML
 		// ---------------------------------------
 		m_htmlGenerator = new NiftyHtmlGenerator(nifty);
 		m_htmlGenerator.setDefaultFont("fonts/aurulent-sans-16.fnt");
 		m_htmlGenerator.setDefaultBoldFont("fonts/aurulent-sans-16-bold.fnt");
-		
-		Element userManualElement = nifty.getScreen("GScreen0").findElementById("MY_USER_MANUAL_DIALOG");
-		WindowControl userManualControl = userManualElement.getAttachedInputControl().getControl(WindowControl.class);
-		Element htmlElement = userManualControl.getElement().findElementById("BLABLA");
+
+		m_userManualDialog = nifty.getScreen("GScreen0").findElementById("MY_USER_MANUAL_DIALOG");
+		WindowControl userManualControl = m_userManualDialog.getAttachedInputControl().getControl(WindowControl.class);
+
 		try
 		{
-			JUST ONE TEXT IS BUILD BY GENERATOR? MAYBE WRONG VERSION OF NIFTY, TRY THE 1.4 BRANCH
-			String htmlFileContent = readHTMLFile("/html/test-22.html");
-			m_htmlGenerator.generate(htmlFileContent, m_screen, htmlElement);
+			Element htmlElementLeft = userManualControl.getElement().findElementById("HTML_LEFT");
+			Element htmlElementRight = userManualControl.getElement().findElementById("HTML_RIGHT");
+
+			m_htmlGenerator.generate(readHTMLFile("/html/test-22.html"), m_screen, htmlElementLeft);
+			m_htmlGenerator.generate(readHTMLFile("/html/bla.html"), m_screen, htmlElementRight);
 		}
 		catch (Exception e)
 		{
-			System.out.println("Error HTML: "+e.getMessage()+", "+e.toString());
+			System.out.println("Error HTML: " + e.getMessage() + ", " + e.toString());
 			e.printStackTrace();
 		}
-		
+
+		// ---------------------------------------
+		// Prepare gui for show
+		// ---------------------------------------
 		prepareForSomeMenuOpen();
 
 	}
-	
-	private static String readHTMLFile(final String filename) throws IOException
-{
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				VeinsWindow.class.getResourceAsStream(filename)));
-	  //  InputStreamReader reader = new InputStreamReader(new FileInputStream(filename), "ISO-8859-1");
-	    StringBuffer result = new StringBuffer();
-	    char[] buffer = new char[1024];
-	    int read = -1;
-	    while ((read = reader.read(buffer)) > 0) {
-	      result.append(buffer, 0, read);
-	    }
-	    return result.toString();
-	  }
 
+	private static String readHTMLFile(final String filename) throws IOException
+	{
+		BufferedReader reader = new BufferedReader(new InputStreamReader(VeinsWindow.class.getResourceAsStream(filename)));
+		// InputStreamReader reader = new InputStreamReader(new FileInputStream(filename), "ISO-8859-1");
+		StringBuffer result = new StringBuffer();
+		char[] buffer = new char[1024];
+		int read = -1;
+		while ((read = reader.read(buffer)) > 0)
+		{
+			result.append(buffer, 0, read);
+		}
+		return result.toString();
+	}
 
 	// -----------------------------------
 	// Mouse common
@@ -365,6 +369,9 @@ public class NiftyScreenController extends DefaultScreenController
 
 	public void onButton_NavigationWidgetWASD_OnMouseOver(Element element, NiftyMouseInputEvent event)
 	{
+		if (getState() != GUI_STATE.DEFAULT)
+			return;
+
 		// process widget input and move camera
 		NAVIGATION_WIDGET_BUTTON pressedButton = processNavWidgetInput(m_navWidgetWASD, event);
 		switch (pressedButton)
@@ -392,6 +399,9 @@ public class NiftyScreenController extends DefaultScreenController
 
 	public void onButton_NavigationWidgetUDLR_OnMouseOver(Element element, NiftyMouseInputEvent event)
 	{
+		if (getState() != GUI_STATE.DEFAULT)
+			return;
+
 		// process widget input and move camera
 		NAVIGATION_WIDGET_BUTTON pressedButton = processNavWidgetInput(m_navWidgetUDLR, event);
 		switch (pressedButton)
@@ -439,24 +449,26 @@ public class NiftyScreenController extends DefaultScreenController
 			if (pressedButton == NAVIGATION_WIDGET_BUTTON.CLOSE_CIRCLE)
 				widget.m_navigationWidget.setVisible(false);
 		}
-		else if (event.isButton0Down()) // drag
-		{
-			// start moving widget if clicked on move circle
-			if (pressedButton == NAVIGATION_WIDGET_BUTTON.MOVE_WIDGET_CIRCLE)
+		else
+			if (event.isButton0Down()) // drag
 			{
-				// System.out.println("drag");
-				widget.StartMoving();
+				// start moving widget if clicked on move circle
+				if (pressedButton == NAVIGATION_WIDGET_BUTTON.MOVE_WIDGET_CIRCLE)
+				{
+					// System.out.println("drag");
+					widget.StartMoving();
+				}
+				else
+				{
+					resultButton = pressedButton;
+				}
+
 			}
 			else
-			{
-				resultButton = pressedButton;
-			}
-
-		}
-		else if (event.isButton0Release())
-		{
-			widget.StopMoving();
-		}
+				if (event.isButton0Release())
+				{
+					widget.StopMoving();
+				}
 
 		return resultButton;
 	}
@@ -517,22 +529,24 @@ public class NiftyScreenController extends DefaultScreenController
 					// System.out.println("inner circle: right");
 					return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_RIGHT; // prevent click through to circles below
 				}
-				else if (angleInDegrees >= 45.0f && angleInDegrees <= 135.0f)
-				{
-					// System.out.println("inner circle: up");
-					return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_UP; // prevent click through to circles below
-				}
-
-				else if (angleInDegrees <= -45.0f && angleInDegrees >= -135.0f)
-				{
-					// System.out.println("inner circle: down");
-					return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_DOWN; // prevent click through to circles below
-				}
 				else
-				{
-					// System.out.println("inner circle: left");
-					return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_LEFT; // prevent click through to circles below
-				}
+					if (angleInDegrees >= 45.0f && angleInDegrees <= 135.0f)
+					{
+						// System.out.println("inner circle: up");
+						return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_UP; // prevent click through to circles below
+					}
+
+					else
+						if (angleInDegrees <= -45.0f && angleInDegrees >= -135.0f)
+						{
+							// System.out.println("inner circle: down");
+							return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_DOWN; // prevent click through to circles below
+						}
+						else
+						{
+							// System.out.println("inner circle: left");
+							return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_LEFT; // prevent click through to circles below
+						}
 			}
 		}
 
@@ -614,8 +628,11 @@ public class NiftyScreenController extends DefaultScreenController
 			// get a half smaller resolution if clicked on a maxmize button when maximize
 			// and no last resolution is saved
 			DisplayMode dm = VeinsWindow.m_lastWindowedResoltuon;
+			DisplayMode largestDM = VeinsWindow.GetLargestDisplayMode();
 
-			if (dm == null)
+			// if no display mode to use or if the windowed display mode is actualy same as fullscreen size:
+			// find a smaller windowed mode
+			if (dm == null || (dm.getWidth() == largestDM.getWidth() && dm.getHeight() == largestDM.getHeight()))
 			{
 				dm = VeinsWindow.GetLargestDisplayMode();
 
@@ -815,12 +832,13 @@ public class NiftyScreenController extends DefaultScreenController
 				VeinsWindow.renderer.loadModelRawSafeMode(file.fullFilePathAndName, sigma, threshold);
 			}
 		}
-		else if (file.extensionOnly.compareTo("obj") == 0)
-		{
-
-		}
 		else
-			System.out.println("onButton_OpenDialog_Open: invalid file extensions: " + file.extensionOnly + ", file: " + file.fullFilePathAndName);
+			if (file.extensionOnly.compareTo("obj") == 0)
+			{
+
+			}
+			else
+				System.out.println("onButton_OpenDialog_Open: invalid file extensions: " + file.extensionOnly + ", file: " + file.fullFilePathAndName);
 	}
 
 	// ----------------------------------------------------
@@ -866,6 +884,21 @@ public class NiftyScreenController extends DefaultScreenController
 	{
 		setState(GUI_STATE.DEFAULT);
 		m_licenseDialog.setVisible(false);
+	}
+
+	// ----------------------------------------------------
+	// User manual dialog
+	// ----------------------------------------------------
+	public void onButton_TopMenu_UserManual()
+	{
+		setState(GUI_STATE.DIALOG_OPEN);
+		m_userManualDialog.setVisible(true);
+	}
+
+	public void On_UserManualDialog_Close()
+	{
+		setState(GUI_STATE.DEFAULT);
+		m_userManualDialog.setVisible(false);
 	}
 
 	// ----------------------------------------------------
@@ -1031,16 +1064,17 @@ public class NiftyScreenController extends DefaultScreenController
 		{
 			m_darkeningPanelForDialog.setVisible(false);
 		}
-		else if (state == GUI_STATE.DIALOG_OPEN)
-		{
-			prepareForSomeMenuOpen();
-			m_darkeningPanelForDialog.setVisible(true);
-		}
 		else
-		{
-			// warning in case a new state is added and you forget to implement it
-			System.out.println("NiftyScreenController::setState: invalid GUI_STATE: " + state.toString());
-		}
+			if (state == GUI_STATE.DIALOG_OPEN)
+			{
+				prepareForSomeMenuOpen();
+				m_darkeningPanelForDialog.setVisible(true);
+			}
+			else
+			{
+				// warning in case a new state is added and you forget to implement it
+				System.out.println("NiftyScreenController::setState: invalid GUI_STATE: " + state.toString());
+			}
 
 		__m_guiState_doNotAccessThisDirectly = state;
 	}

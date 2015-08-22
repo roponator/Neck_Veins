@@ -70,7 +70,9 @@
         	  	
         />      
        	<effect>
-			<onHover name="imageOverlay" filename="imgs/new_gui/rect_green_long.png" imageMode="normal" post="true" />
+			<onHover name="imageOverlay" filename="imgs/pngs720p/Med3D-34.png" imageMode="normal" post="true" />
+			<onClick name="imageOverlay" filename="imgs/pngs720p/Med3D-38.png" imageMode="normal" post="true" />
+			<onClick name="textColor" color="#000000ff" post="true" />
 		</effect>	        
     </style>
     

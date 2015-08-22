@@ -256,7 +256,7 @@
 	               		    <!--  the Manual button -->
 	               		    <panel id="" childLayout="overlay" width="100.0%" height="100.0%" style="STYLE_TOP_MENU_DROPDOWN_BUTTON"  valign="center" align="left"  >         	   		
 	               		        <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center" valign="center" label="" align="left" height="100.0%" width="100.0%">
-				                	<interact onClick="onBtn(bla)"/>        	
+				                	<interact onClick="onButton_TopMenu_UserManual()"/>        	
 				                </control>
 	               		         <panel id="" childLayout="horizontal" width="100.0%" height="100.0%" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left"  >
 									<control name="label" id="" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" width="80px" text="User Manual" height="100.0%" font="aurulent-sans-16.fnt"/>
@@ -374,10 +374,8 @@
 		 <!--  user manual dialog -->
 		 <!-- ******************************************* -->
 	  	 
-	          	<control id="MY_USER_MANUAL_DIALOG" name="MY_USER_MANUAL_DIALOG_CONTROL" x="40%" y="30%" visible="true" childLayout="vertical" width="320px" height="330px" valign="center" align="center" />
-	         	
-	          	
-	  	     
+	          	<control id="MY_USER_MANUAL_DIALOG" name="MY_USER_MANUAL_DIALOG_CONTROL" x="10%" y="10%" visible="false" childLayout="vertical" width="600px" height="500px" valign="center" align="center" />
+	         		          		  	     
 	  	     
 	  	 <!-- ******************************************* -->
 		 <!-- TEMP: license dialog -->
