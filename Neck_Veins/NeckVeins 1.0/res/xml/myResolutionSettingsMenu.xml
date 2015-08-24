@@ -27,7 +27,7 @@
            		 </panel> 
            		 
               <!-- MAIN CONTAINER PANEL -->
-              <panel id="" style="STYLE_COMMON_GREEN" childLayout="vertical" width="100%" height="*" valign="top" align="left" backgroundColor="#76787bff">
+              <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="*" valign="top" align="left" backgroundImage="imgs/col2.png">
                  
                   <!-- SLIDERS PANEL -->
 				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="76%" valign="top" align="left" >

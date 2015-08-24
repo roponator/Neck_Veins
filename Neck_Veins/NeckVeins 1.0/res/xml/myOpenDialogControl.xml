@@ -5,7 +5,7 @@
                        controller="de.lessvoid.nifty.controls.window.WindowControl" revert="false" drop="false"
                        handle="#window-bar">
                        
-         <panel id="" style="STYLE_COMMON_INVISIBLE" backgroundColor="#76787bff" childLayout="vertical" width="100%" height="100%" valign="top" align="left" >
+         <panel id="" style="STYLE_COMMON_INVISIBLE" backgroundImage="imgs/col2.png" childLayout="vertical" width="100%" height="100%" valign="top" align="left" >
                <interact onClick="bringToFront()" onClickMouseMove="drag()" onRelease="dragStop()"/>
             
                <effect>

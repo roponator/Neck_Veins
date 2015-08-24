@@ -27,8 +27,8 @@
            		 </panel> 
            		 
               <!-- MAIN CONTAINER PANEL -->
-              <panel id="" style="STYLE_COMMON_GREEN" childLayout="center" width="100%" height="*" valign="center" align="center" backgroundColor="#76787bff">
-                 <panel id="" style="STYLE_COMMON_GREEN" childLayout="vertical" width="98%" height="98%" valign="center" align="center" backgroundColor="#a8a8a8ff">
+              <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="100%" height="*" valign="center" align="center" backgroundImage="imgs/col2.png">
+                 <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="98%" height="98%" valign="center" align="center" backgroundImage="imgs/col1.png">
                
                       	   <control name="label" id="" style="STYLE_LABEL_DARK_TEXT" width="100%" height="100%" wrap="true" textHAlign="left" textVAlign="top" text=" License &#10;  sdffs &#10;  sdffs &#10; sdfsf sdffs &#10;  sdfsdfsdfsddsfffs &#10;sdf sdffs"  />
 			

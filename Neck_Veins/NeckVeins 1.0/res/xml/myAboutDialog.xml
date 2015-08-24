@@ -27,7 +27,7 @@
            		 </panel> 
            		 
               <!-- MAIN CONTAINER PANEL -->
-              <panel id="" style="STYLE_COMMON_GREEN" childLayout="center" width="100%" height="*" valign="top" align="left" backgroundColor="#76787bff">
+              <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="100%" height="*" valign="top" align="left" backgroundImage="imgs/col2.png">
                  
                       	  <image childLayout="center" filename="imgs\pngs720p\about.png" width="299px" height="281px" valign="center" align="center" filter="true"/> 
 	                 

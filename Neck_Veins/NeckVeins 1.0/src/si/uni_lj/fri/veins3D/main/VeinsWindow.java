@@ -78,12 +78,10 @@ import de.lessvoid.nifty.spi.time.impl.AccurateTimeProvider;
 import de.lessvoid.nifty.tools.Color;
 import de.lessvoid.nifty.tools.SizeValue;
 import de.lessvoid.nifty.tools.resourceloader.NiftyResourceLoader;
-import de.matthiasmann.twl.GUI;
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.HUD;
 import si.uni_lj.fri.veins3D.gui.GUIMain;
 import si.uni_lj.fri.veins3D.gui.NiftyScreenController;
-import si.uni_lj.fri.veins3D.gui.VeinsWindow23;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
 import si.uni_lj.fri.veins3D.math.Quaternion;
@@ -424,7 +422,7 @@ public class VeinsWindow
 				wasLeftMouseDownClicked = true;
 
 			m_wasMouseLeftUp = !Mouse.isButtonDown(0);
-
+			
 			// Strange render loop
 
 			// renderer.setupView(); // raycast volume renderer changes some

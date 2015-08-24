@@ -27,12 +27,12 @@
            		 </panel> 
            		 
               <!-- MAIN CONTAINER PANEL -->
-              <panel id="" style="STYLE_COMMON_GREEN" childLayout="vertical" width="100%" height="*" valign="top" align="left" backgroundColor="#76787bff">
+              <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="*" valign="top" align="left" backgroundImage="imgs/col2.png">
                  
                   <!-- SLIDERS PANEL -->
 				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="75%" valign="top" align="left" >
                   	<panel childLayout="center" width="100%" height="100%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center" >
-                    	<panel childLayout="vertical" width="95%" height="95%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center"  backgroundColor="#a8a8a8ff">
+                    	<panel childLayout="vertical" width="95%" height="95%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center"  backgroundImage="imgs/col1.png">
 		                     <control childLayout="vertical" id="sl1" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>    
 		                     <control childLayout="vertical" id="sl2" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>    
 		                     <control childLayout="vertical" id="sl3" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>             

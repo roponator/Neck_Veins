@@ -7,12 +7,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import javax.swing.JFrame;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opencl.CL;
+import org.lwjgl.opencl.CLCapabilities;
+import org.lwjgl.opencl.CLPlatform;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
@@ -69,8 +74,7 @@ public class NiftyScreenController extends DefaultScreenController
 	// -----------------------------------
 	public enum GUI_STATE
 	{
-		DEFAULT,
-		DIALOG_OPEN, // if this state is enabled then all clicks except for that dialog are disabled, only one dialog can be open at a time?
+		DEFAULT, DIALOG_OPEN, // if this state is enabled then all clicks except for that dialog are disabled, only one dialog can be open at a time?
 		DIALOG_SUBDIALOG_OPEN, // if a dialog is already open and we open another dialog in it (eg the Options dialog in the Open File dialog)
 	};
 
@@ -88,8 +92,9 @@ public class NiftyScreenController extends DefaultScreenController
 	private NiftyHtmlGenerator m_htmlGenerator;
 
 	// -----------------------------------
-	// Mouse
+	// Loading bar dialog
 	// -----------------------------------
+	static NiftyLoadingBarDialog m_loadingBarDialog = null;
 
 	// -----------------------------------
 	// Top menu bar buttons
@@ -97,12 +102,12 @@ public class NiftyScreenController extends DefaultScreenController
 	static final int TOPMENU_DROPDOWN_FILE = 0;
 	static final int TOPMENU_DROPDOWN_OPTIONS = 1;
 	static final int TOPMENU_DROPDOWN_HELP = 2;
-	Element[] m_panel_topMenu_DropDownMenus;
+	static Element[] m_panel_topMenu_DropDownMenus;
 
 	// -----------------------------------
 	// Side menu
 	// -----------------------------------
-	NiftySettingsSideMenu m_settingsSideMenu = null;
+	static NiftySettingsSideMenu m_settingsSideMenu = null;
 	boolean m_isSettginsSideMenuOpened = false;
 
 	// -----------------------------------
@@ -203,6 +208,11 @@ public class NiftyScreenController extends DefaultScreenController
 		m_darkeningPanelForDialog = nifty.getScreen("GScreen0").findElementById("DARKENING_PANEL_FOR_DIALOG");
 
 		// ---------------------------------------
+		// Loading bar dialog
+		// ---------------------------------------
+		m_loadingBarDialog = new NiftyLoadingBarDialog(nifty.getScreen("GScreen0").findElementById("MY_LOADING_BAR_DIALOG_CONTROL_ID"));
+		
+		// ---------------------------------------
 		// Stereo menu
 		// ---------------------------------------
 		m_stereoMenu = new NiftyStereoMenu(nifty.getScreen("GScreen0").findElementById("MY_STEREO_OPTIONS_DIALOG"));
@@ -302,7 +312,7 @@ public class NiftyScreenController extends DefaultScreenController
 	// ----------------------------------------------------
 
 	// is called when some menu will open (so you can close others etc..)
-	void prepareForSomeMenuOpen()
+	static void prepareForSomeMenuOpen()
 	{
 		closeAllTopMenuDropDownMenus();
 		m_settingsSideMenu.CloseMenu();
@@ -363,6 +373,24 @@ public class NiftyScreenController extends DefaultScreenController
 
 		m_navWidgetWASD.m_navigationWidget.setConstraintX(new SizeValue(newXPos, SizeValueType.Pixel));
 		m_navWidgetWASD.m_navigationWidget.setConstraintY(new SizeValue(navWidgetHeight * 2 + 50, SizeValueType.Pixel));
+	}
+
+	// ----------------------------------------------------
+	// Loading bar dialog
+	// ----------------------------------------------------
+	
+	// Call it manually when needed
+	public static void UpdateLoadingBarDialog(String text, float percentProgress)
+	{
+		setState(GUI_STATE.DIALOG_OPEN);
+		m_loadingBarDialog.ShowAndUpdate(text, percentProgress);
+	}
+	
+	// Call it manually when you're done with showing progress
+	public static void On_LoadingDialog_CloseOrCancel()
+	{
+		setState(GUI_STATE.DEFAULT);
+		m_loadingBarDialog.Hide();
 	}
 
 	// ----------------------------------------------------
@@ -736,7 +764,7 @@ public class NiftyScreenController extends DefaultScreenController
 		return isVisible;
 	}
 
-	void closeAllTopMenuDropDownMenus()
+	static void closeAllTopMenuDropDownMenus()
 	{
 		for (int i = 0; i < m_panel_topMenu_DropDownMenus.length; ++i)
 			m_panel_topMenu_DropDownMenus[i].setVisible(false);
@@ -800,18 +828,18 @@ public class NiftyScreenController extends DefaultScreenController
 
 	public void On_OpenDialog_Close(String a)
 	{
-		if(getState()==GUI_STATE.DIALOG_SUBDIALOG_OPEN)
+		if (getState() == GUI_STATE.DIALOG_SUBDIALOG_OPEN)
 			return;
-		
+
 		setState(GUI_STATE.DEFAULT);
 		m_openDialog.OnCloseDialog();
 	}
 
 	public void onButton_OpenDialog_Cancel()
-	{		
+	{
 		On_OpenDialog_Close("");
 	}
-		
+
 	public void onButton_OpenDialog_Open()
 	{
 		SelectedFile file = m_openDialog.m_folderBrowser.TryOpeningSelectedFile();
@@ -823,7 +851,6 @@ public class NiftyScreenController extends DefaultScreenController
 			double sigma = 0.5f;
 			double threshold = 0.5f;
 
-			// try loading on gpu, then cpu
 			try
 			{
 				VeinsWindow.renderer.loadModelRaw(file.fullFilePathAndName, sigma, threshold);
@@ -849,25 +876,25 @@ public class NiftyScreenController extends DefaultScreenController
 	// Options subdialog dialog callbacks
 	public void onButton_OpenDialog_OptionsDialog_Open()
 	{
-		if(getState()==GUI_STATE.DIALOG_SUBDIALOG_OPEN)
+		if (getState() == GUI_STATE.DIALOG_SUBDIALOG_OPEN)
 			return;
-		
+
 		setState(GUI_STATE.DIALOG_SUBDIALOG_OPEN);
 		m_openDialog.On_SettingsDialog_Open();
 	}
-	
+
 	public void On_OpenDialog_OptionsDialog_Close()
 	{
 		setState(GUI_STATE.DIALOG_OPEN);
 		m_openDialog.On_SettingsDialog_CloseOrCancel();
 	}
-	
+
 	public void On_OpenDialog_OptionsDialog_OK()
 	{
 		setState(GUI_STATE.DIALOG_OPEN);
 		m_openDialog.On_SettingsDialog_OK();
 	}
-	
+
 	// ----------------------------------------------------
 	// About dialog
 	// ----------------------------------------------------
@@ -1085,7 +1112,7 @@ public class NiftyScreenController extends DefaultScreenController
 		return __m_guiState_doNotAccessThisDirectly;
 	}
 
-	void setState(GUI_STATE state)
+	static void setState(GUI_STATE state)
 	{
 		if (state == GUI_STATE.DEFAULT)
 		{

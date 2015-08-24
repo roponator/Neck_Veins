@@ -29,6 +29,7 @@
      <useControls filename="xml/myNavigationWidgetControl_WASD.xml"/>
      <useControls filename="xml/myUserManualDialog.xml"/>
      <useControls filename="xml/myOpenDialog_OptionsControl.xml"/>
+     <useControls filename="xml/myLoadingBarDialog.xml"/>
      
  
 	 <!-- base="nifty-panel-simple" -->
@@ -337,13 +338,21 @@
 	<!-- ******************************************* -->
 	<layer id="LAYER_DIALOGS_MENU" childLayout="absolute" >
   	  
+  	  	 <!-- ******************************************* -->
+		 <!--  LOADING BAR DIALOG -->
+		 <!-- ******************************************* -->
+	
+	       <control id="MY_LOADING_BAR_DIALOG_CONTROL_ID" name="MY_LOADING_BAR_CONTROL" visible="false" x="10%" y="10%" childLayout="vertical" width="300px" height="140px" valign="center" align="center" />
+	      
+  	  
+  	  
 	  	 <!-- ******************************************* -->
 		 <!--  OPEN DIALOG -->
 		 <!-- ******************************************* -->
 	
-	       <control id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" visible="false" x="10%" y="10%" childLayout="vertical" width="600px" height="330px" valign="center" align="center" />
+	       <control renderOrder="9000" id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" visible="false" x="10%" y="10%" childLayout="vertical" width="600px" height="330px" valign="center" align="center" />
 	       
-	       <control id="MY_OPEN_DIALOG_OPTION_DIALOG_ID" name="MY_OPEN_DIALOG_OPTIONS_CONTROL" visible="false" x="15%" y="15%" childLayout="vertical" width="300px" height="240px" valign="center" align="center" />
+	       <control  renderOrder="9100" id="MY_OPEN_DIALOG_OPTION_DIALOG_ID" name="MY_OPEN_DIALOG_OPTIONS_CONTROL" visible="false" x="15%" y="15%" childLayout="vertical" width="300px" height="240px" valign="center" align="center" />
 	      
 	  	    
 	  	 <!-- ******************************************* -->

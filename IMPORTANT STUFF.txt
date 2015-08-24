@@ -8,3 +8,8 @@ To fix this open your font .fnt file and change this:
 2) HTML
 Not much HTML is supported, see examples here of 
 what you can use: https://github.com/void256/nifty-gui/tree/1.3/nifty-html/src/test/resources/html
+
+3) Nifty gui: 
+ - (See file myNavigationWidgetControl_WADS.xml for example)
+ -  MUST HAVE A PANEL WITH #window-content id as first(top) element and the controlDefition must have attribute childRootId="#window-content" or you cant access children  in java 
+        

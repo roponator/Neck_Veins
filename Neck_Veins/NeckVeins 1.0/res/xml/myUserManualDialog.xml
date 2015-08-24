@@ -28,9 +28,9 @@
            		 
               <!-- MAIN CONTAINER PANEL -->
               
-              <panel id="" childLayout="center" width="100%" height="*" valign="center" align="center" backgroundColor="#76787bff">         
+              <panel id="" childLayout="center" width="100%" height="*" valign="center" align="center" backgroundImage="imgs/col2.png">         
               	
-              	<panel id="" childLayout="vertical" margin="1%,0.7%,1%,0.7%" width="98.6%" height="98%" valign="center" align="center" backgroundColor="#ccccccff">         
+              	<panel id="" childLayout="vertical" margin="1%,0.7%,1%,0.7%" width="98.6%" height="98%" valign="center" align="center" backgroundImage="imgs/col1.png">         
               		
               		<panel id="PADDING" childLayout="horizontal" style="STYLE_COMMON_INVISIBLE" width="100%" height="1%" valign="top" align="left"/>                     			 
               			

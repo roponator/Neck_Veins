@@ -78,7 +78,7 @@ public class ModelCreator {
 		File existingObjFile = new File(meshCreationInfo.GetObjFilePath());
 		if(existingObjFile.exists())
 		{
-			System.out.println("createModel (CPU MARCHING CUBES): obj file exists, using obj file..");
+			System.out.println("createModel (GPU MARCHING CUBES): obj file exists, using obj file..");
 			return new Object[]{meshCreationInfo.GetObjFilePath()};
 		}
 		

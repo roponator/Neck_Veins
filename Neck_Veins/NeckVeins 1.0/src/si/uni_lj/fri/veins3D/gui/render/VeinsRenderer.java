@@ -66,7 +66,6 @@ import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelMesh;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelRaycastVolume;
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import si.uni_lj.fri.veins3D.math.Quaternion;
-import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 
 public class VeinsRenderer  {
 	public static final int FIXED_PIPELINE = -1;

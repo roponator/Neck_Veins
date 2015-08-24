@@ -27,13 +27,13 @@
            		 </panel> 
            		 
               <!-- MAIN CONTAINER PANEL -->
-              <panel id="" style="STYLE_COMMON_GREEN" childLayout="vertical" width="100%" height="*" valign="top" align="left" backgroundColor="#76787bff">
+              <panel id="" style="STYLE_COMMON_INVISLBE" childLayout="vertical" width="100%" height="*" valign="top" align="left" backgroundImage="imgs/col2.png">
                  
       
                   <!-- METHOD TYPE & SLIDERS PANEL -->
 				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="85%" valign="top" align="left" >
                   	<panel childLayout="center" width="100%" height="100%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center" >
-                    	<panel childLayout="vertical" width="95%" height="95%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center"  backgroundColor="#a8a8a8ff">
+                    	<panel childLayout="vertical" width="95%" height="95%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center"  backgroundImage="imgs/col1.png">
 		                     <control name="label" id="" style="STYLE_LABEL_DARK_TEXT"  margin="3%,2%,2%,2%" width="96%" text="Method Type:" textHAlign="left" height="16px" />
 				             <control id="OPEN_DIALOG_FILE_TYPE_DROPDOWN" name="dropDown" margin="2%,4%,5%,4%" width="92%" height = "20px" vertical="optional" horizontal="optional" />
    		                     <control childLayout="vertical" id="slGaussFilterSigma" name="MyHorizontalSlider" align="center" width="100%" height="40px" margin="10px,0px,0px,0px"/>    

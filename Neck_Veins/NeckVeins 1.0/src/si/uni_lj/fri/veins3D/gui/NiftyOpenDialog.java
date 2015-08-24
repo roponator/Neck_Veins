@@ -27,6 +27,7 @@ public class NiftyOpenDialog
 	public NiftyFolderBrowser m_folderBrowser = null;
 	public Element m_optionsDialogControlElement = null;
 	WindowControl m_openDialogWindowControl = null;
+	WindowControl m_settingsDialogWindowControl = null;
 		
 	public NiftyOpenDialog()
 	{
@@ -42,9 +43,9 @@ public class NiftyOpenDialog
 		
 		// options dialog init
 		m_optionsDialogControlElement = NiftyScreenController.m_screen.findElementById("MY_OPEN_DIALOG_OPTION_DIALOG_ID");
-		WindowControl settingsWindowControl = m_optionsDialogControlElement.getAttachedInputControl().getControl(WindowControl.class);
-		Element sliderGaussSigmaElement = settingsWindowControl.getElement().findElementById("slGaussFilterSigma");
-		Element sliderThreshold = settingsWindowControl.getElement().findElementById("slThresholdLevel");
+		m_settingsDialogWindowControl = m_optionsDialogControlElement.getAttachedInputControl().getControl(WindowControl.class);
+		Element sliderGaussSigmaElement = m_settingsDialogWindowControl.getElement().findElementById("slGaussFilterSigma");
+		Element sliderThreshold = m_settingsDialogWindowControl.getElement().findElementById("slThresholdLevel");
 		NiftyScreenController.InitSlider(sliderGaussSigmaElement, 0.0f, 1.0f, 0.5f, 0.01f, "Gauss Filter Sigma",  "%.2f");
 		NiftyScreenController.InitSlider(sliderThreshold, 0.0f, 1.0f, 0.5f, 0.01f, "Threshold",  "%.2f");
 		
@@ -75,6 +76,8 @@ public class NiftyOpenDialog
 	{
 		m_optionsDialogControlElement.setVisible(true);
 		m_openDialogWindowControl.setEnabled(false);
+		m_settingsDialogWindowControl.bringToFront();
+		m_optionsDialogControlElement.setFocus();		
 	}
 	
 	public void On_SettingsDialog_CloseOrCancel()
