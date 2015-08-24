@@ -25,7 +25,9 @@ import si.uni_lj.fri.segmentation.utils.CLUtils;
 import si.uni_lj.fri.segmentation.utils.FileUtils;
 import si.uni_lj.fri.segmentation.utils.Graytresh;
 import si.uni_lj.fri.segmentation.utils.Utils;
+import si.uni_lj.fri.veins3D.gui.NiftyScreenController;
 import si.uni_lj.fri.veins3D.gui.render.models.MeshCreationInfo;
+import si.uni_lj.fri.veins3D.main.VeinsWindow;
 
 /**
  * TODO FIX execFindMax, REFACTOR
@@ -49,7 +51,7 @@ public class ModelCreator {
 	private static float max = 0;
 	private static CLMem[] staticMemory;
 
-	static double m_sigma = 0.0;
+	//static double m_sigma = 0.0; REMOVED THIS, REPLACE THIS AND FOR ALL InfoMarchingCubes and similar Info* classes
 	static  String m_fileName = "";
 	
 	public ModelCreator() {
@@ -82,18 +84,29 @@ public class ModelCreator {
 			return new Object[]{meshCreationInfo.GetObjFilePath()};
 		}
 		
+		NiftyScreenController.UpdateLoadingBarDialog("Creating model ( this may take a few minutes )...", 20.0f);
+		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
+		
 		System.out.println("createModel on Graphics Card (marching cubes)...");
 		clearOldProgram();
 		initializeCL();
 		program = CLUtils.createProgram("/opencl/segmentation.cls", context, devices);
 		initStaticData(fileName, sigma);
 		execGauss3D(sigma);
+		
+		NiftyScreenController.UpdateLoadingBarDialog("Creating model ( this may take a few minutes )...", 50.0f);
+		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
+		
 		long t = Utils.startTime();
 		max = execFindMax();
 		Utils.endTime(t, "Max");
 		System.out.println(max);
 		threshold = execOtsuThreshold((float) threshold);
 		Object[] output = execMarchingCubes(meshCreationInfo,(float) threshold);
+		
+		NiftyScreenController.UpdateLoadingBarDialog("Creating model ( this may take a few minutes )...", 60.0f);
+		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
+		
 		return output;
 	}
 

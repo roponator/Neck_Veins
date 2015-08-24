@@ -108,6 +108,7 @@ public class FileUtils {
 			dis.readFully(fileData);
 			dis.close();
 		} catch (IOException e) {
+			System.out.println(e.toString());
 			e.printStackTrace();
 			System.exit(-1);
 		}

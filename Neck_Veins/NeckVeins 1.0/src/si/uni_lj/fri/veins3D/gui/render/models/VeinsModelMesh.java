@@ -4,6 +4,7 @@
  * or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  */
 package si.uni_lj.fri.veins3D.gui.render.models;
+
 import si.uni_lj.fri.MPU_Implicits.Configuration;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
@@ -27,23 +28,26 @@ import org.lwjgl.opengl.GL11;
 import si.uni_lj.fri.segmentation.ModelCreator;
 import si.uni_lj.fri.segmentation.ModelCreatorJava;
 import si.uni_lj.fri.segmentation.ModelCreatorMPUI;
-import si.uni_lj.fri.segmentation.ModelCreatorSettings;
 import si.uni_lj.fri.segmentation.utils.LabelUtil;
 import si.uni_lj.fri.segmentation.utils.TrianglesLabelHelper;
 import si.uni_lj.fri.segmentation.utils.obj.Triangle;
 import si.uni_lj.fri.segmentation.utils.obj.Vertex;
+import si.uni_lj.fri.veins3D.gui.NiftyScreenController;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
+import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer.ModelType;
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import si.uni_lj.fri.veins3D.math.Vector;
 import si.uni_lj.fri.veins3D.utils.RayUtil;
 import static org.lwjgl.opengl.GL11.*;
+
 /**
  * @author Simon Žagar
  * @since 0.2
  * @version 0.2
  */
-public class VeinsModelMesh extends VeinsModel{
+public class VeinsModelMesh extends VeinsModel
+{
 	private final int APLICATION_SUBDIVISION_LIMIT = 3;
 
 	private TrianglesLabelHelper labelHelper;
@@ -63,42 +67,56 @@ public class VeinsModelMesh extends VeinsModel{
 	private double[] veinsGrabbedAt;
 	private double veinsGrabRadius;
 
-	public VeinsModelMesh() {
+	public VeinsModelMesh()
+	{
 		meshes = new ArrayList<Mesh>();
 		setDefaultOrientation();
 	}
 
-	public VeinsModelMesh(String filepath) {
+	public VeinsModelMesh(String filepath)
+	{
 		constructVBOFromObjFile(filepath);
 		setDefaultOrientation();
 	}
 
-	public VeinsModelMesh(String filepath, double sigma, double threshold) throws LWJGLException {
-		constructVBOFromRawFile(filepath, sigma, threshold);
+	public VeinsModelMesh(String filepath, ModelType modelType, boolean useSafeMode, double sigma, double threshold) throws LWJGLException
+	{
+		constructVBOFromRawFile(filepath, modelType, useSafeMode, sigma, threshold);
 		setDefaultOrientation();
 	}
 
-	public VeinsModelMesh(double threshold, Quaternion currentQuaternion) throws LWJGLException {
+	public VeinsModelMesh(double threshold, Quaternion currentQuaternion) throws LWJGLException
+	{
 		changeThreshold(threshold);
 		this.currentOrientation = currentQuaternion;
 		this.addedOrientation = new Quaternion();
 	}
 
-	public void changeThreshold(double threshold) throws LWJGLException {
+	public void SetNewResolution(int width, int height)
+	{
+		// not needed for this one, needed only for volume renderer
+	}
+
+	public void changeThreshold(double threshold) throws LWJGLException
+	{
 		Object[] output = ModelCreator.changeModel(threshold);
 		constructVBO(output);
 	}
 
-	public void changeMinTriangles(int min) {
-		for (Mesh mesh : meshes) {
+	public void changeMinTriangles(int min)
+	{
+		for (Mesh mesh : meshes)
+		{
 			mesh.deleteVBO();
 		}
 		boolean[] labels = LabelUtil.getValidLabels(maxTriangels, min, labelHelper);
 		meshes = new ArrayList<Mesh>();
 		ArrayList<Integer> tempFaces = new ArrayList<Integer>();
 		int tempFaceCount = 0;
-		for (Triangle t : labelHelper.getTriangles()) {
-			if (labels[t.label]) {
+		for (Triangle t : labelHelper.getTriangles())
+		{
+			if (labels[t.label])
+			{
 				tempFaces.add(t.v3.index);
 				tempFaces.add(t.v2.index);
 				tempFaces.add(t.v1.index);
@@ -106,102 +124,107 @@ public class VeinsModelMesh extends VeinsModel{
 			}
 		}
 
-		if (tempFaceCount > 0) {
+		if (tempFaceCount > 0)
+		{
 			Mesh mesh = new Mesh(new ArrayList<String>(), tempFaces, vertices, null);
 			meshes.add(mesh);
 			System.out.println("Created a new mesh java object that will have it's own VBO.");
 		}
 
-		for (Mesh mesh : meshes) {
+		for (Mesh mesh : meshes)
+		{
 			mesh.constructVBO(true);
 		}
 	}
 
-	public void deleteMesh() {
-		if (meshes != null) {
-			for (Mesh mesh : meshes) {
+	public void deleteMesh()
+	{
+		if (meshes != null)
+		{
+			for (Mesh mesh : meshes)
+			{
 				mesh.deleteVBO();
 			}
 		}
 	}
 
 	/**
-	 * Normals calculated on GPU are currently not used, instead Normals
-	 * calculated in constructVBO are used.
+	 * Normals calculated on GPU are currently not used, instead Normals calculated in constructVBO are used.
 	 * 
 	 * @param filepath
 	 */
-	public void constructVBOFromRawFile(String filepath, double sigma, double threshold) throws LWJGLException {
-		sigma = Configuration.__GAUSS_PARAMETER;
-		
+	public void constructVBOFromRawFile(String filepath, ModelType modelType, boolean useSafeMode, double sigma, double threshold) throws LWJGLException
+	{
 		Object[] output = null;
-		if(ModelCreatorSettings.useMPUIForMeshFromVolumetricDataGeneration)
+		
+		switch (modelType)
+		{
+		case MPUI:
 		{
 			output = ModelCreatorMPUI.createModel(filepath, sigma, threshold);
-			if(output.length!=1)
-				constructVBOPointCloud(output); // generate mesh from raw file
-			else
-				constructVBOFromObjFile((String)output[0]); // load existing obj
-		}
-		else
-		{
-			output = ModelCreator.createModel(filepath, sigma, threshold);	
-			if(output.length!=1)
-				constructVBO(output); // generate mesh from raw file
-			else
-				constructVBOFromObjFile((String)output[0]); // load existing obj
 			
-		}
-		
-	}
-
-	public void constructVBOFromRawFileSafeMode(String filepath, double sigma, double threshold) {
-		sigma = Configuration.__GAUSS_PARAMETER;
-		
-		Object[] output = null;
-		if(ModelCreatorSettings.useMPUIForMeshFromVolumetricDataGeneration)
-		{
-			output = ModelCreatorMPUI.createModel(filepath, sigma, threshold);
-			if(output.length!=1)
+			NiftyScreenController.UpdateLoadingBarDialog("Loading model...", 70.0f);
+			VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
+			
+			if (output.length != 1)
 				constructVBOPointCloud(output); // generate mesh from raw file
 			else
-				constructVBOFromObjFile((String)output[0]); // load existing obj
-				
+				constructVBOFromObjFile((String) output[0]); // load existing obj
 		}
-		else
+			break;
+
+		case MARCHING_CUBES:
 		{
-			output = ModelCreatorJava.createModel(filepath, sigma, threshold);	
-			if(output.length!=1)
+			if (useSafeMode == false) // use GPU marching cubes if no safe mode, otherwise CPU
+				output = ModelCreator.createModel(filepath, sigma, threshold);
+			else
+				output = ModelCreatorJava.createModel(filepath, sigma, threshold);
+
+			NiftyScreenController.UpdateLoadingBarDialog("Loading model...", 70.0f);
+			VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
+			
+			if (output.length != 1)
 				constructVBO(output); // generate mesh from raw file
 			else
-				constructVBOFromObjFile((String)output[0]); // load existing obj
+				constructVBOFromObjFile((String) output[0]); // load existing obj
 		}
+			break;
+
+		case VOLUME_RENDER:
+		{
+			System.out.println("ERROR: constructVBOFromRawFile: VOLUME_RENDER: you must use the VeinsModelRaycaseVolume and not VeinsModelMesh for this");
+		}
+			break;
+
+		default:
+			System.out.println("ERROR: constructVBOFromRawFile: invalid modelType: " + modelType.toString());
+		}
+
 	}
 
-	public static float[] g_voxelPositions=null;
-	public static float[] g_voxelNormals=null;
-	
+	public static float[] g_voxelPositions = null;
+	public static float[] g_voxelNormals = null;
+
 	private void constructVBOPointCloud(Object[] output)
 	{
-		
 
 		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
 		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
 		MeshCreationInfo.MeshInfo meshCreationInfo = (MeshCreationInfo.MeshInfo) output[4];
-		
-		g_voxelPositions =  (float[]) output[5];		
+
+		g_voxelPositions = (float[]) output[5];
 		g_voxelNormals = (float[]) output[6];
-		
+
 		float[] normals = null;
 		normals = (float[]) output[2];
 		labelHelper = new TrianglesLabelHelper(nTrianglesBuff.get(0));
-		if(normals != null)
+		if (normals != null)
 		{
 			normals = LabelUtil.createVertexNormalList(nTrianglesBuff.get(0), trianglesBuff, labelHelper, normals);
 		}
 		else
 			LabelUtil.createVertexList(nTrianglesBuff.get(0), trianglesBuff, labelHelper);
-		
+
 		this.threshold = (Float) output[3];
 
 		this.maxTriangels = nTrianglesBuff.get(0);
@@ -231,7 +254,7 @@ public class VeinsModelMesh extends VeinsModel{
 			vertices.add(x = v.y);
 			vertices.add(y = v.x);
 			vertices.add(z = v.z);
-			
+
 			centerx += x;
 			centery += y;
 			centerz += z;
@@ -248,7 +271,7 @@ public class VeinsModelMesh extends VeinsModel{
 			if (z > maxZ)
 				maxZ = z;
 		}
-		
+
 		for (Triangle t : labelHelper.getTriangles())
 		{
 
@@ -258,15 +281,15 @@ public class VeinsModelMesh extends VeinsModel{
 			tempFaceCount++;
 
 		}
-		
-		if (tempFaceCount > 0) 
+
+		if (tempFaceCount > 0)
 		{
 			Mesh mesh = new Mesh(groups, tempFaces, vertices, normals);
 
 			meshes.add(mesh);
 			System.out.println("Created a new mesh java object that will have it's own VBO.");
-		} 
-		else 
+		}
+		else
 		{
 			System.out.println("One \"g\" holding 0 elements discarted.");
 		}
@@ -280,28 +303,20 @@ public class VeinsModelMesh extends VeinsModel{
 			mesh.SetMeshCreationInfo(meshCreationInfo);
 			mesh.constructVBO(true);
 		}
-		
+
 	}
-	
-	/*void drawMeshNormals()
-	{
-		glBegin(GL_LINES);
-		float scale = 0.5f;
-		for(int i=0;i<g_voxelNormals.length/3;++i)
-		{		
-			float xOffset = 15.0f;
-			glVertex3f(g_voxelPositions[i*3]+xOffset,g_voxelPositions[i*3+1],g_voxelPositions[i*3+2]);
-			glVertex3f(g_voxelPositions[i*3]+g_voxelNormals[i*3]*scale+xOffset,g_voxelPositions[i*3+1]+g_voxelNormals[i*3+1]*scale,g_voxelPositions[i*3+2]+g_voxelNormals[i*3+2]*scale);
-		}
-		glEnd();
-	}*/
-	
-	private void constructVBO(Object[] output) 
+
+	/*
+	 * void drawMeshNormals() { glBegin(GL_LINES); float scale = 0.5f; for(int i=0;i<g_voxelNormals.length/3;++i) { float xOffset = 15.0f; glVertex3f(g_voxelPositions[i*3]+xOffset,g_voxelPositions[i*3+1],g_voxelPositions[i*3+2]);
+	 * glVertex3f(g_voxelPositions[i*3]+g_voxelNormals[i*3]*scale+xOffset,g_voxelPositions[i*3+1]+g_voxelNormals[i*3+1]*scale,g_voxelPositions[i*3+2]+g_voxelNormals[i*3+2]*scale); } glEnd(); }
+	 */
+
+	private void constructVBO(Object[] output)
 	{
 		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
 		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
 		MeshCreationInfo.MeshInfo meshCreationInfo = (MeshCreationInfo.MeshInfo) output[4];
-		
+
 		labelHelper = new TrianglesLabelHelper(nTrianglesBuff.get(0));
 		LabelUtil.createVertexList(nTrianglesBuff.get(0), trianglesBuff, labelHelper);
 		this.threshold = (Float) output[3];
@@ -326,7 +341,8 @@ public class VeinsModelMesh extends VeinsModel{
 		ArrayList<String> groups = new ArrayList<String>();
 		int tempFaceCount = 0;
 
-		for (Vertex v : labelHelper.getVertTriMap().keySet()) {
+		for (Vertex v : labelHelper.getVertTriMap().keySet())
+		{
 			vertices.add(x = v.x);
 			vertices.add(y = v.y);
 			vertices.add(z = v.z);
@@ -346,7 +362,8 @@ public class VeinsModelMesh extends VeinsModel{
 			if (z > maxZ)
 				maxZ = z;
 		}
-		for (Triangle t : labelHelper.getTriangles()) {
+		for (Triangle t : labelHelper.getTriangles())
+		{
 
 			tempFaces.add(t.v3.index);
 			tempFaces.add(t.v2.index);
@@ -355,12 +372,15 @@ public class VeinsModelMesh extends VeinsModel{
 
 		}
 
-		if (tempFaceCount > 0) {
+		if (tempFaceCount > 0)
+		{
 			Mesh mesh = new Mesh(groups, tempFaces, vertices, null);
 			meshes.add(mesh);
 
 			System.out.println("Created a new mesh java object that will have it's own VBO.");
-		} else {
+		}
+		else
+		{
 			System.out.println("One \"g\" holding 0 elements discarted.");
 		}
 
@@ -368,15 +388,15 @@ public class VeinsModelMesh extends VeinsModel{
 		centery /= (vertices.size() / 3);
 		centerz /= (vertices.size() / 3);
 
-		for (Mesh mesh : meshes) 
+		for (Mesh mesh : meshes)
 		{
 			mesh.SetMeshCreationInfo(meshCreationInfo);
 			mesh.constructVBO(true);
 		}
 	}
 
-	
-	public void constructVBOFromObjFile(String filepath) {
+	public void constructVBOFromObjFile(String filepath)
+	{
 		vertices = new ArrayList<Float>();
 		ArrayList<Float> normals = new ArrayList<Float>();
 		centerx = 0;
@@ -400,15 +420,18 @@ public class VeinsModelMesh extends VeinsModel{
 
 		File file = new File(filepath);
 		Scanner scanner;
-		try {
+		try
+		{
 			scanner = new Scanner(file);
 			String type;
 			String line;
-			while (scanner.hasNext()) {
+			while (scanner.hasNext())
+			{
 				line = scanner.nextLine();
 				StringTokenizer strTokenizer = new StringTokenizer(line);
 				type = strTokenizer.nextToken();
-				if (type.equalsIgnoreCase("v")) {
+				if (type.equalsIgnoreCase("v"))
+				{
 					vertices.add(x = Float.parseFloat(strTokenizer.nextToken()));
 					vertices.add(y = Float.parseFloat(strTokenizer.nextToken()));
 					vertices.add(z = Float.parseFloat(strTokenizer.nextToken()));
@@ -427,13 +450,16 @@ public class VeinsModelMesh extends VeinsModel{
 						maxY = y;
 					if (z > maxZ)
 						maxZ = z;
-				} else if(type.equalsIgnoreCase("vn")){
+				}
+				else if (type.equalsIgnoreCase("vn"))
+				{
 					normals.add(Float.parseFloat(strTokenizer.nextToken()));
 					normals.add(Float.parseFloat(strTokenizer.nextToken()));
 					normals.add(Float.parseFloat(strTokenizer.nextToken()));
-					
-					
-				}else if (type.equalsIgnoreCase("f")) {
+
+				}
+				else if (type.equalsIgnoreCase("f"))
+				{
 					int a, b, c;
 					StringTokenizer tok = new StringTokenizer(strTokenizer.nextToken(), "//");
 					a = Integer.parseInt(tok.nextToken());
@@ -447,56 +473,68 @@ public class VeinsModelMesh extends VeinsModel{
 					tempFaces.add(a);
 
 					tempFaceCount++;
-				} else if (type.equalsIgnoreCase("g")) {
-					if (tempFaceCount > 0) {
+				}
+				else if (type.equalsIgnoreCase("g"))
+				{
+					if (tempFaceCount > 0)
+					{
 						// It seems that since last starting a new group, there
 						// have been faces stored
 						// Here I create a new mesh
 						float[] narray = new float[normals.size()];
 						int counter = 0;
-						for(Float f : normals){
+						for (Float f : normals)
+						{
 							narray[counter] = f;
-							counter++ ;
-							
+							counter++;
+
 						}
-						
+
 						Mesh mesh = new Mesh(groups, tempFaces, vertices, narray);
 						meshes.add(mesh);
 						// After the whole file will be read, each mesh object's
 						// faces will be stored as VBOs (Vertex Buffer Objects).
 						System.out.println("Created a new mesh java object that will have it's own VBO.");
-					} else if (newG)
+					}
+					else if (newG)
 						System.out.println("One \"g\" holding 0 elements discarted.");
 					// start a new group
 					newG = true;
 					groups = new ArrayList<String>();
 					tempFaces = new ArrayList<Integer>();
 					tempFaceCount = 0;
-					while (strTokenizer.hasMoreTokens()) {
+					while (strTokenizer.hasMoreTokens())
+					{
 						groups.add(strTokenizer.nextToken());
 					}
 				}
 			}
-			if (tempFaceCount > 0) {
+			if (tempFaceCount > 0)
+			{
 				// It seems that since last starting a new group, there have
 				// been faces stored
 				// Here I create a new mesh
 				float[] narray = new float[normals.size()];
 				int counter = 0;
-				for(Float f : normals){
+				for (Float f : normals)
+				{
 					narray[counter] = f;
-					counter++ ;
-					
+					counter++;
+
 				}
 				Mesh mesh = new Mesh(groups, tempFaces, vertices, narray);
 				meshes.add(mesh);
 				// After the whole file will be read, each mesh object's faces
 				// will be stored as VBOs (Vertex Buffer Objects).
 				System.out.println("Created a new mesh java object that will have it's own VBO.");
-			} else {
+			}
+			else
+			{
 				System.out.println("One \"g\" holding 0 elements discarted.");
 			}
-		} catch (FileNotFoundException e) {
+		}
+		catch (FileNotFoundException e)
+		{
 			e.printStackTrace();
 		}
 
@@ -505,26 +543,30 @@ public class VeinsModelMesh extends VeinsModel{
 		centery /= (vertices.size() / 3);
 		centerz /= (vertices.size() / 3);
 
-		for (Mesh mesh : meshes) {
+		for (Mesh mesh : meshes)
+		{
 			mesh.constructVBO(false); // don't save obj to file if it's created from obj
 		}
 	}
 
 	@Override
-	public void increaseSubdivisionDepth() {
+	public void increaseSubdivisionDepth()
+	{
 		numberOfSubdivisions = Math.min(APLICATION_SUBDIVISION_LIMIT, numberOfSubdivisions + 1);
-		if (maxSubDepth < numberOfSubdivisions) {
+		if (maxSubDepth < numberOfSubdivisions)
+		{
 			for (Mesh mesh : meshes)
 				mesh.increaseMaxSubdivision();
 			maxSubDepth++;
 		}
 	}
-	
+
 	@Override
-	public void decreaseSubdivisionDepth() {
+	public void decreaseSubdivisionDepth()
+	{
 		numberOfSubdivisions = Math.max(0, numberOfSubdivisions - 1);
 	}
-	
+
 	@Override
 	public float GetThreshold()
 	{
@@ -532,40 +574,44 @@ public class VeinsModelMesh extends VeinsModel{
 	}
 
 	@Override
-	public void render() {
+	public void render()
+	{
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 
 		/* Apply orientation (add rotations) */
-	//	Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
-	//	FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
-	//	GL11.glMultMatrix(fb);
+		// Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
+		// FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
+		// GL11.glMultMatrix(fb);
 
 		/* Translate and render */
-		//glTranslatef(-(float) centerx, -(float) centery, -(float) centerz);
-		for (Mesh vbo : meshes) {
-			
+		// glTranslatef(-(float) centerx, -(float) centery, -(float) centerz);
+		for (Mesh vbo : meshes)
+		{
+
 			vbo.render(numberOfSubdivisions);
 		}
 
 		glPopMatrix();
-		//drawMeshNormals();
+		// drawMeshNormals();
 	}
 
 	/**
 	 * Change added orientation (rotations) of the model
 	 */
 	@Override
-	public void changeAddedOrientation(VeinsRenderer renderer) {
+	public void changeAddedOrientation(VeinsRenderer renderer)
+	{
 		double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
 
-		if (veinsHeldAt != null) {
+		if (veinsHeldAt != null)
+		{
 			double[] rotationAxis = Vector.crossProduct(veinsGrabbedAt, veinsHeldAt);
-			if (Vector.length(rotationAxis) > 0) {
+			if (Vector.length(rotationAxis) > 0)
+			{
 				rotationAxis = Vector.normalize(rotationAxis);
 				rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
-				double angle = Math.acos(Vector.dotProduct(veinsGrabbedAt, veinsHeldAt)
-						/ (Vector.length(veinsGrabbedAt) * Vector.length(veinsHeldAt)));
+				double angle = Math.acos(Vector.dotProduct(veinsGrabbedAt, veinsHeldAt) / (Vector.length(veinsGrabbedAt) * Vector.length(veinsHeldAt)));
 				addedOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle, rotationAxis);
 			}
 		}
@@ -576,34 +622,34 @@ public class VeinsModelMesh extends VeinsModel{
 	{
 		return currentOrientation;
 	}
-	
-	private void setDefaultOrientation() {
-		/*double angle1 = Math.toRadians(-90); // Math.PI * -90 / 180;
-		double angle2 = Math.toRadians(180); // Math.PI * 180 / 180;
-		currentOrientation = Quaternion.quaternionFromAngleAndRotationAxis(0, new double[] { 1, 0, 0 });
-	//	double[] v = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(new double[] { 0, 1, 0 });
-	//	currentOrientation = Quaternion.quaternionMultiplication(currentOrientation,
-	//			Quaternion.quaternionFromAngleAndRotationAxis(angle2, v));
-		addedOrientation = new Quaternion();*/
-		
+
+	private void setDefaultOrientation()
+	{
+		/*
+		 * double angle1 = Math.toRadians(-90); // Math.PI * -90 / 180; double angle2 = Math.toRadians(180); // Math.PI * 180 / 180; currentOrientation = Quaternion.quaternionFromAngleAndRotationAxis(0, new double[] { 1, 0, 0 }); // double[] v =
+		 * Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(new double[] { 0, 1, 0 }); // currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, // Quaternion.quaternionFromAngleAndRotationAxis(angle2, v)); addedOrientation = new Quaternion();
+		 */
+
 		currentOrientation = computeDefaultOrientation();
 		addedOrientation = new Quaternion();
-		
+
 	}
-	
+
 	@Override
 	public int GetMaxTriangles()
 	{
 		return maxTriangels;
-		}
+	}
 
 	@Override
-	public void normalizeCurrentOrientation() {
+	public void normalizeCurrentOrientation()
+	{
 		currentOrientation = Quaternion.quaternionNormalization(currentOrientation);
 	}
-	
+
 	@Override
-	public void normalizeAddedOrientation() {
+	public void normalizeAddedOrientation()
+	{
 		addedOrientation = Quaternion.quaternionNormalization(addedOrientation);
 	}
 
@@ -611,52 +657,61 @@ public class VeinsModelMesh extends VeinsModel{
 	 * Saves the current orientation of the model in currenOrientation
 	 */
 	@Override
-	public void saveCurrentOrientation() {
+	public void saveCurrentOrientation()
+	{
 		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
 	}
 
 	@Override
-	public void setAddedOrientation(Quaternion q) {
+	public void setAddedOrientation(Quaternion q)
+	{
 		addedOrientation = q;
 	}
 
-	private void setCurrentOrientation(Quaternion q) {
+	private void setCurrentOrientation(Quaternion q)
+	{
 		currentOrientation = q;
 	}
 
 	@Override
-	public void cleanup() {
-		if (meshes != null) {
-			for (Mesh m : meshes) {
+	public void cleanup()
+	{
+		if (meshes != null)
+		{
+			for (Mesh m : meshes)
+			{
 				m.deleteVBO();
 			}
 		}
 	}
 
 	@Override
-	public void rotateModel3D(double[] rot, VeinsRenderer renderer) {
+	public void rotateModel3D(double[] rot, VeinsRenderer renderer)
+	{
 
-		double[] centerVector = RayUtil.getRayDirection((int) VeinsWindow.settings.resWidth / 2,
-				(int) VeinsWindow.settings.resHeight / 2, renderer);
+		double[] centerVector = RayUtil.getRayDirection((int) VeinsWindow.settings.resWidth / 2, (int) VeinsWindow.settings.resHeight / 2, renderer);
 
 		Quaternion temp = new Quaternion();
 		double[] rotationAxis;
 
-		rotationAxis = Vector.crossProduct(centerVector, new double[] { 0, 1, 0 });
+		rotationAxis = Vector.crossProduct(centerVector, new double[]
+		{ 0, 1, 0 });
 		rotationAxis = Vector.normalize(rotationAxis);
 		rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
 
 		temp = Quaternion.quaternionFromAngleAndRotationAxis(rot[0], rotationAxis);
 		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, temp);
 
-		rotationAxis = Vector.crossProduct(centerVector, new double[] { 1, 0, 0 });
+		rotationAxis = Vector.crossProduct(centerVector, new double[]
+		{ 1, 0, 0 });
 		rotationAxis = Vector.normalize(rotationAxis);
 		rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
 
 		temp = Quaternion.quaternionFromAngleAndRotationAxis(rot[2], rotationAxis);
 		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, temp);
 
-		rotationAxis = Vector.crossProduct(centerVector, new double[] { 0, 0, 1 });
+		rotationAxis = Vector.crossProduct(centerVector, new double[]
+		{ 0, 0, 1 });
 		rotationAxis = Vector.normalize(centerVector);
 		rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
 
@@ -670,27 +725,27 @@ public class VeinsModelMesh extends VeinsModel{
 	{
 		return veinsGrabRadius;
 	}
-	
+
 	@Override
 	public void SetVeinsGrabRadius(double r)
 	{
 		veinsGrabRadius = r;
 	}
-	
+
 	@Override
 	public double[] GetVeinsGrabbedAt()
 	{
 		return veinsGrabbedAt;
 	}
-	
+
 	@Override
 	public void SetVeinsGrabbedAt(double[] v)
 	{
 		veinsGrabbedAt = v;
 	}
-	
+
 	@Override
-	public double calculateCameraDistance() 
+	public double calculateCameraDistance()
 	{
 		double d1 = minX - centerx;
 		double d2 = maxX - centerx;

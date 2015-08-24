@@ -4,6 +4,7 @@
  * or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  */
 package si.uni_lj.fri.veins3D.gui.render.models;
+
 import si.uni_lj.fri.MPU_Implicits.Configuration;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
@@ -27,7 +28,6 @@ import org.lwjgl.opengl.GL11;
 import si.uni_lj.fri.segmentation.ModelCreator;
 import si.uni_lj.fri.segmentation.ModelCreatorJava;
 import si.uni_lj.fri.segmentation.ModelCreatorMPUI;
-import si.uni_lj.fri.segmentation.ModelCreatorSettings;
 import si.uni_lj.fri.segmentation.utils.LabelUtil;
 import si.uni_lj.fri.segmentation.utils.TrianglesLabelHelper;
 import si.uni_lj.fri.segmentation.utils.obj.Triangle;
@@ -38,6 +38,7 @@ import si.uni_lj.fri.veins3D.math.Vector;
 import si.uni_lj.fri.veins3D.utils.RayUtil;
 import si.uni_lj.fri.volumeRaycast.VolumeRaycast;
 import static org.lwjgl.opengl.GL11.*;
+
 /**
  * @author Simon Žagar
  * @since 0.2
@@ -46,47 +47,96 @@ import static org.lwjgl.opengl.GL11.*;
 public class VeinsModelRaycastVolume extends VeinsModel
 {
 	VolumeRaycast m_raycaster = null;
-	
-	public VeinsModelRaycastVolume(int displayWidth,int displayHeight)
+
+	public VeinsModelRaycastVolume(int displayWidth, int displayHeight)
 	{
-		m_raycaster=new VolumeRaycast(displayWidth,displayHeight);
+		m_raycaster = new VolumeRaycast(displayWidth, displayHeight);
 		m_raycaster.MainInit();
 	}
 
+	public void SetNewResolution(int width, int height)
+	{
+		m_raycaster.SetNewResolution(width, height);
+	}
+
 	@Override
-	public void render() 
+	public void render()
 	{
 		m_raycaster.MainRender();
 	}
-	
+
 	public void cleanup()
 	{
-		
+		m_raycaster.ReleaseResources();
 	}
 
-	public void changeMinTriangles(int minTriangels){}
-	
-	
-	public int GetMaxTriangles(){return 0;}
-	public float GetThreshold(){return 0.0f;}
-	public double GetVeinsGrabRadius(){return 0.0;}
-	public double[] GetVeinsGrabbedAt(){return new double[]{0,0,};}
-	
-	public void SetVeinsGrabRadius(double r){}
-	public void SetVeinsGrabbedAt(double[] v){}
-	
-	public void normalizeCurrentOrientation(){}
-	public void normalizeAddedOrientation() {}
-	
-	public void increaseSubdivisionDepth(){}
-	public void decreaseSubdivisionDepth(){}
-	
-	public void changeAddedOrientation(VeinsRenderer renderer){}
-	
-	public void saveCurrentOrientation(){}
-	public void setAddedOrientation(Quaternion q){}
-	
-	public void rotateModel3D(double[] rot, VeinsRenderer renderer){}
+	public void changeMinTriangles(int minTriangels)
+	{
+	}
 
-	public double calculateCameraDistance(){return 0.0;}
+	public int GetMaxTriangles()
+	{
+		return 0;
+	}
+
+	public float GetThreshold()
+	{
+		return 0.0f;
+	}
+
+	public double GetVeinsGrabRadius()
+	{
+		return 0.0;
+	}
+
+	public double[] GetVeinsGrabbedAt()
+	{
+		return new double[]
+		{ 0, 0, };
+	}
+
+	public void SetVeinsGrabRadius(double r)
+	{
+	}
+
+	public void SetVeinsGrabbedAt(double[] v)
+	{
+	}
+
+	public void normalizeCurrentOrientation()
+	{
+	}
+
+	public void normalizeAddedOrientation()
+	{
+	}
+
+	public void increaseSubdivisionDepth()
+	{
+	}
+
+	public void decreaseSubdivisionDepth()
+	{
+	}
+
+	public void changeAddedOrientation(VeinsRenderer renderer)
+	{
+	}
+
+	public void saveCurrentOrientation()
+	{
+	}
+
+	public void setAddedOrientation(Quaternion q)
+	{
+	}
+
+	public void rotateModel3D(double[] rot, VeinsRenderer renderer)
+	{
+	}
+
+	public double calculateCameraDistance()
+	{
+		return 0.0;
+	}
 }

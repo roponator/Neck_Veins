@@ -11,7 +11,9 @@ import si.uni_lj.fri.segmentation.utils.FileUtils;
 import si.uni_lj.fri.segmentation.utils.Gauss3D;
 import si.uni_lj.fri.segmentation.utils.Graytresh;
 import si.uni_lj.fri.segmentation.utils.MarchingCubes;
+import si.uni_lj.fri.veins3D.gui.NiftyScreenController;
 import si.uni_lj.fri.veins3D.gui.render.models.MeshCreationInfo;
+import si.uni_lj.fri.veins3D.main.VeinsWindow;
 
 public class ModelCreatorJava {
 
@@ -28,12 +30,22 @@ public class ModelCreatorJava {
 			System.out.println("createModel (CPU MARCHING CUBES): obj file exists, using obj file..");
 			return new Object[]{meshCreationInfo.GetObjFilePath()};
 		}
+		NiftyScreenController.UpdateLoadingBarDialog("Creating model ( this may take a few minutes )...", 30.0f);
+		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
 				
 		float[][][] ctMatrix = FileUtils.readFile3D(fileName);
 		execGauss(ctMatrix, sigma);
 		threshold = 0.0019760127f;
+		
+		NiftyScreenController.UpdateLoadingBarDialog("Creating model ( this may take a few minutes )...", 40.0f);
+		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
+		
 		double isolevel = execFindTreshold(ctMatrix, threshold);
 		execNormalization(ctMatrix, 65536.0);
+		
+		NiftyScreenController.UpdateLoadingBarDialog("Creating model ( this may take a few minutes )...", 50.0f);
+		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
+		
 		float[] vertices = execMarchingCubes(ctMatrix, isolevel);
 		int[] nTriangles = new int[] { vertices.length / 9 };
 		

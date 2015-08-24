@@ -916,8 +916,6 @@ float* depth
 	// shading params
 	const float4 diffuse = (float4)(1,0,0,1);
 	const float4 specular = (float4)(1,1,1,1);
-	const float specularity = 50.f;
-	const float aostrength = 2.f;
 	
 	// volume dimensions
 	const float3 size = D * convert_float3(M);
@@ -925,7 +923,7 @@ float* depth
 	
 	// raycasting aux data
 	float dataValue = 0;
-	float3 P, Pprev, step;
+	float3 P;
 	float cellSize = fmin(fmin(D.x, D.y), D.z);
 	float samplingRate = 3.5f;
 	if (lin == 0) {
@@ -1043,10 +1041,8 @@ float* depth
 	const float4 diffuse = (float4)(1,0,0,1);
 	const float4 specular = (float4)(1,1,1,1);
 	const float specularity = 50.f;
-	const float aostrength = 2.f;
 	
 	// volume dimensions
-	int octreeSize = 0;
 	
 	int Mmax = max(max(M.x, M.y), M.z);
 	//const float3 size = D * convert_float3(M);
@@ -1055,7 +1051,7 @@ float* depth
 	
 	// raycasting aux data
 	float dataValue = 0;
-	float3 P, step;
+	float3 P;
 	int octreeLevel = 0;
 	
 	float3 L = S;
@@ -1070,8 +1066,7 @@ float* depth
 
 	// child index. 3*octreeIndex+{0,1,2} = min,max,avg
 	int octreeIndex = 0;
-	int iter = 0;
-	
+
 	int safetyCounter = 0;
 	
 	float2 result = (float2)(0,0); // raycasting lambda result buffer
@@ -1084,8 +1079,7 @@ float* depth
 		while (++safetyCounter < MAX_ITER) {
 			float min = octree[3*octreeIndex  ];
 			float max = octree[3*octreeIndex+1];
-			float avg = octree[3*octreeIndex+2];
-
+			
 			if (threshold < min || threshold > max) {
 				// advance / pop
 				if (!raybox(S, E, boxmin, boxmax, &result)) {
@@ -1800,7 +1794,7 @@ kernel void ssao(INPUT_TYPE image, INPUT_TYPE depthBuffer, OUTPUT_TYPE output) {
 		(float2)( 0.3792,    0.6101),
 		(float2)( 0.4192,    0.8732)
 	};
-	const float kappa = 0.01f;
+	
 	const float ssaoSize = 1000.f;
 	float sampleSize;
 	

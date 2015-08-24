@@ -20,10 +20,12 @@ import static org.lwjgl.opengl.ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB;
 import static org.lwjgl.opengl.ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.util.ArrayList;
@@ -44,6 +46,7 @@ import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.Drawable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL14;
@@ -82,6 +85,7 @@ import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.HUD;
 import si.uni_lj.fri.veins3D.gui.GUIMain;
 import si.uni_lj.fri.veins3D.gui.NiftyScreenController;
+import si.uni_lj.fri.veins3D.gui.render.StencilMask;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
 import si.uni_lj.fri.veins3D.math.Quaternion;
@@ -145,17 +149,13 @@ public class VeinsWindow
 		veinsWindow = this;
 		isRunning = true;
 		this.title = Title;
-		loadSettings(filename);
+		loadSettings(filename); // MUST BE BEFORE NIFTY GUI INIT, BECAUSE NIFTY CONTROLS RESTORE STATE FROM THIS!
 		createDisplay();
+		
 		initNiftyAndGUI();
 		initWindowElements();
 		setupWindow();
 
-		/*
-		 * try { renderer.loadModelRaw("C:\\Users\\ropo\\Desktop\\Zile\\Pat13_3D-DSA.mhd", 0.5,0.5); } catch (LWJGLException e) { // TODO Auto-generated catch block e.printStackTrace(); }
-		 */
-
-		// new MyFileChooser();
 	}
 
 	void initNiftyAndGUI()
@@ -256,13 +256,19 @@ public class VeinsWindow
 		{
 			e.printStackTrace();
 		}
-		renderer.setupView();
+		renderer.setupView();	
 		frame.setPreferredSize(new Dimension(currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
 		frame.setSize(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
 		frame.pack();
 		nifty.resolutionChanged();
-		
 		screenController.OnResize(currentDisplayMode);
+		
+		// Do this at the end when openGL has setup itself 
+		//THIS CAUSES THE WHITE SCREEN FLASH ON RESIZE IF YOU ARE USING VOLUME RENDERER:
+		//openCL inits itself again, otherwise you get invalid clContext error.
+		veinsWindow.RenderSingleFrameWithoutModel(); // FIX FOR WHITE SCREEN FLASH
+		veinsWindow.RenderSingleFrameWithoutModel(); // FIX FOR WHITE SCREEN FLASH
+		renderer.SetNewResolution(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
 	}
 
 	void loadSettings(String fileName)
@@ -432,8 +438,13 @@ public class VeinsWindow
 			// hud.setClickedOn(clickedOn);
 			renderer.setupView(); // raycast volume renderer changes some states, theys must be reset
 			renderer.clearView();
+			
+			
+			//glPushAttrib(GL_ALL_ATTRIB_BITS);
 			renderer.render();
-
+			//glPopAttrib();
+			
+		
 			// hud.drawHUD();
 			setTitle();
 
@@ -459,11 +470,19 @@ public class VeinsWindow
 			}
 		}
 	}
+	
+	public void RenderSingleFrameWithoutModel()
+	{
+		renderer.setupView(); // raycast volume renderer changes some states, theys must be reset
+		renderer.clearView();
+		renderNiftyGUI();
+		Display.update();
+	}
 
 	// saves, sets and restores openGL states
 	void renderNiftyGUI()
 	{
-
+		
 		glPushMatrix();
 		glPushAttrib(GL_ALL_ATTRIB_BITS);
 

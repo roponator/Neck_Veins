@@ -45,6 +45,8 @@ public abstract class VeinsModel
 	
 	public abstract double calculateCameraDistance();
 	
+	public abstract void SetNewResolution(int width, int height); // needed only for volumeRenderer
+	
 	public Quaternion GetCurrentOrientation()
 	{
 		return computeDefaultOrientation();

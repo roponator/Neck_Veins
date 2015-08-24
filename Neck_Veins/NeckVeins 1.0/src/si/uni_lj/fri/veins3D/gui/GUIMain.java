@@ -10,7 +10,6 @@ import org.lwjgl.opengl.DisplayMode;
 
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.elements.Element;
-import si.uni_lj.fri.segmentation.ModelCreatorSettings;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelMesh;

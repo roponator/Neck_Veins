@@ -25,6 +25,7 @@ import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyFileExtensionItem;
 import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyTreeFolderItem;
 import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyTreeFolderItem;
 import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.SelectedFile;
+import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer.ModelType;
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import de.lessvoid.nifty.EndNotify;
 import de.lessvoid.nifty.Nifty;
@@ -211,7 +212,7 @@ public class NiftyScreenController extends DefaultScreenController
 		// Loading bar dialog
 		// ---------------------------------------
 		m_loadingBarDialog = new NiftyLoadingBarDialog(nifty.getScreen("GScreen0").findElementById("MY_LOADING_BAR_DIALOG_CONTROL_ID"));
-		
+
 		// ---------------------------------------
 		// Stereo menu
 		// ---------------------------------------
@@ -378,14 +379,14 @@ public class NiftyScreenController extends DefaultScreenController
 	// ----------------------------------------------------
 	// Loading bar dialog
 	// ----------------------------------------------------
-	
+
 	// Call it manually when needed
 	public static void UpdateLoadingBarDialog(String text, float percentProgress)
 	{
 		setState(GUI_STATE.DIALOG_OPEN);
 		m_loadingBarDialog.ShowAndUpdate(text, percentProgress);
 	}
-	
+
 	// Call it manually when you're done with showing progress
 	public static void On_LoadingDialog_CloseOrCancel()
 	{
@@ -479,26 +480,24 @@ public class NiftyScreenController extends DefaultScreenController
 			if (pressedButton == NAVIGATION_WIDGET_BUTTON.CLOSE_CIRCLE)
 				widget.m_navigationWidget.setVisible(false);
 		}
-		else
-			if (event.isButton0Down()) // drag
+		else if (event.isButton0Down()) // drag
+		{
+			// start moving widget if clicked on move circle
+			if (pressedButton == NAVIGATION_WIDGET_BUTTON.MOVE_WIDGET_CIRCLE)
 			{
-				// start moving widget if clicked on move circle
-				if (pressedButton == NAVIGATION_WIDGET_BUTTON.MOVE_WIDGET_CIRCLE)
-				{
-					// System.out.println("drag");
-					widget.StartMoving();
-				}
-				else
-				{
-					resultButton = pressedButton;
-				}
-
+				// System.out.println("drag");
+				widget.StartMoving();
 			}
 			else
-				if (event.isButton0Release())
-				{
-					widget.StopMoving();
-				}
+			{
+				resultButton = pressedButton;
+			}
+
+		}
+		else if (event.isButton0Release())
+		{
+			widget.StopMoving();
+		}
 
 		return resultButton;
 	}
@@ -559,24 +558,22 @@ public class NiftyScreenController extends DefaultScreenController
 					// System.out.println("inner circle: right");
 					return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_RIGHT; // prevent click through to circles below
 				}
-				else
-					if (angleInDegrees >= 45.0f && angleInDegrees <= 135.0f)
-					{
-						// System.out.println("inner circle: up");
-						return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_UP; // prevent click through to circles below
-					}
+				else if (angleInDegrees >= 45.0f && angleInDegrees <= 135.0f)
+				{
+					// System.out.println("inner circle: up");
+					return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_UP; // prevent click through to circles below
+				}
 
-					else
-						if (angleInDegrees <= -45.0f && angleInDegrees >= -135.0f)
-						{
-							// System.out.println("inner circle: down");
-							return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_DOWN; // prevent click through to circles below
-						}
-						else
-						{
-							// System.out.println("inner circle: left");
-							return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_LEFT; // prevent click through to circles below
-						}
+				else if (angleInDegrees <= -45.0f && angleInDegrees >= -135.0f)
+				{
+					// System.out.println("inner circle: down");
+					return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_DOWN; // prevent click through to circles below
+				}
+				else
+				{
+					// System.out.println("inner circle: left");
+					return NAVIGATION_WIDGET_BUTTON.CENTER_CIRCLE_LEFT; // prevent click through to circles below
+				}
 			}
 		}
 
@@ -845,32 +842,70 @@ public class NiftyScreenController extends DefaultScreenController
 		SelectedFile file = m_openDialog.m_folderBrowser.TryOpeningSelectedFile();
 
 		On_OpenDialog_Close("");
-
-		if (file.extensionOnly.compareTo("mhd") == 0)
+		
+		
+		UpdateLoadingBarDialog("Loading model...",0.0f);
+		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
+		
+		// Marching cubes, MPUI or volume render (obj is used if the file was already loaded for MC or MPUI)
+		if (file != null && file.extensionOnly.compareTo("mhd") == 0)
 		{
 			double sigma = 0.5f;
 			double threshold = 0.5f;
 
-			try
-			{
-				VeinsWindow.renderer.loadModelRaw(file.fullFilePathAndName, sigma, threshold);
-			}
-			catch (LWJGLException e)
-			{
-				System.out.println("onButton_OpenDialog_Open: exceptions: " + e.getMessage());
-				e.printStackTrace();
+			String selectedMethod = m_openDialog.m_methodTypeDropdown.getSelection();
 
-				// try safe mode
-				VeinsWindow.renderer.loadModelRawSafeMode(file.fullFilePathAndName, sigma, threshold);
-			}
-		}
-		else
-			if (file.extensionOnly.compareTo("obj") == 0)
+			// Convert string model type to enum
+			ModelType modelType = ModelType.MARCHING_CUBES;
+			if (selectedMethod == null || selectedMethod.compareTo(NiftyOpenDialog.METHOD_TYPE_MARCHING_CUBES) == 0)
 			{
-
+				modelType = ModelType.MARCHING_CUBES;
+			}
+			else if (selectedMethod.compareTo(NiftyOpenDialog.METHOD_TYPE_MPUI) == 0)
+			{
+				modelType = ModelType.MPUI;
+			}
+			else if (selectedMethod.compareTo(NiftyOpenDialog.METHOD_TYPE_VOLUME_RENDER) == 0)
+			{
+				modelType = ModelType.VOLUME_RENDER;
 			}
 			else
-				System.out.println("onButton_OpenDialog_Open: invalid file extensions: " + file.extensionOnly + ", file: " + file.fullFilePathAndName);
+			{
+				System.out.println("WARNING: onButton_OpenDialog_Open: Invalid model type");
+				return;
+			}
+
+			// Try loading file
+			try
+			{
+				// try fast methods (gpu marching cubes)
+				VeinsWindow.renderer.loadModelRaw(file.fullFilePathAndName, modelType, false, sigma, threshold);
+			}
+			catch (Exception e)
+			{
+				// try fallback methods (cpu marching cubes, slower)
+				System.out.println("WARNING: onButton_OpenDialog_Open: trying to load the model in safe mode, GPU mode probably failed");
+				try
+				{
+					VeinsWindow.renderer.loadModelRaw(file.fullFilePathAndName, modelType, true, sigma, threshold);
+				}
+				catch (LWJGLException e1)
+				{
+					System.out.println("WARNING: onButton_OpenDialog_Open: can't load model, problem with the file you try to load?");
+				}
+			}
+		}
+		
+		// OBJ load
+		if (file != null && file.extensionOnly.compareTo("obj") == 0)
+		{
+			VeinsWindow.renderer.loadModelObj(file.fullFilePathAndName);
+		}
+		
+		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
+		
+		UpdateLoadingBarDialog("Loading model...",100.0f);
+		On_LoadingDialog_CloseOrCancel();
 	}
 
 	// Options subdialog dialog callbacks
@@ -1103,6 +1138,12 @@ public class NiftyScreenController extends DefaultScreenController
 
 		updateSliderValueLabel(mySliderControl, initialValue);
 	}
+	
+	public static de.lessvoid.nifty.controls.Slider ConvertElementToSlider(Element mySliderControl)
+	{
+		Element niftySliderElement = mySliderControl.findElementById("SLIDER_CONTROL");
+		return niftySliderElement.getControl(de.lessvoid.nifty.controls.slider.SliderControl.class);	
+	}
 
 	// ----------------------------------------------------
 	// State handling
@@ -1118,17 +1159,21 @@ public class NiftyScreenController extends DefaultScreenController
 		{
 			m_darkeningPanelForDialog.setVisible(false);
 		}
+		else if (state == GUI_STATE.DIALOG_OPEN)
+		{
+			prepareForSomeMenuOpen();
+			m_darkeningPanelForDialog.setVisible(true);
+		}
+		else if (state == GUI_STATE.DIALOG_SUBDIALOG_OPEN)
+		{
+			prepareForSomeMenuOpen();
+			m_darkeningPanelForDialog.setVisible(true);
+		}
 		else
-			if (state == GUI_STATE.DIALOG_OPEN)
-			{
-				prepareForSomeMenuOpen();
-				m_darkeningPanelForDialog.setVisible(true);
-			}
-			else
-			{
-				// warning in case a new state is added and you forget to implement it
-				System.out.println("NiftyScreenController::setState: invalid GUI_STATE: " + state.toString());
-			}
+		{
+			// warning in case a new state is added and you forget to implement it
+			System.out.println("NiftyScreenController::setState: invalid GUI_STATE: " + state.toString());
+		}
 
 		__m_guiState_doNotAccessThisDirectly = state;
 	}

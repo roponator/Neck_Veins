@@ -24,6 +24,5 @@ public class Configuration {
 	
 	public static final int __SAMPLE_SIZE = 200;
 
-	public static final double __GAUSS_PARAMETER = 0.75;
 	
 }

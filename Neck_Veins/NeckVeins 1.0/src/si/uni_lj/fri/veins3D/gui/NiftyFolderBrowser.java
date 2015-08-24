@@ -146,7 +146,7 @@ public class NiftyFolderBrowser
 		    }
 		}*/
 	}
-
+	
 	// Returns null if nothing is selected
 	public SelectedFile TryOpeningSelectedFile()
 	{
@@ -165,6 +165,7 @@ public class NiftyFolderBrowser
 		
 		return new SelectedFile(fullPath, extension);
 	}
+
 	
 	// On selection changed
 	public void OnTreeboxSelectionChanged(String id, ListBoxSelectionChangedEvent<TreeItem<MyTreeFolderItem>> event)
@@ -193,6 +194,8 @@ public class NiftyFolderBrowser
 				boolean isCurrentlyExpanded = selectedTreeItem.isExpanded();
 				selectedTreeItem.setExpanded(!isCurrentlyExpanded);
 				m_treebox.setTree(m_root); // update tree
+				
+				changeFileListboxContent(selectedTreeItem); // must show contents 
 			}
 
 			// restore scrollbar value so it doesn't jump after nodes have been added
