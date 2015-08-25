@@ -147,6 +147,11 @@ public class NiftyFolderBrowser
 		}*/
 	}
 	
+	public void OnOpenDialog()
+	{
+		changeFileListboxContent(m_currentlySelectedFolder);
+	}
+	
 	// Returns null if nothing is selected
 	public SelectedFile TryOpeningSelectedFile()
 	{
@@ -163,10 +168,13 @@ public class NiftyFolderBrowser
 		String fullPath = m_currentlySelectedFolder.getValue().path+"//"+m_currentlySelectedFolder.getValue().folderNameOnly+"//"+selectedFileName;
 		String extension = FilenameUtils.getExtension(fullPath);
 		
+		// deselect
+		if(selectedItems.size()<1 || selectedItems.size()>1)
+			m_fileListboxControl.deselectItem(selectedItems.get(0));
+		
 		return new SelectedFile(fullPath, extension);
 	}
 
-	
 	// On selection changed
 	public void OnTreeboxSelectionChanged(String id, ListBoxSelectionChangedEvent<TreeItem<MyTreeFolderItem>> event)
 	{

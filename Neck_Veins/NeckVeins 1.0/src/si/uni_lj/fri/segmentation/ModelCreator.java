@@ -68,13 +68,12 @@ public class ModelCreator {
 	 * @return
 	 * @throws LWJGLException
 	 */
-	public static Object[] createModel(String fileName, double sigma, double threshold) throws LWJGLException {
-		m_sigma = sigma;
+	public static Object[] createModel(String fileName) throws LWJGLException {
 		m_fileName = fileName;
 		
 		// create mesh info
 		String fileNameOnly = MeshCreationInfo.GetFileNameOnlyFromPath(fileName);
-		MeshCreationInfo.InfoMarchingCubes meshCreationInfo= new MeshCreationInfo.InfoMarchingCubes(fileNameOnly, sigma, threshold);
+		MeshCreationInfo.InfoMarchingCubes meshCreationInfo= new MeshCreationInfo.InfoMarchingCubes(fileNameOnly, VeinsWindow.settings.gaussSigma, VeinsWindow.settings.threshold);
 		
 		// check if the obj  file exists for this model params: if it does, return one output.
 		File existingObjFile = new File(meshCreationInfo.GetObjFilePath());
@@ -91,8 +90,8 @@ public class ModelCreator {
 		clearOldProgram();
 		initializeCL();
 		program = CLUtils.createProgram("/opencl/segmentation.cls", context, devices);
-		initStaticData(fileName, sigma);
-		execGauss3D(sigma);
+		initStaticData(fileName, VeinsWindow.settings.gaussSigma);
+		execGauss3D(VeinsWindow.settings.gaussSigma);
 		
 		NiftyScreenController.UpdateLoadingBarDialog("Creating model ( this may take a few minutes )...", 50.0f);
 		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
@@ -101,7 +100,7 @@ public class ModelCreator {
 		max = execFindMax();
 		Utils.endTime(t, "Max");
 		System.out.println(max);
-		threshold = execOtsuThreshold((float) threshold);
+		float threshold = (float) execOtsuThreshold((float) VeinsWindow.settings.threshold);
 		Object[] output = execMarchingCubes(meshCreationInfo,(float) threshold);
 		
 		NiftyScreenController.UpdateLoadingBarDialog("Creating model ( this may take a few minutes )...", 60.0f);
@@ -123,7 +122,7 @@ public class ModelCreator {
 	public static Object[] changeModel(double threshold) throws LWJGLException {
 		// create mesh info
 		String fileNameOnly = MeshCreationInfo.GetFileNameOnlyFromPath(m_fileName);
-		MeshCreationInfo.InfoMarchingCubes meshCreationInfo= new MeshCreationInfo.InfoMarchingCubes(fileNameOnly, m_sigma, threshold);
+		MeshCreationInfo.InfoMarchingCubes meshCreationInfo= new MeshCreationInfo.InfoMarchingCubes(fileNameOnly, VeinsWindow.settings.gaussSigma, VeinsWindow.settings.threshold);
 
 		System.out.println("Marching cubes on GPU...");
 		return execMarchingCubes(meshCreationInfo, (float) threshold);

@@ -69,6 +69,12 @@ public class VeinsModelMesh extends VeinsModel
 
 	public VeinsModelMesh()
 	{
+		System.out.println("STACK TRACE START ****************");
+		for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+		    System.out.println(ste);
+		}
+		System.out.println("STACK TRACE END ****************");
+				
 		meshes = new ArrayList<Mesh>();
 		setDefaultOrientation();
 	}
@@ -79,9 +85,9 @@ public class VeinsModelMesh extends VeinsModel
 		setDefaultOrientation();
 	}
 
-	public VeinsModelMesh(String filepath, ModelType modelType, boolean useSafeMode, double sigma, double threshold) throws LWJGLException
+	public VeinsModelMesh(String filepath, ModelType modelType, boolean useSafeMode) throws LWJGLException
 	{
-		constructVBOFromRawFile(filepath, modelType, useSafeMode, sigma, threshold);
+		constructVBOFromRawFile(filepath, modelType, useSafeMode);
 		setDefaultOrientation();
 	}
 
@@ -137,23 +143,13 @@ public class VeinsModelMesh extends VeinsModel
 		}
 	}
 
-	public void deleteMesh()
-	{
-		if (meshes != null)
-		{
-			for (Mesh mesh : meshes)
-			{
-				mesh.deleteVBO();
-			}
-		}
-	}
 
 	/**
 	 * Normals calculated on GPU are currently not used, instead Normals calculated in constructVBO are used.
 	 * 
 	 * @param filepath
 	 */
-	public void constructVBOFromRawFile(String filepath, ModelType modelType, boolean useSafeMode, double sigma, double threshold) throws LWJGLException
+	public void constructVBOFromRawFile(String filepath, ModelType modelType, boolean useSafeMode) throws LWJGLException
 	{
 		Object[] output = null;
 		
@@ -161,7 +157,7 @@ public class VeinsModelMesh extends VeinsModel
 		{
 		case MPUI:
 		{
-			output = ModelCreatorMPUI.createModel(filepath, sigma, threshold);
+			output = ModelCreatorMPUI.createModel(filepath);
 			
 			NiftyScreenController.UpdateLoadingBarDialog("Loading model...", 70.0f);
 			VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
@@ -176,9 +172,9 @@ public class VeinsModelMesh extends VeinsModel
 		case MARCHING_CUBES:
 		{
 			if (useSafeMode == false) // use GPU marching cubes if no safe mode, otherwise CPU
-				output = ModelCreator.createModel(filepath, sigma, threshold);
+				output = ModelCreator.createModel(filepath);
 			else
-				output = ModelCreatorJava.createModel(filepath, sigma, threshold);
+				output = ModelCreatorJava.createModel(filepath);
 
 			NiftyScreenController.UpdateLoadingBarDialog("Loading model...", 70.0f);
 			VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
@@ -576,6 +572,7 @@ public class VeinsModelMesh extends VeinsModel
 	@Override
 	public void render()
 	{
+		
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 
@@ -683,6 +680,7 @@ public class VeinsModelMesh extends VeinsModel
 				m.deleteVBO();
 			}
 		}
+		meshes.clear();
 	}
 
 	@Override

@@ -50,6 +50,13 @@ public class VeinsModelRaycastVolume extends VeinsModel
 
 	public VeinsModelRaycastVolume(int displayWidth, int displayHeight)
 	{
+		System.out.println("STACK TRACE START ****************");
+		for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+		    System.out.println(ste);
+		}
+		System.out.println("STACK TRACE END ****************");
+				
+		
 		m_raycaster = new VolumeRaycast(displayWidth, displayHeight);
 		m_raycaster.MainInit();
 	}

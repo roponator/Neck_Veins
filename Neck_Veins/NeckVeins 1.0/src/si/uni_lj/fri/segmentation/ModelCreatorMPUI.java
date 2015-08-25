@@ -47,11 +47,11 @@ public class ModelCreatorMPUI
 	}
 
 	// Returns only one String in output if the obj file with these presets already exists.
-	public static Object[] createModel(String fileName, double sigma, double threshold)
+	public static Object[] createModel(String fileName)
 	{
 		// Create mesh info
 		String fileNameOnly = MeshCreationInfo.GetFileNameOnlyFromPath(fileName);
-		MeshCreationInfo.InfoMPUI meshCreationInfo = new MeshCreationInfo.InfoMPUI(fileNameOnly, sigma, threshold, Configuration.__APLHA, Configuration.__LAMBDA, Configuration.__ERROR, Configuration.__RESOLUTION, Configuration.__POINT_CLOUD);
+		MeshCreationInfo.InfoMPUI meshCreationInfo = new MeshCreationInfo.InfoMPUI(fileNameOnly, VeinsWindow.settings.gaussSigma, VeinsWindow.settings.threshold, Configuration.__APLHA, Configuration.__LAMBDA, Configuration.__ERROR, Configuration.__RESOLUTION, Configuration.__POINT_CLOUD);
 
 		// check if the obj file exists for this model params: if it does, return one output.
 		File existingObjFile = new File(meshCreationInfo.GetObjFilePath());

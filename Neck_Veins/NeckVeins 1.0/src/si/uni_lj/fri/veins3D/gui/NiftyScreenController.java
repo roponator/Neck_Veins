@@ -839,6 +839,7 @@ public class NiftyScreenController extends DefaultScreenController
 
 	public void onButton_OpenDialog_Open()
 	{
+		System.out.println("onButton_OpenDialog_Open");
 		SelectedFile file = m_openDialog.m_folderBrowser.TryOpeningSelectedFile();
 
 		On_OpenDialog_Close("");
@@ -850,8 +851,8 @@ public class NiftyScreenController extends DefaultScreenController
 		// Marching cubes, MPUI or volume render (obj is used if the file was already loaded for MC or MPUI)
 		if (file != null && file.extensionOnly.compareTo("mhd") == 0)
 		{
-			double sigma = 0.5f;
-			double threshold = 0.5f;
+			double sigma = VeinsWindow.settings.gaussSigma;
+			double threshold = VeinsWindow.settings.threshold;
 
 			String selectedMethod = m_openDialog.m_methodTypeDropdown.getSelection();
 
@@ -879,7 +880,7 @@ public class NiftyScreenController extends DefaultScreenController
 			try
 			{
 				// try fast methods (gpu marching cubes)
-				VeinsWindow.renderer.loadModelRaw(file.fullFilePathAndName, modelType, false, sigma, threshold);
+				VeinsWindow.renderer.loadModelRaw(file.fullFilePathAndName, modelType, false);
 			}
 			catch (Exception e)
 			{
@@ -887,7 +888,7 @@ public class NiftyScreenController extends DefaultScreenController
 				System.out.println("WARNING: onButton_OpenDialog_Open: trying to load the model in safe mode, GPU mode probably failed");
 				try
 				{
-					VeinsWindow.renderer.loadModelRaw(file.fullFilePathAndName, modelType, true, sigma, threshold);
+					VeinsWindow.renderer.loadModelRaw(file.fullFilePathAndName, modelType, true);
 				}
 				catch (LWJGLException e1)
 				{

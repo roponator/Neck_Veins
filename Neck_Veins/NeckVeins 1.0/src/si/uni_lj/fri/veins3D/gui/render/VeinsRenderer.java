@@ -345,7 +345,7 @@ public class VeinsRenderer  {
 	 * @param threshold
 	 * @throws LWJGLException
 	 */
-	public void loadModelRaw(String fileName, ModelType modelType, boolean useSafeMode, double sigma, double threshold) throws LWJGLException {
+	public void loadModelRaw(String fileName, ModelType modelType, boolean useSafeMode) throws LWJGLException {
 		if (veinsModel != null)
 			veinsModel.cleanup();
 		
@@ -358,7 +358,7 @@ public class VeinsRenderer  {
 		{
 			veinsModel = new VeinsModelMesh();
 			VeinsModelMesh veinsModelMesh = (VeinsModelMesh)veinsModel;
-			veinsModelMesh.constructVBOFromRawFile(fileName,modelType, useSafeMode,sigma, threshold);		
+			veinsModelMesh.constructVBOFromRawFile(fileName,modelType, useSafeMode);		
 		}
 		
 		setDefaultViewOptions();

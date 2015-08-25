@@ -17,11 +17,11 @@ import si.uni_lj.fri.veins3D.main.VeinsWindow;
 
 public class ModelCreatorJava {
 
-	public static Object[] createModel(String fileName, double sigma, double threshold) 
+	public static Object[] createModel(String fileName) 
 	{
 		// Create mesh info
 		String fileNameOnly = MeshCreationInfo.GetFileNameOnlyFromPath(fileName);
-		MeshCreationInfo.InfoMarchingCubes meshCreationInfo= new MeshCreationInfo.InfoMarchingCubes(fileNameOnly, sigma, threshold);
+		MeshCreationInfo.InfoMarchingCubes meshCreationInfo= new MeshCreationInfo.InfoMarchingCubes(fileNameOnly, VeinsWindow.settings.gaussSigma, VeinsWindow.settings.threshold);
 			
 		// check if the obj  file exists for this model params: if it does, return one output.
 		File existingObjFile = new File(meshCreationInfo.GetObjFilePath());
@@ -34,8 +34,8 @@ public class ModelCreatorJava {
 		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
 				
 		float[][][] ctMatrix = FileUtils.readFile3D(fileName);
-		execGauss(ctMatrix, sigma);
-		threshold = 0.0019760127f;
+		execGauss(ctMatrix, VeinsWindow.settings.gaussSigma);
+		float threshold = 0.0019760127f;
 		
 		NiftyScreenController.UpdateLoadingBarDialog("Creating model ( this may take a few minutes )...", 40.0f);
 		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();

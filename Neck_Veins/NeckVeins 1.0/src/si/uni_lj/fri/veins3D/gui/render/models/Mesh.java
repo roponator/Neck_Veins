@@ -16,6 +16,7 @@ import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY;
 import static org.lwjgl.opengl.GL11.glDrawElements;
 import static org.lwjgl.opengl.GL11.glEnableClientState;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glNormalPointer;
 import static org.lwjgl.opengl.GL11.glVertexPointer;
 
@@ -35,35 +36,33 @@ import org.lwjgl.BufferUtils;
 import si.uni_lj.fri.veins3D.math.Vector;
 
 /**
- * The VBO class I made holds ID for indices to faces (and also their
- * count/amount) and ID to vertices and normals. It also remembers the
- * belongings to groups of the actual VBO it refers to. During the parsing of
- * the .obj file, each object of the VBO class briefly holds an array of
- * integers as faces (in my case: 3 integers = 1 face), it than writes and
- * actual VBO into the graphics card.
+ * The VBO class I made holds ID for indices to faces (and also their count/amount) and ID to vertices and normals. It also remembers the belongings to groups of the actual VBO it refers to. During the parsing of the .obj file, each object of the VBO class briefly holds an array of integers as faces
+ * (in my case: 3 integers = 1 face), it than writes and actual VBO into the graphics card.
  * 
  * @author Simon �agar
  * @since 0.2
  * @version 0.2
  */
-public class Mesh {
+public class Mesh
+{
 	ArrayList<Float> vertices;
 	float[] normals;
 	ArrayList<Integer> faces;
 	ArrayList<String> groups;// groups this VBO belongs to
-	
+
 	int maxSubDepth;// maximal number of subdivisions able to render
 	ArrayList<Integer> verticesAndNormalsIDs;
 	ArrayList<Integer> verticesCounters;
 	ArrayList<Integer> indicesIDs;
 	ArrayList<Integer> facesCounters;
-	
+
 	// 'meshCreationInfo' can be NULL. If it's set it will convert its params
 	// to string and generate the OBJ file name as: "original_file_name + params + .obj".
 	// If 'meshCreationInfo' is NULL it will use date-time: "VeinsObj_" + dateTime + .obj".
-	MeshCreationInfo.MeshInfo meshCreationInfo = null;  
-	
-	public Mesh(ArrayList<String> groups, ArrayList<Integer> faces, ArrayList<Float> vertices, float[] normals) {
+	MeshCreationInfo.MeshInfo meshCreationInfo = null;
+
+	public Mesh(ArrayList<String> groups, ArrayList<Integer> faces, ArrayList<Float> vertices, float[] normals)
+	{
 		this.normals = normals;
 		maxSubDepth = -1;
 		verticesAndNormalsIDs = new ArrayList<Integer>();
@@ -75,7 +74,8 @@ public class Mesh {
 		this.vertices = vertices;
 	}
 
-	public void increaseMaxSubdivision() {
+	public void increaseMaxSubdivision()
+	{
 		// Disclaimer: This will change the location of vertices used in other
 		// VBOs as well. (At the writing of the program, that's not an issue).
 		ArrayList<Float> Fs = new ArrayList<Float>();
@@ -83,8 +83,9 @@ public class Mesh {
 		for (int i = 0; i < vertices.size() / 3; i++)
 			allNeighbours.add(new PointNeighbours());
 
-		for (int f = 0; f < faces.size() / 3; f++) {// f is quasi-index of face
-													// with three points
+		for (int f = 0; f < faces.size() / 3; f++)
+		{// f is quasi-index of face
+			// with three points
 			int a = faces.get(f * 3) - 1;// quasi-index of point a
 			int b = faces.get(f * 3 + 1) - 1;// quasi-index of point b
 			int c = faces.get(f * 3 + 2) - 1;// quasi-index of point c
@@ -116,16 +117,21 @@ public class Mesh {
 			facesEdges.add(new FaceEdgePoints());
 		ArrayList<Float> Es = new ArrayList<Float>();
 		int eIndex = 0;
-		for (int point1 = 0; point1 < allNeighbours.size(); point1++) {
+		for (int point1 = 0; point1 < allNeighbours.size(); point1++)
+		{
 			PointNeighbours point1Neighbours = allNeighbours.get(point1);
-			for (int point2 : point1Neighbours.points) {
+			for (int point2 : point1Neighbours.points)
+			{
 				PointNeighbours point2Neighbours = allNeighbours.get(point2);
 				int faceOne = -1;
 				int faceTwo = -1;
 
-				for (int face1 : point1Neighbours.faces) {
-					for (int face2 : point2Neighbours.faces) {
-						if (face1 == face2) {
+				for (int face1 : point1Neighbours.faces)
+				{
+					for (int face2 : point2Neighbours.faces)
+					{
+						if (face1 == face2)
+						{
 							if (faceOne == -1)
 								faceOne = face1;
 							else if (faceTwo == -1)
@@ -133,19 +139,23 @@ public class Mesh {
 						}
 					}
 				}
-				if (faceOne != -1 && faceTwo != -1) {
+				if (faceOne != -1 && faceTwo != -1)
+				{
 					float[] P1, P2, F1, F2;
-					P1 = new float[] { vertices.get(point1 * 3), vertices.get(point1 * 3 + 1),
-							vertices.get(point1 * 3 + 2) };
-					P2 = new float[] { vertices.get(point2 * 3), vertices.get(point2 * 3 + 1),
-							vertices.get(point2 * 3 + 2) };
-					F1 = new float[] { Fs.get(faceOne * 3), Fs.get(faceOne * 3 + 1), Fs.get(faceOne * 3 + 2) };
-					F2 = new float[] { Fs.get(faceTwo * 3), Fs.get(faceTwo * 3 + 1), Fs.get(faceTwo * 3 + 2) };
+					P1 = new float[]
+					{ vertices.get(point1 * 3), vertices.get(point1 * 3 + 1), vertices.get(point1 * 3 + 2) };
+					P2 = new float[]
+					{ vertices.get(point2 * 3), vertices.get(point2 * 3 + 1), vertices.get(point2 * 3 + 2) };
+					F1 = new float[]
+					{ Fs.get(faceOne * 3), Fs.get(faceOne * 3 + 1), Fs.get(faceOne * 3 + 2) };
+					F2 = new float[]
+					{ Fs.get(faceTwo * 3), Fs.get(faceTwo * 3 + 1), Fs.get(faceTwo * 3 + 2) };
 					Es.add((P1[0] + P2[0] + F1[0] + F2[0]) / 4);
 					Es.add((P1[1] + P2[1] + F1[1] + F2[1]) / 4);
 					Es.add((P1[2] + P2[2] + F1[2] + F2[2]) / 4);
 					// point1Neighbours.points.remove(new Integer(point2));
-					if (!point2Neighbours.points.remove(new Integer(point1))) {
+					if (!point2Neighbours.points.remove(new Integer(point1)))
+					{
 						System.out.println("Removed a non-existing point");
 					}
 					;
@@ -155,22 +165,26 @@ public class Mesh {
 					int a = faces.get(faceOne * 3) - 1;// quasi-index of point a
 					int b = faces.get(faceOne * 3 + 1) - 1;// quasi-index of
 															// point b
-					if (a == point1 || a == point2) {
+					if (a == point1 || a == point2)
+					{
 						if (b == point1 || b == point2)
 							facesEdges.get(faceOne).e1 = eIndex;
 						else
 							facesEdges.get(faceOne).e3 = eIndex;
-					} else
+					}
+					else
 						facesEdges.get(faceOne).e2 = eIndex;
 					// faceTwo
 					a = faces.get(faceTwo * 3) - 1;// quasi-index of point a
 					b = faces.get(faceTwo * 3 + 1) - 1;// quasi-index of point b
-					if (a == point1 || a == point2) {
+					if (a == point1 || a == point2)
+					{
 						if (b == point1 || b == point2)
 							facesEdges.get(faceTwo).e1 = eIndex;
 						else
 							facesEdges.get(faceTwo).e3 = eIndex;
-					} else
+					}
+					else
 						facesEdges.get(faceTwo).e2 = eIndex;
 					eIndex++;
 				}
@@ -180,7 +194,8 @@ public class Mesh {
 		ArrayList<Float> newOriginal = new ArrayList<Float>();
 		// Now the extra points have been submitted
 		// We need to recalculate new vertices values
-		for (int point1 = 0; point1 < vertices.size() / 3; point1++) {
+		for (int point1 = 0; point1 < vertices.size() / 3; point1++)
+		{
 			PointNeighbours point1Neighbours = allNeighbours.get(point1);// still
 																			// contains
 																			// the
@@ -189,7 +204,8 @@ public class Mesh {
 																			// need
 			int f = 0;
 			float[] F = new float[3];
-			for (int face1 : point1Neighbours.faces) {
+			for (int face1 : point1Neighbours.faces)
+			{
 				f++;
 				F[0] += Fs.get(face1 * 3);
 				F[1] += Fs.get(face1 * 3 + 1);
@@ -200,10 +216,11 @@ public class Mesh {
 			F[2] /= f;
 
 			float[] R = new float[3];
-			float[] P = new float[] { vertices.get(point1 * 3), vertices.get(point1 * 3 + 1),
-					vertices.get(point1 * 3 + 2) };
+			float[] P = new float[]
+			{ vertices.get(point1 * 3), vertices.get(point1 * 3 + 1), vertices.get(point1 * 3 + 2) };
 			int e = 0;
-			for (int point2 : point1Neighbours.pointsOriginal) {
+			for (int point2 : point1Neighbours.pointsOriginal)
+			{
 				e++;
 				R[0] += (vertices.get(point2 * 3) + P[0]) / 2;
 				R[1] += (vertices.get(point2 * 3 + 1) + P[1]) / 2;
@@ -212,13 +229,16 @@ public class Mesh {
 			R[0] /= e;
 			R[1] /= e;
 			R[2] /= e;
-			if (e == f) {// This means there are as many edges as there are
-							// faces. In other cases the formula can't be used
-							// and points aren't moved.
+			if (e == f)
+			{// This means there are as many edges as there are
+				// faces. In other cases the formula can't be used
+				// and points aren't moved.
 				newOriginal.add((F[0] + 2 * R[0] + (f - 3) * P[0]) / f);
 				newOriginal.add((F[1] + 2 * R[1] + (f - 3) * P[1]) / f);
 				newOriginal.add((F[2] + 2 * R[2] + (f - 3) * P[2]) / f);
-			} else {
+			}
+			else
+			{
 				newOriginal.add(P[0]);
 				newOriginal.add(P[1]);
 				newOriginal.add(P[2]);
@@ -235,7 +255,8 @@ public class Mesh {
 
 		ArrayList<Integer> newFaces = new ArrayList<Integer>();
 		// Now create new indexes for the new faces
-		for (int f = 0; f < faces.size() / 3; f++) {
+		for (int f = 0; f < faces.size() / 3; f++)
+		{
 			FaceEdgePoints edgePoints = facesEdges.get(f);
 			int e1 = newOriginal.size() / 3 + Fs.size() / 3 + edgePoints.e1;
 			int e2 = newOriginal.size() / 3 + Fs.size() / 3 + edgePoints.e2;
@@ -244,7 +265,8 @@ public class Mesh {
 			int b = faces.get(f * 3 + 1) - 1;// quasi-index of point b
 			int c = faces.get(f * 3 + 2) - 1;// quasi-index of point c
 			int fPoint = newOriginal.size() / 3 + f;
-			if (edgePoints.e1 != -1) {
+			if (edgePoints.e1 != -1)
+			{
 				newFaces.add(a);
 				newFaces.add(e1);
 				newFaces.add(fPoint);
@@ -252,26 +274,32 @@ public class Mesh {
 				newFaces.add(b);
 				newFaces.add(fPoint);
 				newFaces.add(e1);
-			} else {
+			}
+			else
+			{
 				newFaces.add(a);
 				newFaces.add(b);
 				newFaces.add(fPoint);
 			}
-			if (edgePoints.e2 != -1) {
+			if (edgePoints.e2 != -1)
+			{
 				newFaces.add(b);
 				newFaces.add(e2);
 				newFaces.add(fPoint);
 
 				newFaces.add(c);
 				newFaces.add(fPoint);
-				newFaces.add(e2);   
+				newFaces.add(e2);
 
-			} else {
+			}
+			else
+			{
 				newFaces.add(b);
 				newFaces.add(c);
 				newFaces.add(fPoint);
 			}
-			if (edgePoints.e3 != -1) {
+			if (edgePoints.e3 != -1)
+			{
 				newFaces.add(c);
 				newFaces.add(e3);
 				newFaces.add(fPoint);
@@ -280,7 +308,9 @@ public class Mesh {
 				newFaces.add(fPoint);
 				newFaces.add(e3);
 
-			} else {
+			}
+			else
+			{
 				newFaces.add(c);
 				newFaces.add(a);
 				newFaces.add(fPoint);
@@ -289,24 +319,30 @@ public class Mesh {
 		faces = new ArrayList<Integer>();
 		for (int i : newFaces)
 			faces.add(i + 1);
-		
-		meshCreationInfo.m_numSubdivisions += 1; 
-		constructVBO(meshCreationInfo!=null); // save obj if meshCreationInfo is set
+
+		meshCreationInfo.m_numSubdivisions += 1;
+		constructVBO(meshCreationInfo != null); // save obj if meshCreationInfo is set
 	}
 
-	public void deleteVBO() {
-		for (int i : verticesAndNormalsIDs) {
+	public void deleteVBO()
+	{
+		for (int i : verticesAndNormalsIDs)
+		{
 			glDeleteBuffersARB(i);
 		}
-		for (int i : indicesIDs) {
+			
+		
+		for (int i : indicesIDs)
+		{
 			glDeleteBuffersARB(i);
+			
 		}
+		
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 	}
 
-
-	public void constructVBO(boolean saveObjToFile) 
+	public void constructVBO(boolean saveObjToFile)
 	{
 		maxSubDepth++;
 		verticesAndNormalsIDs.add(glGenBuffersARB());
@@ -316,8 +352,9 @@ public class Mesh {
 
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, verticesAndNormalsIDs.get(maxSubDepth));
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, indicesIDs.get(maxSubDepth));
-	
-		if(normals == null){
+
+		if (normals == null)
+		{
 			System.out.println("No normals given, calculating normals.");
 			normals = getNormals(vertices, faces);
 		}
@@ -334,17 +371,17 @@ public class Mesh {
 
 		glBufferDataARB(GL_ARRAY_BUFFER_ARB, verticesAndNormalsBuffer, GL_STATIC_DRAW_ARB);
 		glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, facesBuffer, GL_STATIC_DRAW_ARB);
-		System.out.println("Finished building a VBO. Faces: " + (faces.size() / 3) + " Vertices: "
-				+ (vertices.size() / 3));
-		
-		if(saveObjToFile)
+		System.out.println("Finished building a VBO. Faces: " + (faces.size() / 3) + " Vertices: " + (vertices.size() / 3));
+
+		if (saveObjToFile)
 		{
 			PrintWriter writer;
-			try {
-				
+			try
+			{
+
 				// Use mesh info to create file name if it's set, otherwise use date time
 				String meshCreationParamsString = "";
-				if(meshCreationInfo != null) 
+				if (meshCreationInfo != null)
 				{
 					meshCreationParamsString = meshCreationInfo.toString(); // use mesh info
 				}
@@ -353,81 +390,95 @@ public class Mesh {
 					// use calendar
 					DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd__HH_mm_ss");
 					Calendar cal = Calendar.getInstance();
-					meshCreationParamsString = "VeinsObj_"+dateFormat.format(cal.getTime());
+					meshCreationParamsString = "VeinsObj_" + dateFormat.format(cal.getTime());
 				}
-							
-				writer = new PrintWriter(meshCreationParamsString+".obj", "UTF-8");
+
+				writer = new PrintWriter(meshCreationParamsString + ".obj", "UTF-8");
 				writer.println("o Sample");
-				for(int i = 0; i<vertices.size(); i+=3){
-					writer.println("v "+vertices.get(i)+" "+vertices.get(i+1)+" "+vertices.get(i+2));				
-					
+				for (int i = 0; i < vertices.size(); i += 3)
+				{
+					writer.println("v " + vertices.get(i) + " " + vertices.get(i + 1) + " " + vertices.get(i + 2));
+
 				}
-				for(int i = 0; i<normals.length; i+=3){
-					writer.println("vn "+normals[i]+" "+normals[i+1]+" "+normals[i+2]);				
-					
+				for (int i = 0; i < normals.length; i += 3)
+				{
+					writer.println("vn " + normals[i] + " " + normals[i + 1] + " " + normals[i + 2]);
+
 				}
-				for(int i = 0; i<faces.size(); i+=3){
-					writer.println("f "+faces.get(i)+"//"+faces.get(i)+" "+faces.get(i+1)+"//"+faces.get(i+1)+" "+faces.get(i+2)+"//"+faces.get(i+2));				
-					
-				}	
+				for (int i = 0; i < faces.size(); i += 3)
+				{
+					writer.println("f " + faces.get(i) + "//" + faces.get(i) + " " + faces.get(i + 1) + "//" + faces.get(i + 1) + " " + faces.get(i + 2) + "//" + faces.get(i + 2));
+
+				}
 				writer.close();
 			}
-			catch (FileNotFoundException e) 
+			catch (FileNotFoundException e)
 			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} 
-			catch (UnsupportedEncodingException e) 
+			}
+			catch (UnsupportedEncodingException e)
 			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
+
 		// must be disabled!
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-		
+
 	}
 
-	public void render(int subDepth) {
+	public void render(int subDepth)
+	{
 		if (maxSubDepth < subDepth)
 			return;
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, verticesAndNormalsIDs.get(subDepth));
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, indicesIDs.get(subDepth));
-		
+
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_FLOAT, 0, 0);
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glNormalPointer(GL_FLOAT, 0, (4 * verticesCounters.get(subDepth)));
-			
+
 		boolean pointCloud = false;
-		
-		if(pointCloud){
+
+		if (pointCloud)
+		{
 			glPointSize(7);
 			glDrawElements(GL_POINTS, facesCounters.get(subDepth), GL_UNSIGNED_INT, 0);
-		}else{
-			
-			glDrawElements(GL_TRIANGLES, facesCounters.get(subDepth), GL_UNSIGNED_INT, 0);
-			
 		}
-		
+		else
+		{
+
+			glDrawElements(GL_TRIANGLES, facesCounters.get(subDepth), GL_UNSIGNED_INT, 0);
+
+		}
+
 		// must be disabled!
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
 	}
 
-	public static float[] getNormals(ArrayList<Float> vertices, ArrayList<Integer> faces) {
+	public static float[] getNormals(ArrayList<Float> vertices, ArrayList<Integer> faces)
+	{
 		float[] normals = new float[vertices.size()];
-		for (int f = 0; f < faces.size() / 3; f++) {
+		for (int f = 0; f < faces.size() / 3; f++)
+		{
 			int a = faces.get(f * 3) - 1;
 			int b = faces.get(f * 3 + 1) - 1;
 			int c = faces.get(f * 3 + 2) - 1;
 
-			double[] A = new double[] { vertices.get(a * 3), vertices.get(1 + a * 3), vertices.get(2 + a * 3) };
-			double[] B = new double[] { vertices.get(b * 3), vertices.get(1 + b * 3), vertices.get(2 + b * 3) };
-			double[] C = new double[] { vertices.get(c * 3), vertices.get(1 + c * 3), vertices.get(2 + c * 3) };
+			double[] A = new double[]
+			{ vertices.get(a * 3), vertices.get(1 + a * 3), vertices.get(2 + a * 3) };
+			double[] B = new double[]
+			{ vertices.get(b * 3), vertices.get(1 + b * 3), vertices.get(2 + b * 3) };
+			double[] C = new double[]
+			{ vertices.get(c * 3), vertices.get(1 + c * 3), vertices.get(2 + c * 3) };
 
 			double[] AB = Vector.subtraction(B, A);
 			double[] AC = Vector.subtraction(C, A);
@@ -444,8 +495,10 @@ public class Mesh {
 			normals[c * 3 + 1] += n[1];
 			normals[c * 3 + 2] += n[2];
 		}
-		for (int normal = 0; normal < normals.length / 3; normal++) {
-			double[] n = new double[] { normals[normal * 3], normals[normal * 3 + 1], normals[normal * 3 + 2] };
+		for (int normal = 0; normal < normals.length / 3; normal++)
+		{
+			double[] n = new double[]
+			{ normals[normal * 3], normals[normal * 3 + 1], normals[normal * 3 + 2] };
 			n = Vector.normalize(n);
 			normals[normal * 3] = (float) n[0];
 			normals[normal * 3 + 1] = (float) n[1];
@@ -454,9 +507,10 @@ public class Mesh {
 		return normals;
 	}
 
-	public void setNormals(float[] normals) {
+	public void setNormals(float[] normals)
+	{
 		this.normals = normals;
-		
+
 	}
 
 	public void SetMeshCreationInfo(MeshCreationInfo.MeshInfo meshInfo)

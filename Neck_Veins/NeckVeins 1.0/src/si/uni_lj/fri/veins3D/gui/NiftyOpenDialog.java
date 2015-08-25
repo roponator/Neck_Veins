@@ -65,6 +65,7 @@ public class NiftyOpenDialog
 
 	public void OnOpenDialog()
 	{
+		m_folderBrowser.OnOpenDialog(); // refreshes files list box content, otherwise some strange not-item selected error
 		m_mainOpenDailogElement.setVisible(true);
 	}
 
