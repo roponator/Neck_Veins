@@ -92,6 +92,8 @@ public class NiftyOpenDialog
 
 	public void On_SettingsDialog_CloseOrCancel()
 	{
+		updateAvalibleFileTypesBasedOnSelectedMethodType();
+		
 		m_optionsDialogControlElement.setVisible(false);
 		m_openDialogWindowControl.setEnabled(true);
 		
@@ -101,9 +103,18 @@ public class NiftyOpenDialog
 	public void On_SettingsDialog_OK()
 	{
 		setStates();
+		updateAvalibleFileTypesBasedOnSelectedMethodType();
 		
 		m_optionsDialogControlElement.setVisible(false);
 		m_openDialogWindowControl.setEnabled(true);
+	}
+	
+	public void updateAvalibleFileTypesBasedOnSelectedMethodType()
+	{
+		String selected = m_methodTypeDropdown.getSelection();
+		if( selected == null)
+			selected = "";
+		m_folderBrowser.SetAvalibleFileTypesBasedOnMethodType(selected);
 	}
 
 	void restoreSettingsDialogGUIStates()

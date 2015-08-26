@@ -26,6 +26,8 @@ import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyTreeFolderItem;
 import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyTreeFolderItem;
 import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.SelectedFile;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer.ModelType;
+import si.uni_lj.fri.veins3D.gui.render.models.Mesh;
+import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelMesh;
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import de.lessvoid.nifty.EndNotify;
 import de.lessvoid.nifty.Nifty;
@@ -41,6 +43,7 @@ import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.controls.NiftyInputControl;
 import de.lessvoid.nifty.controls.Slider;
 import de.lessvoid.nifty.controls.SliderChangedEvent;
+import de.lessvoid.nifty.controls.TextFieldChangedEvent;
 import de.lessvoid.nifty.controls.TreeItem;
 import de.lessvoid.nifty.controls.label.LabelControl;
 import de.lessvoid.nifty.controls.slider.SliderControl;
@@ -66,9 +69,11 @@ public class NiftyScreenController extends DefaultScreenController
 {
 	// CUSTOM CONTROL IMPORTANT INSTRUCTION: SEE COMMENT IN FILE myNavigationWidgetControl_WASD.xml
 
-	public static Screen m_screen = null;;
+	public static Screen m_screen = null;
+	public static final String m_supportedType_MHD = "mhd";
+	public static final String m_supportedType_OBJ = "obj";
 	public static String[] m_supportedFileTypes = new String[]
-	{ "mhd", "obj" };
+	{ m_supportedType_MHD, m_supportedType_OBJ };
 
 	// -----------------------------------
 	// GUI state
@@ -175,6 +180,7 @@ public class NiftyScreenController extends DefaultScreenController
 	// Dialogs
 	// -----------------------------------
 	static NiftyOpenDialog m_openDialog = null;
+	static NiftySaveDialog m_saveDialog = null;
 	static Element m_aboutDialog = null;
 	static Element m_inputOptionsDialog = null;
 	static Element m_licenseDialog = null;
@@ -201,6 +207,7 @@ public class NiftyScreenController extends DefaultScreenController
 		// Create/get dialogs
 		// ---------------------------------------
 		m_openDialog = new NiftyOpenDialog();
+		m_saveDialog = new NiftySaveDialog();
 
 		m_aboutDialog = nifty.getScreen("GScreen0").findElementById("MY_ABOUT_DIALOG");
 		m_inputOptionsDialog = nifty.getScreen("GScreen0").findElementById("MY_INPUT_OPTIONS_DIALOG");
@@ -353,6 +360,7 @@ public class NiftyScreenController extends DefaultScreenController
 	public void OnResize(DisplayMode displayMode)
 	{
 		m_openDialog.ResetPosition(); // this one definitely needs this, to be safe for others also
+		m_saveDialog.ResetPosition();
 		m_resolutionMenu.ResetPosition();
 		m_stereoMenu.ResetPosition();
 
@@ -843,11 +851,10 @@ public class NiftyScreenController extends DefaultScreenController
 		SelectedFile file = m_openDialog.m_folderBrowser.TryOpeningSelectedFile();
 
 		On_OpenDialog_Close("");
-		
-		
-		UpdateLoadingBarDialog("Loading model...",0.0f);
+
+		UpdateLoadingBarDialog("Loading model...", 0.0f);
 		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
-		
+
 		// Marching cubes, MPUI or volume render (obj is used if the file was already loaded for MC or MPUI)
 		if (file != null && file.extensionOnly.compareTo("mhd") == 0)
 		{
@@ -896,16 +903,16 @@ public class NiftyScreenController extends DefaultScreenController
 				}
 			}
 		}
-		
+
 		// OBJ load
 		if (file != null && file.extensionOnly.compareTo("obj") == 0)
 		{
 			VeinsWindow.renderer.loadModelObj(file.fullFilePathAndName);
 		}
-		
+
 		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
-		
-		UpdateLoadingBarDialog("Loading model...",100.0f);
+
+		UpdateLoadingBarDialog("Loading model...", 100.0f);
 		On_LoadingDialog_CloseOrCancel();
 	}
 
@@ -931,6 +938,83 @@ public class NiftyScreenController extends DefaultScreenController
 		m_openDialog.On_SettingsDialog_OK();
 	}
 
+	// ----------------------------------------------------
+	// Save dialog
+	// ----------------------------------------------------
+	public void onButton_TopMenu_File_SaveAs()
+	{
+		setState(GUI_STATE.DIALOG_OPEN);
+		m_saveDialog.OnOpenDialog();
+	}
+
+	public void On_SaveDialog_Close(String a)
+	{
+		if (getState() == GUI_STATE.DIALOG_SUBDIALOG_OPEN)
+			return;
+
+		setState(GUI_STATE.DEFAULT);
+		m_saveDialog.OnCloseDialog();
+	}
+
+	public void onButton_SaveDialog_Cancel()
+	{
+		On_SaveDialog_Close("");
+	}
+
+	public void onButton_SaveDialog_Save()
+	{
+		// System.out.println("onButton_SaveDialog_Save");
+		SelectedFile file = m_saveDialog.m_folderBrowser.TryGettingSelectedFile();
+		if(file==null)
+			System.out.println("You must specify the file & path to save to");
+		
+		// Can only save meshes to obj, not volume
+		if( VeinsWindow.renderer.veinsModel != null && VeinsWindow.renderer.veinsModel instanceof VeinsModelMesh) 
+		{
+			VeinsModelMesh model = (VeinsModelMesh)VeinsWindow.renderer.veinsModel;
+			for(int i=0;i<model.meshes.size();++i)
+			{
+				Mesh mesh = model.meshes.get(i);
+				String fullPath = file.fullFilePathAndName;
+				
+				// if more than one mesh add the mesh index before the .obj
+				if(model.meshes.size()>1)
+				{
+					int chIdx = fullPath.indexOf(".obj");
+					if(chIdx > 0)
+						fullPath = insert(fullPath,Integer.toString(i),chIdx);
+				}
+				
+				mesh.SaveToFile(fullPath);
+			}
+		}
+		else
+		{
+			System.out.println("Warning: Cannot save a volume model. You can only save models created with Marching Cubes or MPUI to .obj files");
+		}
+		
+		On_SaveDialog_Close("");
+
+		UpdateLoadingBarDialog("Saving model...", 10.0f);
+		
+		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
+
+		UpdateLoadingBarDialog("Saving model...", 100.0f);
+		On_LoadingDialog_CloseOrCancel();
+	}
+	
+	@NiftyEventSubscriber(id = "SAVE_DIALOG_FILES_LIST_LISTBOX")
+	public void OnTextFieldTextChanged(String id, ListBoxSelectionChangedEvent event)
+	{
+		m_saveDialog.m_folderBrowser.OnListboxSelectionChanged(id, event);
+	}
+
+	public static String insert(String bag, String marble, int index) {
+	    String bagBegin = bag.substring(0,index);
+	    String bagEnd = bag.substring(index);
+	    return bagBegin + marble + bagEnd;
+	}
+	
 	// ----------------------------------------------------
 	// About dialog
 	// ----------------------------------------------------
@@ -1058,7 +1142,10 @@ public class NiftyScreenController extends DefaultScreenController
 	@NiftyEventSubscriber(id = "tree-box")
 	public void OnTreeboxSelectionChanged(String id, ListBoxSelectionChangedEvent<TreeItem<MyTreeFolderItem>> event)
 	{
-		m_openDialog.m_folderBrowser.OnTreeboxSelectionChanged(id, event);
+		if(event.getListBox().getElement().getParent().getId().compareTo("SAVE_DIALOG_FOLDER_TREEBOX_PANEL_CONTAINER")==0)
+			m_saveDialog.m_folderBrowser.OnTreeboxSelectionChanged(id, event);
+		else
+			m_openDialog.m_folderBrowser.OnTreeboxSelectionChanged(id, event);
 	}
 
 	// ----------------------------------------------------
@@ -1139,17 +1226,17 @@ public class NiftyScreenController extends DefaultScreenController
 
 		updateSliderValueLabel(mySliderControl, initialValue);
 	}
-	
+
 	public static de.lessvoid.nifty.controls.Slider ConvertElementToSlider(Element mySliderControl)
 	{
 		Element niftySliderElement = mySliderControl.findElementById("SLIDER_CONTROL");
-		return niftySliderElement.getControl(de.lessvoid.nifty.controls.slider.SliderControl.class);	
+		return niftySliderElement.getControl(de.lessvoid.nifty.controls.slider.SliderControl.class);
 	}
 
 	// ----------------------------------------------------
 	// State handling
 	// ----------------------------------------------------
-	GUI_STATE getState()
+	public GUI_STATE getState()
 	{
 		return __m_guiState_doNotAccessThisDirectly;
 	}

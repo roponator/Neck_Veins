@@ -11,8 +11,10 @@
  	 <useControls filename="xml/mySliderControl.xml"/>
  	 
      <useControls filename="xml/myOpenDialogControl.xml"/>
+      <useControls filename="xml/mySaveDialogControl.xml"/>
      
     <useStyles filename="xml/myListboxStyle.xml"/>
+     <useStyles filename="xml/myTextfieldStyle.xml"/>
     
      <useStyles filename="xml/myScrollbarStyle.xml"/>
      <useStyles filename="xml/myTreeboxStyle.xml"/>
@@ -354,6 +356,13 @@
 	       
 	       <control  renderOrder="9100" id="MY_OPEN_DIALOG_OPTION_DIALOG_ID" name="MY_OPEN_DIALOG_OPTIONS_CONTROL" visible="false" x="15%" y="15%" childLayout="vertical" width="300px" height="240px" valign="center" align="center" />
 	      
+	     <!-- ******************************************* -->
+		 <!--  SAVE DIALOG -->
+		 <!-- ******************************************* -->
+	
+	       <control renderOrder="9000" id="MY_SAVE_DIALOG_ID" name="MY_SAVE_DIALOG_CONTROL" visible="false" x="10%" y="10%" childLayout="vertical" width="600px" height="330px" valign="center" align="center" />
+	       
+	       
 	  	    
 	  	 <!-- ******************************************* -->
 		 <!--  Input settings dialog -->

@@ -52,7 +52,7 @@ public class VeinsModelMesh extends VeinsModel
 
 	private TrianglesLabelHelper labelHelper;
 	protected ArrayList<Float> vertices, normals;
-	protected ArrayList<Mesh> meshes;
+	public ArrayList<Mesh> meshes;
 	public double centerx, centery, centerz;
 	public float maxX, maxY, maxZ;
 	public float minX, minY, minZ;

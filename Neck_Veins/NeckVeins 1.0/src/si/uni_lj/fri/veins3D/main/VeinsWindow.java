@@ -85,6 +85,7 @@ import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.HUD;
 import si.uni_lj.fri.veins3D.gui.GUIMain;
 import si.uni_lj.fri.veins3D.gui.NiftyScreenController;
+import si.uni_lj.fri.veins3D.gui.NiftyScreenController.GUI_STATE;
 import si.uni_lj.fri.veins3D.gui.render.StencilMask;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.settings.NeckVeinsSettings;
@@ -434,16 +435,17 @@ public class VeinsWindow
 			// renderer.setupView(); // raycast volume renderer changes some
 			// states, theys must be reset
 
-			pollInput();
+			// Allow input only if default state, otherwise leave nifty keyboard input (required for text field for save menu)
+			if( screenController != null && screenController.getState()==GUI_STATE.DEFAULT)
+				pollInput();
+			
 			// hud.setClickedOn(clickedOn);
 			renderer.setupView(); // raycast volume renderer changes some states, theys must be reset
 			renderer.clearView();
 			
-			
 			//glPushAttrib(GL_ALL_ATTRIB_BITS);
 			renderer.render();
-			//glPopAttrib();
-			
+			//glPopAttrib();	
 		
 			// hud.drawHUD();
 			setTitle();

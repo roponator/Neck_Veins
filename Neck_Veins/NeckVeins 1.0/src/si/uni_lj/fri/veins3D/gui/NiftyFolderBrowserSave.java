@@ -3,6 +3,7 @@ package si.uni_lj.fri.veins3D.gui;
 import java.awt.Color;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +13,9 @@ import javax.swing.filechooser.FileSystemView;
 import org.apache.commons.io.FilenameUtils;
 import org.newdawn.slick.util.ResourceLoader;
 
+import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyFileExtensionItem;
+import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyTreeFolderItem;
+import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.SelectedFile;
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import si.uni_lj.fri.veins3D.utils.HelperFunctions;
 import de.lessvoid.nifty.builder.ControlBuilder;
@@ -30,60 +34,11 @@ import de.lessvoid.nifty.render.NiftyImage;
 import de.lessvoid.nifty.tools.SizeValue;
 import de.lessvoid.nifty.tools.SizeValueType;
 
-public class NiftyFolderBrowser
+public class NiftyFolderBrowserSave
 {
-	// Represents a folder in the folder treebox
-	static class MyTreeFolderItem
-	{
-		public String path;
-		public String folderNameOnly;
-
-		public MyTreeFolderItem(String Path, String FolderNameOnly)
-		{
-			this.path = Path;
-			this.folderNameOnly = FolderNameOnly;
-		}
-
-		// This is used ny niftyGUI to display a string
-		@Override
-		public String toString()
-		{
-			return folderNameOnly;
-		}
-	}
-
-	// Represents one file extension in the file extensions dropdown list
-	static class MyFileExtensionItem
-	{
-		public String extensionOnly; // just the extensions, eg 'mdh', 'obj'
-		
-		public MyFileExtensionItem(String ext)
-		{
-			extensionOnly = ext;
-		}
-		
-		// This is used ny niftyGUI to display a string
-		@Override
-		public String toString()
-		{
-			return " ."+extensionOnly; // adds an indent so its prettier, problematic with xml gui...
-		}
-	}
-	
-	static class SelectedFile
-	{
-		public String fullFilePathAndName;
-		public String extensionOnly;
-		
-		public SelectedFile(String FullFilePathAndName,String ExtensionOnly)
-		{
-			fullFilePathAndName = FullFilePathAndName;
-			extensionOnly = ExtensionOnly;
-		}
-	}
 	
 	de.lessvoid.nifty.controls.ListBox m_fileListboxControl = null;
-	de.lessvoid.nifty.controls.DropDown<MyFileExtensionItem> m_fileTypeDropdownControl = null;
+	de.lessvoid.nifty.controls.TextField m_fileNameTextField = null;
 
 	TreeBox m_treebox = null;
 	TreeItem<MyTreeFolderItem> m_root = null;
@@ -92,7 +47,7 @@ public class NiftyFolderBrowser
 	public static String m_lastOpenedFilePath = null; // stores the path to the folder where the last opened file is (if any)
 	
 	// The constructor param elements are the one that actualy contain the control(er).
-	public NiftyFolderBrowser(Element folderBrowserParentPanel, Element fileListboxElement, Element fileTypeElement)
+	public NiftyFolderBrowserSave(Element folderBrowserParentPanel, Element fileListboxElement, Element textFieldElement)
 	{
 		// create treebox for folders, nested anonymous inner classes black magic
 		ControlBuilder builder = new ControlBuilder("")
@@ -117,60 +72,24 @@ public class NiftyFolderBrowser
 
 		// get/create controls
 		m_fileListboxControl = (de.lessvoid.nifty.controls.ListBox) fileListboxElement.getAttachedInputControl().getController();
-		m_fileTypeDropdownControl = (de.lessvoid.nifty.controls.DropDown<MyFileExtensionItem>) fileTypeElement.getAttachedInputControl().getController();
+		m_fileNameTextField = (de.lessvoid.nifty.controls.TextField) textFieldElement.getAttachedInputControl().getController();
 
 		Element treeboxElement = builder.build(VeinsWindow.nifty, NiftyScreenController.m_screen, folderBrowserParentPanel);
 		m_treebox = (TreeBox) treeboxElement.getAttachedInputControl().getController();
 
 		// clear lists & fill file type list box
 		m_fileListboxControl.clear();
-		m_fileTypeDropdownControl.clear();
+		m_fileNameTextField.setText("");
 
-		String space = " ";
-		String[] supportedFileFormats = NiftyScreenController.m_supportedFileTypes;
-		for (int i = 0; i < supportedFileFormats.length; ++i)
-			m_fileTypeDropdownControl.addItem(new MyFileExtensionItem(supportedFileFormats[i]));
-		
-		//m_fileTypeDropdownControl.selectItemByIndex(0);
-		
+	
+
 		// init foldertree
-		String currentFolder = "..";
+		String currentPath = ".."; // current dir
 		m_root = new TreeItem<MyTreeFolderItem>();
-		createBranchesForFolder(m_treebox,currentFolder, m_root);
+		m_root.setValue(new MyTreeFolderItem(".", "."));
+		createBranchesForFolder(m_treebox,currentPath, m_root);
 		m_treebox.setTree(m_root);
-
-		
-		/*File[] drives = File.listRoots();
-		if (drives != null && drives.length > 0) {
-		    for (File aDrive : drives) {
-		        System.out.println(aDrive);
-		    }
-		}*/
 	}
-	
-	// Some methods support only some file types (volume render supports only obj)
-	public void SetAvalibleFileTypesBasedOnMethodType(String methodType)
-	{
-		m_fileTypeDropdownControl.clear();
-		
-		if(methodType.compareTo(NiftyOpenDialog.METHOD_TYPE_MARCHING_CUBES)==0 || methodType.compareTo(NiftyOpenDialog.METHOD_TYPE_MPUI)==0 )
-		{
-			m_fileTypeDropdownControl.addItem(new MyFileExtensionItem(NiftyScreenController.m_supportedType_MHD));
-			m_fileTypeDropdownControl.addItem(new MyFileExtensionItem(NiftyScreenController.m_supportedType_OBJ));
-		}
-		else if(methodType.compareTo(NiftyOpenDialog.METHOD_TYPE_VOLUME_RENDER)==0)
-		{
-			m_fileTypeDropdownControl.addItem(new MyFileExtensionItem(NiftyScreenController.m_supportedType_MHD));
-			
-		}
-		else // allow all
-		{
-			String[] supportedFileFormats = NiftyScreenController.m_supportedFileTypes;
-			for (int i = 0; i < supportedFileFormats.length; ++i)
-				m_fileTypeDropdownControl.addItem(new MyFileExtensionItem(supportedFileFormats[i]));
-		}
-	}
-	
 	
 	public void OnOpenDialog()
 	{
@@ -178,28 +97,33 @@ public class NiftyFolderBrowser
 	}
 	
 	// Returns null if nothing is selected
-	public SelectedFile TryOpeningSelectedFile()
+	public SelectedFile TryGettingSelectedFile()
 	{
-		if(m_currentlySelectedFolder==null)
+		TreeItem<MyTreeFolderItem> saveLocation = m_currentlySelectedFolder;
+		
+		if(saveLocation==null)
+			saveLocation = m_root;
+		
+		return getSelectedFileToSave(saveLocation);
+	
+	}
+
+	// Converts the tree item to file path
+	SelectedFile getSelectedFileToSave(TreeItem<MyTreeFolderItem> saveLocation)
+	{
+		String textfieldText = m_fileNameTextField.getText();
+		if(textfieldText.length()<1)
 			return null;
 		
-		// is single selection
-		List<String> selectedItems = m_fileListboxControl.getSelection();
+		if(textfieldText.indexOf(".obj")<0)
+			textfieldText += ".obj";
 		
-		if(selectedItems.size()<1 || selectedItems.size()>1)
-			return null;
-		
-		String selectedFileName = selectedItems.get(0);
-		String fullPath = m_currentlySelectedFolder.getValue().path+"//"+m_currentlySelectedFolder.getValue().folderNameOnly+"//"+selectedFileName;
+		String fullPath = saveLocation.getValue().path+"//"+saveLocation.getValue().folderNameOnly+"//"+textfieldText;
 		String extension = FilenameUtils.getExtension(fullPath);
-		
-		// deselect
-		if(selectedItems.size()<1 || selectedItems.size()>1)
-			m_fileListboxControl.deselectItem(selectedItems.get(0));
 		
 		return new SelectedFile(fullPath, extension);
 	}
-
+	
 	// On selection changed
 	public void OnTreeboxSelectionChanged(String id, ListBoxSelectionChangedEvent<TreeItem<MyTreeFolderItem>> event)
 	{
@@ -236,10 +160,18 @@ public class NiftyFolderBrowser
 		}
 
 	}
-
-	public void OnFileTypeSelectionChanged(DropDownSelectionChangedEvent<MyFileExtensionItem> event)
+	
+	// On listbox file selected
+	public void OnListboxSelectionChanged(String id,ListBoxSelectionChangedEvent event)
 	{
-		changeFileListboxContent(m_currentlySelectedFolder);
+		// when clicked on list item set textbox filename
+		if(event.getSelection() != null)
+		{
+			List sel = event.getSelection();
+			if(sel.size()==1 && sel.get(0) != null)
+				m_fileNameTextField.setText( sel.get(0).toString());		
+		}
+		
 	}
 	
 	// select the given item, loading all of its folders and adding it to tree
@@ -268,13 +200,7 @@ public class NiftyFolderBrowser
 		String selectedFolderPath = myTreeItem.path + "//" + myTreeItem.folderNameOnly;
 
 		// get which file type is selected, select all in case none is selected
-		String[] selectedExtensions = NiftyScreenController.m_supportedFileTypes; // select all by default
-
-		if (m_fileTypeDropdownControl.getSelection() != null) // if an extension is selected, show only those file types
-		{
-			MyFileExtensionItem selectedExtension = m_fileTypeDropdownControl.getSelection();
-			selectedExtensions = new String[]{selectedExtension.extensionOnly};
-		}
+		String[] selectedExtensions = new String[]{"obj"}; // select all by default
 
 		// get files with the proper extension(s)
 		String[] filesWithCorrectExtensions = HelperFunctions.GetFilesInFolder(selectedFolderPath, selectedExtensions);
@@ -329,21 +255,6 @@ public class NiftyFolderBrowser
 		
 	}
 	
-	/*static void setColorRecursive(Element root)
-	{
-		if(root.getAttachedInputControl() != null)
-		{
-			if(root.getAttachedInputControl().getControl(LabelControl.class)!=null)
-			{
-				de.lessvoid.nifty.controls.Label label = root.getAttachedInputControl().getControl(LabelControl.class);
-				label.setText("gdf");
-			}
-		}
-		
-		for(int i=0;i<root.getChildrenCount();++i)
-			setColorRecursive(root.getChildren().get(i));
-	}*/
-
 	// recursively unexpand all children of this branch
 	static void unexpandAllChildren(TreeItem<MyTreeFolderItem> parent)
 	{

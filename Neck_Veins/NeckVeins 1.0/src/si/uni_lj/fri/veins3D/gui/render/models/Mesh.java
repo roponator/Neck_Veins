@@ -330,14 +330,13 @@ public class Mesh
 		{
 			glDeleteBuffersARB(i);
 		}
-			
-		
+
 		for (int i : indicesIDs)
 		{
 			glDeleteBuffersARB(i);
-			
+
 		}
-		
+
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 	}
@@ -373,60 +372,63 @@ public class Mesh
 		glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, facesBuffer, GL_STATIC_DRAW_ARB);
 		System.out.println("Finished building a VBO. Faces: " + (faces.size() / 3) + " Vertices: " + (vertices.size() / 3));
 
-		if (saveObjToFile)
+		// Save mesh to file
+		String meshCreationParamsString = "";
+		if (meshCreationInfo != null)
 		{
-			PrintWriter writer;
-			try
-			{
-
-				// Use mesh info to create file name if it's set, otherwise use date time
-				String meshCreationParamsString = "";
-				if (meshCreationInfo != null)
-				{
-					meshCreationParamsString = meshCreationInfo.toString(); // use mesh info
-				}
-				else
-				{
-					// use calendar
-					DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd__HH_mm_ss");
-					Calendar cal = Calendar.getInstance();
-					meshCreationParamsString = "VeinsObj_" + dateFormat.format(cal.getTime());
-				}
-
-				writer = new PrintWriter(meshCreationParamsString + ".obj", "UTF-8");
-				writer.println("o Sample");
-				for (int i = 0; i < vertices.size(); i += 3)
-				{
-					writer.println("v " + vertices.get(i) + " " + vertices.get(i + 1) + " " + vertices.get(i + 2));
-
-				}
-				for (int i = 0; i < normals.length; i += 3)
-				{
-					writer.println("vn " + normals[i] + " " + normals[i + 1] + " " + normals[i + 2]);
-
-				}
-				for (int i = 0; i < faces.size(); i += 3)
-				{
-					writer.println("f " + faces.get(i) + "//" + faces.get(i) + " " + faces.get(i + 1) + "//" + faces.get(i + 1) + " " + faces.get(i + 2) + "//" + faces.get(i + 2));
-
-				}
-				writer.close();
-			}
-			catch (FileNotFoundException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			catch (UnsupportedEncodingException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			meshCreationParamsString = meshCreationInfo.toString(); // use mesh info
 		}
+		else
+		{
+			// use calendar
+			DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd__HH_mm_ss");
+			Calendar cal = Calendar.getInstance();
+			meshCreationParamsString = "VeinsObj_" + dateFormat.format(cal.getTime());
+			;
+		}
+
+		SaveToFile(meshCreationParamsString + ".obj");
 
 		// must be disabled!
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+
+	}
+
+	public void SaveToFile(String path)
+	{
+		PrintWriter writer;
+		try
+		{
+			writer = new PrintWriter(path, "UTF-8");
+			writer.println("o Sample");
+			for (int i = 0; i < vertices.size(); i += 3)
+			{
+				writer.println("v " + vertices.get(i) + " " + vertices.get(i + 1) + " " + vertices.get(i + 2));
+
+			}
+			for (int i = 0; i < normals.length; i += 3)
+			{
+				writer.println("vn " + normals[i] + " " + normals[i + 1] + " " + normals[i + 2]);
+
+			}
+			for (int i = 0; i < faces.size(); i += 3)
+			{
+				writer.println("f " + faces.get(i) + "//" + faces.get(i) + " " + faces.get(i + 1) + "//" + faces.get(i + 1) + " " + faces.get(i + 2) + "//" + faces.get(i + 2));
+
+			}
+			writer.close();
+		}
+		catch (FileNotFoundException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
