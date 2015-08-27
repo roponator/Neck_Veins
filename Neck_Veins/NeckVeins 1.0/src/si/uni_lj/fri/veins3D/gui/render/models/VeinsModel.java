@@ -3,6 +3,8 @@ package si.uni_lj.fri.veins3D.gui.render.models;
 import org.lwjgl.input.Mouse;
 
 
+
+import si.uni_lj.fri.veins3D.gui.render.Camera;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import si.uni_lj.fri.veins3D.math.Vector;
@@ -17,7 +19,7 @@ public abstract class VeinsModel
 {
 	// You must implement at least 'render'. 
 	// Also implementing 'cleanup' would be nice :)
-	public abstract void render();
+	public abstract void render(Camera camera);
 	public abstract void cleanup();
 	
 	public abstract void changeMinTriangles(int minTriangels);

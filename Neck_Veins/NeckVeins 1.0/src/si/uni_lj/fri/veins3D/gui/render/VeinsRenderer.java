@@ -190,7 +190,7 @@ public class VeinsRenderer  {
 			glMaterial(GL_FRONT, GL_SPECULAR, allocFloats(new float[] { 0.66f, 0.66f, 0.66f, 1f }));
 			glMaterial(GL_FRONT, GL_SHININESS, allocFloats(new float[] { 100f, 256.0f, 256.0f, 256.0f }));
 
-			veinsModel.render();
+			veinsModel.render(cam);
 				
 			GL20.glUseProgram(0);
 			glPopMatrix();

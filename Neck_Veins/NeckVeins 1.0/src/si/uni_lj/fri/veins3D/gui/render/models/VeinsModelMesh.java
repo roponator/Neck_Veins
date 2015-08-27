@@ -33,6 +33,7 @@ import si.uni_lj.fri.segmentation.utils.TrianglesLabelHelper;
 import si.uni_lj.fri.segmentation.utils.obj.Triangle;
 import si.uni_lj.fri.segmentation.utils.obj.Vertex;
 import si.uni_lj.fri.veins3D.gui.NiftyScreenController;
+import si.uni_lj.fri.veins3D.gui.render.Camera;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer.ModelType;
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
@@ -570,7 +571,7 @@ public class VeinsModelMesh extends VeinsModel
 	}
 
 	@Override
-	public void render()
+	public void render(Camera camera)
 	{
 		
 		glMatrixMode(GL_MODELVIEW);

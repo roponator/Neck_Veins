@@ -20,8 +20,10 @@ import org.lwjgl.util.vector.Vector3f;
 import de.lessvoid.nifty.render.batch.spi.GL;
 import si.uni_lj.fri.segmentation.MHDReader;
 import si.uni_lj.fri.veins3D.gui.NiftyScreenController;
+import si.uni_lj.fri.veins3D.gui.render.Camera;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
+import si.uni_lj.fri.veins3D.math.Quaternion;
 import sun.nio.ch.DirectBuffer;
 
 import java.io.*;
@@ -112,13 +114,13 @@ public class VolumeRaycast
 	private long tPrev = 0;
 	private long tNow = 0;
 
-	private Vector3f camPos = new Vector3f(68.02019f, 124.51997f, -22.897635f); // mrt16_angio
-	private Vector3f camDir = new Vector3f(0.3290509f, -0.10898647f, 0.9380018f);
-	private Vector3f camRight = new Vector3f(-0.94362277f, 0.0f, 0.33102274f);
-	private Vector3f camUp = new Vector3f(0.036077f, 0.99404323f, 0.102842115f);
-	private float camAngle = (float) Math.PI;
-	private float camZAngle = 0;
-	private float camSpeed = 100.f;
+//	private Vector3f camPos = new Vector3f(68.02019f, 124.51997f, -22.897635f); // mrt16_angio
+//private Vector3f camDir = new Vector3f(0.3290509f, -0.10898647f, 0.9380018f);
+	//private Vector3f camRight = new Vector3f(-0.94362277f, 0.0f, 0.33102274f);
+	//private Vector3f camUp = new Vector3f(0.036077f, 0.99404323f, 0.102842115f);
+	//private float camAngle = (float) Math.PI;
+	//private float camZAngle = 0;
+	//private float camSpeed = 100.f;
 	private float fov = (float) Math.tan(Math.PI / 3);
 	private float asr = 0.0f;
 	// private float threshold = 0.03f;
@@ -473,11 +475,11 @@ public class VolumeRaycast
 
 	// rendering cycle
 
-	public void MainRender()
+	public void MainRender(Camera camera)
 	{
 		initView(width, height);
 		// handleIO();
-		display();
+		display(camera);
 
 		glMatrixMode(GL_MODELVIEW); // no idea why but it has to be here, otherwise a bunch of state error (underflow)
 
@@ -500,7 +502,7 @@ public class VolumeRaycast
 		Display.destroy();
 	}
 
-	public void display()
+	public void display(Camera camera)
 	{
 		// TODO: Need to clean-up events, test when ARB_cl_events & KHR_gl_event are implemented.
 
@@ -528,7 +530,7 @@ public class VolumeRaycast
 		glUseProgram(glProgram);
 		glUniform1i(glGetUniformLocation(glProgram, "mandelbrot"), 0);
 
-		compute(doublePrecision);
+		compute(doublePrecision,camera);
 
 		render();
 	}
@@ -686,7 +688,7 @@ public class VolumeRaycast
 		kernelSecondPass.setArg(0, glBuffers[BUFFER_1]).setArg(1, glBuffers[BUFFER_2]).setArg(2, glBuffers[BUFFER_DEPTH_1]).setArg(3, glBuffers[BUFFER_DEPTH_2]).setArg(18, matrix).setArg(25, octree).setArg(27, clTransferFunction);
 	}
 
-	private void compute(final boolean is64bit)
+	private void compute(final boolean is64bit,Camera camera)
 	{
 		kernel2DGlobalWorkSize.put(0, width).put(1, height);
 
@@ -697,9 +699,29 @@ public class VolumeRaycast
 		{
 			clEnqueueAcquireGLObjects(queue, glBuffers[i], null, null);
 		}
+		
 
+		// create camera matrix, must also rotate by 180 degrees on Y axis for proper initial orientation
+		Quaternion rotY = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{0,1,0});
+		Quaternion worldOrientation = Quaternion.quaternionReciprocal(camera.cameraOrientation);
+		FloatBuffer rotMatrix =  Quaternion.quaternionMultiplication(worldOrientation, rotY).getRotationMatrix(true);
+		
 		// start computation
-		kernel.setArg(4, camPos.x).setArg(5, camPos.y).setArg(6, camPos.z).setArg(7, camUp.x).setArg(8, camUp.y).setArg(9, camUp.z).setArg(10, camDir.x).setArg(11, camDir.y).setArg(12, camDir.z).setArg(13, camRight.x).setArg(14, camRight.y).setArg(15, camRight.z).setArg(16, fov).setArg(17, asr)
+		kernel.
+		setArg(4, -camera.cameraX + 68.02019f). // offsets neeed for proper camera position
+		setArg(5, -camera.cameraY + 124.51997f).
+		setArg(6, -camera.cameraZ - 22.897635f).
+		setArg(7, rotMatrix.get(4*1+0)). // up
+		setArg(8, rotMatrix.get(4*1+1)).
+		setArg(9, rotMatrix.get(4*1+2)).
+		setArg(10,- rotMatrix.get(4*2+0)). // forward
+		setArg(11,-rotMatrix.get(4*2+1)).
+		setArg(12, -rotMatrix.get(4*2+2)).
+		setArg(13, rotMatrix.get(4*0+0)). // right
+		setArg(14, rotMatrix.get(4*0+1)).
+		setArg(15, rotMatrix.get(4*0+2)).
+		setArg(16, fov).
+		setArg(17, asr)
 				.setArg(19, MHDReader.Nx).setArg(20, MHDReader.Ny).setArg(21, MHDReader.Nz).setArg(22, (float) MHDReader.dx).setArg(23, (float) MHDReader.dy).setArg(24, (float) MHDReader.dz).setArg(26, octreeLevels).setArg(28, transferFunctionSamples).setArg(29, threshold).setArg(30, lin);
 
 		clEnqueueNDRangeKernel(queue, kernel, 2, null, kernel2DGlobalWorkSize, null, null, null);// */
@@ -789,7 +811,7 @@ public class VolumeRaycast
 
 	private void handleIO()
 	{
-		tPrev = tNow;
+		/*tPrev = tNow;
 		tNow = System.currentTimeMillis();
 		float dt = (tNow - tPrev) / 1000.f;
 		if (Keyboard.getNumKeyboardEvents() != 0)
@@ -911,7 +933,7 @@ public class VolumeRaycast
 		{
 			threshold = Math.max(Math.min(threshold + step * (float) wheel * wheelSpeed, 1.f), 0.f);
 			System.out.println("New threshold: " + threshold);
-		}
+		}*/
 	}
 
 	private static boolean isDoubleFPAvailable(CLDevice device)
