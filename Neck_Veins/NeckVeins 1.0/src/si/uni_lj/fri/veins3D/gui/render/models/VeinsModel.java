@@ -23,6 +23,9 @@ public abstract class VeinsModel
 	public abstract void cleanup();
 	
 	public abstract void changeMinTriangles(int minTriangels);
+	public abstract void changeThreshold(float threshold);
+	
+	public abstract boolean wasLoadedFromObj(); // needed to disable settings when loading models using obj
 	
 	public abstract int GetMaxTriangles();
 	public abstract float GetThreshold();

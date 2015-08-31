@@ -339,6 +339,9 @@ public class Mesh
 
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+
+		verticesAndNormalsIDs.clear();
+		indicesIDs.clear();
 	}
 
 	public void constructVBO(boolean saveObjToFile)
@@ -373,21 +376,24 @@ public class Mesh
 		System.out.println("Finished building a VBO. Faces: " + (faces.size() / 3) + " Vertices: " + (vertices.size() / 3));
 
 		// Save mesh to file
-		String meshCreationParamsString = "";
-		if (meshCreationInfo != null)
+		if (saveObjToFile)
 		{
-			meshCreationParamsString = meshCreationInfo.toString(); // use mesh info
-		}
-		else
-		{
-			// use calendar
-			DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd__HH_mm_ss");
-			Calendar cal = Calendar.getInstance();
-			meshCreationParamsString = "VeinsObj_" + dateFormat.format(cal.getTime());
-			;
-		}
+			String meshCreationParamsString = "";
+			if (meshCreationInfo != null)
+			{
+				meshCreationParamsString = meshCreationInfo.toString(); // use mesh info
+			}
+			else
+			{
+				// use calendar
+				DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd__HH_mm_ss");
+				Calendar cal = Calendar.getInstance();
+				meshCreationParamsString = "VeinsObj_" + dateFormat.format(cal.getTime());
+				;
+			}
 
-		SaveToFile(meshCreationParamsString + ".obj");
+			SaveToFile(meshCreationParamsString + ".obj");
+		}
 
 		// must be disabled!
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);

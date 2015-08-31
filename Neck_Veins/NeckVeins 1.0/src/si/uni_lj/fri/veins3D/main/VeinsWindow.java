@@ -413,6 +413,7 @@ public class VeinsWindow
 	 */
 
 	boolean m_wasMouseLeftUp = true;
+	public static boolean wire = false;
 
 	public void mainLoop()
 	{
@@ -438,6 +439,8 @@ public class VeinsWindow
 			// Allow input only if default state, otherwise leave nifty keyboard input (required for text field for save menu)
 			if( screenController != null && screenController.getState()==GUI_STATE.DEFAULT)
 				pollInput();
+			
+			renderer.switchWireframe(wire);
 			
 			// hud.setClickedOn(clickedOn);
 			renderer.setupView(); // raycast volume renderer changes some states, theys must be reset
@@ -480,6 +483,7 @@ public class VeinsWindow
 		renderNiftyGUI();
 		Display.update();
 	}
+	
 
 	// saves, sets and restores openGL states
 	void renderNiftyGUI()
@@ -617,7 +621,7 @@ public class VeinsWindow
 				}
 				else if (Keyboard.getEventKey() == Keyboard.KEY_9)
 				{
-					renderer.switchWireframe();
+					wire = !wire;
 				}
 				else if (Keyboard.getEventKey() == Keyboard.KEY_ADD && renderer.getVeinsModel() != null)
 				{
@@ -627,7 +631,7 @@ public class VeinsWindow
 				{
 					renderer.getVeinsModel().decreaseSubdivisionDepth();
 				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_9)
+				else if (Keyboard.getEventKey() == Keyboard.KEY_9) // no aa implemented at all??
 				{
 					renderer.switchAA();
 				}

@@ -86,6 +86,9 @@ public class VeinsRenderer  {
 	private boolean isWireframeOn;
 	private boolean isAAEnabled;
 
+	public boolean WasLastModelLoadedFromObj = false;
+	public ModelType LastLoadedModelType = ModelType.VOLUME_RENDER;
+	
 	private Camera cam;
 
 	public VeinsModel veinsModel; // TODO: CHANGE TO PRIVATE
@@ -326,7 +329,8 @@ public class VeinsRenderer  {
 	 * @param fileName
 	 * @throws LWJGLException
 	 */
-	public void loadModelObj(String fileName) {
+	public void loadModelObj(String fileName) 
+	{
 		if (veinsModel != null)
 			veinsModel.cleanup();
 		veinsModel = new VeinsModelMesh();
@@ -334,6 +338,7 @@ public class VeinsRenderer  {
 		veinsModelMesh.constructVBOFromObjFile(fileName);
 		setDefaultViewOptions();
 		isOpen = true;
+		WasLastModelLoadedFromObj = true;
 	}
 
 
@@ -345,9 +350,13 @@ public class VeinsRenderer  {
 	 * @param threshold
 	 * @throws LWJGLException
 	 */
-	public void loadModelRaw(String fileName, ModelType modelType, boolean useSafeMode) throws LWJGLException {
+	public void loadModelRaw(String fileName, ModelType modelType, boolean useSafeMode) throws LWJGLException 
+	{
 		if (veinsModel != null)
 			veinsModel.cleanup();
+		
+		LastLoadedModelType = modelType;
+		WasLastModelLoadedFromObj = false;
 		
 		// create either the volume model or the mesh model (mpui, marching cubes)
 		if(modelType == ModelType.VOLUME_RENDER)
@@ -358,7 +367,7 @@ public class VeinsRenderer  {
 		{
 			veinsModel = new VeinsModelMesh();
 			VeinsModelMesh veinsModelMesh = (VeinsModelMesh)veinsModel;
-			veinsModelMesh.constructVBOFromRawFile(fileName,modelType, useSafeMode);		
+			WasLastModelLoadedFromObj = veinsModelMesh.constructVBOFromRawFile(fileName,modelType, useSafeMode);		
 		}
 		
 		setDefaultViewOptions();
@@ -366,15 +375,17 @@ public class VeinsRenderer  {
 	}
 
 
-
-	public void changeModel(double threshold) throws LWJGLException 
+	/*public void ChangeMinTriangles(int min) throws LWJGLException 
 	{
-		veinsModel.cleanup();
-		veinsModel = new VeinsModelMesh(threshold, veinsModel.GetCurrentOrientation());
-		VeinsModelMesh veinsModelMesh = (VeinsModelMesh)veinsModel;
-		double d = veinsModel.calculateCameraDistance();
-		 veinsModelMesh.SetVeinsGrabRadius(d / Math.sqrt(2));
-	}
+		if(veinsModel instanceof VeinsModelMesh)
+		{
+			veinsModel.cleanup();
+			veinsModel = new VeinsModelMesh(threshold, veinsModel.GetCurrentOrientation());
+			VeinsModelMesh veinsModelMesh = (VeinsModelMesh)veinsModel;
+			double d = veinsModel.calculateCameraDistance();
+			 veinsModelMesh.SetVeinsGrabRadius(d / Math.sqrt(2));
+		}
+	}*/
 
 	private void setDefaultViewOptions()
 	{
@@ -442,12 +453,21 @@ public class VeinsRenderer  {
 	}
 
 	public void switchWireframe() {
-		if (isWireframeOn)
+		if (isWireframeOn == false)
 			GL11.glPolygonMode(GL11.GL_FRONT, GL11.GL_FILL);
 		else
 			GL11.glPolygonMode(GL11.GL_FRONT, GL11.GL_LINE);
 
 		isWireframeOn = !isWireframeOn;
+	}
+	
+	public void switchWireframe(boolean useWireframe) {
+		isWireframeOn = useWireframe;
+
+		if (isWireframeOn == false)
+			GL11.glPolygonMode(GL11.GL_FRONT, GL11.GL_FILL);
+		else
+			GL11.glPolygonMode(GL11.GL_FRONT, GL11.GL_LINE);
 	}
 
 	public void switchAA() {

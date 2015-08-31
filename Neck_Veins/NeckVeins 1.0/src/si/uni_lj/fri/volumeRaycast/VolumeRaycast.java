@@ -705,7 +705,7 @@ public class VolumeRaycast
 		Quaternion rotY = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{0,1,0});
 		Quaternion worldOrientation = Quaternion.quaternionReciprocal(camera.cameraOrientation);
 		FloatBuffer rotMatrix =  Quaternion.quaternionMultiplication(worldOrientation, rotY).getRotationMatrix(true);
-		
+				
 		// start computation
 		kernel.
 		setArg(4, -camera.cameraX + 68.02019f). // offsets neeed for proper camera position

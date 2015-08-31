@@ -78,10 +78,13 @@ public class VeinsModelRaycastVolume extends VeinsModel
 		m_raycaster.ReleaseResources();
 	}
 
+	public boolean wasLoadedFromObj(){return false;}
+	
 	public void changeMinTriangles(int minTriangels)
 	{
 	}
-
+	public void changeThreshold(float threshold){}
+	
 	public int GetMaxTriangles()
 	{
 		return 0;

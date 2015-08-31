@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty-controls xmlns="http://nifty-gui.lessvoid.com/nifty-gui">
+    <controlDefinition name="MY_SIDE_SETTINGS_OBJ">
+       
+     <panel childLayout="vertical" width="100%"  height="100%" style="STYLE_COMMON_INVISIBLE" align="left">           
+          	<control name="label"style="STYLE_LABEL_DARK_TEXT" margin="2%,2%,2%,2%" width="96%" height="20px" text="Shader Type" textHAlign="left"  />			               		
+         	<control id="OBJ_SHADER_DROPDOWN" name="dropDown"  margin="2%,4%,2%,4%" width="92%" height = "20px" align="left" vertical="no" horizontal="optional" selection="Single" displayItems="9"  />          
+			<control id="WIREFRAME_CHECKBOX_ID" name="MY_CHECKBOX" width="92%" height="30px" margin="2%,4%,2%,4%" align="left" />
+				 		
+     </panel>			
+        
+    </controlDefinition>
+</nifty-controls>

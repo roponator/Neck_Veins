@@ -68,6 +68,7 @@ public class ModelCreator {
 	 * @return
 	 * @throws LWJGLException
 	 */
+
 	public static Object[] createModel(String fileName) throws LWJGLException {
 		m_fileName = fileName;
 		
@@ -124,6 +125,11 @@ public class ModelCreator {
 		String fileNameOnly = MeshCreationInfo.GetFileNameOnlyFromPath(m_fileName);
 		MeshCreationInfo.InfoMarchingCubes meshCreationInfo= new MeshCreationInfo.InfoMarchingCubes(fileNameOnly, VeinsWindow.settings.gaussSigma, VeinsWindow.settings.threshold);
 
+		//clearOldProgram();
+		//initializeCL();
+		//program = CLUtils.createProgram("/opencl/segmentation.cls", context, devices);
+		//initStaticData(m_fileName, VeinsWindow.settings.gaussSigma);
+		
 		System.out.println("Marching cubes on GPU...");
 		return execMarchingCubes(meshCreationInfo, (float) threshold);
 	}
@@ -269,7 +275,7 @@ public class ModelCreator {
 
 		CLMem[] memObj = { maxThreshMemory, trianglesMemory, normalsMemory, nTrianglesMemory };
 		CLKernel[] kernelObj = { marchingKernel };
-		CLUtils.cleanCLResources(memObj, kernelObj, null);
+		//CLUtils.cleanCLResources(memObj, kernelObj, null);
 
 		return new Object[] { nTrianglesBuff, trianglesBuff, normalsBuff, threshold, meshCreationInfo };
 

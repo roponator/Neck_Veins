@@ -32,6 +32,8 @@
      <useControls filename="xml/myUserManualDialog.xml"/>
      <useControls filename="xml/myOpenDialog_OptionsControl.xml"/>
      <useControls filename="xml/myLoadingBarDialog.xml"/>
+     <useControls filename="xml/mySettingsMarchingCubesControl.xml"/>
+     <useControls filename="xml/mySettingsObjControl.xml"/>
      
  
 	 <!-- base="nifty-panel-simple" -->
@@ -80,25 +82,17 @@
 	                          	  <image childLayout="center" filename="imgs\pngs720p\Med3D-47.png" width="17px" height="22px" valign="center" align="left" filter="true"/> 
 	                   		 <interact onClick="onButton_SettingsSideMenu_Close(a)"/>
 	                   </panel>
-	               
-	               		 <panel id="" childLayout="absolute" width="100%" height="100.0%" style="STYLE_SIDE_SETTINGS_MENU_LEFT_PANEL" />
-
-		            	
+	  		            	
 	               </panel>
 	               
                  <!--  settings sliders container -->
-                <panel childLayout="vertical" width="100%" height="*" style="STYLE_COMMON_INVISIBLE" align="center" backgroundColor="#393E4377">
+                <panel id="MENU_SETTINGS_CONTROL_CONTAINER" childLayout="vertical" width="100%" height="*" style="STYLE_COMMON_INVISIBLE" align="center" backgroundColor="#393E4377">
                     
-                     <control childLayout="vertical" id="sl1" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>
-                     <control childLayout="vertical" id="sl2" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>
-                     
-                     <panel childLayout="vertical" width="100%" height="50%" style="STYLE_COMMON_INVISIBLE" align="left" backgroundColor="#76787bff">
-                    		 <control  name="verticalSlider"  height="100px" />
-		              </panel>  
-		                   
-                     <control id="" name="listBox" vertical="on" horizontal="on" displayItems="5"/>
-     				
+                     <control childLayout="vertical" id="SIDE_SETTINGS_MARCHING_CUBES_CONTROL" name="MY_SIDE_SETTINGS_MARCHING_CUBES" align="center" width="100%" height="100px" margin="10px,0px,0px,0px"/>
+                     <control childLayout="vertical" id="SIDE_SETTINGS_MARCHING_OBJ_CONTROL" name="MY_SIDE_SETTINGS_OBJ" align="center" width="100%" height="100px" margin="10px,0px,0px,0px"/>
+                  
                 </panel>
+            
                                  	               
 	                  
 		          <effect>

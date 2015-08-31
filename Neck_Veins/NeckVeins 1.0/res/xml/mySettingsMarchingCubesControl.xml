@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty-controls xmlns="http://nifty-gui.lessvoid.com/nifty-gui">
+    <controlDefinition name="MY_SIDE_SETTINGS_MARCHING_CUBES">
+       
+     <panel childLayout="vertical" width="100%"  height="100%" style="STYLE_COMMON_INVISIBLE" align="center">           
+          <control childLayout="vertical" id="SLIDER_MODEL_MESH_THRESHOLD" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>
+          <control childLayout="vertical" id="SLIDER_MODEL_MESH_MIN_TRIANGLES" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>                                 
+     </panel>			
+        
+    </controlDefinition>
+</nifty-controls>

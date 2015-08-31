@@ -50,7 +50,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class VeinsModelMesh extends VeinsModel
 {
 	private final int APLICATION_SUBDIVISION_LIMIT = 3;
-
+	private boolean bWasLoadedFromObj = false;
 	private TrianglesLabelHelper labelHelper;
 	protected ArrayList<Float> vertices, normals;
 	public ArrayList<Mesh> meshes;
@@ -71,17 +71,19 @@ public class VeinsModelMesh extends VeinsModel
 	public VeinsModelMesh()
 	{
 		System.out.println("STACK TRACE START ****************");
-		for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-		    System.out.println(ste);
+		for (StackTraceElement ste : Thread.currentThread().getStackTrace())
+		{
+			System.out.println(ste);
 		}
 		System.out.println("STACK TRACE END ****************");
-				
+
 		meshes = new ArrayList<Mesh>();
 		setDefaultOrientation();
 	}
 
 	public VeinsModelMesh(String filepath)
 	{
+		bWasLoadedFromObj = true;
 		constructVBOFromObjFile(filepath);
 		setDefaultOrientation();
 	}
@@ -92,26 +94,35 @@ public class VeinsModelMesh extends VeinsModel
 		setDefaultOrientation();
 	}
 
-	public VeinsModelMesh(double threshold, Quaternion currentQuaternion) throws LWJGLException
-	{
-		changeThreshold(threshold);
-		this.currentOrientation = currentQuaternion;
-		this.addedOrientation = new Quaternion();
-	}
-
 	public void SetNewResolution(int width, int height)
 	{
 		// not needed for this one, needed only for volume renderer
 	}
 
-	public void changeThreshold(double threshold) throws LWJGLException
+	public void changeThreshold(float threshold)
 	{
-		Object[] output = ModelCreator.changeModel(threshold);
-		constructVBO(output);
+		if(bWasLoadedFromObj) // must be loaded from raw file to this to work
+			return;
+		
+		try
+		{
+			this.deleteMeshes();
+			Object[] output = ModelCreator.changeModel(threshold);
+			constructVBO(output, false);
+		}
+		catch (LWJGLException e)
+		{
+			System.out.println("changeThreshold: " + e.toString());
+			e.printStackTrace();
+		}
+
 	}
 
 	public void changeMinTriangles(int min)
 	{
+		if(bWasLoadedFromObj) // must be loaded from raw file to this to work
+			return;
+		
 		for (Mesh mesh : meshes)
 		{
 			mesh.deleteVBO();
@@ -140,29 +151,30 @@ public class VeinsModelMesh extends VeinsModel
 
 		for (Mesh mesh : meshes)
 		{
-			mesh.constructVBO(true);
+			mesh.constructVBO(false);
 		}
 	}
-
 
 	/**
 	 * Normals calculated on GPU are currently not used, instead Normals calculated in constructVBO are used.
 	 * 
 	 * @param filepath
 	 */
-	public void constructVBOFromRawFile(String filepath, ModelType modelType, boolean useSafeMode) throws LWJGLException
+	// Returns true if the file was loaded from obj.
+	public boolean constructVBOFromRawFile(String filepath, ModelType modelType, boolean useSafeMode) throws LWJGLException
 	{
+		bWasLoadedFromObj = false;
 		Object[] output = null;
-		
+
 		switch (modelType)
 		{
 		case MPUI:
 		{
 			output = ModelCreatorMPUI.createModel(filepath);
-			
+
 			NiftyScreenController.UpdateLoadingBarDialog("Loading model...", 70.0f);
 			VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
-			
+
 			if (output.length != 1)
 				constructVBOPointCloud(output); // generate mesh from raw file
 			else
@@ -179,9 +191,9 @@ public class VeinsModelMesh extends VeinsModel
 
 			NiftyScreenController.UpdateLoadingBarDialog("Loading model...", 70.0f);
 			VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
-			
+
 			if (output.length != 1)
-				constructVBO(output); // generate mesh from raw file
+				constructVBO(output, true); // generate mesh from raw file
 			else
 				constructVBOFromObjFile((String) output[0]); // load existing obj
 		}
@@ -197,6 +209,7 @@ public class VeinsModelMesh extends VeinsModel
 			System.out.println("ERROR: constructVBOFromRawFile: invalid modelType: " + modelType.toString());
 		}
 
+		return bWasLoadedFromObj;
 	}
 
 	public static float[] g_voxelPositions = null;
@@ -308,7 +321,7 @@ public class VeinsModelMesh extends VeinsModel
 	 * glVertex3f(g_voxelPositions[i*3]+g_voxelNormals[i*3]*scale+xOffset,g_voxelPositions[i*3+1]+g_voxelNormals[i*3+1]*scale,g_voxelPositions[i*3+2]+g_voxelNormals[i*3+2]*scale); } glEnd(); }
 	 */
 
-	private void constructVBO(Object[] output)
+	private void constructVBO(Object[] output, boolean saveObjToFile)
 	{
 		IntBuffer nTrianglesBuff = (IntBuffer) output[0];
 		FloatBuffer trianglesBuff = (FloatBuffer) output[1];
@@ -388,12 +401,14 @@ public class VeinsModelMesh extends VeinsModel
 		for (Mesh mesh : meshes)
 		{
 			mesh.SetMeshCreationInfo(meshCreationInfo);
-			mesh.constructVBO(true);
+			mesh.constructVBO(saveObjToFile);
 		}
 	}
 
 	public void constructVBOFromObjFile(String filepath)
 	{
+		bWasLoadedFromObj = true;
+		
 		vertices = new ArrayList<Float>();
 		ArrayList<Float> normals = new ArrayList<Float>();
 		centerx = 0;
@@ -573,7 +588,7 @@ public class VeinsModelMesh extends VeinsModel
 	@Override
 	public void render(Camera camera)
 	{
-		
+
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 
@@ -671,8 +686,7 @@ public class VeinsModelMesh extends VeinsModel
 		currentOrientation = q;
 	}
 
-	@Override
-	public void cleanup()
+	public void deleteMeshes()
 	{
 		if (meshes != null)
 		{
@@ -682,6 +696,12 @@ public class VeinsModelMesh extends VeinsModel
 			}
 		}
 		meshes.clear();
+	}
+
+	@Override
+	public void cleanup()
+	{
+		deleteMeshes();
 	}
 
 	@Override
@@ -764,6 +784,12 @@ public class VeinsModelMesh extends VeinsModel
 		d1 = Math.sqrt(Math.max(Math.max(d1 + d2, d2 + d3), d1 + d3));
 
 		return d1;
+	}
+
+	@Override
+	public boolean wasLoadedFromObj()
+	{
+		return bWasLoadedFromObj;
 	}
 
 }

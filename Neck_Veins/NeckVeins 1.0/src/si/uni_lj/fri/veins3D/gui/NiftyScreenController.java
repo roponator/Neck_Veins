@@ -35,6 +35,7 @@ import de.lessvoid.nifty.NiftyEvent;
 import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.NiftyMouse;
 import de.lessvoid.nifty.controls.ButtonClickedEvent;
+import de.lessvoid.nifty.controls.CheckBoxStateChangedEvent;
 import de.lessvoid.nifty.controls.Controller;
 import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.Label;
@@ -822,6 +823,12 @@ public class NiftyScreenController extends DefaultScreenController
 		m_settingsSideMenu.OnMenuCloseAnimationFinished();
 	}
 
+	@NiftyEventSubscriber(id = "WIREFRAME_CHECKBOX_ID")
+	public void OnSettingsSideMenuWireframeCheckboxChanged(String id, CheckBoxStateChangedEvent event)
+	{
+		VeinsWindow.wire=event.isChecked();
+	}
+	
 	// ----------------------------------------------------
 	// Open dialog
 	// ----------------------------------------------------
@@ -965,26 +972,26 @@ public class NiftyScreenController extends DefaultScreenController
 	{
 		// System.out.println("onButton_SaveDialog_Save");
 		SelectedFile file = m_saveDialog.m_folderBrowser.TryGettingSelectedFile();
-		if(file==null)
+		if (file == null)
 			System.out.println("You must specify the file & path to save to");
-		
+
 		// Can only save meshes to obj, not volume
-		if( VeinsWindow.renderer.veinsModel != null && VeinsWindow.renderer.veinsModel instanceof VeinsModelMesh) 
+		if (VeinsWindow.renderer.veinsModel != null && VeinsWindow.renderer.veinsModel instanceof VeinsModelMesh)
 		{
-			VeinsModelMesh model = (VeinsModelMesh)VeinsWindow.renderer.veinsModel;
-			for(int i=0;i<model.meshes.size();++i)
+			VeinsModelMesh model = (VeinsModelMesh) VeinsWindow.renderer.veinsModel;
+			for (int i = 0; i < model.meshes.size(); ++i)
 			{
 				Mesh mesh = model.meshes.get(i);
 				String fullPath = file.fullFilePathAndName;
-				
+
 				// if more than one mesh add the mesh index before the .obj
-				if(model.meshes.size()>1)
+				if (model.meshes.size() > 1)
 				{
 					int chIdx = fullPath.indexOf(".obj");
-					if(chIdx > 0)
-						fullPath = insert(fullPath,Integer.toString(i),chIdx);
+					if (chIdx > 0)
+						fullPath = insert(fullPath, Integer.toString(i), chIdx);
 				}
-				
+
 				mesh.SaveToFile(fullPath);
 			}
 		}
@@ -992,29 +999,30 @@ public class NiftyScreenController extends DefaultScreenController
 		{
 			System.out.println("Warning: Cannot save a volume model. You can only save models created with Marching Cubes or MPUI to .obj files");
 		}
-		
+
 		On_SaveDialog_Close("");
 
 		UpdateLoadingBarDialog("Saving model...", 10.0f);
-		
+
 		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
 
 		UpdateLoadingBarDialog("Saving model...", 100.0f);
 		On_LoadingDialog_CloseOrCancel();
 	}
-	
+
 	@NiftyEventSubscriber(id = "SAVE_DIALOG_FILES_LIST_LISTBOX")
 	public void OnTextFieldTextChanged(String id, ListBoxSelectionChangedEvent event)
 	{
 		m_saveDialog.m_folderBrowser.OnListboxSelectionChanged(id, event);
 	}
 
-	public static String insert(String bag, String marble, int index) {
-	    String bagBegin = bag.substring(0,index);
-	    String bagEnd = bag.substring(index);
-	    return bagBegin + marble + bagEnd;
+	public static String insert(String bag, String marble, int index)
+	{
+		String bagBegin = bag.substring(0, index);
+		String bagEnd = bag.substring(index);
+		return bagBegin + marble + bagEnd;
 	}
-	
+
 	// ----------------------------------------------------
 	// About dialog
 	// ----------------------------------------------------
@@ -1142,7 +1150,7 @@ public class NiftyScreenController extends DefaultScreenController
 	@NiftyEventSubscriber(id = "tree-box")
 	public void OnTreeboxSelectionChanged(String id, ListBoxSelectionChangedEvent<TreeItem<MyTreeFolderItem>> event)
 	{
-		if(event.getListBox().getElement().getParent().getId().compareTo("SAVE_DIALOG_FOLDER_TREEBOX_PANEL_CONTAINER")==0)
+		if (event.getListBox().getElement().getParent().getId().compareTo("SAVE_DIALOG_FOLDER_TREEBOX_PANEL_CONTAINER") == 0)
 			m_saveDialog.m_folderBrowser.OnTreeboxSelectionChanged(id, event);
 		else
 			m_openDialog.m_folderBrowser.OnTreeboxSelectionChanged(id, event);
@@ -1158,6 +1166,15 @@ public class NiftyScreenController extends DefaultScreenController
 		m_openDialog.m_folderBrowser.OnFileTypeSelectionChanged(event);
 	}
 
+	@NiftyEventSubscriber(id = "OBJ_SHADER_DROPDOWN")
+	public void OnObjShaderTypeDropdownSelectionChanged(String id, DropDownSelectionChangedEvent<MyFileExtensionItem> event)
+	{
+		if (m_settingsSideMenu.m_objShaderTypeDropdown.getSelection() != null)
+		{
+			VeinsWindow.renderer.setActiveShaderProgram(m_settingsSideMenu.m_objShaderTypeDropdown.getSelection().shaderId);
+		}
+	}
+
 	// ----------------------------------------------------
 	// Sliders
 	// ----------------------------------------------------
@@ -1170,11 +1187,23 @@ public class NiftyScreenController extends DefaultScreenController
 		// modifty the value of the changed slider
 		updateSliderValueLabel(modifiedSlider, event.getValue());
 
-		/*
-		 * if (modifiedSlider.getId().compareTo("sl1") == 0) {
-		 * 
-		 * } else { java.awt.Toolkit.getDefaultToolkit().beep(); System.out.println("Error: onSliderChangedEvent: invalid slider, implement it"); }
-		 */
+		// specific callbacks
+		if (modifiedSlider.getId().compareTo("SLIDER_MODEL_MESH_THRESHOLD") == 0)
+		{
+			if (VeinsWindow.renderer.getVeinsModel() != null)
+			{
+				VeinsWindow.renderer.getVeinsModel().changeThreshold(event.getValue());
+				GetSliderFromElement(m_settingsSideMenu.m_sliderMinTriangles).setValue(0.0f);
+			}
+		}
+		if (modifiedSlider.getId().compareTo("SLIDER_MODEL_MESH_MIN_TRIANGLES") == 0)
+		{
+			if (VeinsWindow.renderer.getVeinsModel() != null)
+			{
+				VeinsWindow.renderer.getVeinsModel().changeMinTriangles((int) event.getValue());
+			}
+		}
+
 	}
 
 	// A hacky way to get slider events to work: the slider inside my control makes an event, this function
@@ -1200,6 +1229,11 @@ public class NiftyScreenController extends DefaultScreenController
 	{
 		Element slider = nifty.getScreen("GScreen0").findElementById(id);
 		updateSliderValueLabel(slider, event.getValue());
+	}
+
+	public de.lessvoid.nifty.controls.Slider GetSliderFromElement(Element e)
+	{
+		return e.findElementById("SLIDER_CONTROL").getControl(de.lessvoid.nifty.controls.slider.SliderControl.class);
 	}
 
 	static void updateSliderValueLabel(Element slider, float value)
