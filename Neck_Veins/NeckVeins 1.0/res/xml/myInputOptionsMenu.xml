@@ -30,22 +30,24 @@
               <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="*" valign="top" align="left" backgroundImage="imgs/col2.png">
                  
                   <!-- SLIDERS PANEL -->
-				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="75%" valign="top" align="left" >
+				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="130px" valign="top" align="left" >
                   	<panel childLayout="center" width="100%" height="100%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center" >
                     	<panel childLayout="vertical" width="95%" height="95%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center"  backgroundImage="imgs/col1.png">
-		                     <control childLayout="vertical" id="sl1" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>    
-		                     <control childLayout="vertical" id="sl2" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>    
-		                     <control childLayout="vertical" id="sl3" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>             
-	                     </panel> 
+		                     <control childLayout="vertical" id="INPUT_inputSens" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>    
+		                     <control childLayout="vertical" id="INPUT_leapSens" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>    
+		                 </panel> 
                		 </panel>
                 </panel>
                  
-				  <!-- CHECKBOXES PANEL -->
-				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="10%" valign="top" align="left" >
-				    <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
-				   		 <control id="simpleCheckBox" name="MY_CHECKBOX" width="50%" height="100%"/>
-				    </panel>
-                </panel>
+				<control name="label"style="STYLE_LABEL_DARK_TEXT" margin="2%,2%,2%,2%" width="96%" height="20px" text="Input Method" textHAlign="left"  />			               		
+         		<control id="INPUT_METHOD_DROPDOWN" name="dropDown"  margin="2%,4%,2%,4%" width="92%" height = "20px" align="left" vertical="no" horizontal="optional" selection="Single" displayItems="3"  />          
+		
+         		<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="10px" valign="top" align="left" />
+                
+         		
+         		<control name="label"style="STYLE_LABEL_DARK_TEXT" margin="2%,2%,2%,2%" width="96%" height="20px" text="Move Type" textHAlign="left"  />			               		
+         		<control id="MOVE_TYPE_METHOD_DROPDOWN" name="dropDown"  margin="2%,4%,2%,4%" width="92%" height = "20px" align="left" vertical="no" horizontal="optional" selection="Single" displayItems="2"  />          
+		
                  
 				  <!-- Buttons -->
 				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="15%" valign="top" align="left" >

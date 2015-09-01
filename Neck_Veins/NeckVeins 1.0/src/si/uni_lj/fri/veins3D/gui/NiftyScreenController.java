@@ -29,6 +29,8 @@ import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer.ModelType;
 import si.uni_lj.fri.veins3D.gui.render.models.Mesh;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelMesh;
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
+import si.uni_lj.fri.volumeRaycast.VolumeRaycast;
+import si.uni_lj.fri.volumeRaycast.VolumeRaycast.RenderMethod;
 import de.lessvoid.nifty.EndNotify;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEvent;
@@ -46,6 +48,7 @@ import de.lessvoid.nifty.controls.Slider;
 import de.lessvoid.nifty.controls.SliderChangedEvent;
 import de.lessvoid.nifty.controls.TextFieldChangedEvent;
 import de.lessvoid.nifty.controls.TreeItem;
+import de.lessvoid.nifty.controls.dropdown.DropDownControl;
 import de.lessvoid.nifty.controls.label.LabelControl;
 import de.lessvoid.nifty.controls.slider.SliderControl;
 import de.lessvoid.nifty.controls.slider.SliderImpl;
@@ -70,6 +73,13 @@ public class NiftyScreenController extends DefaultScreenController
 {
 	// CUSTOM CONTROL IMPORTANT INSTRUCTION: SEE COMMENT IN FILE myNavigationWidgetControl_WASD.xml
 
+	static final String INPUT_SETTINGS_MOVE_CAMERA = "Move Camera";
+	static final String INPUT_SETTINGS_MOVE_MODEL = "Move Model";
+	
+	static final String INPUT_SETTINGS_INPUT_TYPE_NORMAL = "Default";
+	static final String INPUT_SETTINGS_INPUT_TYPE_3DMOUSE = "3D Mouse";
+	static final String INPUT_SETTINGS_INPUT_TYPE_LEAPMOTION = "Leap Motion";
+	
 	public static Screen m_screen = null;
 	public static final String m_supportedType_MHD = "mhd";
 	public static final String m_supportedType_OBJ = "obj";
@@ -81,7 +91,8 @@ public class NiftyScreenController extends DefaultScreenController
 	// -----------------------------------
 	public enum GUI_STATE
 	{
-		DEFAULT, DIALOG_OPEN, // if this state is enabled then all clicks except for that dialog are disabled, only one dialog can be open at a time?
+		DEFAULT, //
+		DIALOG_OPEN, // if this state is enabled then all clicks except for that dialog are disabled, only one dialog can be open at a time?
 		DIALOG_SUBDIALOG_OPEN, // if a dialog is already open and we open another dialog in it (eg the Options dialog in the Open File dialog)
 	};
 
@@ -114,7 +125,7 @@ public class NiftyScreenController extends DefaultScreenController
 	// -----------------------------------
 	// Side menu
 	// -----------------------------------
-	static NiftySettingsSideMenu m_settingsSideMenu = null;
+	public static NiftySettingsSideMenu m_settingsSideMenu = null;
 	boolean m_isSettginsSideMenuOpened = false;
 
 	// -----------------------------------
@@ -188,6 +199,15 @@ public class NiftyScreenController extends DefaultScreenController
 	static Element m_userManualDialog = null;
 	static Element m_darkeningPanelForDialog = null;
 
+
+	// -----------------------------------
+	// Input settings controls
+	// -----------------------------------
+	de.lessvoid.nifty.controls.DropDown m_inputSettingsInputMethodTypeDropdown = null;
+	de.lessvoid.nifty.controls.DropDown m_inputSettingsMoveTypeDropdown = null;
+	Element m_inputSettingsInputSensitivitySlider = null;
+	Element m_inputSettingsLeapMotionSlider = null;
+	
 	// -----------------------------------
 	// Init
 	// -----------------------------------
@@ -279,7 +299,29 @@ public class NiftyScreenController extends DefaultScreenController
 			System.out.println("Error HTML: " + e.getMessage() + ", " + e.toString());
 			e.printStackTrace();
 		}
-
+		
+		// ---------------------------------------
+		// Input menu 
+		// ---------------------------------------
+		m_inputSettingsInputMethodTypeDropdown = m_inputOptionsDialog.findElementById("INPUT_METHOD_DROPDOWN").getAttachedInputControl().getControl(DropDownControl.class);
+		m_inputSettingsInputSensitivitySlider = m_inputOptionsDialog.findElementById("INPUT_inputSens");
+		m_inputSettingsLeapMotionSlider = m_inputOptionsDialog.findElementById("INPUT_leapSens");
+		m_inputSettingsMoveTypeDropdown  = m_inputOptionsDialog.findElementById("MOVE_TYPE_METHOD_DROPDOWN").getAttachedInputControl().getControl(DropDownControl.class);
+		
+		IMPLEMENT OK & CANCEL BUTTON & MVOE CAMERA (NO NEED FOR CALLBACKS FOR DROPDOWN BECAUSE OF OK/CANCEL BUTTON :)
+		
+		InitSlider(m_inputSettingsInputSensitivitySlider, 0.0f, 1.0f, 0.5f, 0.1f, "Input Sensitivity", "%.1f");
+		InitSlider(m_inputSettingsLeapMotionSlider,		  0.0f, 1.0f, 0.5f, 0.1f, "Input Sensitivity", "%.1f");
+		
+		m_inputSettingsMoveTypeDropdown.addItem(INPUT_SETTINGS_MOVE_CAMERA);
+		m_inputSettingsMoveTypeDropdown.addItem(INPUT_SETTINGS_MOVE_MODEL);
+		m_inputSettingsMoveTypeDropdown.selectItemByIndex(0);
+		
+		m_inputSettingsInputMethodTypeDropdown.addItem(INPUT_SETTINGS_INPUT_TYPE_NORMAL);
+		m_inputSettingsInputMethodTypeDropdown.addItem(INPUT_SETTINGS_INPUT_TYPE_3DMOUSE);
+		m_inputSettingsInputMethodTypeDropdown.addItem(INPUT_SETTINGS_INPUT_TYPE_LEAPMOTION);
+		m_inputSettingsInputMethodTypeDropdown.selectItemByIndex(0);
+		
 		// ---------------------------------------
 		// Prepare gui for show
 		// ---------------------------------------
@@ -826,8 +868,63 @@ public class NiftyScreenController extends DefaultScreenController
 	@NiftyEventSubscriber(id = "WIREFRAME_CHECKBOX_ID")
 	public void OnSettingsSideMenuWireframeCheckboxChanged(String id, CheckBoxStateChangedEvent event)
 	{
-		VeinsWindow.wire=event.isChecked();
+		VeinsWindow.wire = event.isChecked();
 	}
+
+	public void onButton_ObjIncreaseSubdivLevel()
+	{
+		VeinsWindow.increaseSubdivLevel = true;
+	}
+
+	public void onButton_ObjDecreaseSubdivLevel()
+	{
+		VeinsWindow.decreaseSubdivLevel = true;
+	}
+	
+	@NiftyEventSubscriber(id = "ENABLE_SSAO_CHECKBOX")
+	public void OnSettingsSideMenuSSAOCheckbox(String id, CheckBoxStateChangedEvent event)
+	{
+		VolumeRaycast.m_enableSSAO = event.isChecked();
+	}
+	
+	@NiftyEventSubscriber(id = "OVERRIDE_GRADIENT_CHECKBOX")
+	public void OnSettingsSideMenuOverrideGradientheckbox(String id, CheckBoxStateChangedEvent event)
+	{
+		VolumeRaycast.m_overrideGradient = event.isChecked();
+	}
+	
+	@NiftyEventSubscriber(id = "ENABLE_DOF_CHECKBOX")
+	public void OnSettingsSideMenuDOFCheckbox(String id, CheckBoxStateChangedEvent event)
+	{
+		VolumeRaycast.m_enableDOF = event.isChecked();
+	}
+
+	// render methods 
+	@NiftyEventSubscriber(id = "VOLUME_RENDERMETHOD_DROPDOWN")
+	public void OnVolumeRendererMethodTypeDropdown(String id, DropDownSelectionChangedEvent event)
+	{
+		if(event.getSelection() != null)
+		{
+			String sel = (String)event.getSelection();
+			if(sel.compareTo(NiftySettingsSideMenu.VOLUME_RENDER_METHOD_ISO)==0)
+			{
+				VolumeRaycast.SetRenderMethod(VolumeRaycast.RenderMethod.ISO);
+			}
+			else if(sel.compareTo(NiftySettingsSideMenu.VOLUME_RENDER_METHOD_ALPHA)==0)
+			{
+				VolumeRaycast.SetRenderMethod(VolumeRaycast.RenderMethod.ALPHA);
+			}
+			else if(sel.compareTo(NiftySettingsSideMenu.VOLUME_RENDER_METHOD_MAXMIMUM_PROJECTIOn)==0)
+			{
+				VolumeRaycast.SetRenderMethod(VolumeRaycast.RenderMethod.MAX_PROJECTION);
+			}
+			else
+			{
+				System.out.println("Error: invalid volume render method: "+sel);
+			};
+		}
+	}
+
 	
 	// ----------------------------------------------------
 	// Open dialog
@@ -1203,7 +1300,39 @@ public class NiftyScreenController extends DefaultScreenController
 				VeinsWindow.renderer.getVeinsModel().changeMinTriangles((int) event.getValue());
 			}
 		}
-
+		
+		// Volume renderer
+		if (modifiedSlider.getId().compareTo("ssao_strength") == 0)
+		{
+			VolumeRaycast.m_ssaoStrength = event.getValue();
+		}
+		if (modifiedSlider.getId().compareTo("dof_focus") == 0)
+		{
+			VolumeRaycast.m_dofFocus = event.getValue();
+		}
+		if (modifiedSlider.getId().compareTo("dof_strength") == 0)
+		{
+			VolumeRaycast.m_dofStrength = event.getValue();
+		}
+		if (modifiedSlider.getId().compareTo("volume_grad_x") == 0)
+		{
+			VolumeRaycast.m_gradXCustom = event.getValue();
+		}
+		if (modifiedSlider.getId().compareTo("volume_grad_y") == 0)
+		{
+			VolumeRaycast.m_gradYCustom = event.getValue();
+		}
+		if (modifiedSlider.getId().compareTo("volume_grad_z") == 0)
+		{
+			VolumeRaycast.m_gradZCustom = event.getValue();
+		}
+		
+		// threhold
+		if (modifiedSlider.getId().compareTo("volume_iso_threshold") == 0)
+		{
+			VolumeRaycast.threshold = event.getValue();
+		}
+	
 	}
 
 	// A hacky way to get slider events to work: the slider inside my control makes an event, this function

@@ -1382,7 +1382,11 @@ const float threshold, const int lin
 	float depth = FLT_MAX;
 	float4 color = castAlpha(S, E, matrix, M, D, trf, trfSamples, threshold, lin, &depth);
 	
-
+	// brighten color so it matches backgorund, otherwise gui not visible
+	const float brighter = 0.15f;
+	color += (float4)(brighter,brighter,brighter,0);
+	
+	
 	#ifdef USE_TEXTURE
 		write_imagef(output, (int2)(ix, iy), color);
 		writeDepth(outputDepth, (int2)(ix, iy), depth);
@@ -1737,7 +1741,7 @@ kernel void depthOfField(INPUT_TYPE clear, INPUT_TYPE blurred, INPUT_TYPE depthB
 	const float alpha = clamp(dist * strength, 0.f, 1.f);
 	color = lerp4(cclear, cblurred, alpha);
 	//if (depth != FLT_MAX)
-		color *= (1.f - alpha) * 0.6f + 0.4f;
+		//color *= (1.f - alpha);
 	//float d = depth / 500.f;
 	//color = (float4)(d,d,d,1);
 
@@ -1765,7 +1769,7 @@ kernel void depthOfField(INPUT_TYPE clear, INPUT_TYPE blurred, INPUT_TYPE depthB
 //   output       - output image                                             //
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
-kernel void ssao(INPUT_TYPE image, INPUT_TYPE depthBuffer, OUTPUT_TYPE output) {
+kernel void ssao(INPUT_TYPE image, INPUT_TYPE depthBuffer, OUTPUT_TYPE output,const float ssaoStrength) {
 	const int x = get_global_id(0);
 	const int y = get_global_id(1);
 	const int w = get_global_size(0);
@@ -1833,7 +1837,7 @@ kernel void ssao(INPUT_TYPE image, INPUT_TYPE depthBuffer, OUTPUT_TYPE output) {
 		}
 	}
 	
-	color *= 1 - s;
+	color *= 1 - s*ssaoStrength;
 	
 	
 	

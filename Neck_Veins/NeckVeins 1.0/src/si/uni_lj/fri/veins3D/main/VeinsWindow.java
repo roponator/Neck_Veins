@@ -128,6 +128,9 @@ public class VeinsWindow
 	public static Frame frame = null; // Window frame
 	public static VeinsWindow veinsWindow = null;// itself
 
+	public static boolean increaseSubdivLevel = false;
+	public static boolean decreaseSubdivLevel = false;
+
 	/**
 	 * 
 	 */
@@ -152,7 +155,7 @@ public class VeinsWindow
 		this.title = Title;
 		loadSettings(filename); // MUST BE BEFORE NIFTY GUI INIT, BECAUSE NIFTY CONTROLS RESTORE STATE FROM THIS!
 		createDisplay();
-		
+
 		initNiftyAndGUI();
 		initWindowElements();
 		setupWindow();
@@ -208,21 +211,21 @@ public class VeinsWindow
 		int height = gd.getDisplayMode().getHeight();
 		return currentDisplayMode.getWidth() == width && currentDisplayMode.getHeight() == height;
 	}
-	
+
 	// Returns largest display mode or returns the first one if it fails.
 	public static DisplayMode GetLargestDisplayMode()
-	{	
+	{
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		int width = gd.getDisplayMode().getWidth();
 		int height = gd.getDisplayMode().getHeight();
-		
+
 		DisplayMode displayModes[];
 		try
 		{
 			displayModes = Display.getAvailableDisplayModes();
-			for(int i=0;i<displayModes.length;++i)
+			for (int i = 0; i < displayModes.length; ++i)
 			{
-				if(displayModes[i].getWidth() == width && displayModes[i].getHeight()==height)
+				if (displayModes[i].getWidth() == width && displayModes[i].getHeight() == height)
 					return displayModes[i];
 			}
 			return displayModes[0];
@@ -232,17 +235,17 @@ public class VeinsWindow
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		return currentDisplayMode; // hacky, but should always return a valid display mode		
+
+		return currentDisplayMode; // hacky, but should always return a valid display mode
 	}
-	
+
 	// Contains all logic to resize window, renderer and niftyGUI
 	public static void ResizeWindow(DisplayMode displayMode, boolean fullscreen)
 	{
 		renderer = (VeinsRenderer) renderer;
 		currentDisplayMode = displayMode;
-		
-		if(fullscreen == false)
+
+		if (fullscreen == false)
 			m_lastWindowedResoltuon = displayMode;
 
 		try
@@ -257,16 +260,16 @@ public class VeinsWindow
 		{
 			e.printStackTrace();
 		}
-		renderer.setupView();	
+		renderer.setupView();
 		frame.setPreferredSize(new Dimension(currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
 		frame.setSize(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
 		frame.pack();
 		nifty.resolutionChanged();
 		screenController.OnResize(currentDisplayMode);
-		
-		// Do this at the end when openGL has setup itself 
-		//THIS CAUSES THE WHITE SCREEN FLASH ON RESIZE IF YOU ARE USING VOLUME RENDERER:
-		//openCL inits itself again, otherwise you get invalid clContext error.
+
+		// Do this at the end when openGL has setup itself
+		// THIS CAUSES THE WHITE SCREEN FLASH ON RESIZE IF YOU ARE USING VOLUME RENDERER:
+		// openCL inits itself again, otherwise you get invalid clContext error.
 		veinsWindow.RenderSingleFrameWithoutModel(); // FIX FOR WHITE SCREEN FLASH
 		veinsWindow.RenderSingleFrameWithoutModel(); // FIX FOR WHITE SCREEN FLASH
 		renderer.SetNewResolution(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
@@ -276,7 +279,7 @@ public class VeinsWindow
 	{
 		try
 		{
-			
+
 			displayModes = Display.getAvailableDisplayModes();
 			// displayModeStrings = new String[displayModes.length];
 			currentDisplayMode = Display.getDesktopDisplayMode();
@@ -304,19 +307,19 @@ public class VeinsWindow
 			}
 
 			// ADD TO VM ARGS: -Dorg.lwjgl.opengl.Window.undecorated=true
-		//	currentDisplayMode = displayModes[6]; // TODO: REMOVE LATER ON
+			// currentDisplayMode = displayModes[6]; // TODO: REMOVE LATER ON
 			// settings.fullscreen = true;
 			settings.resWidth = currentDisplayMode.getWidth();
 			settings.resHeight = currentDisplayMode.getHeight();
 			settings.bitsPerPixel = currentDisplayMode.getBitsPerPixel();
 			settings.frequency = currentDisplayMode.getFrequency();
-			
+
 			Display.setFullscreen(settings.fullscreen);
-			Display.setVSyncEnabled(true);	
-			
-			if(settings.fullscreen == false)
+			Display.setVSyncEnabled(true);
+
+			if (settings.fullscreen == false)
 				m_lastWindowedResoltuon = currentDisplayMode;
-				
+
 		}
 		catch (LWJGLException e)
 		{
@@ -424,32 +427,42 @@ public class VeinsWindow
 
 		while (isRunning)
 		{
+			// handle subdiv increase
+			if (increaseSubdivLevel && VeinsWindow.renderer.veinsModel != null)
+				VeinsWindow.renderer.veinsModel.increaseSubdivisionDepth();
+
+			if (decreaseSubdivLevel && VeinsWindow.renderer.veinsModel != null)
+				VeinsWindow.renderer.veinsModel.decreaseSubdivisionDepth();
+
+			increaseSubdivLevel = false;
+			decreaseSubdivLevel = false;
+
 			// Detect on down click after it was up (NOT DOWN->UP!)
 			boolean wasLeftMouseDownClicked = false;
 			if (Mouse.isButtonDown(0) == true && m_wasMouseLeftUp == true)
 				wasLeftMouseDownClicked = true;
 
 			m_wasMouseLeftUp = !Mouse.isButtonDown(0);
-			
+
 			// Strange render loop
 
 			// renderer.setupView(); // raycast volume renderer changes some
 			// states, theys must be reset
 
 			// Allow input only if default state, otherwise leave nifty keyboard input (required for text field for save menu)
-			if( screenController != null && screenController.getState()==GUI_STATE.DEFAULT)
+			if (screenController != null && screenController.getState() == GUI_STATE.DEFAULT)
 				pollInput();
-			
+
 			renderer.switchWireframe(wire);
-			
+
 			// hud.setClickedOn(clickedOn);
 			renderer.setupView(); // raycast volume renderer changes some states, theys must be reset
 			renderer.clearView();
-			
-			//glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+			// glPushAttrib(GL_ALL_ATTRIB_BITS);
 			renderer.render();
-			//glPopAttrib();	
-		
+			// glPopAttrib();
+
 			// hud.drawHUD();
 			setTitle();
 
@@ -475,7 +488,7 @@ public class VeinsWindow
 			}
 		}
 	}
-	
+
 	public void RenderSingleFrameWithoutModel()
 	{
 		renderer.setupView(); // raycast volume renderer changes some states, theys must be reset
@@ -483,12 +496,11 @@ public class VeinsWindow
 		renderNiftyGUI();
 		Display.update();
 	}
-	
 
 	// saves, sets and restores openGL states
 	void renderNiftyGUI()
 	{
-		
+
 		glPushMatrix();
 		glPushAttrib(GL_ALL_ATTRIB_BITS);
 

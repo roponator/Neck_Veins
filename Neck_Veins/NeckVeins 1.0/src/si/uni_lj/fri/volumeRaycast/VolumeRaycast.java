@@ -54,11 +54,32 @@ import static org.lwjgl.opengl.GL21.*;
 
 public class VolumeRaycast
 {
+	public enum RenderMethod
+	{
+		ISO,
+		ALPHA,
+		MAX_PROJECTION
+	}
+	
+	static RenderMethod renderMethod = RenderMethod.ISO;
+	
 	private Set<String> params;
 
+	public static boolean m_enableSSAO = false;
+	public static float m_ssaoStrength = 1.0f;
+	
+	public static boolean m_enableDOF = false;
+	public static float m_dofFocus = 20.0f;
+	public static float m_dofStrength = 0.015f;
+	
+	public static boolean m_overrideGradient = false;
+	public static float m_gradXCustom=1.0f, m_gradYCustom = 1.0f, m_gradZCustom = 1.0f;
+	
 	private CLContext clContext;
 	private CLCommandQueue queue;
-	private CLKernel kernel;
+	static private CLKernel kernelISO = null;
+	static private CLKernel kernelAlpha = null;
+	static private CLKernel currentlyActiveKernel = null;
 	private CLKernel kernelFirstPass;
 	private CLKernel kernelSecondPass;
 	private CLProgram program;
@@ -114,18 +135,18 @@ public class VolumeRaycast
 	private long tPrev = 0;
 	private long tNow = 0;
 
-//	private Vector3f camPos = new Vector3f(68.02019f, 124.51997f, -22.897635f); // mrt16_angio
-//private Vector3f camDir = new Vector3f(0.3290509f, -0.10898647f, 0.9380018f);
-	//private Vector3f camRight = new Vector3f(-0.94362277f, 0.0f, 0.33102274f);
-	//private Vector3f camUp = new Vector3f(0.036077f, 0.99404323f, 0.102842115f);
-	//private float camAngle = (float) Math.PI;
-	//private float camZAngle = 0;
-	//private float camSpeed = 100.f;
+	// private Vector3f camPos = new Vector3f(68.02019f, 124.51997f, -22.897635f); // mrt16_angio
+	// private Vector3f camDir = new Vector3f(0.3290509f, -0.10898647f, 0.9380018f);
+	// private Vector3f camRight = new Vector3f(-0.94362277f, 0.0f, 0.33102274f);
+	// private Vector3f camUp = new Vector3f(0.036077f, 0.99404323f, 0.102842115f);
+	// private float camAngle = (float) Math.PI;
+	// private float camZAngle = 0;
+	// private float camSpeed = 100.f;
 	private float fov = (float) Math.tan(Math.PI / 3);
 	private float asr = 0.0f;
 	// private float threshold = 0.03f;
-	private float threshold = 0.0025f; // mrt16_angio
-	private int lin = 0;
+	public static float threshold = 0.025f; // mrt16_angio
+	private int lin = 1;
 
 	private boolean doublePrecision = true;
 	private boolean buffersInitialized;
@@ -145,8 +166,12 @@ public class VolumeRaycast
 	private GLSync glSync;
 	private CLEvent glEvent;
 
+	static VolumeRaycast me;
+	
 	public VolumeRaycast(int width, int height)
 	{
+		me = this;
+		
 		this.width = width;
 		this.height = height;
 		asr = width / (float) height;
@@ -165,10 +190,10 @@ public class VolumeRaycast
 		try
 		{
 			CL.create();
-			
+
 			NiftyScreenController.UpdateLoadingBarDialog("Loading model...", 10.0f);
 			VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
-			
+
 		}
 		catch (LWJGLException e)
 		{
@@ -197,7 +222,7 @@ public class VolumeRaycast
 
 		initGLObjects();
 		glFinish();
-		
+
 		NiftyScreenController.UpdateLoadingBarDialog("Loading model...", 80.0f);
 		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
 
@@ -252,6 +277,21 @@ public class VolumeRaycast
 		setKernelConstants();
 	}
 
+	public static void SetRenderMethod(RenderMethod method)
+	{
+		if(method == RenderMethod.ISO)
+			currentlyActiveKernel = kernelISO;
+		else if(method == RenderMethod.ALPHA)
+			currentlyActiveKernel = kernelAlpha;
+		else if(method == RenderMethod.MAX_PROJECTION)
+			currentlyActiveKernel = kernelISO;
+		else
+			System.out.println("VolumeRaycast: invalid render method: "+method.toString());
+		
+		if(currentlyActiveKernel != null)
+			me.setKernelConstants();
+	}
+	
 	public void SetNewResolution(int width, int height)
 	{
 		this.width = width;
@@ -530,7 +570,7 @@ public class VolumeRaycast
 		glUseProgram(glProgram);
 		glUniform1i(glGetUniformLocation(glProgram, "mandelbrot"), 0);
 
-		compute(doublePrecision,camera);
+		compute(doublePrecision, camera);
 
 		render();
 	}
@@ -666,7 +706,11 @@ public class VolumeRaycast
 
 		rebuild = false;
 
-		kernel = clCreateKernel(program, "raycastAlpha", null);
+		kernelISO = clCreateKernel(program, "raycast", null);
+		kernelAlpha = clCreateKernel(program, "raycastAlpha", null);
+		
+		currentlyActiveKernel = kernelISO;
+		
 		kernelFirstPass = clCreateKernel(program, "raycastPass1", null);
 		kernelSecondPass = clCreateKernel(program, "raycastPass2", null);
 
@@ -683,12 +727,12 @@ public class VolumeRaycast
 
 	private void setKernelConstants()
 	{
-		kernel.setArg(0, glBuffers[BUFFER_1]).setArg(1, glBuffers[BUFFER_2]).setArg(2, glBuffers[BUFFER_DEPTH_1]).setArg(3, glBuffers[BUFFER_DEPTH_2]).setArg(18, matrix).setArg(25, octree).setArg(27, clTransferFunction);
+		currentlyActiveKernel.setArg(0, glBuffers[BUFFER_1]).setArg(1, glBuffers[BUFFER_2]).setArg(2, glBuffers[BUFFER_DEPTH_1]).setArg(3, glBuffers[BUFFER_DEPTH_2]).setArg(18, matrix).setArg(25, octree).setArg(27, clTransferFunction);
 		kernelFirstPass.setArg(0, glBuffers[BUFFER_2]).setArg(1, glBuffers[BUFFER_1]).setArg(2, glBuffers[BUFFER_DEPTH_2]).setArg(3, glBuffers[BUFFER_DEPTH_1]).setArg(18, matrix).setArg(25, octree).setArg(27, clTransferFunction);
 		kernelSecondPass.setArg(0, glBuffers[BUFFER_1]).setArg(1, glBuffers[BUFFER_2]).setArg(2, glBuffers[BUFFER_DEPTH_1]).setArg(3, glBuffers[BUFFER_DEPTH_2]).setArg(18, matrix).setArg(25, octree).setArg(27, clTransferFunction);
 	}
 
-	private void compute(final boolean is64bit,Camera camera)
+	private void compute(final boolean is64bit, Camera camera)
 	{
 		kernel2DGlobalWorkSize.put(0, width).put(1, height);
 
@@ -699,37 +743,35 @@ public class VolumeRaycast
 		{
 			clEnqueueAcquireGLObjects(queue, glBuffers[i], null, null);
 		}
-		
 
 		// create camera matrix, must also rotate by 180 degrees on Y axis for proper initial orientation
-		Quaternion rotY = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{0,1,0});
+		Quaternion rotY = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]
+		{ 0, 1, 0 });
 		Quaternion worldOrientation = Quaternion.quaternionReciprocal(camera.cameraOrientation);
-		FloatBuffer rotMatrix =  Quaternion.quaternionMultiplication(worldOrientation, rotY).getRotationMatrix(true);
-				
-		// start computation
-		kernel.
-		setArg(4, -camera.cameraX + 68.02019f). // offsets neeed for proper camera position
-		setArg(5, -camera.cameraY + 124.51997f).
-		setArg(6, -camera.cameraZ - 22.897635f).
-		setArg(7, rotMatrix.get(4*1+0)). // up
-		setArg(8, rotMatrix.get(4*1+1)).
-		setArg(9, rotMatrix.get(4*1+2)).
-		setArg(10,- rotMatrix.get(4*2+0)). // forward
-		setArg(11,-rotMatrix.get(4*2+1)).
-		setArg(12, -rotMatrix.get(4*2+2)).
-		setArg(13, rotMatrix.get(4*0+0)). // right
-		setArg(14, rotMatrix.get(4*0+1)).
-		setArg(15, rotMatrix.get(4*0+2)).
-		setArg(16, fov).
-		setArg(17, asr)
-				.setArg(19, MHDReader.Nx).setArg(20, MHDReader.Ny).setArg(21, MHDReader.Nz).setArg(22, (float) MHDReader.dx).setArg(23, (float) MHDReader.dy).setArg(24, (float) MHDReader.dz).setArg(26, octreeLevels).setArg(28, transferFunctionSamples).setArg(29, threshold).setArg(30, lin);
+		FloatBuffer rotMatrix = Quaternion.quaternionMultiplication(worldOrientation, rotY).getRotationMatrix(true);
 
-		clEnqueueNDRangeKernel(queue, kernel, 2, null, kernel2DGlobalWorkSize, null, null, null);// */
+		double dx = m_overrideGradient ? m_gradXCustom : MHDReader.dx;
+		double dy = m_overrideGradient ? m_gradYCustom : MHDReader.dy;
+		double dz = m_overrideGradient ? m_gradZCustom : MHDReader.dz;
+		
+		// start computation
+		currentlyActiveKernel.setArg(4, -camera.cameraX + 68.02019f)
+				. // offsets neeed for proper camera position
+				setArg(5, -camera.cameraY + 124.51997f).setArg(6, -camera.cameraZ - 22.897635f).setArg(7, rotMatrix.get(4 * 1 + 0))
+				. // up
+				setArg(8, rotMatrix.get(4 * 1 + 1)).setArg(9, rotMatrix.get(4 * 1 + 2)).setArg(10, -rotMatrix.get(4 * 2 + 0))
+				. // forward
+				setArg(11, -rotMatrix.get(4 * 2 + 1)).setArg(12, -rotMatrix.get(4 * 2 + 2)).setArg(13, rotMatrix.get(4 * 0 + 0))
+				. // right
+				setArg(14, rotMatrix.get(4 * 0 + 1)).setArg(15, rotMatrix.get(4 * 0 + 2)).setArg(16, fov).setArg(17, asr).setArg(19, MHDReader.Nx).setArg(20, MHDReader.Ny).setArg(21, MHDReader.Nz).setArg(22, (float) dx).setArg(23, (float) dy).setArg(24, (float) dz)
+				.setArg(26, octreeLevels).setArg(28, transferFunctionSamples).setArg(29, threshold).setArg(30, lin);
+
+		clEnqueueNDRangeKernel(queue, currentlyActiveKernel, 2, null, kernel2DGlobalWorkSize, null, null, null);// */
 
 		// adaptive sampling pass 1
 		/*
 		 * kernelFirstPass.setArg(4, camPos.x).setArg(5, camPos.y).setArg(6, camPos.z) .setArg(7, camUp.x).setArg(8, camUp.y).setArg(9, camUp.z) .setArg(10, camDir.x).setArg(11, camDir.y).setArg(12, camDir.z) .setArg(13, camRight.x).setArg(14, camRight.y).setArg(15, camRight.z) .setArg(16,
-		 * fov).setArg(17, asr) .setArg(19, MHDReader.Nx).setArg(20, MHDReader.Ny).setArg(21, MHDReader.Nz) .setArg(22, (float) MHDReader.dx).setArg(23, (float) MHDReader.dy).setArg(24, (float) MHDReader.dz) .setArg(26, octreeLevels).setArg(28, transferFunctionSamples) .setArg(29,
+		 * fov).setArg(17, asr) .setArg(19, MHDReader.Nx).setArg(20, MHDReader.Ny).setArg(21, MHDReader.Nz) .setArg(22, (float) dx).setArg(23, (float) dy).setArg(24, (float) dz) .setArg(26, octreeLevels).setArg(28, transferFunctionSamples) .setArg(29,
 		 * threshold).setArg(30, lin);
 		 * 
 		 * clEnqueueNDRangeKernel(queue, kernelFirstPass, 2, null, kernel2DGlobalWorkSize, null, null, null);
@@ -737,19 +779,24 @@ public class VolumeRaycast
 		 * // adaptive sampling pass 2
 		 * 
 		 * kernelSecondPass.setArg(4, camPos.x).setArg(5, camPos.y).setArg(6, camPos.z) .setArg(7, camUp.x).setArg(8, camUp.y).setArg(9, camUp.z) .setArg(10, camDir.x).setArg(11, camDir.y).setArg(12, camDir.z) .setArg(13, camRight.x).setArg(14, camRight.y).setArg(15, camRight.z) .setArg(16,
-		 * fov).setArg(17, asr) .setArg(19, MHDReader.Nx).setArg(20, MHDReader.Ny).setArg(21, MHDReader.Nz) .setArg(22, (float) MHDReader.dx).setArg(23, (float) MHDReader.dy).setArg(24, (float) MHDReader.dz) .setArg(26, octreeLevels).setArg(28, transferFunctionSamples) .setArg(29,
+		 * fov).setArg(17, asr) .setArg(19, MHDReader.Nx).setArg(20, MHDReader.Ny).setArg(21, MHDReader.Nz) .setArg(22, (float) dx).setArg(23, (float) dy).setArg(24, (float) dz) .setArg(26, octreeLevels).setArg(28, transferFunctionSamples) .setArg(29,
 		 * threshold).setArg(30, lin);
 		 * 
 		 * clEnqueueNDRangeKernel(queue, kernelSecondPass, 2, null, kernel2DGlobalWorkSize, null, null, null);//
 		 */
 
-		// if (lin == 1) {
-		// ssao(glBuffers[BUFFER_1], glBuffers[BUFFER_DEPTH_1], glBuffers[BUFFER_2]);
-		// copyImage(glBuffers[BUFFER_2], glBuffers[BUFFER_1]);
-		// }
-		/*
-		 * convolve(glBuffers[BUFFER_1], glBuffers[BUFFER_2], glBuffers[BUFFER_3]); depthOfField(glBuffers[BUFFER_1], glBuffers[BUFFER_3], glBuffers[BUFFER_DEPTH_1], glBuffers[BUFFER_2], 20.f, 0.015f); copyImage(glBuffers[BUFFER_2], glBuffers[BUFFER_1]);//
-		 */
+		if (lin == 1 && m_enableSSAO)
+		{
+			ssao(glBuffers[BUFFER_1], glBuffers[BUFFER_DEPTH_1], glBuffers[BUFFER_2]);
+			copyImage(glBuffers[BUFFER_2], glBuffers[BUFFER_1]);
+		}
+
+		if (lin == 1 && m_enableDOF)
+		{
+			convolve(glBuffers[BUFFER_1], glBuffers[BUFFER_2], glBuffers[BUFFER_3]);
+			depthOfField(glBuffers[BUFFER_1], glBuffers[BUFFER_3], glBuffers[BUFFER_DEPTH_1], glBuffers[BUFFER_2], m_dofFocus, m_dofStrength);
+			copyImage(glBuffers[BUFFER_2], glBuffers[BUFFER_1]);
+		}
 
 		for (int i = 0; i < glBuffersCount; i++)
 		{
@@ -805,135 +852,47 @@ public class VolumeRaycast
 		if (syncCLtoGL)
 		{
 			glSync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-			glEvent = clCreateEventFromGLsyncKHR(clContext, glSync, null);
+			//glEvent = clCreateEventFromGLsyncKHR(clContext, glSync, null);
+			//clReleaseEvent(glEvent);
 		}
 	}
 
 	private void handleIO()
 	{
-		/*tPrev = tNow;
-		tNow = System.currentTimeMillis();
-		float dt = (tNow - tPrev) / 1000.f;
-		if (Keyboard.getNumKeyboardEvents() != 0)
-		{
-			while (Keyboard.next() && !Keyboard.getEventKeyState())
-			{
-				switch (Keyboard.getEventKey())
-				{
-				case Keyboard.KEY_ESCAPE:
-					isRunning = false;
-					break;
-				case Keyboard.KEY_SPACE:
-					lin = lin == 0 ? 1 : 0;
-					break;
-				}
-			}
-		}
-
-		if (Keyboard.isKeyDown(Keyboard.KEY_W))
-		{
-			Vector3f camDirPrev = new Vector3f(camDir);
-			camDir.scale(camSpeed * dt);
-			Vector3f.add(camPos, camDir, camPos);
-			camDir = camDirPrev;
-		}
-
-		if (Keyboard.isKeyDown(Keyboard.KEY_S))
-		{
-			Vector3f camDirPrev = new Vector3f(camDir);
-			camDir.scale(camSpeed * dt);
-			Vector3f.sub(camPos, camDir, camPos);
-			camDir = camDirPrev;
-		}
-
-		if (Keyboard.isKeyDown(Keyboard.KEY_A))
-		{
-			Vector3f camRightPrev = new Vector3f(camRight);
-			camRight.scale(camSpeed * dt);
-			Vector3f.sub(camPos, camRight, camPos);
-			camRight = camRightPrev;
-		}
-
-		if (Keyboard.isKeyDown(Keyboard.KEY_D))
-		{
-			Vector3f camRightPrev = new Vector3f(camRight);
-			camRight.scale(camSpeed * dt);
-			Vector3f.add(camPos, camRight, camPos);
-			camRight = camRightPrev;
-		}
-
-		while (Mouse.next())
-		{
-			final int x = Mouse.getX();
-			final int y = Mouse.getY();
-
-			if (Mouse.getEventButton() == 2 && Mouse.getEventButtonState())
-			{
-				lin = lin == 0 ? 1 : 0;
-				System.out.println("click!");
-			}
-
-			if (Mouse.getEventButton() == 1 && Mouse.getEventButtonState())
-			{
-				System.out.println("saved!");
-
-				try
-				{
-					PrintWriter pr = new PrintWriter(new File("cam.txt"));
-					pr.println("pos: " + camPos.x + " " + camPos.y + " " + camPos.z);
-					pr.println("dir: " + camDir.x + " " + camDir.y + " " + camDir.z);
-					pr.println("rgt: " + camRight.x + " " + camRight.y + " " + camRight.z);
-					pr.println("cup: " + camUp.x + " " + camUp.y + " " + camUp.z);
-					pr.close();
-				}
-				catch (FileNotFoundException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
-			if (!Mouse.isButtonDown(0))
-			{
-				int offsetX = x - mouseX;
-				int offsetY = y - mouseY;
-
-				float spd = 0.005f;
-				float limit = (float) (Math.PI / 2);
-
-				camAngle += offsetX * spd;
-				camZAngle += offsetY * spd;
-				camZAngle = camZAngle < -limit ? -limit : (camZAngle > limit ? limit : camZAngle);
-
-				float ca = (float) Math.cos(camAngle);
-				float sa = (float) Math.sin(camAngle);
-				float cza = (float) Math.cos(camZAngle);
-				float sza = (float) Math.sin(camZAngle);
-				camDir.set(ca * cza, sza, sa * cza);
-				camUp.set(-ca * sza, cza, -sa * sza);
-				Vector3f.cross(camDir, camUp, camRight);
-			}
-
-			mouseX = x;
-			mouseY = y;
-		}
-
-		float wheelSpeed = 0.001f;
-		int wheel = Mouse.getDWheel();
-		float step = 0.0001f;
-		if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
-		{
-			step = 0.01f;
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT))
-		{
-			step = 0.1f;
-		}
-		if (wheel != 0)
-		{
-			threshold = Math.max(Math.min(threshold + step * (float) wheel * wheelSpeed, 1.f), 0.f);
-			System.out.println("New threshold: " + threshold);
-		}*/
+		/*
+		 * tPrev = tNow; tNow = System.currentTimeMillis(); float dt = (tNow - tPrev) / 1000.f; if (Keyboard.getNumKeyboardEvents() != 0) { while (Keyboard.next() && !Keyboard.getEventKeyState()) { switch (Keyboard.getEventKey()) { case Keyboard.KEY_ESCAPE: isRunning = false; break; case
+		 * Keyboard.KEY_SPACE: lin = lin == 0 ? 1 : 0; break; } } }
+		 * 
+		 * if (Keyboard.isKeyDown(Keyboard.KEY_W)) { Vector3f camDirPrev = new Vector3f(camDir); camDir.scale(camSpeed * dt); Vector3f.add(camPos, camDir, camPos); camDir = camDirPrev; }
+		 * 
+		 * if (Keyboard.isKeyDown(Keyboard.KEY_S)) { Vector3f camDirPrev = new Vector3f(camDir); camDir.scale(camSpeed * dt); Vector3f.sub(camPos, camDir, camPos); camDir = camDirPrev; }
+		 * 
+		 * if (Keyboard.isKeyDown(Keyboard.KEY_A)) { Vector3f camRightPrev = new Vector3f(camRight); camRight.scale(camSpeed * dt); Vector3f.sub(camPos, camRight, camPos); camRight = camRightPrev; }
+		 * 
+		 * if (Keyboard.isKeyDown(Keyboard.KEY_D)) { Vector3f camRightPrev = new Vector3f(camRight); camRight.scale(camSpeed * dt); Vector3f.add(camPos, camRight, camPos); camRight = camRightPrev; }
+		 * 
+		 * while (Mouse.next()) { final int x = Mouse.getX(); final int y = Mouse.getY();
+		 * 
+		 * if (Mouse.getEventButton() == 2 && Mouse.getEventButtonState()) { lin = lin == 0 ? 1 : 0; System.out.println("click!"); }
+		 * 
+		 * if (Mouse.getEventButton() == 1 && Mouse.getEventButtonState()) { System.out.println("saved!");
+		 * 
+		 * try { PrintWriter pr = new PrintWriter(new File("cam.txt")); pr.println("pos: " + camPos.x + " " + camPos.y + " " + camPos.z); pr.println("dir: " + camDir.x + " " + camDir.y + " " + camDir.z); pr.println("rgt: " + camRight.x + " " + camRight.y + " " + camRight.z); pr.println("cup: " +
+		 * camUp.x + " " + camUp.y + " " + camUp.z); pr.close(); } catch (FileNotFoundException e) { // TODO Auto-generated catch block e.printStackTrace(); } }
+		 * 
+		 * if (!Mouse.isButtonDown(0)) { int offsetX = x - mouseX; int offsetY = y - mouseY;
+		 * 
+		 * float spd = 0.005f; float limit = (float) (Math.PI / 2);
+		 * 
+		 * camAngle += offsetX * spd; camZAngle += offsetY * spd; camZAngle = camZAngle < -limit ? -limit : (camZAngle > limit ? limit : camZAngle);
+		 * 
+		 * float ca = (float) Math.cos(camAngle); float sa = (float) Math.sin(camAngle); float cza = (float) Math.cos(camZAngle); float sza = (float) Math.sin(camZAngle); camDir.set(ca * cza, sza, sa * cza); camUp.set(-ca * sza, cza, -sa * sza); Vector3f.cross(camDir, camUp, camRight); }
+		 * 
+		 * mouseX = x; mouseY = y; }
+		 * 
+		 * float wheelSpeed = 0.001f; int wheel = Mouse.getDWheel(); float step = 0.0001f; if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) { step = 0.01f; } if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) { step = 0.1f; } if (wheel != 0) { threshold = Math.max(Math.min(threshold + step * (float) wheel *
+		 * wheelSpeed, 1.f), 0.f); System.out.println("New threshold: " + threshold); }
+		 */
 	}
 
 	private static boolean isDoubleFPAvailable(CLDevice device)
@@ -1077,10 +1036,16 @@ public class VolumeRaycast
 		CLKernel gaussY = CL10.clCreateKernel(program, "gaussY", null);
 		CLKernel gaussZ = CL10.clCreateKernel(program, "gaussZ", null);
 
+		double dx = m_overrideGradient ? m_gradXCustom : MHDReader.dx;
+		double dy = m_overrideGradient ? m_gradYCustom : MHDReader.dy;
+		double dz = m_overrideGradient ? m_gradZCustom : MHDReader.dz;
+		
+		
 		// MATRIX
-		int size = (int) (2 * Math.ceil(3 * sigma / MHDReader.dx) + 1);
+		int size = (int) (2 * Math.ceil(3 * sigma / dx) + 1);
 		CLMem kernel = locateMemory(getGauss1DKernel(size, sigma), CL10.CL_MEM_READ_ONLY, queue, clContext);
 		Util.checkCLError(CL10.clFinish(queue));
+		
 
 		// GAUSS 3D
 		gaussX.setArg(0, matrix2).setArg(1, MHDReader.Nx).setArg(2, MHDReader.Ny).setArg(3, MHDReader.Nz).setArg(4, size).setArg(5, kernel).setArg(6, matrix);
@@ -1189,7 +1154,7 @@ public class VolumeRaycast
 
 	public void ssao(CLMem image, CLMem depthBuffer, CLMem output)
 	{
-		kernelsEffects[KERNEL_SSAO].setArg(0, image).setArg(1, depthBuffer).setArg(2, output);
+		kernelsEffects[KERNEL_SSAO].setArg(0, image).setArg(1, depthBuffer).setArg(2, output).setArg(3,m_ssaoStrength);
 		clEnqueueNDRangeKernel(queue, kernelsEffects[KERNEL_SSAO], 2, null, kernel2DGlobalWorkSize, null, null, null);
 	}
 

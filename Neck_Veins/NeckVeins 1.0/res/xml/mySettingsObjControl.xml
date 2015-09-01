@@ -6,6 +6,13 @@
           	<control name="label"style="STYLE_LABEL_DARK_TEXT" margin="2%,2%,2%,2%" width="96%" height="20px" text="Shader Type" textHAlign="left"  />			               		
          	<control id="OBJ_SHADER_DROPDOWN" name="dropDown"  margin="2%,4%,2%,4%" width="92%" height = "20px" align="left" vertical="no" horizontal="optional" selection="Single" displayItems="9"  />          
 			<control id="WIREFRAME_CHECKBOX_ID" name="MY_CHECKBOX" width="92%" height="30px" margin="2%,4%,2%,4%" align="left" />
+			
+			<control id="" name="button" label="Increase Subdivision Level"  margin="3%,2%,2%,3%" width="180px" >
+                  <interact onClick="onButton_ObjIncreaseSubdivLevel()"/> 
+            </control>
+            <control id="" name="button" label="Decrease Subdivision Level" margin="3%,2%,2%,3%" width="180px" >
+                  <interact onClick="onButton_ObjDecreaseSubdivLevel()"/> 
+           </control>
 				 		
      </panel>			
         

@@ -34,8 +34,8 @@
      <useControls filename="xml/myLoadingBarDialog.xml"/>
      <useControls filename="xml/mySettingsMarchingCubesControl.xml"/>
      <useControls filename="xml/mySettingsObjControl.xml"/>
+     <useControls filename="xml/mySettingsVolumeRendererController.xml"/>
      
- 
 	 <!-- base="nifty-panel-simple" -->
 	 
 	 <!-- PADDING ORDER: top,right,bottom,left -->
@@ -90,6 +90,7 @@
                     
                      <control childLayout="vertical" id="SIDE_SETTINGS_MARCHING_CUBES_CONTROL" name="MY_SIDE_SETTINGS_MARCHING_CUBES" align="center" width="100%" height="100px" margin="10px,0px,0px,0px"/>
                      <control childLayout="vertical" id="SIDE_SETTINGS_MARCHING_OBJ_CONTROL" name="MY_SIDE_SETTINGS_OBJ" align="center" width="100%" height="100px" margin="10px,0px,0px,0px"/>
+                  	  <control childLayout="vertical" id="SIDE_SETTINGS_MARCHING_VOLUME_RENDERER_CONTROL" name="MY_SIDE_SETTINGS_VOLUME_RENDERER" align="center" width="100%" height="100px" margin="10px,0px,0px,0px"/>
                   
                 </panel>
             
@@ -362,7 +363,7 @@
 		 <!--  Input settings dialog -->
 		 <!-- ******************************************* -->
 	
-	            <control id="MY_INPUT_OPTIONS_DIALOG" name="MY_INPUT_OPTIONS_CONTROL" x="40%" y="30%"  visible="false" childLayout="vertical" width="250px" height="300px" valign="center" align="center" />
+	            <control id="MY_INPUT_OPTIONS_DIALOG" name="MY_INPUT_OPTIONS_CONTROL" x="40%" y="30%"  visible="false" childLayout="vertical" width="250px" height="340px" valign="center" align="center" />
 	
 	          
 	  	 <!-- ******************************************* -->

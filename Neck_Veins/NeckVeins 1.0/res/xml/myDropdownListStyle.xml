@@ -33,7 +33,7 @@
             <onClick name="focus" targetElement="#parent"/>
             <onClick name="imageOverlay" filename="imgs\pngs720p\dropdown_list_arrow.png" imageMode="normal" post="true"/>
             <onFocus name="imageOverlay" filename="imgs\pngs720p\dropdown_list_arrow.png" imageMode="normal" post="true"/>
-           
+            <onActive name="border" border="1px,1px,1px,1px" color="#353535ff" timeType="infinite"/>
         </effect>
     </style>
 
