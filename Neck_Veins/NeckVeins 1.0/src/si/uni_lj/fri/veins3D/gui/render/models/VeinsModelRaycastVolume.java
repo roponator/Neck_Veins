@@ -97,7 +97,7 @@ public class VeinsModelRaycastVolume extends VeinsModel
 
 	public double GetVeinsGrabRadius()
 	{
-		return 0.0;
+		return 20.0;
 	}
 
 	public double[] GetVeinsGrabbedAt()

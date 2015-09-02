@@ -873,7 +873,7 @@ public class VolumeRaycast
 		 * 
 		 * if (Keyboard.isKeyDown(Keyboard.KEY_D)) { Vector3f camRightPrev = new Vector3f(camRight); camRight.scale(camSpeed * dt); Vector3f.add(camPos, camRight, camPos); camRight = camRightPrev; }
 		 * 
-		 * while (Mouse.next()) { final int x = Mouse.getX(); final int y = Mouse.getY();
+		 * while (Mouse.next()) { final int x = VeinsWindow.GetMouseX()(); final int y = VeinsWindow.GetMouseY()();
 		 * 
 		 * if (Mouse.getEventButton() == 2 && Mouse.getEventButtonState()) { lin = lin == 0 ? 1 : 0; System.out.println("click!"); }
 		 * 

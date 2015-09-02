@@ -192,7 +192,7 @@ public class VeinsRenderer
 	 */
 	private void setCameraAndLight(float offset)
 	{
-		double v[] = new double[]
+	/*	double v[] = new double[]
 		{ offset, 0, 0 };
 
 		v = cam.cameraOrientation.rotateVector3d(v);
@@ -223,7 +223,22 @@ public class VeinsRenderer
 		{ 0.15f, 0.15f, 0.15f, 1 }));
 		glLight(GL_LIGHT0, GL_SPECULAR, allocFloats(new float[]
 		{ 1.0f, 1.0f, 1.0f, 1.0f }));
-		gluLookAt(posX, posY, posZ, centerX, centerY, centerZ, upX, upY, upZ);
+		gluLookAt(posX, posY, posZ, centerX, centerY, centerZ, upX, upY, upZ);*/
+		
+		double v[] = new double[] { offset, 0, 0 };
+		v = cam.cameraOrientation.rotateVector3d(v);
+		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+		GL11.glLoadIdentity();
+		Quaternion worldOrientation = Quaternion.quaternionReciprocal(cam.cameraOrientation);
+		glMultMatrix(worldOrientation.getRotationMatrix(false));
+		glTranslatef(-cam.cameraX + (float) v[0], -cam.cameraY + (float) v[1], -cam.cameraZ + (float) v[2]);
+
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
+		glLight(GL_LIGHT0, GL_POSITION, allocFloats(new float[] { 0.0f, 1000.0f, 0.0f, 0.0f }));
+		glLight(GL_LIGHT0, GL_DIFFUSE, allocFloats(new float[] { 1f, 1f, 1f, 1 }));
+		glLight(GL_LIGHT0, GL_AMBIENT, allocFloats(new float[] { 0.3f, 0.3f, 0.3f, 1 }));
+		glLight(GL_LIGHT0, GL_SPECULAR, allocFloats(new float[] { 1.0f, 1.0f, 1.0f, 1.0f }));
 
 	}
 

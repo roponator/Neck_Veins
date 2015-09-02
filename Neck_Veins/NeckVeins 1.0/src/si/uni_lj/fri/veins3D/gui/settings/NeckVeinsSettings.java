@@ -18,7 +18,7 @@ public class NeckVeinsSettings implements Serializable {
 	public boolean mRot;
 	public boolean mSelected;
 	public boolean mStrong;
-	public int sensitivity = 100;
+	public int sensitivity = 50;
 	public String workingDirectory;
 	public int leapSensitivity = 75; 
 	

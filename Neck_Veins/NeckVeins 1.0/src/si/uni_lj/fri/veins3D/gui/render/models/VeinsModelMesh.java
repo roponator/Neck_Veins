@@ -101,9 +101,9 @@ public class VeinsModelMesh extends VeinsModel
 
 	public void changeThreshold(float threshold)
 	{
-		if(bWasLoadedFromObj) // must be loaded from raw file to this to work
+		if (bWasLoadedFromObj) // must be loaded from raw file to this to work
 			return;
-		
+
 		try
 		{
 			this.deleteMeshes();
@@ -120,9 +120,9 @@ public class VeinsModelMesh extends VeinsModel
 
 	public void changeMinTriangles(int min)
 	{
-		if(bWasLoadedFromObj) // must be loaded from raw file to this to work
+		if (bWasLoadedFromObj) // must be loaded from raw file to this to work
 			return;
-		
+
 		for (Mesh mesh : meshes)
 		{
 			mesh.deleteVBO();
@@ -408,7 +408,7 @@ public class VeinsModelMesh extends VeinsModel
 	public void constructVBOFromObjFile(String filepath)
 	{
 		bWasLoadedFromObj = true;
-		
+
 		vertices = new ArrayList<Float>();
 		ArrayList<Float> normals = new ArrayList<Float>();
 		centerx = 0;
@@ -585,6 +585,11 @@ public class VeinsModelMesh extends VeinsModel
 		return threshold;
 	}
 
+	public void setAddedOrientation(Quaternion q)
+	{
+		addedOrientation = q;
+	}
+	
 	@Override
 	public void render(Camera camera)
 	{
@@ -592,25 +597,24 @@ public class VeinsModelMesh extends VeinsModel
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 
+		Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
+		FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
+		GL11.glMultMatrix(fb);
+		glTranslatef(-(float) centerx, -(float) centery, -(float) centerz);
+
 		// Move model if enabled
-		if(VeinsWindow.moveModel == true)
-		{
-			// Apply orientation (add rotations) 
-			 Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
-			 FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
-			 GL11.glMultMatrix(fb); 
-	
-			 // LEAVE THIS OFF
-			// Translate and render 
-			//glTranslatef(-(float) centerx, -(float) centery, -(float) centerz);	
-		}
-		
+		/*
+		 * if(VeinsWindow.moveModel == true) { // Apply orientation (add rotations) Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation); FloatBuffer fb = compositeOrientation.getRotationMatrix(false); GL11.glMultMatrix(fb);
+		 * 
+		 * // LEAVE THIS OFF // Translate and render //glTranslatef(-(float) centerx, -(float) centery, -(float) centerz); }
+		 */
+
 		// Render mesh
 		for (Mesh vbo : meshes)
 		{
 			vbo.render(numberOfSubdivisions);
 		}
-		
+
 		glPopMatrix();
 		// drawMeshNormals();
 	}
@@ -619,18 +623,19 @@ public class VeinsModelMesh extends VeinsModel
 	 * Change added orientation (rotations) of the model
 	 */
 	@Override
-	public void changeAddedOrientation(VeinsRenderer renderer)
-	{
-		double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
+	public void changeAddedOrientation(VeinsRenderer renderer) {
+		double[] veinsHeldAt = RayUtil.getRaySphereIntersection_WITH_ONLY_ONE_INTERSECTION_POINT(Mouse.getX(), Mouse.getY(), renderer);
 
-		if (veinsHeldAt != null && veinsGrabbedAt != null && VeinsWindow.renderer.veinsModel != null)
-		{
+		if (veinsHeldAt != null && veinsGrabbedAt != null ) {
 			double[] rotationAxis = Vector.crossProduct(veinsGrabbedAt, veinsHeldAt);
-			if (Vector.length(rotationAxis) > 0)
-			{
+			if (Vector.length(rotationAxis) > 0) {
 				rotationAxis = Vector.normalize(rotationAxis);
+				//rotationAxis[0] *= -1.0f;
+				//rotationAxis[1] *= -1.0f;
+				//rotationAxis[2] *= -1.0f;
 				rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
-				double angle = Math.acos(Vector.dotProduct(veinsGrabbedAt, veinsHeldAt) / (Vector.length(veinsGrabbedAt) * Vector.length(veinsHeldAt)));
+				double angle = Math.acos(Vector.dotProduct(veinsGrabbedAt, veinsHeldAt)
+						/ (Vector.length(veinsGrabbedAt) * Vector.length(veinsHeldAt)));
 				addedOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle, rotationAxis);
 			}
 		}
@@ -644,13 +649,18 @@ public class VeinsModelMesh extends VeinsModel
 
 	private void setDefaultOrientation()
 	{
-		/*
-		 * double angle1 = Math.toRadians(-90); // Math.PI * -90 / 180; double angle2 = Math.toRadians(180); // Math.PI * 180 / 180; currentOrientation = Quaternion.quaternionFromAngleAndRotationAxis(0, new double[] { 1, 0, 0 }); // double[] v =
-		 * Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(new double[] { 0, 1, 0 }); // currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, // Quaternion.quaternionFromAngleAndRotationAxis(angle2, v)); addedOrientation = new Quaternion();
-		 */
 
-		currentOrientation = computeDefaultOrientation();
+		double angle1 = Math.toRadians(-90); // Math.PI * -90 / 180;
+		double angle2 = Math.toRadians(180); // Math.PI * 180 / 180;
+		currentOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle1, new double[]
+		{ 1, 0, 0 });
+		double[] v = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(new double[]
+		{ 0, 1, 0 });
+		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, Quaternion.quaternionFromAngleAndRotationAxis(angle2, v));
 		addedOrientation = new Quaternion();
+
+		// currentOrientation = computeDefaultOrientation();
+		// addedOrientation = new Quaternion();
 
 	}
 
@@ -679,12 +689,6 @@ public class VeinsModelMesh extends VeinsModel
 	public void saveCurrentOrientation()
 	{
 		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
-	}
-
-	@Override
-	public void setAddedOrientation(Quaternion q)
-	{
-		addedOrientation = q;
 	}
 
 	private void setCurrentOrientation(Quaternion q)

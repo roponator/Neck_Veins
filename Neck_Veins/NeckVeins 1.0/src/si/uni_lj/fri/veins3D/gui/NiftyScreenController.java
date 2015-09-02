@@ -458,6 +458,7 @@ public class NiftyScreenController extends DefaultScreenController
 
 		// process widget input and move camera
 		NAVIGATION_WIDGET_BUTTON pressedButton = processNavWidgetInput(m_navWidgetWASD, event);
+		
 		switch (pressedButton)
 		{
 		case CENTER_CIRCLE_DOWN:
@@ -552,6 +553,11 @@ public class NiftyScreenController extends DefaultScreenController
 			widget.StopMoving();
 		}
 
+		// Disable object rotation if click on nav widget
+		if(resultButton != NAVIGATION_WIDGET_BUTTON.NONE)
+			VeinsWindow. canModelBeRotatedByMouse = false;
+			
+		
 		return resultButton;
 	}
 

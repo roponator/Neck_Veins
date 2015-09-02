@@ -15,7 +15,8 @@ public class RayUtil {
 	 * @param renderer
 	 * @return
 	 */
-	public static double[] getRaySphereIntersection(int x, int y, VeinsRenderer renderer) {
+	// We pick only one hitpoint on sphere, we do not check which one is closest, this causes strange rotation
+	public static double[] getRaySphereIntersection_WITH_ONLY_ONE_INTERSECTION_POINT(int x, int y, VeinsRenderer renderer) {
 		// figure out if the click on the screen intersects the circle that
 		// surrounds the veins model
 		Camera cam = renderer.getCamera();
@@ -47,10 +48,13 @@ public class RayUtil {
 			double t1 = (Vector.dotProduct(Sd, eSc) + Math.sqrt(discriminant)) / Vector.dotProduct(d, d);
 			double t2 = (Vector.dotProduct(Sd, eSc) - Math.sqrt(discriminant)) / Vector.dotProduct(d, d);
 
-			if (t2 < 0)
+			// Only one point
+			return Vector.sum(e, Vector.vScale(d, t1));
+
+			/*if (t2 < 0)
 				return Vector.sum(e, Vector.vScale(d, t1));
 			else
-				return Vector.sum(e, Vector.vScale(d, t2));
+				return Vector.sum(e, Vector.vScale(d, t2));*/
 		}
 	}
 
