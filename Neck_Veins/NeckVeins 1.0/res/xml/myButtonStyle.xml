@@ -6,7 +6,7 @@
     <!-- +++++++++++++++++++++++++++++++++++++ -->
     <style id="nifty-button#panel">
         <attributes backgroundImage="imgs/pngs720p/Med3D-36.png" imageMode="normal"
-                    paddingLeft="15px" paddingRight="7px" width="95px" height="23px" childLayout="center"
+                    paddingLeft="15px" paddingRight="15px" width="95px" height="23px" childLayout="center"
                     visibleToMouse="true"/>
         <effect>
             <onHover name="border" color="#4cb4b3ff" post="true"/>
@@ -20,7 +20,7 @@
     <!-- style for the button text -->
     <!-- +++++++++++++++++++++++++++++++++++++ -->
     <style id="nifty-button#text" base="button-font">
-        <attributes align="center" valign="center" textHAlign="center" textVAlign="center" visibleToMouse="false"/>
+        <attributes align="center" valign="center" textHAlign="center" textVAlign="center" visibleToMouse="false" padding="0px,0px,0px,0px" margin="0px,0px,0px,0px"/>
         <effect>
             <onEnabled name="textColorAnimated" startColor="#8886" endColor="#eeef" post="false" length="150"/>
             <onDisabled name="textColorAnimated" startColor="#eeef" endColor="#8886" post="false" length="150"/>

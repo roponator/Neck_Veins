@@ -36,7 +36,7 @@
               			
 	              	<!-- top text and icon -->
 	              	<panel id="" childLayout="horizontal" style="STYLE_COMMON_INVISIBLE" width="100%" height="10%" valign="top" align="left">         
-	              			<panel id="PADDING" childLayout="horizontal" style="STYLE_COMMON_INVISIBLE" width="1%" height="100%" valign="top" align="left"/>         
+	              			<panel id="PADDING" childLayout="horizontal" style="STYLE_COMMON_INVISIBLE" width="2.5%" height="100%" valign="top" align="left"/>         
 	              			<image  childLayout="center" filename="imgs\pngs720p\Med3D-19.png" width="48px" height="48px" valign="center" align="left" filter="true"/>
 	                		<panel id="PADDING" childLayout="horizontal" style="STYLE_COMMON_INVISIBLE" width="1%" height="100%" valign="top" align="left"/>         
 	              	

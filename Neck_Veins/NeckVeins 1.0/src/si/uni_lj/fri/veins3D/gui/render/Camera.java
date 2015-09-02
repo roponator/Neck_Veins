@@ -24,16 +24,20 @@ public class Camera {
 		cameraOrientation = new Quaternion();
 	}
 
-	public void zoomIn() {
-		cameraX *= 0.8;
-		cameraY *= 0.8;
-		cameraZ *= 0.8;
+	public void zoomIn()
+	{
+		double rotateVector[] = cameraOrientation.rotateVector3d(Z_NEGATIVE_AXIS);
+		cameraX += (float) rotateVector[0];
+		cameraY += (float) rotateVector[1];
+		cameraZ += (float) rotateVector[2];
 	}
 
-	public void zoomOut() {
-		cameraX *= 1.25;
-		cameraY *= 1.25;
-		cameraZ *= 1.25;
+	public void zoomOut() 
+	{
+		double rotateVector[] = cameraOrientation.rotateVector3d(Z_NEGATIVE_AXIS);
+		cameraX -= (float) rotateVector[0];
+		cameraY -= (float) rotateVector[1];
+		cameraZ -= (float) rotateVector[2];
 	}
 
 	public void lookUp() {
@@ -85,7 +89,8 @@ public class Camera {
 		cameraOrientation = Quaternion.quaternionMultiplication(cameraOrientation, addRotation);
 	}
 
-	public void move(float moveUp, float moveRight) {
+	public void move(float moveUp, float moveRight)
+	{
 		double up[] = new double[] { 0, 0, -moveUp };
 		up = cameraOrientation.rotateVector3d(up);
 		double right[] = new double[] { moveRight, 0, 0 };

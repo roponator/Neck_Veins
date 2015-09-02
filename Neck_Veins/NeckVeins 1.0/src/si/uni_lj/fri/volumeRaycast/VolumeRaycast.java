@@ -79,6 +79,7 @@ public class VolumeRaycast
 	private CLCommandQueue queue;
 	static private CLKernel kernelISO = null;
 	static private CLKernel kernelAlpha = null;
+	static private CLKernel kernelAlphaWithMip = null;
 	static private CLKernel currentlyActiveKernel = null;
 	private CLKernel kernelFirstPass;
 	private CLKernel kernelSecondPass;
@@ -284,7 +285,7 @@ public class VolumeRaycast
 		else if(method == RenderMethod.ALPHA)
 			currentlyActiveKernel = kernelAlpha;
 		else if(method == RenderMethod.MAX_PROJECTION)
-			currentlyActiveKernel = kernelISO;
+			currentlyActiveKernel = kernelAlphaWithMip;
 		else
 			System.out.println("VolumeRaycast: invalid render method: "+method.toString());
 		
@@ -707,7 +708,8 @@ public class VolumeRaycast
 		rebuild = false;
 
 		kernelISO = clCreateKernel(program, "raycast", null);
-		kernelAlpha = clCreateKernel(program, "raycastAlpha", null);
+		kernelAlpha = clCreateKernel(program, "raycastAlpha_NO_MIP", null);
+		kernelAlphaWithMip = clCreateKernel(program, "raycastAlpha_WITH_MIP", null);
 		
 		currentlyActiveKernel = kernelISO;
 		

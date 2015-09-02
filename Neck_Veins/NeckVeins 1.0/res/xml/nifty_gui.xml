@@ -3,7 +3,8 @@
     <useControls filename="nifty-default-controls.xml"/>
     <useStyles filename="nifty-default-styles.xml"/>
     <useStyles filename="xml/nifty_styles.xml"/>
-     
+    
+
     <useStyles filename="xml/myCheckboxStyle.xml"/>
     <useControls filename="xml/myCheckboxControl.xml"/>
     

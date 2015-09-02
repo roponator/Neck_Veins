@@ -592,19 +592,25 @@ public class VeinsModelMesh extends VeinsModel
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 
-		/* Apply orientation (add rotations) */
-		// Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
-		// FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
-		// GL11.glMultMatrix(fb);
-
-		/* Translate and render */
-		// glTranslatef(-(float) centerx, -(float) centery, -(float) centerz);
+		// Move model if enabled
+		if(VeinsWindow.moveModel == true)
+		{
+			// Apply orientation (add rotations) 
+			 Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
+			 FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
+			 GL11.glMultMatrix(fb); 
+	
+			 // LEAVE THIS OFF
+			// Translate and render 
+			//glTranslatef(-(float) centerx, -(float) centery, -(float) centerz);	
+		}
+		
+		// Render mesh
 		for (Mesh vbo : meshes)
 		{
-
 			vbo.render(numberOfSubdivisions);
 		}
-
+		
 		glPopMatrix();
 		// drawMeshNormals();
 	}
@@ -617,7 +623,7 @@ public class VeinsModelMesh extends VeinsModel
 	{
 		double[] veinsHeldAt = RayUtil.getRaySphereIntersection(Mouse.getX(), Mouse.getY(), renderer);
 
-		if (veinsHeldAt != null)
+		if (veinsHeldAt != null && veinsGrabbedAt != null && VeinsWindow.renderer.veinsModel != null)
 		{
 			double[] rotationAxis = Vector.crossProduct(veinsGrabbedAt, veinsHeldAt);
 			if (Vector.length(rotationAxis) > 0)

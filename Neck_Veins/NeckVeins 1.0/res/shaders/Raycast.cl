@@ -48,8 +48,6 @@
 #define AO_DEPTH 100.f
 #define SSAO_SAMPLES 16
 
-//#define MIP // undef for alpha
-
 
 // nearest-neighbour sampler for texture-based read functions
 constant const sampler_t nearest_sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST;
@@ -766,8 +764,8 @@ float* depth
 ) {
 	*depth = FLT_MAX;
 	float4 color = (float4)(0,0,0,0); // output color
-	const float4 background = (float4)(0.3,0.3,0.3,1);
-	const float4 debugcolor = (float4)(0.4,0.4,0.4,1);
+	const float4 background = (float4)(0.7,0.7,0.7,1);
+	const float4 debugcolor = (float4)(0.7,0.7,0.7,1);
 	
 	// shading params
 	const float4 diffuse = (float4)(1,0,0,1);
@@ -900,7 +898,100 @@ float* depth
 //   depth       - pointer to depth buffer                                   //
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
-float4 castAlpha(
+float4 castAlpha_WITH_MIP(
+float3 S, float3 E,
+global const float* matrix,
+const int3 M, const float3 D,
+global const float4* trf, const int trfSamples,
+const float threshold, const int lin,
+float* depth
+) {	
+	float4 color = (float4)(0,0,0,0); // output color
+	const float4 background = (float4)(0.7,0.7,0.7,1);
+	const float4 debugcolor = (float4)(0.7,0.7,0.7,1);
+	
+	// shading params
+	const float4 diffuse = (float4)(1,0,0,1);
+	const float4 specular = (float4)(1,1,1,1);
+	
+	// volume dimensions
+	const float3 size = D * convert_float3(M);
+	const float3 invD = 1 / D;
+	
+	// raycasting aux data
+	float dataValue = 0;
+	float3 P;
+	float cellSize = fmin(fmin(D.x, D.y), D.z);
+	float samplingRate = 3.5f;
+	if (lin == 0) {
+		samplingRate = 0.3f;
+	}
+	float dt = cellSize * samplingRate;
+	float eps = 0.01f;
+	
+	#ifdef ADAPTIVE_SAMPLING
+	/*const float k1 = 0.001f;
+	const float k2 = 0.001f;
+	const float k3 = 0.00005f;
+	const float x0 = 100.f;
+	const float y0 = 1.f;
+	const float y1 = 3.f;*/
+	#endif
+	
+	float2 result = (float2)(0,0); // raycasting lambda result buffer
+	if (raybox(S, E, (float3)(0,0,0), size, &result) && result.y > 0) {
+		result.x = fmax(result.x, 0); // start ray from camera, not from behind the camera
+		
+		float t = result.x + eps;
+		
+		
+		
+		
+		float maxval = 0.f;
+		while (t < result.y) {
+			P = S + t * E;
+			dataValue = sample(matrix, M, invD, P);
+			if (dataValue < threshold) dataValue = 0;
+			if (dataValue > maxval) { maxval = dataValue; }
+			t += dt;
+		}
+		const float strength = 150.f; // todo cl arg
+		color = lerp4(background, diffuse, maxval * strength);
+		
+
+	
+	} else {
+		if (result.y < 0)
+			color = background;
+		else
+			color = debugcolor;
+	}
+	
+	return color;
+}
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //
+// Raycasting algorithm. Used in raycasting kernels using                    //
+// alpha compositing.                                                        //
+//                                                                           //
+// params:                                                                   //
+//   S           - start of ray                                              //
+//   E           - direction of ray                                          //
+//   matrix      - input volume data                                         //
+//   M           - matrix array dimensions                                   //
+//   D           - volume dimensions                                         //
+//   trf         - transfer function - mapping from reals to color/alpha     //
+//   trfSamples  - transfer function array size                              //
+//   threshold   - isosurface value                                          //
+//   lin         - generic debugging int                                     //
+//   depth       - pointer to depth buffer                                   //
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+float4 castAlpha_NO_MIP(
 float3 S, float3 E,
 global const float* matrix,
 const int3 M, const float3 D,
@@ -910,8 +1001,8 @@ float* depth
 ) {	
 	float4 color = (float4)(0,0,0,0); // output color
 	float4 currentColor;
-	const float4 background = (float4)(0.3,0.3,0.3,1);
-	const float4 debugcolor = (float4)(0.4,0.4,0.4,1);
+	const float4 background = (float4)(0.7,0.7,0.7,1);
+	const float4 debugcolor = (float4)(0.7,0.7,0.7,1);
 	
 	// shading params
 	const float4 diffuse = (float4)(1,0,0,1);
@@ -946,23 +1037,7 @@ float* depth
 		result.x = fmax(result.x, 0); // start ray from camera, not from behind the camera
 		
 		float t = result.x + eps;
-		
-		
-		
-		#ifdef MIP
-		float maxval = 0.f;
-		while (t < result.y) {
-			P = S + t * E;
-			dataValue = sample(matrix, M, invD, P);
-			if (dataValue < threshold) dataValue = 0;
-			if (dataValue > maxval) { maxval = dataValue; }
-			t += dt;
-		}
-		const float strength = 150.f; // todo cl arg
-		color = lerp4(background, diffuse, maxval * strength);
-		
-		
-		#else
+	
 		const float kappa = 1.f;
 		float alpha = 0.f;
 		*depth = result.x;
@@ -987,9 +1062,6 @@ float* depth
 		}
 		
 		color = lerp4(background, color, color.w);
-		#endif
-	
-	
 	
 	
 	} else {
@@ -1303,7 +1375,6 @@ const float threshold, const int lin
 	
 	float depth;
 	float4 color = cast(S, E, matrix, M, D, threshold, lin, &depth);
-	
 
 	#ifdef USE_TEXTURE
 		write_imagef(output, (int2)(ix, iy), color);
@@ -1342,7 +1413,7 @@ const float threshold, const int lin
 //   lin           - generic debugging int                                   //
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
-kernel void raycastAlpha(
+kernel void raycastAlpha_WITH_MIP(
 OUTPUT_TYPE output, INPUT_TYPE input, OUTPUT_TYPE outputDepth, INPUT_TYPE inputDepth,
 const float Cx, const float Cy, const float Cz,
 const float Ux, const float Uy, const float Uz,
@@ -1380,13 +1451,84 @@ const float threshold, const int lin
 	float3 D = (float3)(dX, dY, dZ);
 	
 	float depth = FLT_MAX;
-	float4 color = castAlpha(S, E, matrix, M, D, trf, trfSamples, threshold, lin, &depth);
+	float4 color = castAlpha_WITH_MIP(S, E, matrix, M, D, trf, trfSamples, threshold, lin, &depth);
 	
-	// brighten color so it matches backgorund, otherwise gui not visible
-	const float brighter = 0.15f;
-	color += (float4)(brighter,brighter,brighter,0);
+
+	#ifdef USE_TEXTURE
+		write_imagef(output, (int2)(ix, iy), color);
+		writeDepth(outputDepth, (int2)(ix, iy), depth);
+	#else
+		writeColorUint(output, iy * iw + ix, color);
+		outputDepth[iy * iw + ix] = as_uint(depth);
+	#endif
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //
+// The kernel used for raycasting. Uses compositing for color synthesis.     //
+//                                                                           //
+// params:                                                                   //
+//   output        - output image                                            //
+//   input         - input image                                             //
+//   outputDepth   - output depth image                                      //
+//   inputDepth    - input depth image                                       //
+//   Cx, Cy, Cz    - camera position                                         //
+//   Ux, Uy, Uz    - camera unit up vector                                   //
+//   Dx, Dy, Dz    - camera unit directional vector                          //
+//   Rx, Ry, Rz    - camera unit right vector                                //
+//   fov           - field of view = tan(angle)                              //
+//   asr           - aspect ratio                                            //
+//   matrix        - input volume data                                       //
+//   mX, mY, mZ    - matrix array dimensions                                 //
+//   dX, dY, dZ    - volume dimensions                                       //
+//   octree        - octree structure                                        //
+//   octreeLevels  - number of octree levels                                 //
+//   threshold     - isosurface value                                        //
+//   lin           - generic debugging int                                   //
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+kernel void raycastAlpha_NO_MIP(
+OUTPUT_TYPE output, INPUT_TYPE input, OUTPUT_TYPE outputDepth, INPUT_TYPE inputDepth,
+const float Cx, const float Cy, const float Cz,
+const float Ux, const float Uy, const float Uz,
+const float Dx, const float Dy, const float Dz,
+const float Rx, const float Ry, const float Rz,
+const float fov, const float asr,
+global const float* matrix,
+const int mX, const int mY, const int mZ,
+const float dX, const float dY, const float dZ,
+global const float* octree, const int octreeLevels,
+global const float4* trf, const int trfSamples,
+const float threshold, const int lin
+) {
+    unsigned int ix = get_global_id(0);
+    unsigned int iy = get_global_id(1);
+	unsigned int iw = get_global_size(0);
+	unsigned int ih = get_global_size(1);
+	float alphax = ix / (float) iw - 0.5f;
+	float alphay = iy / (float) ih - 0.5f;
 	
+	float viewx = alphax * fov;
+	float viewy = alphay * fov / asr;
 	
+	// ray direction
+	float rx = Dx + viewx * Rx + viewy * Ux;
+	float ry = Dy + viewx * Ry + viewy * Uy;
+	float rz = Dz + viewx * Rz + viewy * Uz;
+	
+	// raycast
+	float3 S = (float3)(Cx,Cy,Cz); // ray start
+	float3 E = fast_normalize((float3)(rx,ry,rz)); // ray direction
+
+	// volume
+	int3 M = (int3)(mX, mY, mZ);
+	float3 D = (float3)(dX, dY, dZ);
+	
+	float depth = FLT_MAX;
+	float4 color = castAlpha_NO_MIP(S, E, matrix, M, D, trf, trfSamples, threshold, lin, &depth);
+		
 	#ifdef USE_TEXTURE
 		write_imagef(output, (int2)(ix, iy), color);
 		writeDepth(outputDepth, (int2)(ix, iy), depth);

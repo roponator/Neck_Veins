@@ -207,6 +207,8 @@ public class NiftyScreenController extends DefaultScreenController
 	de.lessvoid.nifty.controls.DropDown m_inputSettingsMoveTypeDropdown = null;
 	Element m_inputSettingsInputSensitivitySlider = null;
 	Element m_inputSettingsLeapMotionSlider = null;
+	float m_input_LeapMotionSensitivity_LastSliderValue = 0.5f; // temp values, in case Cancel is clicked
+	float m_input_sensitivity_LastSliderValue = 0.5f;
 	
 	// -----------------------------------
 	// Init
@@ -308,10 +310,10 @@ public class NiftyScreenController extends DefaultScreenController
 		m_inputSettingsLeapMotionSlider = m_inputOptionsDialog.findElementById("INPUT_leapSens");
 		m_inputSettingsMoveTypeDropdown  = m_inputOptionsDialog.findElementById("MOVE_TYPE_METHOD_DROPDOWN").getAttachedInputControl().getControl(DropDownControl.class);
 		
-		IMPLEMENT OK & CANCEL BUTTON & MVOE CAMERA (NO NEED FOR CALLBACKS FOR DROPDOWN BECAUSE OF OK/CANCEL BUTTON :)
-		
-		InitSlider(m_inputSettingsInputSensitivitySlider, 0.0f, 1.0f, 0.5f, 0.1f, "Input Sensitivity", "%.1f");
-		InitSlider(m_inputSettingsLeapMotionSlider,		  0.0f, 1.0f, 0.5f, 0.1f, "Input Sensitivity", "%.1f");
+		m_input_sensitivity_LastSliderValue = VeinsWindow.settings.sensitivity;
+		m_input_LeapMotionSensitivity_LastSliderValue = VeinsWindow.settings.leapSensitivity;
+		InitSlider(m_inputSettingsInputSensitivitySlider, 0.0f, 100.0f, m_input_sensitivity_LastSliderValue, 0.1f, "Input Sensitivity", "%.1f");
+		InitSlider(m_inputSettingsLeapMotionSlider, 0.0f, 100.0f, m_input_LeapMotionSensitivity_LastSliderValue, 0.1f, "Input Sensitivity", "%.1f");
 		
 		m_inputSettingsMoveTypeDropdown.addItem(INPUT_SETTINGS_MOVE_CAMERA);
 		m_inputSettingsMoveTypeDropdown.addItem(INPUT_SETTINGS_MOVE_MODEL);
@@ -1150,6 +1152,25 @@ public class NiftyScreenController extends DefaultScreenController
 		m_inputOptionsDialog.setVisible(false);
 	}
 
+
+	public void onButton_InputSettingsDialog_Cancel()
+	{
+		On_InputOptionsDialog_Close();
+	}
+	
+	public void onButton_InputSettingsDialog_OK()
+	{
+		VeinsWindow.settings.sensitivity = (int)m_input_sensitivity_LastSliderValue;
+		VeinsWindow.settings.leapSensitivity = (int)m_input_LeapMotionSensitivity_LastSliderValue;
+		
+		if(m_inputSettingsMoveTypeDropdown.getSelection()!=null)
+		{
+			String sel=(String)m_inputSettingsMoveTypeDropdown.getSelection();			
+			VeinsWindow.moveModel = sel.compareTo(INPUT_SETTINGS_MOVE_MODEL)==0;		
+		}
+		
+		On_InputOptionsDialog_Close();
+	}
 	// ----------------------------------------------------
 	// License options dialog
 	// ----------------------------------------------------
@@ -1333,6 +1354,16 @@ public class NiftyScreenController extends DefaultScreenController
 			VolumeRaycast.threshold = event.getValue();
 		}
 	
+		// Input dialog
+		if (modifiedSlider.getId().compareTo("INPUT_inputSens") == 0)
+		{
+			m_input_LeapMotionSensitivity_LastSliderValue = event.getValue();
+		}
+		
+		if (modifiedSlider.getId().compareTo("INPUT_leapSens") == 0)
+		{
+			m_input_sensitivity_LastSliderValue = event.getValue();
+		}
 	}
 
 	// A hacky way to get slider events to work: the slider inside my control makes an event, this function

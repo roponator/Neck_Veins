@@ -40,23 +40,21 @@
                  
 				  <!-- CHECKBOXES PANEL -->
 				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="17%" valign="top" align="left" >
-				    <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
-				   		 <control id="enabledCheckbox" name="MY_CHECKBOX" width="50%" height="100%"/>
-				    </panel>
+				   		 <control id="enabledCheckbox" name="MY_CHECKBOX" width="50%" height="100%" align="left" margin="0%,0%,0%,2.5%" />
                 </panel>
                  
 				  <!-- Buttons -->
-				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="28%" valign="top" align="left" >
-				    <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
-				   		 <control id="appendButton" name="button" label="Cancel" >
-				   		      <interact onClick="OnButton_StereoMenu_Cancel()"/>        	
-				   		 </control>
-				    </panel>
-				     <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
-				   		 <control id="appendButton" name="button" label="OK" >
-				   		      <interact onClick="OnButton_StereoMenu_OK()"/>        	
-						</control>
-				    </panel>
+				<panel id="" style="STYLE_COMMON_INVISIBLE" margin="3.5%,0%,0%,0%" childLayout="horizontal" width="100%" height="28%" valign="top" align="left" >
+				    	<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="2.5%" height="100%" valign="top" align="left" />			  		
+				   			 <control id="appendButton" name="button" label="Cancel" >
+					   		      <interact onClick="OnButton_StereoMenu_Cancel()"/>        	
+					   		 </control>
+						<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="*" height="100%" valign="top" align="left" />	  		
+					     	<control id="appendButton" name="button" label="OK" >
+					   		      <interact onClick="OnButton_StereoMenu_OK()"/>        	
+							</control>
+						 <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="2.5%" height="100%" valign="top" align="left" />
+				  		
                 </panel>
                    
               </panel>

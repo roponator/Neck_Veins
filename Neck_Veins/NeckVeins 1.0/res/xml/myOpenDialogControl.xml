@@ -51,17 +51,17 @@
                      <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="*" valign="top" align="left" />
                   
                      <!-- BUTTON BUTTONS ROW-->
-                   <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="10%" valign="center" align="left" padding="0px,10px,0px,10px" >
+                   <panel id="" style="STYLE_COMMON_INVISIBLE" padding="0px,6px,0px,6px"  childLayout="horizontal" width="100%" height="10%" valign="center" align="left" >
                        
-                        <control id="appendButton" name="button" label="Options" margin="0px,0px,0px,0px">
+                        <control id="appendButton" name="button" label="Options">
                         	<interact onClick="onButton_OpenDialog_OptionsDialog_Open()"/> 
                         </control>
                      	<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="*" height="100%" valign="top" align="left" />
-                         <control id="" name="button" label="Cancel" >
+                         <control id="" name="button" label="Cancel"  >
                              <interact onClick="onButton_OpenDialog_Cancel()"/> 
                          </control>
                          <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="5%" height="100%" valign="top" align="left" />
-                          <control id="appendButton" name="button" label="Open" >
+                          <control id="appendButton" name="button" label="Open">
                                <interact onClick="onButton_OpenDialog_Open()"/> 
                          </control>
                   </panel>

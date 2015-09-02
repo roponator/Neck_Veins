@@ -45,18 +45,15 @@
               
 				  <!-- Buttons -->
 				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="horizontal" width="100%" height="*" valign="center" align="left" >
-				      			
-						    <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
-						   		 <control id="appendButton" name="button" label="Cancel" valign="center"  >
+				      <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="2.5%" height="100%" valign="top" align="left" />			  		
+					  		 <control id="appendButton" name="button" label="Cancel" valign="center"  >
 						   		 	<interact onClick="On_OpenDialog_OptionsDialog_Close()"/>     
-						   		 </control>
-						    </panel>
-						     <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="center" width="50%" height="100%" valign="center" align="center" >
+						   		 </control>	    
+						    <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="*" height="100%" valign="top" align="left" />			  		
 						   		 <control id="appendButton" name="button" label="OK" valign="center" >
 						   		 	<interact onClick="On_OpenDialog_OptionsDialog_OK()"/>     
 						   		 </control>
-						    </panel>
-					    
+					    <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="2.5%" height="100%" valign="top" align="left" />			  				   		
 				    
                 </panel>
                    

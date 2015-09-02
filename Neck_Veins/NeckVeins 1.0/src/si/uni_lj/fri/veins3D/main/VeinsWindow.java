@@ -131,6 +131,8 @@ public class VeinsWindow
 	public static boolean increaseSubdivLevel = false;
 	public static boolean decreaseSubdivLevel = false;
 
+	public static boolean moveModel = false; // if true model is moved and camera is still
+
 	/**
 	 * 
 	 */
@@ -577,7 +579,7 @@ public class VeinsWindow
 	public void pollInput()
 	{
 		pollKeyboardInput();
-		// pollMouseInput();
+	 pollMouseInput();
 		// poll3DMouseInput();
 	}
 
@@ -661,51 +663,51 @@ public class VeinsWindow
 		// if (!frame.isDialogOpened()) return; TODO NIFTY
 
 		// moving the camera
-		if (Keyboard.isKeyDown(Keyboard.KEY_W))
+		if (Keyboard.isKeyDown(Keyboard.KEY_W) && moveModel == false)
 		{
 			renderer.getCamera().lookUp();
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_S))
+		if (Keyboard.isKeyDown(Keyboard.KEY_S) && moveModel == false)
 		{
 			renderer.getCamera().lookDown();
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_A))
+		if (Keyboard.isKeyDown(Keyboard.KEY_A) && moveModel == false)
 		{
 			renderer.getCamera().lookRight();
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_D))
+		if (Keyboard.isKeyDown(Keyboard.KEY_D) && moveModel == false)
 		{
 			renderer.getCamera().lookLeft();
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_Q))
+		if (Keyboard.isKeyDown(Keyboard.KEY_Q) && moveModel == false)
 		{
 			renderer.getCamera().rotateCounterClockwise();
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_E))
+		if (Keyboard.isKeyDown(Keyboard.KEY_E) && moveModel == false)
 		{
 			renderer.getCamera().rotateClockwise();
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_UP))
+		if (Keyboard.isKeyDown(Keyboard.KEY_UP) && moveModel == false)
 		{
 			renderer.getCamera().moveForward();
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
+		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN) && moveModel == false)
 		{
 			renderer.getCamera().moveBackwards();
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
+		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT) && moveModel == false)
 		{
 			renderer.getCamera().moveRight();
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
+		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT) && moveModel == false)
 		{
 			renderer.getCamera().moveLeft();
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_R))
+		if (Keyboard.isKeyDown(Keyboard.KEY_R) && moveModel == false)
 		{
 			renderer.getCamera().moveUp();
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_F))
+		if (Keyboard.isKeyDown(Keyboard.KEY_F) && moveModel == false)
 		{
 			renderer.getCamera().moveDown();
 		}
@@ -713,33 +715,30 @@ public class VeinsWindow
 	}
 
 	// TODO NIFTY
+
+	private void pollMouseInput()
+	{
+		if (screenController.getState() != GUI_STATE.DEFAULT || renderer.getVeinsModel() == null)
+			return;
+
+		int z = Mouse.getDWheel();
+		if (z > 0)
+		{
+			renderer.getCamera().zoomIn();
+		}
+		else if (z < 0)
+		{
+			renderer.getCamera().zoomOut();
+		}
+
+		if (Mouse.isButtonDown(0))
+		{
+			calculateClickedOn();
+			renderer.getVeinsModel().changeAddedOrientation(renderer);
+		}
+	}
+
 	/*
-	 * private void pollMouseInput() { if (!frame.isDialogOpened() || renderer.getVeinsModel() == null) return;
-	 * 
-	 * int z = Mouse.getDWheel(); if (z > 0) { renderer.getCamera().zoomIn(); } else if (z < 0) { renderer.getCamera().zoomOut(); }
-	 * 
-	 * if (Mouse.isButtonDown(0)) { calculateClickedOn();
-	 * 
-	 * if (clickedOn == CLICKED_ON_VEINS_MODEL) { renderer.getVeinsModel().changeAddedOrientation(renderer); }
-	 * 
-	 * if (clickedOn == CLICKED_ON_ROTATION_CIRCLE || clickedOn == CLICKED_ON_MOVE_CIRCLE) { float x = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? hud.x1 : hud.x2; float y = (clickedOn == VeinsWindow.CLICKED_ON_ROTATION_CIRCLE) ? hud.y1 : hud.y2;
-	 * 
-	 * float clickToCircleDistance = (float) Math.sqrt((x - Mouse .getX()) (x - Mouse.getX()) + (y - Mouse.getY()) (y - Mouse.getY())); float upRotation = (Mouse.getY() - y) / ((clickToCircleDistance > hud.r) ? clickToCircleDistance : hud.r); float rightRotation = (Mouse.getX() - x) /
-	 * ((clickToCircleDistance > hud.r) ? clickToCircleDistance : hud.r);
-	 * 
-	 * hud.clickToCircleDistance = Math.min(clickToCircleDistance, hud.r) / hud.r; hud.clickOnCircleAngle = (float) Math.atan2(Mouse.getY() - y, Mouse.getX() - x);
-	 * 
-	 * if (clickedOn == CLICKED_ON_ROTATION_CIRCLE) { renderer.getCamera().rotate(upRotation, rightRotation); } else { renderer.getCamera().move(upRotation, rightRotation); }
-	 * 
-	 * }
-	 * 
-	 * if (clickedOn == CLICKED_ON_ROTATION_ELLIPSE) { if (hud.x1 - Mouse.getX() <= 0) { hud.ellipseSide = 0; renderer.getCamera().rotateClockwise(); } else { hud.ellipseSide = 1; renderer.getCamera().rotateCounterClockwise(); } }
-	 * 
-	 * if (clickedOn == CLICKED_ON_MOVE_ELLIPSE) { if (hud.x2 - Mouse.getX() <= 0) { hud.ellipseSide = 0; renderer.getCamera().moveDown(); } else { hud.ellipseSide = 1; renderer.getCamera().moveUp(); } }
-	 * 
-	 * } else { clickedOn = CLICKED_ON_NOTHING; // renderer.getVeinsModel().veinsGrabbedAt = null; // TODO: WHAT, IS // THIS EVEN NEEDED? renderer.getVeinsModel().saveCurrentOrientation(); renderer.getVeinsModel().setAddedOrientation(new Quaternion()); }
-	 * 
-	 * }
 	 * 
 	 * 
 	 * private void poll3DMouseInput() {
