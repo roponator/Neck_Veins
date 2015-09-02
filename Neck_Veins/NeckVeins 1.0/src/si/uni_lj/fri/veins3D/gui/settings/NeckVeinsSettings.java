@@ -25,4 +25,9 @@ public class NeckVeinsSettings implements Serializable {
 	public float gaussSigma = 0.5f;
 	public float threshold = 0.5f;
 	public int selectedModelMethodIndex = 0;
+	public int volumeRenderMethod = 0; // iso, alpha, max projection
+	
+	public boolean useModelMoveMode = false; // if true the model is moved instead of camera on input
+	
+	
 }

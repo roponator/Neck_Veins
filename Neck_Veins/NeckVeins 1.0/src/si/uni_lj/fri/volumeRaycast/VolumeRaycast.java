@@ -20,6 +20,7 @@ import org.lwjgl.util.vector.Vector3f;
 import de.lessvoid.nifty.render.batch.spi.GL;
 import si.uni_lj.fri.segmentation.MHDReader;
 import si.uni_lj.fri.veins3D.gui.NiftyScreenController;
+import si.uni_lj.fri.veins3D.gui.NiftySettingsSideMenu;
 import si.uni_lj.fri.veins3D.gui.render.Camera;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
@@ -74,6 +75,11 @@ public class VolumeRaycast
 	
 	public static boolean m_overrideGradient = false;
 	public static float m_gradXCustom=1.0f, m_gradYCustom = 1.0f, m_gradZCustom = 1.0f;
+	
+	public static float m_keyboardMoveX = 0.0f;
+	public static float m_keyboardMoveY = 0.0f;
+	public static float m_keyboardMoveZ = 0.0f;
+	public static Quaternion m_keyboardRotation = new Quaternion();
 	
 	private CLContext clContext;
 	private CLCommandQueue queue;
@@ -276,6 +282,28 @@ public class VolumeRaycast
 		System.out.println();
 
 		setKernelConstants();
+		
+		setInitialRenderMethod();
+	}
+	
+	void setInitialRenderMethod()
+	{
+		if(VeinsWindow.settings.volumeRenderMethod ==0)
+		{
+			VolumeRaycast.SetRenderMethod(VolumeRaycast.RenderMethod.ISO);
+		}
+		else if(VeinsWindow.settings.volumeRenderMethod==1)
+		{
+			VolumeRaycast.SetRenderMethod(VolumeRaycast.RenderMethod.ALPHA);
+		}
+		else if(VeinsWindow.settings.volumeRenderMethod==2)
+		{
+			VolumeRaycast.SetRenderMethod(VolumeRaycast.RenderMethod.MAX_PROJECTION);
+		}
+		else
+		{
+			System.out.println("Error: invalid volume render method: "+VeinsWindow.settings.volumeRenderMethod);
+		}
 	}
 
 	public static void SetRenderMethod(RenderMethod method)
@@ -756,16 +784,32 @@ public class VolumeRaycast
 		double dy = m_overrideGradient ? m_gradYCustom : MHDReader.dy;
 		double dz = m_overrideGradient ? m_gradZCustom : MHDReader.dz;
 		
+		float xOff = 68.02019f ;
+		float yOff = 124.51997f;
+		float zOff = -22.897635f;
+		float camPosX = -camera.cameraX + xOff;
+		float camPosY = -camera.cameraY + yOff;
+		float camPosZ = -camera.cameraZ + zOff;
+		
+		// different xyz permutation for keyboard move
+		double[] rotCameraPos = m_keyboardRotation.rotateVector3d(new double[]{camPosX,camPosY,camPosZ});
+		camPosX = (float)rotCameraPos[0] + m_keyboardMoveX;
+		camPosY = (float)rotCameraPos[1] + m_keyboardMoveZ;
+		camPosZ = (float)rotCameraPos[2] + m_keyboardMoveY;
+		
+		FloatBuffer rotMatrixKeyboard = Quaternion.quaternionReciprocal(m_keyboardRotation).getRotationMatrix(true);
+
+		
+		//rotMatrixModelOnly = rotMatrix;
 		// start computation
-		currentlyActiveKernel.setArg(4, -camera.cameraX + 68.02019f)
-				. // offsets neeed for proper camera position
-				setArg(5, -camera.cameraY + 124.51997f).setArg(6, -camera.cameraZ - 22.897635f).setArg(7, rotMatrix.get(4 * 1 + 0))
+		currentlyActiveKernel.setArg(4, camPosX). // offsets neeed for proper camera position
+				setArg(5, camPosY).setArg(6, camPosZ).setArg(7, rotMatrixKeyboard.get(4 * 1 + 0))
 				. // up
-				setArg(8, rotMatrix.get(4 * 1 + 1)).setArg(9, rotMatrix.get(4 * 1 + 2)).setArg(10, -rotMatrix.get(4 * 2 + 0))
+				setArg(8, rotMatrixKeyboard.get(4 * 1 + 1)).setArg(9, rotMatrixKeyboard.get(4 * 1 + 2)).setArg(10, -rotMatrixKeyboard.get(4 * 2 + 0))
 				. // forward
-				setArg(11, -rotMatrix.get(4 * 2 + 1)).setArg(12, -rotMatrix.get(4 * 2 + 2)).setArg(13, rotMatrix.get(4 * 0 + 0))
+				setArg(11, -rotMatrixKeyboard.get(4 * 2 + 1)).setArg(12, -rotMatrixKeyboard.get(4 * 2 + 2)).setArg(13, rotMatrixKeyboard.get(4 * 0 + 0))
 				. // right
-				setArg(14, rotMatrix.get(4 * 0 + 1)).setArg(15, rotMatrix.get(4 * 0 + 2)).setArg(16, fov).setArg(17, asr).setArg(19, MHDReader.Nx).setArg(20, MHDReader.Ny).setArg(21, MHDReader.Nz).setArg(22, (float) dx).setArg(23, (float) dy).setArg(24, (float) dz)
+				setArg(14, rotMatrixKeyboard.get(4 * 0 + 1)).setArg(15, rotMatrixKeyboard.get(4 * 0 + 2)).setArg(16, fov).setArg(17, asr).setArg(19, MHDReader.Nx).setArg(20, MHDReader.Ny).setArg(21, MHDReader.Nz).setArg(22, (float) dx).setArg(23, (float) dy).setArg(24, (float) dz)
 				.setArg(26, octreeLevels).setArg(28, transferFunctionSamples).setArg(29, threshold).setArg(30, lin);
 
 		clEnqueueNDRangeKernel(queue, currentlyActiveKernel, 2, null, kernel2DGlobalWorkSize, null, null, null);// */

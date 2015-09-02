@@ -141,7 +141,7 @@ public class NiftySettingsSideMenu
 		 renderMethodType.addItem(VOLUME_RENDER_METHOD_ISO);
 		 renderMethodType.addItem(VOLUME_RENDER_METHOD_ALPHA);
 		 renderMethodType.addItem(VOLUME_RENDER_METHOD_MAXMIMUM_PROJECTIOn);
-		 renderMethodType.selectItemByIndex(0);
+		 renderMethodType.selectItemByIndex(VeinsWindow.settings.volumeRenderMethod);
 
 		 // hide all at start
 		showMarchingCubesControl(false);

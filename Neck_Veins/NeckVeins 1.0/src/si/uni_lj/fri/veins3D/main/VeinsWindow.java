@@ -95,6 +95,8 @@ import si.uni_lj.fri.veins3D.utils.RayUtil;
 import si.uni_lj.fri.veins3D.utils.SettingsUtil;
 import static org.lwjgl.opengl.GL11.*;
 
+// TODO: CLICK ON UI WHILE LOADING VOLUME MODEL CAUSES MULTIPLE LOAD
+
 public class VeinsWindow
 {
 	public final static int CLICKED_ON_NOTHING = 0;
@@ -123,7 +125,7 @@ public class VeinsWindow
 	public static Mouse3D joystick;
 
 	public static boolean canModelBeRotatedByMouse = true; // false when click on some widget
-	
+
 	public static Nifty nifty = null; // So it can be accessed from outside
 	public static GUIMain gui = null; // So it can be accessed from outside
 	public static NiftyScreenController screenController = null;
@@ -132,8 +134,6 @@ public class VeinsWindow
 
 	public static boolean increaseSubdivLevel = false;
 	public static boolean decreaseSubdivLevel = false;
-
-	public static boolean moveModel = false; // if true model is moved and camera is still
 
 	/**
 	 * 
@@ -151,12 +151,12 @@ public class VeinsWindow
 		init(title, fileName);
 
 	}
-	
+
 	public static int GetMouseX()
 	{
 		return Mouse.getX();
 	}
-	
+
 	public static int GetMouseY()
 	{
 		return Mouse.getY();
@@ -431,6 +431,9 @@ public class VeinsWindow
 	boolean m_wasMouseLeftUp = true;
 	public static boolean wire = false;
 
+	long prevTime = System.nanoTime();
+	float deltaTime = 1.0f / 60.0f;
+
 	public void mainLoop()
 	{
 		fps = 0;
@@ -438,10 +441,12 @@ public class VeinsWindow
 		timePastFps = timePastFrame;
 		fpsToDisplay = 0;
 
+		long prevTime = System.nanoTime();
+
 		while (isRunning)
 		{
 			canModelBeRotatedByMouse = true; // reset
-			
+
 			// handle subdiv increase
 			if (increaseSubdivLevel && VeinsWindow.renderer.veinsModel != null)
 				VeinsWindow.renderer.veinsModel.increaseSubdivisionDepth();
@@ -483,7 +488,7 @@ public class VeinsWindow
 
 			// TODO: PRESENT ORDER: BEFORE OR AFTER NIFTY.RENDER?
 			// Display.update();
-			
+
 			// On down click after it was up (NOT DOWN->UP!)
 			if (wasLeftMouseDownClicked)
 				screenController.onMouseLeftDownClicked();
@@ -491,7 +496,7 @@ public class VeinsWindow
 			renderNiftyGUI();
 
 			Display.update();
-			
+
 			logic();
 
 			Display.sync(settings.frequency); // TODO NIFTY
@@ -502,6 +507,11 @@ public class VeinsWindow
 				String glerrmsg = GLU.gluErrorString(error);
 				System.err.println(glerrmsg);
 			}
+
+			long currentTime = System.nanoTime();
+			deltaTime = ((float) currentTime) - ((float) prevTime);
+			deltaTime /= 1000000000.0f;
+			prevTime = currentTime;
 		}
 	}
 
@@ -561,7 +571,7 @@ public class VeinsWindow
 		// update framerate and calculate time that passed since last frame
 		long time = (Sys.getTime() * 1000) / Sys.getTimerResolution();
 		fps++;
-		if (time - timePastFps >= 1000)
+		// if (time - timePastFps >= 1000)
 		{
 			fpsToDisplay = fps;
 			fps = 0;
@@ -573,7 +583,7 @@ public class VeinsWindow
 				renderer.getVeinsModel().normalizeCurrentOrientation();
 			}
 		}
-		timePastFrame = time;
+		// timePastFrame = time;
 	}
 
 	/**
@@ -676,54 +686,160 @@ public class VeinsWindow
 
 		// if (!frame.isDialogOpened()) return; TODO NIFTY
 
+		float moveDeltaFactor = deltaTime * 10.0f;
+		float maxMoveSpeed = 20.0f;
+		if (moveDeltaFactor > maxMoveSpeed)
+			moveDeltaFactor = maxMoveSpeed;
+
+		float rotationFactor = deltaTime * 2.0f;
+		float maxRotationSpeed = 2.0f;
+		if (rotationFactor > maxRotationSpeed)
+			rotationFactor = maxRotationSpeed;
+
 		// moving the camera
-		if (Keyboard.isKeyDown(Keyboard.KEY_W) && moveModel == false)
+		if (Keyboard.isKeyDown(Keyboard.KEY_W))
 		{
-			renderer.getCamera().lookUp();
+			if (settings.useModelMoveMode)
+			{
+				if (renderer.getVeinsModel() != null)
+					renderer.getVeinsModel().rotateModelX(-rotationFactor);
+			}
+			else
+			{
+				renderer.getCamera().lookUp();
+			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_S) && moveModel == false)
+		if (Keyboard.isKeyDown(Keyboard.KEY_S))
 		{
-			renderer.getCamera().lookDown();
+			if (settings.useModelMoveMode)
+			{
+				if (renderer.getVeinsModel() != null)
+					renderer.getVeinsModel().rotateModelX(rotationFactor);
+			}
+			else
+			{
+				renderer.getCamera().lookDown();
+			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_A) && moveModel == false)
+		if (Keyboard.isKeyDown(Keyboard.KEY_A))
 		{
-			renderer.getCamera().lookRight();
+			if (settings.useModelMoveMode)
+			{
+				if (renderer.getVeinsModel() != null)
+					renderer.getVeinsModel().rotateModelZ(-rotationFactor);
+			}
+			else
+			{
+				renderer.getCamera().lookRight();
+			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_D) && moveModel == false)
+		if (Keyboard.isKeyDown(Keyboard.KEY_D))
 		{
-			renderer.getCamera().lookLeft();
+			if (settings.useModelMoveMode)
+			{
+				if (renderer.getVeinsModel() != null)
+					renderer.getVeinsModel().rotateModelZ(rotationFactor);
+			}
+			else
+			{
+				renderer.getCamera().lookLeft();
+			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_Q) && moveModel == false)
+		if (Keyboard.isKeyDown(Keyboard.KEY_Q))
 		{
-			renderer.getCamera().rotateCounterClockwise();
+			if (settings.useModelMoveMode)
+			{
+				if (renderer.getVeinsModel() != null)
+					renderer.getVeinsModel().rotateModelY(-rotationFactor);
+			}
+			else
+			{
+				renderer.getCamera().rotateCounterClockwise();
+			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_E) && moveModel == false)
+		if (Keyboard.isKeyDown(Keyboard.KEY_E))
 		{
-			renderer.getCamera().rotateClockwise();
+			if (settings.useModelMoveMode)
+			{
+				if (renderer.getVeinsModel() != null)
+					renderer.getVeinsModel().rotateModelY(rotationFactor);
+			}
+			else
+			{
+				renderer.getCamera().rotateClockwise();
+			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_UP) && moveModel == false)
+		if (Keyboard.isKeyDown(Keyboard.KEY_UP))
 		{
-			renderer.getCamera().moveForward();
+			if (settings.useModelMoveMode)
+			{
+				if (renderer.getVeinsModel() != null)
+					renderer.getVeinsModel().moveModelY(-moveDeltaFactor);
+			}
+			else
+			{
+				renderer.getCamera().moveForward();
+			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN) && moveModel == false)
+		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
 		{
-			renderer.getCamera().moveBackwards();
+			if (settings.useModelMoveMode)
+			{
+				if (renderer.getVeinsModel() != null)
+					renderer.getVeinsModel().moveModelY(moveDeltaFactor);
+			}
+			else
+			{
+				renderer.getCamera().moveBackwards();
+			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT) && moveModel == false)
+		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
 		{
-			renderer.getCamera().moveRight();
+			if (settings.useModelMoveMode)
+			{
+				if (renderer.getVeinsModel() != null)
+					renderer.getVeinsModel().moveModelX(-moveDeltaFactor);
+			}
+			else
+			{
+				renderer.getCamera().moveRight();
+			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT) && moveModel == false)
+		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
 		{
-			renderer.getCamera().moveLeft();
+			if (settings.useModelMoveMode)
+			{
+				if (renderer.getVeinsModel() != null)
+					renderer.getVeinsModel().moveModelX(moveDeltaFactor);
+			}
+			else
+			{
+				renderer.getCamera().moveLeft();
+			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_R) && moveModel == false)
+		if (Keyboard.isKeyDown(Keyboard.KEY_R))
 		{
-			renderer.getCamera().moveUp();
+			if (settings.useModelMoveMode)
+			{
+				if (renderer.getVeinsModel() != null)
+					renderer.getVeinsModel().moveModelZ(moveDeltaFactor);
+			}
+			else
+			{
+				renderer.getCamera().moveUp();
+			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_F) && moveModel == false)
+		if (Keyboard.isKeyDown(Keyboard.KEY_F))
 		{
-			renderer.getCamera().moveDown();
+			if (settings.useModelMoveMode)
+			{
+				if (renderer.getVeinsModel() != null)
+					renderer.getVeinsModel().moveModelZ(-moveDeltaFactor);
+			}
+			else
+			{
+				renderer.getCamera().moveDown();
+			}
 		}
 
 	}
@@ -745,16 +861,14 @@ public class VeinsWindow
 			renderer.getCamera().zoomOut();
 		}
 
-		
-		
 		if (canModelBeRotatedByMouse && Mouse.isButtonDown(0) && wasLeftMouseDownClicked == false)
 		{
 			renderer.getVeinsModel().changeAddedOrientation(renderer);
 		}
 
-		if(canModelBeRotatedByMouse && wasLeftMouseDownClicked)
+		if (canModelBeRotatedByMouse && wasLeftMouseDownClicked)
 		{
-			renderer.getVeinsModel().SetVeinsGrabbedAt(RayUtil.getRaySphereIntersection_WITH_ONLY_ONE_INTERSECTION_POINT( VeinsWindow.GetMouseX(), VeinsWindow.GetMouseY(), renderer));
+			renderer.getVeinsModel().SetVeinsGrabbedAt(RayUtil.getRaySphereIntersection_WITH_ONLY_ONE_INTERSECTION_POINT(VeinsWindow.GetMouseX(), VeinsWindow.GetMouseY(), renderer));
 			renderer.getVeinsModel().saveCurrentOrientation();
 			renderer.getVeinsModel().setAddedOrientation(new Quaternion());
 		}
@@ -770,54 +884,30 @@ public class VeinsWindow
 	 * 
 	 * /** Calculates on which element mouse click was performed - on HUD element or on veins model
 	 */
-	/*private void calculateClickedOn()
-	{
-		float distanceToRotationCircle = (hud.x1 - VeinsWindow.GetMouseX()) * (hud.x1 -  VeinsWindow.GetMouseX()) + (hud.y1 - VeinsWindow.GetMouseY()) * (hud.y1 - VeinsWindow.GetMouseY());
-
-		float distanceToMoveCircle = (hud.x2 - VeinsWindow.GetMouseX()) * (hud.x2 -  VeinsWindow.GetMouseX()) + (hud.y2 - VeinsWindow.GetMouseY()) * (hud.y2 - VeinsWindow.GetMouseY());
-
-		float distanceToRotationFoci = (float) (Math.sqrt((hud.x1 - hud.f -  VeinsWindow.GetMouseX()) * (hud.x1 - hud.f - VeinsWindow.GetMouseX()) + (hud.y1 - VeinsWindow.GetMouseY()) * (hud.y1 - VeinsWindow.GetMouseY())) + Math.sqrt((hud.x1 + hud.f - VeinsWindow.GetMouseX()) * (hud.x1 + hud.f - VeinsWindow.GetMouseX()) + (hud.y1 - VeinsWindow.GetMouseY())
-				* (hud.y1 - VeinsWindow.GetMouseY())));
-
-		float distanceToMoveFoci = (float) (Math.sqrt((hud.x2 - hud.f - VeinsWindow.GetMouseX()) * (hud.x2 - hud.f - VeinsWindow.GetMouseX()) + (hud.y2 - VeinsWindow.GetMouseY()) * (hud.y2 - VeinsWindow.GetMouseY())) + Math.sqrt((hud.x2 + hud.f - VeinsWindow.GetMouseX()) * (hud.x2 + hud.f - VeinsWindow.GetMouseX()) + (hud.y2 - VeinsWindow.GetMouseY())
-				* (hud.y2 - VeinsWindow.GetMouseY())));
-
-		if (clickedOn == CLICKED_ON_NOTHING)
-		{
-			if (settings.resHeight - VeinsWindow.GetMouseY() < settings.resHeight / 18)
-			{
-				clickedOn = CLICKED_ON_BUTTONS;
-
-			}
-			else if (distanceToRotationCircle <= hud.r * hud.r)
-			{
-				clickedOn = CLICKED_ON_ROTATION_CIRCLE;
-
-			}
-			else if (distanceToMoveCircle <= hud.r * hud.r)
-			{
-				clickedOn = CLICKED_ON_MOVE_CIRCLE;
-
-			}
-			else if (distanceToRotationFoci <= hud.r * 3f)
-			{
-				clickedOn = CLICKED_ON_ROTATION_ELLIPSE;
-
-			}
-			else if (distanceToMoveFoci <= hud.r * 3f)
-			{
-				clickedOn = CLICKED_ON_MOVE_ELLIPSE;
-
-			}
-			else
-			{
-				renderer.getVeinsModel().SetVeinsGrabbedAt(RayUtil.getRaySphereIntersection(VeinsWindow.GetMouseX(), VeinsWindow.GetMouseY(), renderer));
-				renderer.getVeinsModel().setAddedOrientation(new Quaternion());
-				if (renderer.getVeinsModel().GetVeinsGrabbedAt() != null)
-					clickedOn = CLICKED_ON_VEINS_MODEL;
-			}
-		}
-	}*/
+	/*
+	 * private void calculateClickedOn() { float distanceToRotationCircle = (hud.x1 - VeinsWindow.GetMouseX()) * (hud.x1 - VeinsWindow.GetMouseX()) + (hud.y1 - VeinsWindow.GetMouseY()) * (hud.y1 - VeinsWindow.GetMouseY());
+	 * 
+	 * float distanceToMoveCircle = (hud.x2 - VeinsWindow.GetMouseX()) * (hud.x2 - VeinsWindow.GetMouseX()) + (hud.y2 - VeinsWindow.GetMouseY()) * (hud.y2 - VeinsWindow.GetMouseY());
+	 * 
+	 * float distanceToRotationFoci = (float) (Math.sqrt((hud.x1 - hud.f - VeinsWindow.GetMouseX()) * (hud.x1 - hud.f - VeinsWindow.GetMouseX()) + (hud.y1 - VeinsWindow.GetMouseY()) * (hud.y1 - VeinsWindow.GetMouseY())) + Math.sqrt((hud.x1 + hud.f - VeinsWindow.GetMouseX()) * (hud.x1 + hud.f -
+	 * VeinsWindow.GetMouseX()) + (hud.y1 - VeinsWindow.GetMouseY()) (hud.y1 - VeinsWindow.GetMouseY())));
+	 * 
+	 * float distanceToMoveFoci = (float) (Math.sqrt((hud.x2 - hud.f - VeinsWindow.GetMouseX()) * (hud.x2 - hud.f - VeinsWindow.GetMouseX()) + (hud.y2 - VeinsWindow.GetMouseY()) * (hud.y2 - VeinsWindow.GetMouseY())) + Math.sqrt((hud.x2 + hud.f - VeinsWindow.GetMouseX()) * (hud.x2 + hud.f -
+	 * VeinsWindow.GetMouseX()) + (hud.y2 - VeinsWindow.GetMouseY()) (hud.y2 - VeinsWindow.GetMouseY())));
+	 * 
+	 * if (clickedOn == CLICKED_ON_NOTHING) { if (settings.resHeight - VeinsWindow.GetMouseY() < settings.resHeight / 18) { clickedOn = CLICKED_ON_BUTTONS;
+	 * 
+	 * } else if (distanceToRotationCircle <= hud.r * hud.r) { clickedOn = CLICKED_ON_ROTATION_CIRCLE;
+	 * 
+	 * } else if (distanceToMoveCircle <= hud.r * hud.r) { clickedOn = CLICKED_ON_MOVE_CIRCLE;
+	 * 
+	 * } else if (distanceToRotationFoci <= hud.r * 3f) { clickedOn = CLICKED_ON_ROTATION_ELLIPSE;
+	 * 
+	 * } else if (distanceToMoveFoci <= hud.r * 3f) { clickedOn = CLICKED_ON_MOVE_ELLIPSE;
+	 * 
+	 * } else { renderer.getVeinsModel().SetVeinsGrabbedAt(RayUtil.getRaySphereIntersection(VeinsWindow.GetMouseX(), VeinsWindow.GetMouseY(), renderer)); renderer.getVeinsModel().setAddedOrientation(new Quaternion()); if (renderer.getVeinsModel().GetVeinsGrabbedAt() != null) clickedOn =
+	 * CLICKED_ON_VEINS_MODEL; } } }
+	 */
 
 	/**
 	 * @param n

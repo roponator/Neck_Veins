@@ -22,6 +22,14 @@ public abstract class VeinsModel
 	public abstract void render(Camera camera);
 	public abstract void cleanup();
 	
+	public abstract void moveModelX(float delta);
+	public abstract void moveModelY(float delta);
+	public abstract void moveModelZ(float delta);
+	
+	public abstract void rotateModelX(float delta);
+	public abstract void rotateModelY(float delta);
+	public abstract void rotateModelZ(float delta);
+	
 	public abstract void changeMinTriangles(int minTriangels);
 	public abstract void changeThreshold(float threshold);
 	

@@ -317,7 +317,7 @@ public class NiftyScreenController extends DefaultScreenController
 		
 		m_inputSettingsMoveTypeDropdown.addItem(INPUT_SETTINGS_MOVE_CAMERA);
 		m_inputSettingsMoveTypeDropdown.addItem(INPUT_SETTINGS_MOVE_MODEL);
-		m_inputSettingsMoveTypeDropdown.selectItemByIndex(0);
+		m_inputSettingsMoveTypeDropdown.selectItemByIndex(VeinsWindow.settings.useModelMoveMode ? 1 : 0);
 		
 		m_inputSettingsInputMethodTypeDropdown.addItem(INPUT_SETTINGS_INPUT_TYPE_NORMAL);
 		m_inputSettingsInputMethodTypeDropdown.addItem(INPUT_SETTINGS_INPUT_TYPE_3DMOUSE);
@@ -913,6 +913,8 @@ public class NiftyScreenController extends DefaultScreenController
 	{
 		if(event.getSelection() != null)
 		{
+			VeinsWindow.settings.volumeRenderMethod = event.getSelectionItemIndex();
+			
 			String sel = (String)event.getSelection();
 			if(sel.compareTo(NiftySettingsSideMenu.VOLUME_RENDER_METHOD_ISO)==0)
 			{
@@ -929,11 +931,10 @@ public class NiftyScreenController extends DefaultScreenController
 			else
 			{
 				System.out.println("Error: invalid volume render method: "+sel);
-			};
+			}
 		}
 	}
 
-	
 	// ----------------------------------------------------
 	// Open dialog
 	// ----------------------------------------------------
@@ -1172,7 +1173,7 @@ public class NiftyScreenController extends DefaultScreenController
 		if(m_inputSettingsMoveTypeDropdown.getSelection()!=null)
 		{
 			String sel=(String)m_inputSettingsMoveTypeDropdown.getSelection();			
-			VeinsWindow.moveModel = sel.compareTo(INPUT_SETTINGS_MOVE_MODEL)==0;		
+			VeinsWindow.settings.useModelMoveMode = sel.compareTo(INPUT_SETTINGS_MOVE_MODEL)==0;		
 		}
 		
 		On_InputOptionsDialog_Close();

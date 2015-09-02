@@ -122,6 +122,32 @@ public class VeinsModelRaycastVolume extends VeinsModel
 	{
 	}
 
+	public void moveModelX(float delta)
+	{
+		m_raycaster.m_keyboardMoveX += delta;
+	}
+	public void moveModelY(float delta)
+	{
+		m_raycaster.m_keyboardMoveY += delta;
+	}
+	public void moveModelZ(float delta)
+	{
+		m_raycaster.m_keyboardMoveZ += delta;
+	}
+	
+	public void rotateModelX(float delta)
+	{
+		m_raycaster.m_keyboardRotation = Quaternion.quaternionMultiplication(m_raycaster.m_keyboardRotation, Quaternion.quaternionFromAngleAndRotationAxis(delta, new double[]{1,0,0}));	
+	}
+	public void rotateModelY(float delta)
+	{
+		m_raycaster.m_keyboardRotation = Quaternion.quaternionMultiplication(m_raycaster.m_keyboardRotation, Quaternion.quaternionFromAngleAndRotationAxis(delta, new double[]{0,1,0}));		
+	}
+	public void rotateModelZ(float delta)
+	{
+		m_raycaster.m_keyboardRotation = Quaternion.quaternionMultiplication(m_raycaster.m_keyboardRotation, Quaternion.quaternionFromAngleAndRotationAxis(delta, new double[]{0,0,1}));	
+	}
+	
 	public void increaseSubdivisionDepth()
 	{
 	}

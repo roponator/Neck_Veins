@@ -61,7 +61,12 @@ public class VeinsModelMesh extends VeinsModel
 	private int maxTriangels = 0;
 	private int numberOfSubdivisions = 0;
 	private int maxSubDepth = 0;
-
+	
+	float modelKeyboardMoveXPos = 0.0f;
+	float modelKeyboardMoveYPos = 0.0f;
+	float modelKeyboardMoveZPos = 0.0f;
+	
+	private Quaternion modelOnlyRotation; // rotation by keyboard mode only
 	private Quaternion currentOrientation;
 	private Quaternion addedOrientation;
 
@@ -597,10 +602,21 @@ public class VeinsModelMesh extends VeinsModel
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 
+		// different XYZ permutation
+		glTranslatef(-(float) modelKeyboardMoveXPos, -(float) modelKeyboardMoveZPos, -(float) modelKeyboardMoveYPos);
+
+		FloatBuffer modelRotationMatrix = modelOnlyRotation.getRotationMatrix(false);
+		GL11.glMultMatrix(modelRotationMatrix);
+		
 		Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
 		FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
 		GL11.glMultMatrix(fb);
 		glTranslatef(-(float) centerx, -(float) centery, -(float) centerz);
+
+		// apply model rotation;
+		
+		
+		//glTranslatef(-(float) centerx, -(float) centery, -(float) centerz);
 
 		// Move model if enabled
 		/*
@@ -658,12 +674,39 @@ public class VeinsModelMesh extends VeinsModel
 		{ 0, 1, 0 });
 		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, Quaternion.quaternionFromAngleAndRotationAxis(angle2, v));
 		addedOrientation = new Quaternion();
-
+		modelOnlyRotation = new Quaternion();
 		// currentOrientation = computeDefaultOrientation();
 		// addedOrientation = new Quaternion();
 
 	}
 
+	public void moveModelX(float delta)
+	{
+		modelKeyboardMoveXPos += delta;
+	}
+	public void moveModelY(float delta)
+	{
+		modelKeyboardMoveYPos += delta;
+	}
+	public void moveModelZ(float delta)
+	{
+		modelKeyboardMoveZPos += delta;
+	}
+	
+	public void rotateModelX(float delta)
+	{
+		modelOnlyRotation = Quaternion.quaternionMultiplication(modelOnlyRotation, Quaternion.quaternionFromAngleAndRotationAxis(delta, new double[]{1,0,0}));
+	}
+	public void rotateModelY(float delta)
+	{
+		modelOnlyRotation = Quaternion.quaternionMultiplication(modelOnlyRotation, Quaternion.quaternionFromAngleAndRotationAxis(delta, new double[]{0,1,0}));
+
+	}
+	public void rotateModelZ(float delta)
+	{
+		modelOnlyRotation = Quaternion.quaternionMultiplication(modelOnlyRotation, Quaternion.quaternionFromAngleAndRotationAxis(delta, new double[]{0,0,1}));
+	}
+	
 	@Override
 	public int GetMaxTriangles()
 	{
