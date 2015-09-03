@@ -281,8 +281,8 @@ public class VolumeRaycast
 		
 		setInitialRenderMethod();
 		
-		INITIAL ORIENTATION FAIL
-		camera.cameraOrientation = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{0,1,0});
+		VeinsWindow.renderer.resetCameraPositionAndOrientation();
+		//camera.cameraOrientation = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{0,1,0});
 		// position camera
 		
 		//camera.cameraX = -100;
@@ -794,27 +794,48 @@ public class VolumeRaycast
 		float camPosY = -camera.cameraY + yOff;
 		float camPosZ = -camera.cameraZ + zOff-200;
 		
-		Quaternion mouseAndKeyboardRot = Quaternion.quaternionMultiplication(m_keyboardRotation,Quaternion.quaternionReciprocal(mouseRotation));
 		
 		Quaternion rotQuatToUse = null;
 		
+		// Different computatation if in camera move mode or in model move mode
 		if(VeinsWindow.settings.useModelMoveMode==false)
 		{
+			// CAMERA WORKS, BUT NOT MOUSE SPHERE MODEL ROTATION
 			//rotQuatToUse = Quaternion.quaternionReciprocal(camera.cameraOrientation);
 			float moveFactor = 5.0f;
 
 			//Quaternion rotY2 = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{0,1,0});
-			rotQuatToUse = Quaternion.quaternionReciprocal(camera.cameraOrientation);
+			rotQuatToUse =  Quaternion.quaternionReciprocal(camera.cameraOrientation);
 			//FloatBuffer rotMatrix =  Quaternion.quaternionMultiplication(worldOrientation, rotY).getRotationMatrix(true);
 			
 			
 			double[] rotatedMovement = rotQuatToUse.rotateVector3d(new double[]{m_keyboardMoveX*moveFactor,m_keyboardMoveZ*moveFactor,m_keyboardMoveY*moveFactor});
 			camPosX = camera.cameraX;
 			camPosY = camera.cameraY;
-			camPosZ = camera.cameraZ;
+			camPosZ = camera.cameraZ;			
+			
+			
+			// DOESNT WORK
+			/*Quaternion mouseAndCameraRot = Quaternion.quaternionMultiplication(camera.cameraOrientation,Quaternion.quaternionReciprocal(mouseRotation));
+			
+			rotQuatToUse = mouseAndCameraRot;
+			float moveFactor = 5.0f;
+			
+			Quaternion posChangeQuat = Quaternion.quaternionReciprocal(mouseRotation);
+			double[] rotCameraPos = posChangeQuat.rotateVector3d(new double[]{0,0,-200.0f});
+			double[] rotatedMovement = posChangeQuat.rotateVector3d(new double[]{m_keyboardMoveX*moveFactor,m_keyboardMoveZ*moveFactor,-m_keyboardMoveY*moveFactor});
+			camPosX = (float)rotCameraPos[0] + (float)rotatedMovement[0] + xOff;
+			camPosY = (float)rotCameraPos[1] + (float)rotatedMovement[1] + yOff;
+			camPosZ = (float)rotCameraPos[2] + (float)rotatedMovement[2] + zOff;
+			
+			Quaternion yRot = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{0,1,0});
+			Quaternion invQuatToUse = Quaternion.quaternionReciprocal(rotQuatToUse);
+			rotQuatToUse = Quaternion.quaternionMultiplication(yRot,rotQuatToUse);*/
 		}
 		else
 		{
+			Quaternion mouseAndKeyboardRot = Quaternion.quaternionMultiplication(m_keyboardRotation,Quaternion.quaternionReciprocal(mouseRotation));
+			
 			rotQuatToUse = mouseAndKeyboardRot;
 			float moveFactor = 5.0f;
 			

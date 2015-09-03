@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -16,6 +18,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Locale;
 
@@ -293,6 +297,7 @@ public class VeinsWindow
 		veinsWindow.RenderSingleFrameWithoutModel(); // FIX FOR WHITE SCREEN FLASH
 		veinsWindow.RenderSingleFrameWithoutModel(); // FIX FOR WHITE SCREEN FLASH
 		renderer.SetNewResolution(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
+
 	}
 
 	void loadSettings(String fileName)
@@ -367,6 +372,9 @@ public class VeinsWindow
 			frame.pack();
 			frame.setVisible(true);
 
+			// Set new icon
+			setNewIcon(frame);
+
 			Display.setParent(canvas);
 			// -Dorg.lwjgl.opengl.Window.undecorated=true
 
@@ -384,6 +392,24 @@ public class VeinsWindow
 		{
 			e.printStackTrace();
 			exitProgram(1);
+		}
+	}
+
+	void setNewIcon(Frame frame)
+	{
+		try
+		{
+			ClassLoader classLoader = getClass().getClassLoader();
+			URI uri = classLoader.getResource("imgs/pngs720p/Med3D-19.png").toURI();
+			URL url = uri.toURL();
+			Toolkit kit = Toolkit.getDefaultToolkit();
+			Image img = kit.createImage(url);
+			frame.setIconImage(img);
+		}
+		catch (Exception e)
+		{
+			System.out.println("setNewIcon: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -628,18 +654,16 @@ public class VeinsWindow
 	}
 
 	boolean wasEscapePressedAlready = false; // hackish but stupid input doesnt detect escape
-	
+
 	// this must be called before nifty gui, otherwise nifty eats up events
 	public void pollNonModelControlInput()
 	{
 		// Doesn't detect escape otherwise
-		if ( (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE && Keyboard.getNumKeyboardEvents()>0) ||
-				(wasEscapePressedAlready == false && Keyboard.getEventKey() == Keyboard.KEY_ESCAPE))
+		if ((Keyboard.getEventKey() == Keyboard.KEY_ESCAPE && Keyboard.getNumKeyboardEvents() > 0) || (wasEscapePressedAlready == false && Keyboard.getEventKey() == Keyboard.KEY_ESCAPE))
 		{
 			wasEscapePressedAlready = true;
 			screenController.OnEscapeKeyPressed();
 		}
-				
 
 		while (Keyboard.next())
 		{
@@ -799,7 +823,16 @@ public class VeinsWindow
 			}
 			else
 			{
-				renderer.getCamera().rotateCounterClockwise();
+				// different rotations if in volume render model
+				if (isRenderingVolumeModel())
+				{
+					renderer.getCamera().rotateCounterClockwise();
+				}
+				else
+				{
+					renderer.getCamera().rotateClockwise();
+				}
+
 			}
 		}
 		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_E))
@@ -811,7 +844,15 @@ public class VeinsWindow
 			}
 			else
 			{
-				renderer.getCamera().rotateClockwise();
+				// different rotations if in volume render model
+				if (isRenderingVolumeModel())
+				{
+					renderer.getCamera().rotateClockwise();
+				}
+				else
+				{
+					renderer.getCamera().rotateCounterClockwise();
+				}
 			}
 		}
 		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_UP))
@@ -889,8 +930,6 @@ public class VeinsWindow
 
 	}
 
-	// TODO NIFTY
-
 	private void pollMouseInput(boolean wasLeftMouseDownClicked)
 	{
 		if (screenController.getState() != GUI_STATE.DEFAULT || renderer.getVeinsModel() == null)
@@ -953,6 +992,11 @@ public class VeinsWindow
 	 * } else { renderer.getVeinsModel().SetVeinsGrabbedAt(RayUtil.getRaySphereIntersection(VeinsWindow.GetMouseX(), VeinsWindow.GetMouseY(), renderer)); renderer.getVeinsModel().setAddedOrientation(new Quaternion()); if (renderer.getVeinsModel().GetVeinsGrabbedAt() != null) clickedOn =
 	 * CLICKED_ON_VEINS_MODEL; } } }
 	 */
+
+	public boolean isRenderingVolumeModel()
+	{
+		return settings.selectedModelMethodIndex == 2;
+	}
 
 	/**
 	 * @param n

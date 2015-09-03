@@ -1240,14 +1240,20 @@ public class NiftyScreenController extends DefaultScreenController
 	}
 
 	public void onButton_InputSettingsDialog_OK()
-	{
+	{		
 		VeinsWindow.settings.sensitivity = (int) m_input_sensitivity_LastSliderValue;
 		VeinsWindow.settings.leapSensitivity = (int) m_input_LeapMotionSensitivity_LastSliderValue;
 
 		if (m_inputSettingsMoveTypeDropdown.getSelection() != null)
 		{
 			String sel = (String) m_inputSettingsMoveTypeDropdown.getSelection();
-			VeinsWindow.settings.useModelMoveMode = sel.compareTo(INPUT_SETTINGS_MOVE_MODEL) == 0;
+			
+			boolean newCameraMode = sel.compareTo(INPUT_SETTINGS_MOVE_MODEL) == 0;
+			if(newCameraMode != VeinsWindow.settings.useModelMoveMode)
+			{
+				VeinsWindow.renderer.resetCameraPositionAndOrientation(); // must be done or volume renderer fails 
+			}
+			VeinsWindow.settings.useModelMoveMode = newCameraMode;
 		}
 
 		On_InputOptionsDialog_Close();

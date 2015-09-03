@@ -396,7 +396,7 @@ public class VeinsRenderer
 
 		double d = veinsModel.calculateCameraDistance();
 		veinsModel.SetVeinsGrabRadius(d / Math.sqrt(2));
-		setCameraPositionAndOrientation(d, fovMin);
+		resetCameraPositionAndOrientation();
 		setScreenPlanes(d, fovMin);
 	}
 
@@ -414,7 +414,7 @@ public class VeinsRenderer
 	 * return d1; }
 	 */
 
-	private void setCameraPositionAndOrientation(double d, double fovMin)
+	public void resetCameraPositionAndOrientation()
 	{
 		cam.cameraZ = 0;
 		cam.cameraX = 0;

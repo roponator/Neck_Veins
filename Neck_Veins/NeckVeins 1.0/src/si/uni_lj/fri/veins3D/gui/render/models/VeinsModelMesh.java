@@ -84,6 +84,7 @@ public class VeinsModelMesh extends VeinsModel
 
 		meshes = new ArrayList<Mesh>();
 		setDefaultOrientation();
+		VeinsWindow.renderer.resetCameraPositionAndOrientation();
 	}
 
 	public VeinsModelMesh(String filepath)
@@ -91,12 +92,14 @@ public class VeinsModelMesh extends VeinsModel
 		bWasLoadedFromObj = true;
 		constructVBOFromObjFile(filepath);
 		setDefaultOrientation();
+		VeinsWindow.renderer.resetCameraPositionAndOrientation();
 	}
 
 	public VeinsModelMesh(String filepath, ModelType modelType, boolean useSafeMode) throws LWJGLException
 	{
 		constructVBOFromRawFile(filepath, modelType, useSafeMode);
 		setDefaultOrientation();
+		VeinsWindow.renderer.resetCameraPositionAndOrientation();
 	}
 
 	public void SetNewResolution(int width, int height)
@@ -605,11 +608,14 @@ public class VeinsModelMesh extends VeinsModel
 		// different XYZ permutation
 		glTranslatef(-(float) modelKeyboardMoveXPos, -(float) modelKeyboardMoveZPos, -(float) modelKeyboardMoveYPos);
 
-		FloatBuffer modelRotationMatrix = modelOnlyRotation.getRotationMatrix(false);
-		GL11.glMultMatrix(modelRotationMatrix);
+		//Quaternion mouseAndKeyboardRot = Quaternion.quaternionMultiplication(cur,Quaternion.quaternionReciprocal(mouseRotation));
 		
-		Quaternion compositeOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
-		FloatBuffer fb = compositeOrientation.getRotationMatrix(false);
+		//FloatBuffer modelRotationMatrix = modelOnlyRotation.getRotationMatrix(false);
+		//GL11.glMultMatrix(modelRotationMatrix);
+		
+		Quaternion mouseSphereRotation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
+		
+		FloatBuffer fb = Quaternion.quaternionMultiplication(mouseSphereRotation,modelOnlyRotation).getRotationMatrix(false);
 		GL11.glMultMatrix(fb);
 		glTranslatef(-(float) centerx, -(float) centery, -(float) centerz);
 

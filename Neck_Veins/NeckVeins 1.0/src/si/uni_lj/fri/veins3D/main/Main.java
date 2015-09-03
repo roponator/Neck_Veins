@@ -26,21 +26,6 @@ import si.uni_lj.fri.veins3D.utils.OSValidator;
 public class Main
 {
 
-	/**
-	 * @param args
-	 */
-
-	static class SplashWindow1 extends JWindow
-	{
-		public SplashWindow1(String filename)
-		{
-
-			/*
-			 * SplashScreen splash = SplashScreen.getSplashScreen(); splash.setImageURL(url); System.out.println(splash.getImageURL());
-			 */
-
-		}
-	}
 
 	void ShowSplash()
 	{

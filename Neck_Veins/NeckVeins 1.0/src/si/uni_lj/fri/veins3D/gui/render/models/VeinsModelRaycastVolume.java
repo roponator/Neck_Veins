@@ -71,6 +71,8 @@ public class VeinsModelRaycastVolume extends VeinsModel
 		currentOrientation = new Quaternion();
 		addedOrientation = new Quaternion();
 		modelOnlyRotation = new Quaternion();
+		
+		VeinsWindow.renderer.resetCameraPositionAndOrientation();
 	}
 
 	public void SetNewResolution(int width, int height)
