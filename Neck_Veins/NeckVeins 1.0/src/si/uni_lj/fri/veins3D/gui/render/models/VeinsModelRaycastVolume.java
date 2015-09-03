@@ -34,6 +34,7 @@ import si.uni_lj.fri.segmentation.utils.obj.Triangle;
 import si.uni_lj.fri.segmentation.utils.obj.Vertex;
 import si.uni_lj.fri.veins3D.gui.render.Camera;
 import si.uni_lj.fri.veins3D.gui.render.VeinsRenderer;
+import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import si.uni_lj.fri.veins3D.math.Quaternion;
 import si.uni_lj.fri.veins3D.math.Vector;
 import si.uni_lj.fri.veins3D.utils.RayUtil;
@@ -47,9 +48,15 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class VeinsModelRaycastVolume extends VeinsModel
 {
+	Quaternion addedOrientation;
+	Quaternion modelOnlyRotation;
+	Quaternion currentOrientation;
+	private double[] veinsGrabbedAt;
+	private double veinsGrabRadius;
+	
 	VolumeRaycast m_raycaster = null;
 
-	public VeinsModelRaycastVolume(int displayWidth, int displayHeight)
+	public VeinsModelRaycastVolume(int displayWidth, int displayHeight,String filepath)
 	{
 		System.out.println("STACK TRACE START ****************");
 		for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
@@ -59,7 +66,11 @@ public class VeinsModelRaycastVolume extends VeinsModel
 				
 		
 		m_raycaster = new VolumeRaycast(displayWidth, displayHeight);
-		m_raycaster.MainInit();
+		m_raycaster.MainInit(filepath,VeinsWindow.renderer.getCamera());
+		
+		currentOrientation = new Quaternion();
+		addedOrientation = new Quaternion();
+		modelOnlyRotation = new Quaternion();
 	}
 
 	public void SetNewResolution(int width, int height)
@@ -70,7 +81,9 @@ public class VeinsModelRaycastVolume extends VeinsModel
 	@Override
 	public void render(Camera camera)
 	{
-		m_raycaster.MainRender(camera);
+		Quaternion mouseRotation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
+		mouseRotation = Quaternion.quaternionMultiplication(Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{-1,0,0}), mouseRotation);
+		m_raycaster.MainRender(camera,mouseRotation);
 	}
 
 	public void cleanup()
@@ -95,31 +108,38 @@ public class VeinsModelRaycastVolume extends VeinsModel
 		return 0.0f;
 	}
 
+		@Override
 	public double GetVeinsGrabRadius()
 	{
-		return 20.0;
+		return veinsGrabRadius;
 	}
 
-	public double[] GetVeinsGrabbedAt()
-	{
-		return new double[]
-		{ 0, 0, };
-	}
-
+	@Override
 	public void SetVeinsGrabRadius(double r)
 	{
+		veinsGrabRadius = r;
 	}
 
+	@Override
+	public double[] GetVeinsGrabbedAt()
+	{
+		return veinsGrabbedAt;
+	}
+
+	@Override
 	public void SetVeinsGrabbedAt(double[] v)
 	{
+		veinsGrabbedAt = v;
 	}
 
 	public void normalizeCurrentOrientation()
 	{
+		currentOrientation = Quaternion.quaternionNormalization(currentOrientation);
 	}
 
 	public void normalizeAddedOrientation()
 	{
+		addedOrientation = Quaternion.quaternionNormalization(addedOrientation);
 	}
 
 	public void moveModelX(float delta)
@@ -141,11 +161,11 @@ public class VeinsModelRaycastVolume extends VeinsModel
 	}
 	public void rotateModelY(float delta)
 	{
-		m_raycaster.m_keyboardRotation = Quaternion.quaternionMultiplication(m_raycaster.m_keyboardRotation, Quaternion.quaternionFromAngleAndRotationAxis(delta, new double[]{0,1,0}));		
+		m_raycaster.m_keyboardRotation = Quaternion.quaternionMultiplication(m_raycaster.m_keyboardRotation, Quaternion.quaternionFromAngleAndRotationAxis(delta, new double[]{0,0,-1}));		
 	}
 	public void rotateModelZ(float delta)
 	{
-		m_raycaster.m_keyboardRotation = Quaternion.quaternionMultiplication(m_raycaster.m_keyboardRotation, Quaternion.quaternionFromAngleAndRotationAxis(delta, new double[]{0,0,1}));	
+		m_raycaster.m_keyboardRotation = Quaternion.quaternionMultiplication(m_raycaster.m_keyboardRotation, Quaternion.quaternionFromAngleAndRotationAxis(delta, new double[]{0,-1,0}));	
 	}
 	
 	public void increaseSubdivisionDepth()
@@ -158,22 +178,45 @@ public class VeinsModelRaycastVolume extends VeinsModel
 
 	public void changeAddedOrientation(VeinsRenderer renderer)
 	{
+		double[] veinsHeldAt = RayUtil.getRaySphereIntersection_WITH_ONLY_ONE_INTERSECTION_POINT(Mouse.getX(), Mouse.getY(), renderer);
+
+		if (veinsHeldAt != null && veinsGrabbedAt != null ) {
+			double[] rotationAxis = Vector.crossProduct(veinsGrabbedAt, veinsHeldAt);
+			if (Vector.length(rotationAxis) > 0) {
+				rotationAxis = Vector.normalize(rotationAxis);
+				//rotationAxis[0] *= -1.0f;
+				//rotationAxis[1] *= -1.0f;
+				//rotationAxis[2] *= -1.0f;
+				rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
+				double angle = Math.acos(Vector.dotProduct(veinsGrabbedAt, veinsHeldAt)
+						/ (Vector.length(veinsGrabbedAt) * Vector.length(veinsHeldAt)));
+				addedOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle, rotationAxis);
+			}
+		}
 	}
 
 	public void saveCurrentOrientation()
 	{
+		currentOrientation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
 	}
 
 	public void setAddedOrientation(Quaternion q)
 	{
+		addedOrientation = q;
 	}
 
 	public void rotateModel3D(double[] rot, VeinsRenderer renderer)
 	{
 	}
 
+	@Override
 	public double calculateCameraDistance()
 	{
-		return 0.0;
+		return 10;
 	}
+
+
+
+
+
 }

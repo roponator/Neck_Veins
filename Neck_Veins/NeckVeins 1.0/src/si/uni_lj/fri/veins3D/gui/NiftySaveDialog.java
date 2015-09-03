@@ -50,7 +50,7 @@ public class NiftySaveDialog
 	{
 		m_mainOpenDailogElement.setVisible(false);
 	}
-
+	
 	public void ResetPosition()
 	{
 		m_mainOpenDailogElement.setConstraintX(new SizeValue(10, SizeValueType.PercentWidth));

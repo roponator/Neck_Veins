@@ -371,7 +371,7 @@ public class VeinsRenderer
 		// create either the volume model or the mesh model (mpui, marching cubes)
 		if (modelType == ModelType.VOLUME_RENDER)
 		{
-			veinsModel = new VeinsModelRaycastVolume(VeinsWindow.settings.resWidth, VeinsWindow.settings.resHeight);
+			veinsModel = new VeinsModelRaycastVolume(VeinsWindow.settings.resWidth, VeinsWindow.settings.resHeight,fileName);
 		}
 		else
 		{

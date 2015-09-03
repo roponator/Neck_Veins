@@ -663,6 +663,7 @@ public class VeinsModelMesh extends VeinsModel
 		return currentOrientation;
 	}
 
+	
 	private void setDefaultOrientation()
 	{
 

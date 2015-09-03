@@ -367,33 +367,6 @@ public class VeinsWindow
 			frame.pack();
 			frame.setVisible(true);
 
-			canvas.addKeyListener(new KeyListener()
-			{
-
-				@Override
-				public void keyTyped(KeyEvent e)
-				{
-					// TODO Auto-generated method stub
-
-				}
-
-				@Override
-				public void keyReleased(KeyEvent e)
-				{
-					// TODO Auto-generated method stub
-
-				}
-ESC DOESNT WORK
-				@Override
-				public void keyPressed(KeyEvent e)
-				{
-					if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
-					{
-						m_escPressed = true;
-					}
-				}
-			});
-
 			Display.setParent(canvas);
 			// -Dorg.lwjgl.opengl.Window.undecorated=true
 
@@ -481,6 +454,7 @@ ESC DOESNT WORK
 
 		while (isRunning)
 		{
+
 			// Input disable for a couple of frames
 			if (screenController.m_dragWindow || screenController.getState() != GUI_STATE.DEFAULT || screenController == null)
 				disableInputTime = 0.3f;
@@ -653,15 +627,23 @@ ESC DOESNT WORK
 			Display.setTitle(title);
 	}
 
+	boolean wasEscapePressedAlready = false; // hackish but stupid input doesnt detect escape
+	
 	// this must be called before nifty gui, otherwise nifty eats up events
 	public void pollNonModelControlInput()
 	{
-		/*
-		 * if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) { screenController.OnEscapeKeyPressed(); }
-		 */
+		// Doesn't detect escape otherwise
+		if ( (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE && Keyboard.getNumKeyboardEvents()>0) ||
+				(wasEscapePressedAlready == false && Keyboard.getEventKey() == Keyboard.KEY_ESCAPE))
+		{
+			wasEscapePressedAlready = true;
+			screenController.OnEscapeKeyPressed();
+		}
+				
 
 		while (Keyboard.next())
 		{
+
 			// if a key was pressed (vs.// released)
 			if (Keyboard.getEventKeyState())
 			{

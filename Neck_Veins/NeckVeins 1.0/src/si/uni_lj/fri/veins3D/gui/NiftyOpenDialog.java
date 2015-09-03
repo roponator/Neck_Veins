@@ -73,6 +73,18 @@ public class NiftyOpenDialog
 	{
 		m_mainOpenDailogElement.setVisible(false);
 	}
+	
+	public void OnEscapeKeyPressed()
+	{
+		if(m_optionsDialogControlElement.isVisible())
+		{
+			On_SettingsDialog_CloseOrCancel();
+		}
+		else
+		{
+			OnCloseDialog();
+		}
+	}
 
 	public void ResetPosition()
 	{

@@ -429,14 +429,15 @@ public class NiftyScreenController extends DefaultScreenController
 
 	public void OnEscapeKeyPressed()
 	{
-		//m_openDialog.OnEscapeKeyPressed();
-		//m_saveDialog.OnEscapeKeyPressed();
+		m_openDialog.OnEscapeKeyPressed();
+		On_SaveDialog_Close("");
 		onButton_SettingsSideMenu_Close("");
 		On_InputOptionsDialog_Close();
 		On_ResolutionDialog_Close();
 		On_AboutDialog_Close();
 		On_UserManualDialog_Close();
 		On_LicenseDialog_Close();
+		On_StereoDialog_Close();
 		
 	}
 	

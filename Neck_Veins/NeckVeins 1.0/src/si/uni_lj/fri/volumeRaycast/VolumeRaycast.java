@@ -192,7 +192,7 @@ public class VolumeRaycast
 	 * public static void main(String args[]) { /*VolumeRaycast demo = new VolumeRaycast(args); demo.init(); demo.run(); }
 	 */
 
-	public void MainInit()
+	public void MainInit(String filepath,Camera camera)
 	{
 		try
 		{
@@ -238,13 +238,9 @@ public class VolumeRaycast
 		// load data into memory
 		System.out.print("Reading file...");
 		t = System.currentTimeMillis();
-		// float[] data = readFile("../mhddata/ball128.mhd");
-		// float[] data = readFile("D:/Users/cirilb/zile/_rawData/Pat14_3D-DSA.mhd");
 		String workingDir = System.getProperty("user.dir");
 
-		float[] data = readFile("C://Users//ropo//Desktop//Zile//Pat2_3D-DSA.mhd"); // ciril
-		// float[] data = readFile("../mhddata/mrt16_angio2.mhd"); // ciril
-		// float[] data = readFile("../mhddata/vertebra16.mhd"); // ciril
+		float[] data = readFile("C://Users//ropo//Desktop//Zile//Pat2_3D-DSA.mhd"); // TODO
 
 		matrix = locateMemory(data, CL_MEM_READ_WRITE, queue, clContext);
 		t = System.currentTimeMillis() - t;
@@ -284,6 +280,12 @@ public class VolumeRaycast
 		setKernelConstants();
 		
 		setInitialRenderMethod();
+		
+		// position camera
+		
+		//camera.cameraX = -100;
+		//camera.cameraY = -100;
+		//camera.cameraZ = -100;
 	}
 	
 	void setInitialRenderMethod()
@@ -544,11 +546,11 @@ public class VolumeRaycast
 
 	// rendering cycle
 
-	public void MainRender(Camera camera)
+	public void MainRender(Camera camera,Quaternion mouseRotation)
 	{
 		initView(width, height);
 		// handleIO();
-		display(camera);
+		display(camera,mouseRotation);
 
 		glMatrixMode(GL_MODELVIEW); // no idea why but it has to be here, otherwise a bunch of state error (underflow)
 
@@ -571,7 +573,7 @@ public class VolumeRaycast
 		Display.destroy();
 	}
 
-	public void display(Camera camera)
+	public void display(Camera camera,Quaternion mouseRotation)
 	{
 		// TODO: Need to clean-up events, test when ARB_cl_events & KHR_gl_event are implemented.
 
@@ -599,7 +601,7 @@ public class VolumeRaycast
 		glUseProgram(glProgram);
 		glUniform1i(glGetUniformLocation(glProgram, "mandelbrot"), 0);
 
-		compute(doublePrecision, camera);
+		compute(doublePrecision, camera, mouseRotation);
 
 		render();
 	}
@@ -762,7 +764,7 @@ public class VolumeRaycast
 		kernelSecondPass.setArg(0, glBuffers[BUFFER_1]).setArg(1, glBuffers[BUFFER_2]).setArg(2, glBuffers[BUFFER_DEPTH_1]).setArg(3, glBuffers[BUFFER_DEPTH_2]).setArg(18, matrix).setArg(25, octree).setArg(27, clTransferFunction);
 	}
 
-	private void compute(final boolean is64bit, Camera camera)
+	private void compute(final boolean is64bit, Camera camera,Quaternion mouseRotation)
 	{
 		kernel2DGlobalWorkSize.put(0, width).put(1, height);
 
@@ -784,32 +786,49 @@ public class VolumeRaycast
 		double dy = m_overrideGradient ? m_gradYCustom : MHDReader.dy;
 		double dz = m_overrideGradient ? m_gradZCustom : MHDReader.dz;
 		
-		float xOff = 68.02019f ;
-		float yOff = 124.51997f;
-		float zOff = -22.897635f;
+		/*float xOff = (float)MHDReader.Nx/2;
+		float yOff = (float)MHDReader.Ny/2;
+		float zOff = (float)MHDReader.Nz/2;*/
+		
+		//camera.cameraX = (float)MHDReader.Nx/2;
+		//camera.cameraY = (float)MHDReader.Ny/2;
+		//camera.cameraZ = (float)MHDReader.Nz/2;
+		float xOff = 100;
+		float yOff = 100;
+		float zOff = 100;
+		
 		float camPosX = -camera.cameraX + xOff;
 		float camPosY = -camera.cameraY + yOff;
-		float camPosZ = -camera.cameraZ + zOff;
+		float camPosZ = -camera.cameraZ + zOff-200;
+		
+		Quaternion mouseAndKeyboardRot = Quaternion.quaternionMultiplication(m_keyboardRotation,Quaternion.quaternionReciprocal(mouseRotation));
 		
 		// different xyz permutation for keyboard move
-		double[] rotCameraPos = m_keyboardRotation.rotateVector3d(new double[]{camPosX,camPosY,camPosZ});
-		camPosX = (float)rotCameraPos[0] + m_keyboardMoveX;
-		camPosY = (float)rotCameraPos[1] + m_keyboardMoveZ;
-		camPosZ = (float)rotCameraPos[2] + m_keyboardMoveY;
+		float moveFactor = 5.0f;
+		double[] rotCameraPos = mouseAndKeyboardRot.rotateVector3d(new double[]{0,0,-200.0f});
+		double[] rotatedMovement = mouseAndKeyboardRot.rotateVector3d(new double[]{m_keyboardMoveX*moveFactor,m_keyboardMoveZ*moveFactor,-m_keyboardMoveY*moveFactor});
+		camPosX = (float)rotCameraPos[0] + (float)rotatedMovement[0] + xOff;
+		camPosY = (float)rotCameraPos[1] + (float)rotatedMovement[1] + yOff;
+		camPosZ = (float)rotCameraPos[2] + (float)rotatedMovement[2] + zOff;
 		
-		FloatBuffer rotMatrixKeyboard = Quaternion.quaternionReciprocal(m_keyboardRotation).getRotationMatrix(true);
+		//FloatBuffer rotMatrixKeyboard = Quaternion.quaternionReciprocal(m_keyboardRotation).getRotationMatrix(true);
 
+		Quaternion yRot = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{0,1,0});
+		Quaternion invKeyboardRot = Quaternion.quaternionReciprocal(mouseAndKeyboardRot);
+		Quaternion camRot = Quaternion.quaternionMultiplication(yRot,invKeyboardRot);
+	
+		FloatBuffer finalCamRot =  camRot.getRotationMatrix(true) ;
 		
 		//rotMatrixModelOnly = rotMatrix;
 		// start computation
 		currentlyActiveKernel.setArg(4, camPosX). // offsets neeed for proper camera position
-				setArg(5, camPosY).setArg(6, camPosZ).setArg(7, rotMatrixKeyboard.get(4 * 1 + 0))
+				setArg(5, camPosY).setArg(6, camPosZ).setArg(7, finalCamRot.get(4 * 1 + 0))
 				. // up
-				setArg(8, rotMatrixKeyboard.get(4 * 1 + 1)).setArg(9, rotMatrixKeyboard.get(4 * 1 + 2)).setArg(10, -rotMatrixKeyboard.get(4 * 2 + 0))
+				setArg(8, finalCamRot.get(4 * 1 + 1)).setArg(9, finalCamRot.get(4 * 1 + 2)).setArg(10, -finalCamRot.get(4 * 2 + 0))
 				. // forward
-				setArg(11, -rotMatrixKeyboard.get(4 * 2 + 1)).setArg(12, -rotMatrixKeyboard.get(4 * 2 + 2)).setArg(13, rotMatrixKeyboard.get(4 * 0 + 0))
+				setArg(11, -finalCamRot.get(4 * 2 + 1)).setArg(12, -finalCamRot.get(4 * 2 + 2)).setArg(13, finalCamRot.get(4 * 0 + 0))
 				. // right
-				setArg(14, rotMatrixKeyboard.get(4 * 0 + 1)).setArg(15, rotMatrixKeyboard.get(4 * 0 + 2)).setArg(16, fov).setArg(17, asr).setArg(19, MHDReader.Nx).setArg(20, MHDReader.Ny).setArg(21, MHDReader.Nz).setArg(22, (float) dx).setArg(23, (float) dy).setArg(24, (float) dz)
+				setArg(14, finalCamRot.get(4 * 0 + 1)).setArg(15, finalCamRot.get(4 * 0 + 2)).setArg(16, fov).setArg(17, asr).setArg(19, MHDReader.Nx).setArg(20, MHDReader.Ny).setArg(21, MHDReader.Nz).setArg(22, (float) dx).setArg(23, (float) dy).setArg(24, (float) dz)
 				.setArg(26, octreeLevels).setArg(28, transferFunctionSamples).setArg(29, threshold).setArg(30, lin);
 
 		clEnqueueNDRangeKernel(queue, currentlyActiveKernel, 2, null, kernel2DGlobalWorkSize, null, null, null);// */
@@ -1039,6 +1058,7 @@ public class VolumeRaycast
 	public static float[] readFile(String fileName)
 	{
 		MHDReader.readMHD(fileName);
+		
 		Buffer shorts = fastFileRead();
 		return bufferAs1DMatrix(shorts);
 	}
