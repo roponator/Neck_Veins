@@ -16,7 +16,22 @@
             <onDisabled name="renderQuad" startColor="#2220" endColor="#2228" post="false" length="150"/>
         </effect>
     </style>
-
+    
+    <style id="nifty-listbox#scrollpanel">
+        <attributes focusable="true" padding="1px" />
+        <effect overlay="true">
+        	<!-- background color -->
+            <onActive name="colorBar" color="#515257ff" post="false" neverStopRendering="true" timeType="infinite"/>
+            <onActive name="border" border="1px" color="#222f" inset="1px,0px,0px,1px"/>
+            <onFocus name="border" border="1px" color="#4cb4b3ff"/>
+            <onEnabled name="renderQuad" startColor="#2228" endColor="#2220" post="false" length="150"/>
+            <onDisabled name="renderQuad" startColor="#2220" endColor="#2228" post="false" length="150"/>
+        </effect>
+    </style>
+    
+      <style id="nifty-horizontal-scrollbar#panel">
+        <attributes childLayout="horizontal" height="43px" align="center" focusable="true"/>
+    </style>
 
     <style id="nifty-listbox-item" base="nifty-label">
         <attributes color="#ffffffff" selectionColor="#ffff" width="100%" align="left" textVAlign="center" textHAlign="left" />

@@ -34,8 +34,8 @@
     <style id="nifty-vertical-slider#position">
         <attributes filename="imgs/pngs720p/Med3D-49.png" x="0px" y="0px" width="15px" height="15px" imageMode="normal" childLayout="center"/>
         <effect>
-             <onClick  name="imageOverlay" filename="imgs/pngs720p/Med3D-50.png" x="0px" y="0px" width="100%" height="100%" imageMode="normal" post="true" renderOrder="1001"/>
-             <onHover name="imageOverlay" filename="imgs/pngs720p/Med3D-50.png" x="0px" y="0px" width="100%" height="100%" imageMode="normal" post="true" renderOrder="1001"/>
+             <onClick  name="imageOverlay" filename="imgs/pngs720p/Med3D-48.png" x="0px" y="0px" width="100%" height="100%" imageMode="normal" post="true" renderOrder="1001"/>
+             <onHover name="imageOverlay" filename="imgs/pngs720p/Med3D-48.png" x="0px" y="0px" width="100%" height="100%" imageMode="normal" post="true" renderOrder="1001"/>
 			
         </effect>
     </style>
@@ -74,8 +74,8 @@
     <style id="nifty-horizontal-slider#position">
         <attributes filename="imgs/pngs720p/Med3D-49.png" x="0px" y="0px" width="30px" height="15px" imageMode="normal"/>
         <effect>
-            <onClick  name="imageOverlay" filename="imgs/pngs720p/Med3D-50.png" x="0px" y="0px" width="100%" height="100%" imageMode="normal" post="true" renderOrder="1001"/>
-            <onHover name="imageOverlay" filename="imgs/pngs720p/Med3D-50.png" x="0px" y="0px" width="100%" height="100%" imageMode="normal" post="true" renderOrder="1001"/>
+            <onClick  name="imageOverlay" filename="imgs/pngs720p/Med3D-48.png" x="0px" y="0px" width="100%" height="100%" imageMode="normal" post="true" renderOrder="1001"/>
+            <onHover name="imageOverlay" filename="imgs/pngs720p/Med3D-48.png" x="0px" y="0px" width="100%" height="100%" imageMode="normal" post="true" renderOrder="1001"/>
         </effect>
     </style>
 </nifty-styles>

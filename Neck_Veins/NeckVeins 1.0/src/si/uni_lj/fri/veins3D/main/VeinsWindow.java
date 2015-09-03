@@ -7,7 +7,11 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -134,6 +138,8 @@ public class VeinsWindow
 
 	public static boolean increaseSubdivLevel = false;
 	public static boolean decreaseSubdivLevel = false;
+
+	boolean m_escPressed = false;
 
 	/**
 	 * 
@@ -360,6 +366,34 @@ public class VeinsWindow
 
 			frame.pack();
 			frame.setVisible(true);
+
+			canvas.addKeyListener(new KeyListener()
+			{
+
+				@Override
+				public void keyTyped(KeyEvent e)
+				{
+					// TODO Auto-generated method stub
+
+				}
+
+				@Override
+				public void keyReleased(KeyEvent e)
+				{
+					// TODO Auto-generated method stub
+
+				}
+ESC DOESNT WORK
+				@Override
+				public void keyPressed(KeyEvent e)
+				{
+					if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+					{
+						m_escPressed = true;
+					}
+				}
+			});
+
 			Display.setParent(canvas);
 			// -Dorg.lwjgl.opengl.Window.undecorated=true
 
@@ -433,6 +467,8 @@ public class VeinsWindow
 
 	long prevTime = System.nanoTime();
 	float deltaTime = 1.0f / 60.0f;
+	float disableInputTime = 0; // number of frames that the input will be disabled
+	boolean disableInput = false;
 
 	public void mainLoop()
 	{
@@ -445,6 +481,10 @@ public class VeinsWindow
 
 		while (isRunning)
 		{
+			// Input disable for a couple of frames
+			if (screenController.m_dragWindow || screenController.getState() != GUI_STATE.DEFAULT || screenController == null)
+				disableInputTime = 0.3f;
+
 			canModelBeRotatedByMouse = true; // reset
 
 			// handle subdiv increase
@@ -469,9 +509,23 @@ public class VeinsWindow
 			// renderer.setupView(); // raycast volume renderer changes some
 			// states, theys must be reset
 
-			// Allow input only if default state, otherwise leave nifty keyboard input (required for text field for save menu)
-			if (screenController != null && screenController.getState() == GUI_STATE.DEFAULT)
-				pollInput(wasLeftMouseDownClicked);
+			if (m_escPressed)
+				screenController.OnEscapeKeyPressed();
+
+			// non model input must be before nifty
+			pollNonModelControlInput();
+
+			// NIFTY LOGIC MUST BE RAN BEFORE GAME INPUT LOGIC BECAUSE OF INPUT!
+			if (wasLeftMouseDownClicked)
+			{
+				screenController.onMouseLeftDownClicked();
+			}
+
+			nifty.update();
+
+			// model input must be after nifty
+			disableInput = disableInputTime > 0;
+			pollModelInput(wasLeftMouseDownClicked);
 
 			renderer.switchWireframe(wire);
 
@@ -489,10 +543,6 @@ public class VeinsWindow
 			// TODO: PRESENT ORDER: BEFORE OR AFTER NIFTY.RENDER?
 			// Display.update();
 
-			// On down click after it was up (NOT DOWN->UP!)
-			if (wasLeftMouseDownClicked)
-				screenController.onMouseLeftDownClicked();
-
 			renderNiftyGUI();
 
 			Display.update();
@@ -508,10 +558,17 @@ public class VeinsWindow
 				System.err.println(glerrmsg);
 			}
 
+			// prepare for next frame
 			long currentTime = System.nanoTime();
 			deltaTime = ((float) currentTime) - ((float) prevTime);
 			deltaTime /= 1000000000.0f;
 			prevTime = currentTime;
+
+			disableInputTime -= deltaTime;
+			if (disableInputTime < 0)
+				disableInputTime = -1.0f;
+
+			m_escPressed = false;
 		}
 	}
 
@@ -554,7 +611,6 @@ public class VeinsWindow
 		GL11.glDisable(GL11.GL_LIGHTING);
 		glEnable(GL11.GL_TEXTURE_2D);
 
-		nifty.update();
 		nifty.render(false); // TODO: THROWS ERROR ON FIRST FRAME??
 
 		// restore your OpenGL state
@@ -597,10 +653,88 @@ public class VeinsWindow
 			Display.setTitle(title);
 	}
 
-	/**
-	 * 
-	 */
-	public void pollInput(boolean wasLeftMouseDownClicked)
+	// this must be called before nifty gui, otherwise nifty eats up events
+	public void pollNonModelControlInput()
+	{
+		/*
+		 * if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) { screenController.OnEscapeKeyPressed(); }
+		 */
+
+		while (Keyboard.next())
+		{
+			// if a key was pressed (vs.// released)
+			if (Keyboard.getEventKeyState())
+			{
+				if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_TAB)
+				{
+					settings.isFpsShown = !settings.isFpsShown;
+				}
+				else if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_1)
+				{
+					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER);
+				}
+				else if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_2)
+				{
+					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP);
+				}
+				else if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_3)
+				{
+					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP_AMBIENT_L);
+				}
+				else if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_4)
+				{
+					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP_AMBIENT_L_SPEC_BLINN_PHONG);
+				}
+				else if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_5)
+				{
+					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP_AMBIENT_L_SPEC_PHONG);
+				}
+				else if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_6)
+				{
+					renderer.setActiveShaderProgram(VeinsRenderer.SHADER_6);
+				}
+				else if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_7)
+				{
+					renderer.setActiveShaderProgram(VeinsRenderer.SHADER_7);
+				}
+				else if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_8)
+				{
+					renderer.setActiveShaderProgram(VeinsRenderer.SHADER_8);
+				}
+				else if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_0)
+				{
+					renderer.setActiveShaderProgram(VeinsRenderer.FIXED_PIPELINE);
+				}
+				else if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_9)
+				{
+					wire = !wire;
+				}
+				else if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_ADD && renderer.getVeinsModel() != null)
+				{
+					renderer.getVeinsModel().increaseSubdivisionDepth();
+				}
+				else if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_SUBTRACT && renderer.getVeinsModel() != null)
+				{
+					renderer.getVeinsModel().decreaseSubdivisionDepth();
+				}
+				else if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_9) // no aa implemented at all??
+				{
+					renderer.switchAA();
+				}
+				else if (!disableInput && Keyboard.getEventKey() == Keyboard.KEY_L)
+				{
+					if (settings.locale.getLanguage().equals("sl"))
+						settings.locale = new Locale("en", "US");
+					else
+						settings.locale = new Locale("sl", "SI");
+					// frame.setLanguageSpecific(); TODO NIFTY
+				}
+			}
+		}
+	}
+
+	// this must be called after nifty gui
+	public void pollModelInput(boolean wasLeftMouseDownClicked)
 	{
 		pollKeyboardInput();
 		pollMouseInput(wasLeftMouseDownClicked);
@@ -612,77 +746,6 @@ public class VeinsWindow
 	 */
 	private void pollKeyboardInput()
 	{
-		while (Keyboard.next())
-		{
-			// if a key was pressed (vs.// released)
-			if (Keyboard.getEventKeyState())
-			{
-				if (Keyboard.getEventKey() == Keyboard.KEY_TAB)
-				{
-					settings.isFpsShown = !settings.isFpsShown;
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_1)
-				{
-					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER);
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_2)
-				{
-					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP);
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_3)
-				{
-					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP_AMBIENT_L);
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_4)
-				{
-					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP_AMBIENT_L_SPEC_BLINN_PHONG);
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_5)
-				{
-					renderer.setActiveShaderProgram(VeinsRenderer.SIMPLE_SHADER_NORM_INTERP_AMBIENT_L_SPEC_PHONG);
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_6)
-				{
-					renderer.setActiveShaderProgram(VeinsRenderer.SHADER_6);
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_7)
-				{
-					renderer.setActiveShaderProgram(VeinsRenderer.SHADER_7);
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_8)
-				{
-					renderer.setActiveShaderProgram(VeinsRenderer.SHADER_8);
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_0)
-				{
-					renderer.setActiveShaderProgram(VeinsRenderer.FIXED_PIPELINE);
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_9)
-				{
-					wire = !wire;
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_ADD && renderer.getVeinsModel() != null)
-				{
-					renderer.getVeinsModel().increaseSubdivisionDepth();
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_SUBTRACT && renderer.getVeinsModel() != null)
-				{
-					renderer.getVeinsModel().decreaseSubdivisionDepth();
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_9) // no aa implemented at all??
-				{
-					renderer.switchAA();
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_L)
-				{
-					if (settings.locale.getLanguage().equals("sl"))
-						settings.locale = new Locale("en", "US");
-					else
-						settings.locale = new Locale("sl", "SI");
-					// frame.setLanguageSpecific(); TODO NIFTY
-				}
-			}
-		}
 
 		// if (!frame.isDialogOpened()) return; TODO NIFTY
 
@@ -697,7 +760,7 @@ public class VeinsWindow
 			rotationFactor = maxRotationSpeed;
 
 		// moving the camera
-		if (Keyboard.isKeyDown(Keyboard.KEY_W))
+		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_W))
 		{
 			if (settings.useModelMoveMode)
 			{
@@ -709,7 +772,7 @@ public class VeinsWindow
 				renderer.getCamera().lookUp();
 			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_S))
+		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_S))
 		{
 			if (settings.useModelMoveMode)
 			{
@@ -721,7 +784,7 @@ public class VeinsWindow
 				renderer.getCamera().lookDown();
 			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_A))
+		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_A))
 		{
 			if (settings.useModelMoveMode)
 			{
@@ -733,7 +796,7 @@ public class VeinsWindow
 				renderer.getCamera().lookRight();
 			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_D))
+		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_D))
 		{
 			if (settings.useModelMoveMode)
 			{
@@ -745,7 +808,7 @@ public class VeinsWindow
 				renderer.getCamera().lookLeft();
 			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_Q))
+		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_Q))
 		{
 			if (settings.useModelMoveMode)
 			{
@@ -757,7 +820,7 @@ public class VeinsWindow
 				renderer.getCamera().rotateCounterClockwise();
 			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_E))
+		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_E))
 		{
 			if (settings.useModelMoveMode)
 			{
@@ -769,7 +832,7 @@ public class VeinsWindow
 				renderer.getCamera().rotateClockwise();
 			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_UP))
+		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_UP))
 		{
 			if (settings.useModelMoveMode)
 			{
@@ -781,7 +844,7 @@ public class VeinsWindow
 				renderer.getCamera().moveForward();
 			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
+		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_DOWN))
 		{
 			if (settings.useModelMoveMode)
 			{
@@ -793,7 +856,7 @@ public class VeinsWindow
 				renderer.getCamera().moveBackwards();
 			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
+		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
 		{
 			if (settings.useModelMoveMode)
 			{
@@ -805,7 +868,7 @@ public class VeinsWindow
 				renderer.getCamera().moveRight();
 			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
+		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_LEFT))
 		{
 			if (settings.useModelMoveMode)
 			{
@@ -817,7 +880,7 @@ public class VeinsWindow
 				renderer.getCamera().moveLeft();
 			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_R))
+		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_R))
 		{
 			if (settings.useModelMoveMode)
 			{
@@ -829,7 +892,7 @@ public class VeinsWindow
 				renderer.getCamera().moveUp();
 			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_F))
+		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_F))
 		{
 			if (settings.useModelMoveMode)
 			{

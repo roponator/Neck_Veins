@@ -17,7 +17,7 @@
 
     <style id="nifty-drop-down#text" base="base-font">
         <attributes color="#ffffffff" selectionColor="#f00f" visibleToMouse="false" align="left" valign="center"
-                    textHAlign="left" height="100%"/>
+                    textHAlign="left" height="100%" margin = "0px,0px,0px,3px"/>
         <effect>
             <onFocus name="textColor" post="false" color="#ffffffff"/>
         </effect>

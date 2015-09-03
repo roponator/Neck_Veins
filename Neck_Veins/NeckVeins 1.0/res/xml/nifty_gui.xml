@@ -15,6 +15,8 @@
       <useControls filename="xml/mySaveDialogControl.xml"/>
      
     <useStyles filename="xml/myListboxStyle.xml"/>
+     <useControls filename="xml/myListboxControl.xml"/>
+     
      <useStyles filename="xml/myTextfieldStyle.xml"/>
     
      <useStyles filename="xml/myScrollbarStyle.xml"/>
@@ -117,21 +119,26 @@
 	    <!-- ******************************************* -->
 		<!-- Top menu bar controls -->
 		<!-- ******************************************* -->
-        <layer id="LAYER_TOP_MENU_BAR" childLayout="center" valign="top" align="left"  width="100.0%" height="100.0%" >
-            <panel id="GPanel1" style="STYLE_TOP_MENU_BAR_PANEL" childLayout="horizontal" width="100.0%" valign="top" align="left" height="23px">
-               
-                <image id="GImage2" childLayout="center" filename="imgs\pngs720p\Med3D-22.png" width="45px"valign="center" align="left" filter="true"/>
-                
+        <layer id="LAYER_TOP_MENU_BAR" childLayout="center" valign="top" align="left"  width="100.0%" height="100.0%"  >
+           <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="overlay" width="100.0%" valign="top" align="left" height="23px"  visibleToMouse="true">        
+					<interact onClick="onClickMainWindowPanel()"
+	                	    	  onMouseOver="onDragMainWindowPanel()"/>     
+	                	    	  
+            <panel id="GPanel1" style="STYLE_TOP_MENU_BAR_PANEL" childLayout="horizontal" width="100.0%" valign="top" align="left" height="100%"  visibleToMouse="false">
+              	
+	                	    	  
+                <image id="GImage2" childLayout="center" filename="imgs\pngs720p\Med3D-22.png" width="45px"valign="center" align="left" filter="true"  visibleToMouse="false"/>
+            
                  <!--  ********************************** -->
                  <!-- button File & its dropdown menu -->
                  <!--  ********************************** -->
                  <panel id=""  style="STYLE_TOP_MENU_BUTTON" childLayout="vertical" valign="center" align="left" height="100%" width="50px">
-           
+                           
+                                      
                      <!--  the File button -->
 	                <control name="button" id="" style="STYLE_TOP_MENU_BUTTON" childLayout="center"  valign="center" label="File" align="left" height="100.0%" width="100.0%">
 	                	<interact onClick="onButton_TopMenu_File()"
-	                	    	  onMouseOver="onHover_TopMenu_File()"/>   
-	                   	
+	                	    	  onMouseOver="onHover_TopMenu_File()"/>                      	
 	                </control>
 	                
 	                 <!--  Drop-down menu, which is offseted a bit down -->
@@ -279,7 +286,6 @@
                  </panel>
                 <!--  ******** END BUTTON ********** -->
                 
-                 
                 <!-- ******************************************* -->
 				<!-- minimize, maxmimize, close buttons on top menu bar-->
 				<!-- ******************************************* -->
@@ -321,7 +327,8 @@
 					</panel>  
 					              
                 </panel>
- 
+                       
+ 			</panel> <!-- draw frame panel -->
         </layer>
         
     <!-- ******************************************* -->

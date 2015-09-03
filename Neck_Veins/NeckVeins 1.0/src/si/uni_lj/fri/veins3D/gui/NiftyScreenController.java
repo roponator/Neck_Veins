@@ -1,6 +1,8 @@
 package si.uni_lj.fri.veins3D.gui;
 
+import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -75,11 +77,11 @@ public class NiftyScreenController extends DefaultScreenController
 
 	static final String INPUT_SETTINGS_MOVE_CAMERA = "Move Camera";
 	static final String INPUT_SETTINGS_MOVE_MODEL = "Move Model";
-	
+
 	static final String INPUT_SETTINGS_INPUT_TYPE_NORMAL = "Default";
 	static final String INPUT_SETTINGS_INPUT_TYPE_3DMOUSE = "3D Mouse";
 	static final String INPUT_SETTINGS_INPUT_TYPE_LEAPMOTION = "Leap Motion";
-	
+
 	public static Screen m_screen = null;
 	public static final String m_supportedType_MHD = "mhd";
 	public static final String m_supportedType_OBJ = "obj";
@@ -199,7 +201,6 @@ public class NiftyScreenController extends DefaultScreenController
 	static Element m_userManualDialog = null;
 	static Element m_darkeningPanelForDialog = null;
 
-
 	// -----------------------------------
 	// Input settings controls
 	// -----------------------------------
@@ -209,7 +210,7 @@ public class NiftyScreenController extends DefaultScreenController
 	Element m_inputSettingsLeapMotionSlider = null;
 	float m_input_LeapMotionSensitivity_LastSliderValue = 0.5f; // temp values, in case Cancel is clicked
 	float m_input_sensitivity_LastSliderValue = 0.5f;
-	
+
 	// -----------------------------------
 	// Init
 	// -----------------------------------
@@ -301,29 +302,29 @@ public class NiftyScreenController extends DefaultScreenController
 			System.out.println("Error HTML: " + e.getMessage() + ", " + e.toString());
 			e.printStackTrace();
 		}
-		
+
 		// ---------------------------------------
-		// Input menu 
+		// Input menu
 		// ---------------------------------------
 		m_inputSettingsInputMethodTypeDropdown = m_inputOptionsDialog.findElementById("INPUT_METHOD_DROPDOWN").getAttachedInputControl().getControl(DropDownControl.class);
 		m_inputSettingsInputSensitivitySlider = m_inputOptionsDialog.findElementById("INPUT_inputSens");
 		m_inputSettingsLeapMotionSlider = m_inputOptionsDialog.findElementById("INPUT_leapSens");
-		m_inputSettingsMoveTypeDropdown  = m_inputOptionsDialog.findElementById("MOVE_TYPE_METHOD_DROPDOWN").getAttachedInputControl().getControl(DropDownControl.class);
-		
+		m_inputSettingsMoveTypeDropdown = m_inputOptionsDialog.findElementById("MOVE_TYPE_METHOD_DROPDOWN").getAttachedInputControl().getControl(DropDownControl.class);
+
 		m_input_sensitivity_LastSliderValue = VeinsWindow.settings.sensitivity;
 		m_input_LeapMotionSensitivity_LastSliderValue = VeinsWindow.settings.leapSensitivity;
 		InitSlider(m_inputSettingsInputSensitivitySlider, 0.0f, 100.0f, m_input_sensitivity_LastSliderValue, 0.1f, "Input Sensitivity", "%.1f");
 		InitSlider(m_inputSettingsLeapMotionSlider, 0.0f, 100.0f, m_input_LeapMotionSensitivity_LastSliderValue, 0.1f, "Input Sensitivity", "%.1f");
-		
+
 		m_inputSettingsMoveTypeDropdown.addItem(INPUT_SETTINGS_MOVE_CAMERA);
 		m_inputSettingsMoveTypeDropdown.addItem(INPUT_SETTINGS_MOVE_MODEL);
 		m_inputSettingsMoveTypeDropdown.selectItemByIndex(VeinsWindow.settings.useModelMoveMode ? 1 : 0);
-		
+
 		m_inputSettingsInputMethodTypeDropdown.addItem(INPUT_SETTINGS_INPUT_TYPE_NORMAL);
 		m_inputSettingsInputMethodTypeDropdown.addItem(INPUT_SETTINGS_INPUT_TYPE_3DMOUSE);
 		m_inputSettingsInputMethodTypeDropdown.addItem(INPUT_SETTINGS_INPUT_TYPE_LEAPMOTION);
 		m_inputSettingsInputMethodTypeDropdown.selectItemByIndex(0);
-		
+
 		// ---------------------------------------
 		// Prepare gui for show
 		// ---------------------------------------
@@ -346,6 +347,68 @@ public class NiftyScreenController extends DefaultScreenController
 	}
 
 	// -----------------------------------
+	// Top panel dragging
+	// -----------------------------------
+
+	int m_dragPosStartX = -1;
+	int m_dragPosStartY = -1;
+	public static boolean m_dragWindow = false;
+
+	public void onClickMainWindowPanel()
+	{
+		m_dragWindow = true;
+	}
+
+	public void onDragMainWindowPanel()
+	{
+		if (Mouse.isButtonDown(0) == false)
+		{
+			m_dragPosStartX = -1;
+			m_dragPosStartY = -1;
+			m_dragWindow = false;
+		}
+
+		if (m_dragWindow)
+		{
+			int mx = Mouse.getX();
+			int my = Mouse.getY();
+			
+			if(m_dragPosStartX == -1)
+				m_dragPosStartX = mx;
+			
+			if(m_dragPosStartY == -1)
+				m_dragPosStartY = my;
+			
+			int dx = Mouse.getX() - m_dragPosStartX;
+			int dy = Mouse.getY() - m_dragPosStartY;
+			
+			int newPosX = VeinsWindow.frame.getLocation().x + dx;
+			int newPosY = VeinsWindow.frame.getLocation().y - dy;
+			
+			// prevent window going out of screen
+			if(newPosX < 0 )
+				newPosX = 0;
+			
+			if(newPosY < 0)
+				newPosY = 0;
+			
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			
+			if((newPosX+VeinsWindow.currentDisplayMode.getWidth()) > screenSize.width )
+				newPosX = screenSize.width - VeinsWindow.currentDisplayMode.getWidth();
+			
+			if((newPosY+VeinsWindow.currentDisplayMode.getHeight()) > screenSize.height )
+				newPosY = screenSize.height - VeinsWindow.currentDisplayMode.getHeight();
+			
+			VeinsWindow.frame.setLocation(newPosX, newPosY);
+			
+			// prepare for next frame
+			m_dragPosStartX = mx - dx;
+			m_dragPosStartY = my - dy;
+		}
+	}
+
+	// -----------------------------------
 	// Mouse common
 	// -----------------------------------
 
@@ -364,6 +427,19 @@ public class NiftyScreenController extends DefaultScreenController
 	// Common
 	// ----------------------------------------------------
 
+	public void OnEscapeKeyPressed()
+	{
+		//m_openDialog.OnEscapeKeyPressed();
+		//m_saveDialog.OnEscapeKeyPressed();
+		onButton_SettingsSideMenu_Close("");
+		On_InputOptionsDialog_Close();
+		On_ResolutionDialog_Close();
+		On_AboutDialog_Close();
+		On_UserManualDialog_Close();
+		On_LicenseDialog_Close();
+		
+	}
+	
 	// is called when some menu will open (so you can close others etc..)
 	static void prepareForSomeMenuOpen()
 	{
@@ -453,12 +529,12 @@ public class NiftyScreenController extends DefaultScreenController
 
 	public void onButton_NavigationWidgetWASD_OnMouseOver(Element element, NiftyMouseInputEvent event)
 	{
-		if (getState() != GUI_STATE.DEFAULT)
+		if (getState() != GUI_STATE.DEFAULT || m_dragWindow)
 			return;
 
 		// process widget input and move camera
 		NAVIGATION_WIDGET_BUTTON pressedButton = processNavWidgetInput(m_navWidgetWASD, event);
-		
+
 		switch (pressedButton)
 		{
 		case CENTER_CIRCLE_DOWN:
@@ -484,7 +560,7 @@ public class NiftyScreenController extends DefaultScreenController
 
 	public void onButton_NavigationWidgetUDLR_OnMouseOver(Element element, NiftyMouseInputEvent event)
 	{
-		if (getState() != GUI_STATE.DEFAULT)
+		if (getState() != GUI_STATE.DEFAULT || m_dragWindow)
 			return;
 
 		// process widget input and move camera
@@ -515,6 +591,9 @@ public class NiftyScreenController extends DefaultScreenController
 	// returns the hold down button
 	public static NAVIGATION_WIDGET_BUTTON processNavWidgetInput(NavigationWidget widget, NiftyMouseInputEvent event)
 	{
+
+		// Disable object rotation if click on nav widget
+		VeinsWindow.canModelBeRotatedByMouse = false;
 
 		// move widget, must be done outside the buttons if-else thingy
 		if (widget.IsWidgetInMoveState())
@@ -553,11 +632,6 @@ public class NiftyScreenController extends DefaultScreenController
 			widget.StopMoving();
 		}
 
-		// Disable object rotation if click on nav widget
-		if(resultButton != NAVIGATION_WIDGET_BUTTON.NONE)
-			VeinsWindow. canModelBeRotatedByMouse = false;
-			
-		
 		return resultButton;
 	}
 
@@ -888,49 +962,49 @@ public class NiftyScreenController extends DefaultScreenController
 	{
 		VeinsWindow.decreaseSubdivLevel = true;
 	}
-	
+
 	@NiftyEventSubscriber(id = "ENABLE_SSAO_CHECKBOX")
 	public void OnSettingsSideMenuSSAOCheckbox(String id, CheckBoxStateChangedEvent event)
 	{
 		VolumeRaycast.m_enableSSAO = event.isChecked();
 	}
-	
+
 	@NiftyEventSubscriber(id = "OVERRIDE_GRADIENT_CHECKBOX")
 	public void OnSettingsSideMenuOverrideGradientheckbox(String id, CheckBoxStateChangedEvent event)
 	{
 		VolumeRaycast.m_overrideGradient = event.isChecked();
 	}
-	
+
 	@NiftyEventSubscriber(id = "ENABLE_DOF_CHECKBOX")
 	public void OnSettingsSideMenuDOFCheckbox(String id, CheckBoxStateChangedEvent event)
 	{
 		VolumeRaycast.m_enableDOF = event.isChecked();
 	}
 
-	// render methods 
+	// render methods
 	@NiftyEventSubscriber(id = "VOLUME_RENDERMETHOD_DROPDOWN")
 	public void OnVolumeRendererMethodTypeDropdown(String id, DropDownSelectionChangedEvent event)
 	{
-		if(event.getSelection() != null)
+		if (event.getSelection() != null)
 		{
 			VeinsWindow.settings.volumeRenderMethod = event.getSelectionItemIndex();
-			
-			String sel = (String)event.getSelection();
-			if(sel.compareTo(NiftySettingsSideMenu.VOLUME_RENDER_METHOD_ISO)==0)
+
+			String sel = (String) event.getSelection();
+			if (sel.compareTo(NiftySettingsSideMenu.VOLUME_RENDER_METHOD_ISO) == 0)
 			{
 				VolumeRaycast.SetRenderMethod(VolumeRaycast.RenderMethod.ISO);
 			}
-			else if(sel.compareTo(NiftySettingsSideMenu.VOLUME_RENDER_METHOD_ALPHA)==0)
+			else if (sel.compareTo(NiftySettingsSideMenu.VOLUME_RENDER_METHOD_ALPHA) == 0)
 			{
 				VolumeRaycast.SetRenderMethod(VolumeRaycast.RenderMethod.ALPHA);
 			}
-			else if(sel.compareTo(NiftySettingsSideMenu.VOLUME_RENDER_METHOD_MAXMIMUM_PROJECTIOn)==0)
+			else if (sel.compareTo(NiftySettingsSideMenu.VOLUME_RENDER_METHOD_MAXMIMUM_PROJECTIOn) == 0)
 			{
 				VolumeRaycast.SetRenderMethod(VolumeRaycast.RenderMethod.MAX_PROJECTION);
 			}
 			else
 			{
-				System.out.println("Error: invalid volume render method: "+sel);
+				System.out.println("Error: invalid volume render method: " + sel);
 			}
 		}
 	}
@@ -1159,25 +1233,25 @@ public class NiftyScreenController extends DefaultScreenController
 		m_inputOptionsDialog.setVisible(false);
 	}
 
-
 	public void onButton_InputSettingsDialog_Cancel()
 	{
 		On_InputOptionsDialog_Close();
 	}
-	
+
 	public void onButton_InputSettingsDialog_OK()
 	{
-		VeinsWindow.settings.sensitivity = (int)m_input_sensitivity_LastSliderValue;
-		VeinsWindow.settings.leapSensitivity = (int)m_input_LeapMotionSensitivity_LastSliderValue;
-		
-		if(m_inputSettingsMoveTypeDropdown.getSelection()!=null)
+		VeinsWindow.settings.sensitivity = (int) m_input_sensitivity_LastSliderValue;
+		VeinsWindow.settings.leapSensitivity = (int) m_input_LeapMotionSensitivity_LastSliderValue;
+
+		if (m_inputSettingsMoveTypeDropdown.getSelection() != null)
 		{
-			String sel=(String)m_inputSettingsMoveTypeDropdown.getSelection();			
-			VeinsWindow.settings.useModelMoveMode = sel.compareTo(INPUT_SETTINGS_MOVE_MODEL)==0;		
+			String sel = (String) m_inputSettingsMoveTypeDropdown.getSelection();
+			VeinsWindow.settings.useModelMoveMode = sel.compareTo(INPUT_SETTINGS_MOVE_MODEL) == 0;
 		}
-		
+
 		On_InputOptionsDialog_Close();
 	}
+
 	// ----------------------------------------------------
 	// License options dialog
 	// ----------------------------------------------------
@@ -1328,7 +1402,7 @@ public class NiftyScreenController extends DefaultScreenController
 				VeinsWindow.renderer.getVeinsModel().changeMinTriangles((int) event.getValue());
 			}
 		}
-		
+
 		// Volume renderer
 		if (modifiedSlider.getId().compareTo("ssao_strength") == 0)
 		{
@@ -1354,19 +1428,19 @@ public class NiftyScreenController extends DefaultScreenController
 		{
 			VolumeRaycast.m_gradZCustom = event.getValue();
 		}
-		
+
 		// threhold
 		if (modifiedSlider.getId().compareTo("volume_iso_threshold") == 0)
 		{
 			VolumeRaycast.threshold = event.getValue();
 		}
-	
+
 		// Input dialog
 		if (modifiedSlider.getId().compareTo("INPUT_inputSens") == 0)
 		{
 			m_input_LeapMotionSensitivity_LastSliderValue = event.getValue();
 		}
-		
+
 		if (modifiedSlider.getId().compareTo("INPUT_leapSens") == 0)
 		{
 			m_input_sensitivity_LastSliderValue = event.getValue();
