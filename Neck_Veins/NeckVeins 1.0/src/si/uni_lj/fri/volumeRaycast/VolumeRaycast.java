@@ -281,6 +281,8 @@ public class VolumeRaycast
 		
 		setInitialRenderMethod();
 		
+		INITIAL ORIENTATION FAIL
+		camera.cameraOrientation = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{0,1,0});
 		// position camera
 		
 		//camera.cameraX = -100;
@@ -779,20 +781,11 @@ public class VolumeRaycast
 		// create camera matrix, must also rotate by 180 degrees on Y axis for proper initial orientation
 		Quaternion rotY = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]
 		{ 0, 1, 0 });
-		Quaternion worldOrientation = Quaternion.quaternionReciprocal(camera.cameraOrientation);
-		FloatBuffer rotMatrix = Quaternion.quaternionMultiplication(worldOrientation, rotY).getRotationMatrix(true);
-
+	
 		double dx = m_overrideGradient ? m_gradXCustom : MHDReader.dx;
 		double dy = m_overrideGradient ? m_gradYCustom : MHDReader.dy;
 		double dz = m_overrideGradient ? m_gradZCustom : MHDReader.dz;
 		
-		/*float xOff = (float)MHDReader.Nx/2;
-		float yOff = (float)MHDReader.Ny/2;
-		float zOff = (float)MHDReader.Nz/2;*/
-		
-		//camera.cameraX = (float)MHDReader.Nx/2;
-		//camera.cameraY = (float)MHDReader.Ny/2;
-		//camera.cameraZ = (float)MHDReader.Nz/2;
 		float xOff = 100;
 		float yOff = 100;
 		float zOff = 100;
@@ -803,21 +796,53 @@ public class VolumeRaycast
 		
 		Quaternion mouseAndKeyboardRot = Quaternion.quaternionMultiplication(m_keyboardRotation,Quaternion.quaternionReciprocal(mouseRotation));
 		
+		Quaternion rotQuatToUse = null;
+		
+		if(VeinsWindow.settings.useModelMoveMode==false)
+		{
+			//rotQuatToUse = Quaternion.quaternionReciprocal(camera.cameraOrientation);
+			float moveFactor = 5.0f;
+
+			//Quaternion rotY2 = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{0,1,0});
+			rotQuatToUse = Quaternion.quaternionReciprocal(camera.cameraOrientation);
+			//FloatBuffer rotMatrix =  Quaternion.quaternionMultiplication(worldOrientation, rotY).getRotationMatrix(true);
+			
+			
+			double[] rotatedMovement = rotQuatToUse.rotateVector3d(new double[]{m_keyboardMoveX*moveFactor,m_keyboardMoveZ*moveFactor,m_keyboardMoveY*moveFactor});
+			camPosX = camera.cameraX;
+			camPosY = camera.cameraY;
+			camPosZ = camera.cameraZ;
+		}
+		else
+		{
+			rotQuatToUse = mouseAndKeyboardRot;
+			float moveFactor = 5.0f;
+			
+			double[] rotCameraPos = rotQuatToUse.rotateVector3d(new double[]{0,0,-200.0f});
+			double[] rotatedMovement = rotQuatToUse.rotateVector3d(new double[]{m_keyboardMoveX*moveFactor,m_keyboardMoveZ*moveFactor,-m_keyboardMoveY*moveFactor});
+			camPosX = (float)rotCameraPos[0] + (float)rotatedMovement[0] + xOff;
+			camPosY = (float)rotCameraPos[1] + (float)rotatedMovement[1] + yOff;
+			camPosZ = (float)rotCameraPos[2] + (float)rotatedMovement[2] + zOff;
+			
+			Quaternion yRot = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{0,1,0});
+			Quaternion invQuatToUse = Quaternion.quaternionReciprocal(rotQuatToUse);
+			rotQuatToUse = Quaternion.quaternionMultiplication(yRot,invQuatToUse);
+		}
+		
 		// different xyz permutation for keyboard move
-		float moveFactor = 5.0f;
-		double[] rotCameraPos = mouseAndKeyboardRot.rotateVector3d(new double[]{0,0,-200.0f});
-		double[] rotatedMovement = mouseAndKeyboardRot.rotateVector3d(new double[]{m_keyboardMoveX*moveFactor,m_keyboardMoveZ*moveFactor,-m_keyboardMoveY*moveFactor});
+		/*float moveFactor = 5.0f;
+		
+		double[] rotCameraPos = rotQuatToUse.rotateVector3d(new double[]{0,0,-200.0f});
+		double[] rotatedMovement = rotQuatToUse.rotateVector3d(new double[]{m_keyboardMoveX*moveFactor,m_keyboardMoveZ*moveFactor,-m_keyboardMoveY*moveFactor});
 		camPosX = (float)rotCameraPos[0] + (float)rotatedMovement[0] + xOff;
 		camPosY = (float)rotCameraPos[1] + (float)rotatedMovement[1] + yOff;
 		camPosZ = (float)rotCameraPos[2] + (float)rotatedMovement[2] + zOff;
-		
+		*/
 		//FloatBuffer rotMatrixKeyboard = Quaternion.quaternionReciprocal(m_keyboardRotation).getRotationMatrix(true);
 
-		Quaternion yRot = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{0,1,0});
-		Quaternion invKeyboardRot = Quaternion.quaternionReciprocal(mouseAndKeyboardRot);
-		Quaternion camRot = Quaternion.quaternionMultiplication(yRot,invKeyboardRot);
 	
-		FloatBuffer finalCamRot =  camRot.getRotationMatrix(true) ;
+	
+		FloatBuffer finalCamRot =  rotQuatToUse.getRotationMatrix(true) ;
 		
 		//rotMatrixModelOnly = rotMatrix;
 		// start computation
