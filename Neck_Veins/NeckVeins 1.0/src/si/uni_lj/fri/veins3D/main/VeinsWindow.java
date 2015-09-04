@@ -513,7 +513,7 @@ public class VeinsWindow
 				screenController.OnEscapeKeyPressed();
 
 			// non model input must be before nifty
-			pollNonModelControlInput();
+			//pollNonModelControlInput();
 
 			// NIFTY LOGIC MUST BE RAN BEFORE GAME INPUT LOGIC BECAUSE OF INPUT!
 			if (wasLeftMouseDownClicked)

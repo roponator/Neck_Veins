@@ -326,9 +326,9 @@ public class VeinsRenderer
 	{
 		for (int i = 0; i < NUMBER_OF_SHADER_PROGRAMS; i++)
 		{
-			glDetachShader(shaderPrograms[i], vertexShaders[i]);
+			//glDetachShader(shaderPrograms[i], vertexShaders[i]);
 			glDeleteShader(vertexShaders[i]);
-			glDetachShader(shaderPrograms[i], fragmentShaders[i]);
+			//glDetachShader(shaderPrograms[i], fragmentShaders[i]);
 			glDeleteShader(fragmentShaders[i]);
 			glDeleteProgram(shaderPrograms[i]);
 		}
