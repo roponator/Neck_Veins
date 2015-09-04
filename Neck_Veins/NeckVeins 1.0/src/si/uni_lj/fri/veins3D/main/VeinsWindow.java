@@ -384,9 +384,9 @@ public class VeinsWindow
 			Display.setTitle(title);
 			Display.setVSyncEnabled(false);
 			// Display.setDisplayMode(new DisplayMode(512, 800));
-			// Display.create(new PixelFormat().withStencilBits(1));
+		// Display.create(new PixelFormat().withStencilBits(1));
 
-			Display.create(new PixelFormat(), new ContextAttribs(2, 0));
+			Display.create(new PixelFormat().withStencilBits(1), new ContextAttribs(2, 0));
 		}
 		catch (LWJGLException e)
 		{
@@ -480,7 +480,6 @@ public class VeinsWindow
 
 		while (isRunning)
 		{
-
 			// Input disable for a couple of frames
 			if (screenController.m_dragWindow || screenController.getState() != GUI_STATE.DEFAULT || screenController == null)
 				disableInputTime = 0.3f;
@@ -513,7 +512,7 @@ public class VeinsWindow
 				screenController.OnEscapeKeyPressed();
 
 			// non model input must be before nifty
-			//pollNonModelControlInput();
+			pollNonModelControlInput();
 
 			// NIFTY LOGIC MUST BE RAN BEFORE GAME INPUT LOGIC BECAUSE OF INPUT!
 			if (wasLeftMouseDownClicked)

@@ -15,18 +15,22 @@ public class NiftyStereoMenu
 {
 	
 	Element m_controlElement = null;
-
+	float m_prevSliderValue = 0.0f;
+	
 	public NiftyStereoMenu(Element elementWithStereoControl)
 	{
 		m_controlElement = elementWithStereoControl;
 		
 		// slider label & values
-		Element mySliderContainer = m_controlElement.findElementById("sliderC");
-		NiftyScreenController.InitSlider(mySliderContainer, 0.0f, 0.2f, 0.05f, 0.01f, "Disparity", "%.2f");
+		m_prevSliderValue = VeinsWindow.settings.stereoValue;
+		Element mySliderContainer = m_controlElement.findElementById("disparitySlider");
+		NiftyScreenController.InitSlider(mySliderContainer, -100.0f, 100, m_prevSliderValue, 1, "Disparity", "%.0f");
 		
 		// checkbox label
 		LabelControl checkboxLabel = m_controlElement.findElementById("enabledCheckbox").findElementById("checkboxLabel").getAttachedInputControl().getControl(LabelControl.class);
 		checkboxLabel.setText("Enabled");
+		m_controlElement.findElementById("enabledCheckbox").getAttachedInputControl().getControl(CheckboxControl.class).setChecked(VeinsWindow.settings.stereoEnabled);
+		
 	}
 
 	// Clears old and sets new
@@ -39,12 +43,19 @@ public class NiftyStereoMenu
 	public void OnButton_CloseOrCancel()
 	{
 		m_controlElement.setVisible(false);
+		
+		Element niftySliderElement = m_controlElement.findElementById("disparitySlider").findElementById("SLIDER_CONTROL");
+		de.lessvoid.nifty.controls.Slider sliderControl = niftySliderElement.getControl(de.lessvoid.nifty.controls.slider.SliderControl.class);
+		sliderControl.setValue(m_prevSliderValue);
 	}
 
 	public void OnButton_OK()
 	{
 		boolean isEnabled = m_controlElement.findElementById("enabledCheckbox").getAttachedInputControl().getControl(CheckboxControl.class).isChecked();
 		
+		VeinsWindow.settings.stereoEnabled = isEnabled;
+		
+		m_prevSliderValue = VeinsWindow.settings.stereoValue ;
 		
 		// close this menu
 		OnButton_CloseOrCancel();

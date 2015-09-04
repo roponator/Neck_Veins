@@ -763,9 +763,9 @@ const float threshold, const int lin,
 float* depth
 ) {
 	*depth = FLT_MAX;
-	float4 color = (float4)(0,0,0,0); // output color
 	const float4 background = (float4)(0.7,0.7,0.7,1);
 	const float4 debugcolor = (float4)(0.7,0.7,0.7,1);
+	float4 color = background; // output color
 	
 	// shading params
 	const float4 diffuse = (float4)(1,0,0,1);

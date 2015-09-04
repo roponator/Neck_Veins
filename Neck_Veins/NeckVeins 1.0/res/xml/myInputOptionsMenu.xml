@@ -38,7 +38,11 @@
 		                 </panel> 
                		 </panel>
                 </panel>
-                 
+                
+				 <control id="checkbox_NavWASD" name="MY_CHECKBOX" width="50%" height="26px" align="left" margin="0%,0%,0%,2.5%" />
+             <control id="checkbox_NavARROWS" name="MY_CHECKBOX" width="50%" height="26px" align="left" margin="0%,0%,0%,2.5%" />
+            
+				
 				<control name="label"style="STYLE_LABEL_DARK_TEXT" margin="2%,2%,2%,2%" width="96%" height="20px" text="Input Method" textHAlign="left"  />			               		
          		<control id="INPUT_METHOD_DROPDOWN" name="dropDown"  margin="2%,4%,2%,4%" width="92%" height = "20px" align="left" vertical="no" horizontal="optional" selection="Single" displayItems="3"  />          
 		

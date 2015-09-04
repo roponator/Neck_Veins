@@ -19,18 +19,26 @@ import static org.lwjgl.opengl.GL20.glUniform4f;
 import static org.lwjgl.opengl.GL20.glValidateProgram;
 import static org.lwjgl.util.glu.Project.*;
 import static si.uni_lj.fri.veins3D.utils.Tools.allocFloats;
+import static org.lwjgl.opengl.ARBBufferObject.*;
+import static org.lwjgl.opengl.ARBVertexBufferObject.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.GLU;
+
+import com.sun.prism.impl.BufferUtil;
 
 import si.uni_lj.fri.veins3D.exceptions.ShaderLoadException;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModel;
@@ -38,6 +46,7 @@ import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelMesh;
 import si.uni_lj.fri.veins3D.gui.render.models.VeinsModelRaycastVolume;
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import si.uni_lj.fri.veins3D.math.Quaternion;
+import static org.lwjgl.opengl.ARBBufferObject.*;
 
 public class VeinsRenderer
 {
@@ -80,6 +89,64 @@ public class VeinsRenderer
 		MARCHING_CUBES, MPUI, VOLUME_RENDER
 	}
 
+	  private FloatBuffer vertices;
+	    private ShortBuffer indices;
+	    private int VBOVertices;
+	    private int VBOIndices;
+	    int vbID;
+	    int idID;
+	       
+	    public void init()
+	    {
+	        float[] vertexArray = {-0.5f,  0.5f, 0,
+	                                0.5f,  0.5f, 0,
+	                                0.5f, -0.5f, 0,
+	                               -0.5f, -0.5f, 0};
+	        
+	        for(int i=0;i<vertexArray.length;++i)
+	        {
+	        	vertexArray[i] *= 100.0f;
+	        }
+	        
+	        vertices = BufferUtil.newFloatBuffer(vertexArray.length);
+	        vertices.put(vertexArray);
+	        vertices.flip();
+
+	        short[] indexArray = {0, 1, 2, 3, 2, 0};
+	        indices = BufferUtil.newShortBuffer(indexArray.length);
+	        indices.put(indexArray);
+	        indices.flip();
+
+	       vbID = GL15.glGenBuffers();
+	       idID = GL15.glGenBuffers();
+	       
+	       // int[] temp = new int[2];
+	       // GL15.glGenBuffers(buffers);(2, temp, 0);
+
+	        glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbID);
+	        glBufferDataARB(GL_ARRAY_BUFFER_ARB, vertices, GL_STATIC_DRAW_ARB);
+	        glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+
+	        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, idID);
+	        glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, indices, GL_STATIC_DRAW_ARB);
+	        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+	    }
+	    
+	    public  void renderLine() 
+	    {
+	    	  GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+	    	  ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, vbID);
+	    	  GL11.glVertexPointer(3, GL11.GL_FLOAT, 0, 0);
+	    	  
+	    	  ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, idID);
+	    	  GL12.glDrawRangeElements(GL11.GL_TRIANGLES, 0, 5, 6,
+	    	                    GL11.GL_UNSIGNED_INT, 0);
+	    	  
+	    	  ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
+	    	  ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+	    	  
+	    	}
+	
 	public VeinsRenderer() throws LWJGLException
 	{
 
@@ -87,6 +154,8 @@ public class VeinsRenderer
 		activeShaderProgram = 4;
 		isWireframeOn = false;
 		isAAEnabled = true;
+		
+		init();
 	}
 
 	public void SetNewResolution(int width, int height)
@@ -126,29 +195,32 @@ public class VeinsRenderer
 	 * @since 0.1
 	 * @version 0.4
 	 */
+
+	
 	public void render()
 	{
 
 		if (VeinsWindow.settings.stereoEnabled)
 		{
-			float offset = VeinsWindow.settings.stereoValue / 10f;
+			float offset = VeinsWindow.settings.stereoValue / 10.0f;	
 			StencilMask.initStencil();
 			glStencilFunc(GL_EQUAL, 0, 0x01);
 			setCameraAndLight(offset);
-			renderVeins();
+			renderVeins(offset);
 			glStencilFunc(GL_EQUAL, 1, 0x01);
 			setCameraAndLight(-offset);
-			renderVeins();
+			renderVeins(-offset);
 			glDisable(GL_STENCIL_TEST);
 		}
 		else
 		{
 			setCameraAndLight(0);
-			renderVeins();
-		}
+			renderVeins(0.0f);
+		}		
+	
 	}
 
-	private void renderVeins()
+	private void renderVeins(float stereoOffset)
 	{
 		if (veinsModel != null)
 		{
@@ -177,7 +249,7 @@ public class VeinsRenderer
 			glMaterial(GL_FRONT, GL_SHININESS, allocFloats(new float[]
 			{ 100f, 256.0f, 256.0f, 256.0f }));
 
-			veinsModel.render(cam);
+			veinsModel.render(cam,stereoOffset);
 
 			GL20.glUseProgram(0);
 			glPopMatrix();

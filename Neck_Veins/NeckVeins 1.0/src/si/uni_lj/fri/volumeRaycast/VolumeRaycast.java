@@ -240,7 +240,8 @@ public class VolumeRaycast
 		t = System.currentTimeMillis();
 		String workingDir = System.getProperty("user.dir");
 
-		float[] data = readFile("C://Users//ropo//Desktop//Zile//Pat2_3D-DSA.mhd"); // TODO
+		//float[] data = readFile("C://Users//ropo//Desktop//Zile//Pat2_3D-DSA.mhd"); // TODO
+		float[] data = readFile(filepath); // TODO
 
 		matrix = locateMemory(data, CL_MEM_READ_WRITE, queue, clContext);
 		t = System.currentTimeMillis() - t;
@@ -548,11 +549,11 @@ public class VolumeRaycast
 
 	// rendering cycle
 
-	public void MainRender(Camera camera,Quaternion mouseRotation)
+	public void MainRender(Camera camera,Quaternion mouseRotation, float stereoOffset)
 	{
 		initView(width, height);
 		// handleIO();
-		display(camera,mouseRotation);
+		display(camera,mouseRotation,stereoOffset);
 
 		glMatrixMode(GL_MODELVIEW); // no idea why but it has to be here, otherwise a bunch of state error (underflow)
 
@@ -575,7 +576,7 @@ public class VolumeRaycast
 		Display.destroy();
 	}
 
-	public void display(Camera camera,Quaternion mouseRotation)
+	public void display(Camera camera,Quaternion mouseRotation, float stereoOffset)
 	{
 		// TODO: Need to clean-up events, test when ARB_cl_events & KHR_gl_event are implemented.
 
@@ -603,7 +604,7 @@ public class VolumeRaycast
 		glUseProgram(glProgram);
 		glUniform1i(glGetUniformLocation(glProgram, "mandelbrot"), 0);
 
-		compute(doublePrecision, camera, mouseRotation);
+		compute(doublePrecision, camera, mouseRotation, stereoOffset);
 
 		render();
 	}
@@ -766,7 +767,7 @@ public class VolumeRaycast
 		kernelSecondPass.setArg(0, glBuffers[BUFFER_1]).setArg(1, glBuffers[BUFFER_2]).setArg(2, glBuffers[BUFFER_DEPTH_1]).setArg(3, glBuffers[BUFFER_DEPTH_2]).setArg(18, matrix).setArg(25, octree).setArg(27, clTransferFunction);
 	}
 
-	private void compute(final boolean is64bit, Camera camera,Quaternion mouseRotation)
+	private void compute(final boolean is64bit, Camera camera,Quaternion mouseRotation, float stereoOffset)
 	{
 		kernel2DGlobalWorkSize.put(0, width).put(1, height);
 
@@ -794,7 +795,6 @@ public class VolumeRaycast
 		float camPosY = -camera.cameraY + yOff;
 		float camPosZ = -camera.cameraZ + zOff-200;
 		
-		
 		Quaternion rotQuatToUse = null;
 		
 		// Different computatation if in camera move mode or in model move mode
@@ -809,10 +809,12 @@ public class VolumeRaycast
 			//FloatBuffer rotMatrix =  Quaternion.quaternionMultiplication(worldOrientation, rotY).getRotationMatrix(true);
 			
 			
-			double[] rotatedMovement = rotQuatToUse.rotateVector3d(new double[]{m_keyboardMoveX*moveFactor,m_keyboardMoveZ*moveFactor,m_keyboardMoveY*moveFactor});
-			camPosX = camera.cameraX;
-			camPosY = camera.cameraY;
-			camPosZ = camera.cameraZ;			
+			//double[] rotatedMovement = rotQuatToUse.rotateVector3d(new double[]{m_keyboardMoveX*moveFactor,m_keyboardMoveZ*moveFactor,m_keyboardMoveY*moveFactor});
+			
+			double[] rotatedStereoVec = camera.cameraOrientation.rotateVector3d(new double[]{stereoOffset,0,0});
+			camPosX = camera.cameraX+(float)rotatedStereoVec[0];
+			camPosY = camera.cameraY+(float)rotatedStereoVec[1];
+			camPosZ = camera.cameraZ+(float)rotatedStereoVec[2];			
 			
 			
 			// DOESNT WORK
@@ -839,7 +841,7 @@ public class VolumeRaycast
 			rotQuatToUse = mouseAndKeyboardRot;
 			float moveFactor = 5.0f;
 			
-			double[] rotCameraPos = rotQuatToUse.rotateVector3d(new double[]{0,0,-200.0f});
+			double[] rotCameraPos = rotQuatToUse.rotateVector3d(new double[]{stereoOffset,0,-200.0f});
 			double[] rotatedMovement = rotQuatToUse.rotateVector3d(new double[]{m_keyboardMoveX*moveFactor,m_keyboardMoveZ*moveFactor,-m_keyboardMoveY*moveFactor});
 			camPosX = (float)rotCameraPos[0] + (float)rotatedMovement[0] + xOff;
 			camPosY = (float)rotCameraPos[1] + (float)rotatedMovement[1] + yOff;
@@ -934,7 +936,7 @@ public class VolumeRaycast
 
 	private void render()
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
+		//glClear(GL_COLOR_BUFFER_BIT);
 		glDisable(GL_CULL_FACE);
 
 		if (syncGLtoCL)

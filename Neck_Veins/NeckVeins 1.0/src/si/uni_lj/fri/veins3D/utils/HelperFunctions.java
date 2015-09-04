@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 import org.apache.commons.io.FilenameUtils;
-import com.sun.jna
+
 public class HelperFunctions
 {
 	// Returns all directories in the given folder,

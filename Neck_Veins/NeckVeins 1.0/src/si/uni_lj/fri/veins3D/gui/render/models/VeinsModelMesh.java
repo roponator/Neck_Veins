@@ -599,7 +599,7 @@ public class VeinsModelMesh extends VeinsModel
 	}
 	
 	@Override
-	public void render(Camera camera)
+	public void render(Camera camera, float stereoOffset)
 	{
 
 		glMatrixMode(GL_MODELVIEW);

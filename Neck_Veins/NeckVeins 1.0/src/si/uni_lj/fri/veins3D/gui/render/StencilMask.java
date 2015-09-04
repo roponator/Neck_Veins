@@ -14,7 +14,7 @@ import static org.lwjgl.opengl.GL11.glColorMask;
 import static org.lwjgl.opengl.GL11.glDepthMask;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glLineWidth;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
@@ -29,11 +29,10 @@ import static org.lwjgl.opengl.GL11.glVertex2f;
 
 
 
-
-
 import org.lwjgl.opengl.GL11;
 
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
+
 
 public class StencilMask {
 

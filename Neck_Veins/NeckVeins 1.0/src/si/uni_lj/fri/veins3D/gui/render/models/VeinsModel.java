@@ -19,7 +19,7 @@ public abstract class VeinsModel
 {
 	// You must implement at least 'render'. 
 	// Also implementing 'cleanup' would be nice :)
-	public abstract void render(Camera camera);
+	public abstract void render(Camera camera, float stereoOffset);
 	public abstract void cleanup();
 	
 	public abstract void moveModelX(float delta);

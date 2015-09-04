@@ -371,7 +371,7 @@
 		 <!--  Input settings dialog -->
 		 <!-- ******************************************* -->
 	
-	            <control id="MY_INPUT_OPTIONS_DIALOG" name="MY_INPUT_OPTIONS_CONTROL" x="40%" y="30%"  visible="false" childLayout="vertical" width="250px" height="340px" valign="center" align="center" />
+	            <control id="MY_INPUT_OPTIONS_DIALOG" name="MY_INPUT_OPTIONS_CONTROL" x="40%" y="30%"  visible="false" childLayout="vertical" width="250px" height="400px" valign="center" align="center" />
 	
 	          
 	  	 <!-- ******************************************* -->

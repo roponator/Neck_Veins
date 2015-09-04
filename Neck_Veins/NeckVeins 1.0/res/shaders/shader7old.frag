@@ -9,7 +9,7 @@ varying vec3 normal;
 varying vec4 position;
 
 void main(){
-	vec3 n=normalize(normal);
+/*	vec3 n=normalize(normal);
 	vec3 l=normalize(vec3(gl_LightSource[0].position));
 	float intensity = max(dot(l, n), 0.0);
 	
@@ -23,9 +23,20 @@ void main(){
 		if(cosAngle>0.0){
 			specular = (gl_FrontMaterial.specular * gl_LightSource[0].specular) * pow(cosAngle, gl_FrontMaterial.shininess);
 		}
-	}
+	}*/
 	
-	gl_FragColor = intensity * diffuse;
+	
+	//gl_FragColor = specular;
+	
+	vec3 n=normalize(normal);
+	vec3 l1Vec = normalize(vec3(-1,-2,3));
+	vec3 l2Vec = normalize(vec3(-2,1,-3));
+	vec3 l3Vec = normalize(vec3(3,-2,-1));
+	
+	float dp = clamp(dot(n,l1Vec),0,1)+clamp(dot(n,l2Vec),0,1)+clamp(dot(n,l3Vec),0,1);
+	dp /= 3.0f;
+	gl_FragColor = vec4(0,1,1,1)*dp;
+	gl_FragColor = vec4(n*0.5f+0.5f,1.0f);
 }
 
 

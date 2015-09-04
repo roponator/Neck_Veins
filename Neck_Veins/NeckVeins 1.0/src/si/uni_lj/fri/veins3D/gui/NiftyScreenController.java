@@ -50,6 +50,7 @@ import de.lessvoid.nifty.controls.Slider;
 import de.lessvoid.nifty.controls.SliderChangedEvent;
 import de.lessvoid.nifty.controls.TextFieldChangedEvent;
 import de.lessvoid.nifty.controls.TreeItem;
+import de.lessvoid.nifty.controls.checkbox.CheckboxControl;
 import de.lessvoid.nifty.controls.dropdown.DropDownControl;
 import de.lessvoid.nifty.controls.label.LabelControl;
 import de.lessvoid.nifty.controls.slider.SliderControl;
@@ -210,6 +211,8 @@ public class NiftyScreenController extends DefaultScreenController
 	Element m_inputSettingsLeapMotionSlider = null;
 	float m_input_LeapMotionSensitivity_LastSliderValue = 0.5f; // temp values, in case Cancel is clicked
 	float m_input_sensitivity_LastSliderValue = 0.5f;
+	de.lessvoid.nifty.controls.CheckBox m_navWidgetWASDCheckbox = null;
+	de.lessvoid.nifty.controls.CheckBox m_navWidgetARROWSCheckbox = null;
 
 	// -----------------------------------
 	// Init
@@ -325,6 +328,15 @@ public class NiftyScreenController extends DefaultScreenController
 		m_inputSettingsInputMethodTypeDropdown.addItem(INPUT_SETTINGS_INPUT_TYPE_LEAPMOTION);
 		m_inputSettingsInputMethodTypeDropdown.selectItemByIndex(0);
 
+		// checkbox label
+		m_navWidgetWASDCheckbox = m_inputOptionsDialog.findElementById("checkbox_NavWASD").getAttachedInputControl().getControl(CheckboxControl.class);
+		m_navWidgetWASDCheckbox.getElement().findElementById("checkboxLabel").getAttachedInputControl().getControl(LabelControl.class).setText("Show rotation widget");
+		m_navWidgetWASDCheckbox.setChecked(true);
+
+		m_navWidgetARROWSCheckbox = m_inputOptionsDialog.findElementById("checkbox_NavARROWS").getAttachedInputControl().getControl(CheckboxControl.class);
+		m_navWidgetARROWSCheckbox.getElement().findElementById("checkboxLabel").getAttachedInputControl().getControl(LabelControl.class).setText("Show translation widget");
+		m_navWidgetARROWSCheckbox.setChecked(true);
+
 		// ---------------------------------------
 		// Prepare gui for show
 		// ---------------------------------------
@@ -372,36 +384,36 @@ public class NiftyScreenController extends DefaultScreenController
 		{
 			int mx = Mouse.getX();
 			int my = Mouse.getY();
-			
-			if(m_dragPosStartX == -1)
+
+			if (m_dragPosStartX == -1)
 				m_dragPosStartX = mx;
-			
-			if(m_dragPosStartY == -1)
+
+			if (m_dragPosStartY == -1)
 				m_dragPosStartY = my;
-			
+
 			int dx = Mouse.getX() - m_dragPosStartX;
 			int dy = Mouse.getY() - m_dragPosStartY;
-			
+
 			int newPosX = VeinsWindow.frame.getLocation().x + dx;
 			int newPosY = VeinsWindow.frame.getLocation().y - dy;
-			
+
 			// prevent window going out of screen
-			if(newPosX < 0 )
+			if (newPosX < 0)
 				newPosX = 0;
-			
-			if(newPosY < 0)
+
+			if (newPosY < 0)
 				newPosY = 0;
-			
+
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			
-			if((newPosX+VeinsWindow.currentDisplayMode.getWidth()) > screenSize.width )
+
+			if ((newPosX + VeinsWindow.currentDisplayMode.getWidth()) > screenSize.width)
 				newPosX = screenSize.width - VeinsWindow.currentDisplayMode.getWidth();
-			
-			if((newPosY+VeinsWindow.currentDisplayMode.getHeight()) > screenSize.height )
+
+			if ((newPosY + VeinsWindow.currentDisplayMode.getHeight()) > screenSize.height)
 				newPosY = screenSize.height - VeinsWindow.currentDisplayMode.getHeight();
-			
+
 			VeinsWindow.frame.setLocation(newPosX, newPosY);
-			
+
 			// prepare for next frame
 			m_dragPosStartX = mx - dx;
 			m_dragPosStartY = my - dy;
@@ -438,9 +450,9 @@ public class NiftyScreenController extends DefaultScreenController
 		On_UserManualDialog_Close();
 		On_LicenseDialog_Close();
 		On_StereoDialog_Close();
-		
+
 	}
-	
+
 	// is called when some menu will open (so you can close others etc..)
 	static void prepareForSomeMenuOpen()
 	{
@@ -536,6 +548,7 @@ public class NiftyScreenController extends DefaultScreenController
 		// process widget input and move camera
 		NAVIGATION_WIDGET_BUTTON pressedButton = processNavWidgetInput(m_navWidgetWASD, event);
 
+		
 		switch (pressedButton)
 		{
 		case CENTER_CIRCLE_DOWN:
@@ -555,6 +568,9 @@ public class NiftyScreenController extends DefaultScreenController
 			break;
 		case SIDE_CIRCLE_RIGHT:
 			VeinsWindow.renderer.getCamera().rotateClockwise();
+			break;
+		case CLOSE_CIRCLE:
+			m_navWidgetWASDCheckbox.setChecked(false);
 			break;
 		}
 	}
@@ -585,6 +601,9 @@ public class NiftyScreenController extends DefaultScreenController
 			break;
 		case SIDE_CIRCLE_RIGHT:
 			VeinsWindow.renderer.getCamera().moveUp();
+			break;
+		case CLOSE_CIRCLE:
+			m_navWidgetARROWSCheckbox.setChecked(false);
 			break;
 		}
 	}
@@ -1240,23 +1259,36 @@ public class NiftyScreenController extends DefaultScreenController
 	}
 
 	public void onButton_InputSettingsDialog_OK()
-	{		
+	{
 		VeinsWindow.settings.sensitivity = (int) m_input_sensitivity_LastSliderValue;
 		VeinsWindow.settings.leapSensitivity = (int) m_input_LeapMotionSensitivity_LastSliderValue;
 
 		if (m_inputSettingsMoveTypeDropdown.getSelection() != null)
 		{
 			String sel = (String) m_inputSettingsMoveTypeDropdown.getSelection();
-			
+
 			boolean newCameraMode = sel.compareTo(INPUT_SETTINGS_MOVE_MODEL) == 0;
-			if(newCameraMode != VeinsWindow.settings.useModelMoveMode)
+			if (newCameraMode != VeinsWindow.settings.useModelMoveMode)
 			{
-				VeinsWindow.renderer.resetCameraPositionAndOrientation(); // must be done or volume renderer fails 
+				VeinsWindow.renderer.resetCameraPositionAndOrientation(); // must be done or volume renderer fails
 			}
 			VeinsWindow.settings.useModelMoveMode = newCameraMode;
 		}
 
 		On_InputOptionsDialog_Close();
+	}
+
+	@NiftyEventSubscriber(id = "checkbox_NavWASD")
+	public void OnCheckboxInputNavWidgetWASD(String id, CheckBoxStateChangedEvent event)
+	{
+		m_navWidgetWASD.m_navigationWidget.setVisible(event.isChecked());
+	}
+
+	@NiftyEventSubscriber(id = "checkbox_NavARROWS")
+	public void OnCheckboxInputNavWidgetARROWS(String id, CheckBoxStateChangedEvent event)
+	{
+		m_navWidgetUDLR.m_navigationWidget.setVisible(event.isChecked());
+
 	}
 
 	// ----------------------------------------------------
@@ -1452,6 +1484,13 @@ public class NiftyScreenController extends DefaultScreenController
 		{
 			m_input_sensitivity_LastSliderValue = event.getValue();
 		}
+
+		// Stereo
+		if (modifiedSlider.getId().compareTo("disparitySlider") == 0)
+		{
+			VeinsWindow.settings.stereoValue = (int) event.getValue();
+		}
+
 	}
 
 	// A hacky way to get slider events to work: the slider inside my control makes an event, this function

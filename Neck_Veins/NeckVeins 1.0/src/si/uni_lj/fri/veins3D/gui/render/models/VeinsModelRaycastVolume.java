@@ -81,11 +81,11 @@ public class VeinsModelRaycastVolume extends VeinsModel
 	}
 
 	@Override
-	public void render(Camera camera)
+	public void render(Camera camera, float stereoOffset)
 	{
 		Quaternion mouseRotation = Quaternion.quaternionMultiplication(currentOrientation, addedOrientation);
 		mouseRotation = Quaternion.quaternionMultiplication(Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{-1,0,0}), mouseRotation);
-		m_raycaster.MainRender(camera,mouseRotation);
+		m_raycaster.MainRender(camera,mouseRotation,stereoOffset);
 	}
 
 	public void cleanup()
