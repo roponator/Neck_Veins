@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 import org.apache.commons.io.FilenameUtils;
-
+import com.sun.jna
 public class HelperFunctions
 {
 	// Returns all directories in the given folder,
@@ -25,7 +25,7 @@ public class HelperFunctions
 	}
 
 	// Returns only the files with the given extensions, null if none
-	public static String[] GetFilesInFolder(String path, String[] allowedExtensions)
+	public static String[] GetFilesInFolder(String path, final String[] allowedExtensions)
 	{
 		File file = new File(path);
 		String[] directories = file.list(new FilenameFilter()

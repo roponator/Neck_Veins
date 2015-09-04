@@ -19,8 +19,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JWindow;
 import javax.swing.SwingConstants;
 
-import com.sun.javafx.applet.Splash;
-
 import si.uni_lj.fri.veins3D.utils.OSValidator;
 
 public class Main
