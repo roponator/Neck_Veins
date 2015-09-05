@@ -114,9 +114,8 @@ public class VolumeRaycast
 	private int glBuffersCount = 5;
 	private CLMem[] glBuffers = new CLMem[glBuffersCount];
 	private IntBuffer glIDs;
-
-	private final int transferFunctionSamples = 1 << 16; // 2^16 float4 samples
-	private float[] transferFunction = new float[transferFunctionSamples * 4];
+	private int numTransferFunctionSamples = 0; // read from gradient file
+	
 	private CLMem clTransferFunction;
 
 	private CLMem matrix;
@@ -267,7 +266,7 @@ public class VolumeRaycast
 		System.out.print("Reading transfer function...");
 		float[] gradientFromFile = 	loadGradient();
 		t = System.currentTimeMillis();
-		readFloatsFromFile("gradient", transferFunction);
+		//readFloatsFromFile("gradient", transferFunction);
 		clTransferFunction = locateMemory(gradientFromFile, CL_MEM_READ_ONLY, queue, clContext);
 		t = System.currentTimeMillis() - t;
 		System.out.println(t + "ms");
@@ -321,6 +320,9 @@ public class VolumeRaycast
 			{
 				gradRawArray[i]=gradient.get(i);
 			}
+			
+			numTransferFunctionSamples = gradRawArray.length / 4; // divide by 4 because of float -> float4
+			
 			s.close();		
 		}
 		catch (Exception e)
@@ -922,7 +924,7 @@ public class VolumeRaycast
 				setArg(11, -finalCamRot.get(4 * 2 + 1)).setArg(12, -finalCamRot.get(4 * 2 + 2)).setArg(13, finalCamRot.get(4 * 0 + 0))
 				. // right
 				setArg(14, finalCamRot.get(4 * 0 + 1)).setArg(15, finalCamRot.get(4 * 0 + 2)).setArg(16, fov).setArg(17, asr).setArg(19, MHDReader.Nx).setArg(20, MHDReader.Ny).setArg(21, MHDReader.Nz).setArg(22, (float) dx).setArg(23, (float) dy).setArg(24, (float) dz)
-				.setArg(26, octreeLevels).setArg(28, transferFunctionSamples).setArg(29, threshold).setArg(30, lin);
+				.setArg(26, octreeLevels).setArg(28, numTransferFunctionSamples).setArg(29, threshold).setArg(30, lin);
 
 		clEnqueueNDRangeKernel(queue, currentlyActiveKernel, 2, null, kernel2DGlobalWorkSize, null, null, null);// */
 
