@@ -28,6 +28,8 @@ import si.uni_lj.fri.veins3D.math.Quaternion;
 import sun.nio.ch.DirectBuffer;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -35,6 +37,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
@@ -239,7 +242,7 @@ public class VolumeRaycast
 		System.out.print("Reading file...");
 		t = System.currentTimeMillis();
 		String workingDir = System.getProperty("user.dir");
-
+	
 		//float[] data = readFile("C://Users//ropo//Desktop//Zile//Pat2_3D-DSA.mhd"); // TODO
 		float[] data = readFile(filepath); // TODO
 
@@ -262,9 +265,10 @@ public class VolumeRaycast
 		System.out.println(t + "ms");
 
 		System.out.print("Reading transfer function...");
+		float[] gradientFromFile = 	loadGradient();
 		t = System.currentTimeMillis();
 		readFloatsFromFile("gradient", transferFunction);
-		clTransferFunction = locateMemory(transferFunction, CL_MEM_READ_ONLY, queue, clContext);
+		clTransferFunction = locateMemory(gradientFromFile, CL_MEM_READ_ONLY, queue, clContext);
 		t = System.currentTimeMillis() - t;
 		System.out.println(t + "ms");
 
@@ -283,12 +287,53 @@ public class VolumeRaycast
 		setInitialRenderMethod();
 		
 		VeinsWindow.renderer.resetCameraPositionAndOrientation();
-		//camera.cameraOrientation = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{0,1,0});
-		// position camera
+
+	}
+	
+	// returns null if failed to load
+	float[] loadGradient()
+	{
+		float[] gradRawArray=null;
 		
-		//camera.cameraX = -100;
-		//camera.cameraY = -100;
-		//camera.cameraZ = -100;
+		ClassLoader classLoader = getClass().getClassLoader();
+		URI uri;
+		try
+		{
+			uri = classLoader.getResource("gradient/2g.txt").toURI();
+			Scanner s = new Scanner(new FileInputStream(new File(uri)));
+			ArrayList<Float> gradient = new ArrayList<Float>();
+			while(s.hasNextLine())
+			{
+				String line=s.nextLine();
+				String[] splitted = line.split("\\s+");
+			
+				for(int i=0;i<4;++i)
+				{
+					if(splitted[i].length()>0)
+					{
+						gradient.add(Float.parseFloat(splitted[i]));
+					}
+				}
+			}
+					
+			gradRawArray=new float[gradient.size()];
+			for(int i=0;i<gradient.size();++i)
+			{
+				gradRawArray[i]=gradient.get(i);
+			}
+			s.close();		
+		}
+		catch (Exception e)
+		{
+			System.out.println("loadGradient: "+e.toString());
+			e.printStackTrace();
+		}
+		finally
+		{
+			
+		}
+	
+		return gradRawArray;
 	}
 	
 	void setInitialRenderMethod()
