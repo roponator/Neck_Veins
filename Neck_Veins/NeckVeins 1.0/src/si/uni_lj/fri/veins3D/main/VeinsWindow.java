@@ -143,6 +143,8 @@ public class VeinsWindow
 	public static boolean increaseSubdivLevel = false;
 	public static boolean decreaseSubdivLevel = false;
 
+	public final static String defaultGradientFile = "res/gradient/defaultGrad.grad";
+	
 	boolean m_escPressed = false;
 
 	/**
@@ -547,7 +549,7 @@ public class VeinsWindow
 			Display.update();
 
 			logic();
-
+			
 			Display.sync(settings.frequency); // TODO NIFTY
 
 			int error = GL11.glGetError();

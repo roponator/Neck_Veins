@@ -121,20 +121,13 @@ public class NiftySettingsSideMenu
 		NiftyScreenController.InitSlider(m_controlContainer.findElementById("dof_strength"), 0.0f, 0.02f,0.015f, 0.001f, "DOF Strength", "%.4f");
 		
 		// Gradient
-		de.lessvoid.nifty.controls.CheckBox gradCheckbox = m_controlContainer.findElementById("OVERRIDE_GRADIENT_CHECKBOX").getAttachedInputControl().getControl(CheckboxControl.class);
-		gradCheckbox.getElement().findElementById("checkboxLabel").getAttachedInputControl().getControl(LabelControl.class).setText("Override gradient");
+		//de.lessvoid.nifty.controls.CheckBox gradCheckbox = m_controlContainer.findElementById("OVERRIDE_GRADIENT_CHECKBOX").getAttachedInputControl().getControl(CheckboxControl.class);
+		//gradCheckbox.getElement().findElementById("checkboxLabel").getAttachedInputControl().getControl(LabelControl.class).setText("Override gradient");
 
-		float initialGradVal = 0.463838f;
-		VolumeRaycast.m_gradXCustom = initialGradVal;
-		VolumeRaycast.m_gradYCustom = initialGradVal;
-		VolumeRaycast.m_gradZCustom = initialGradVal;
-		
+
 		float initialIsoThreshVal = 0.025f;
 		VolumeRaycast.threshold = initialIsoThreshVal;
 		NiftyScreenController.InitSlider(m_controlContainer.findElementById("volume_iso_threshold"), 0.0001f, 0.1f, initialIsoThreshVal, 0.00001f, "Threshold (ISO Render Method) ", "%.6f");
-		NiftyScreenController.InitSlider(m_controlContainer.findElementById("volume_grad_x"), -1.0f, 1.0f, initialGradVal, 0.00001f, "Grad X", "%.6f");
-		NiftyScreenController.InitSlider(m_controlContainer.findElementById("volume_grad_y"), -1.0f, 1.0f, initialGradVal, 0.00001f, "Grad Y", "%.6f");
-		NiftyScreenController.InitSlider(m_controlContainer.findElementById("volume_grad_z"), -1.0f, 1.0f, initialGradVal, 0.00001f, "Grad Z", "%.6f");
 
 		
 		 de.lessvoid.nifty.controls.DropDown renderMethodType = m_volumeRendererControl.findElementById("VOLUME_RENDERMETHOD_DROPDOWN").getAttachedInputControl().getControl(DropDownControl.class);

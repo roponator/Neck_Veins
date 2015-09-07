@@ -196,6 +196,7 @@ public class NiftyScreenController extends DefaultScreenController
 	// -----------------------------------
 	static NiftyOpenDialog m_openDialog = null;
 	static NiftySaveDialog m_saveDialog = null;
+	static NiftyOpenDialogGradient m_openDialogForGradient = null;
 	static Element m_aboutDialog = null;
 	static Element m_inputOptionsDialog = null;
 	static Element m_licenseDialog = null;
@@ -235,7 +236,8 @@ public class NiftyScreenController extends DefaultScreenController
 		// ---------------------------------------
 		m_openDialog = new NiftyOpenDialog();
 		m_saveDialog = new NiftySaveDialog();
-
+		m_openDialogForGradient = new NiftyOpenDialogGradient();
+		
 		m_aboutDialog = nifty.getScreen("GScreen0").findElementById("MY_ABOUT_DIALOG");
 		m_inputOptionsDialog = nifty.getScreen("GScreen0").findElementById("MY_INPUT_OPTIONS_DIALOG");
 		m_licenseDialog = nifty.getScreen("GScreen0").findElementById("MY_LICENSE_DIALOG");
@@ -548,7 +550,6 @@ public class NiftyScreenController extends DefaultScreenController
 		// process widget input and move camera
 		NAVIGATION_WIDGET_BUTTON pressedButton = processNavWidgetInput(m_navWidgetWASD, event);
 
-		
 		switch (pressedButton)
 		{
 		case CENTER_CIRCLE_DOWN:
@@ -989,10 +990,28 @@ public class NiftyScreenController extends DefaultScreenController
 		VolumeRaycast.m_enableSSAO = event.isChecked();
 	}
 
-	@NiftyEventSubscriber(id = "OVERRIDE_GRADIENT_CHECKBOX")
-	public void OnSettingsSideMenuOverrideGradientheckbox(String id, CheckBoxStateChangedEvent event)
+	public void onButton_SettingsVolume_StartGradEditor()
 	{
-		VolumeRaycast.m_overrideGradient = event.isChecked();
+		try
+		{
+			Process ps;
+			ps = Runtime.getRuntime().exec(new String[]
+			{ "java", "-jar", "GradientConstructor.jar" });
+		}
+		catch (Exception e)
+		{
+			System.out.println("Gradient editor error: " + e.toString());
+			e.printStackTrace();
+		}
+
+	}
+
+	public void onButton_SettingsVolume_ReloadGradFile()
+	{
+		if (VeinsWindow.renderer.getVeinsModel() != null)
+		{
+			VeinsWindow.renderer.getVeinsModel().reloadVolumeGradient(VeinsWindow.defaultGradientFile);
+		}
 	}
 
 	@NiftyEventSubscriber(id = "ENABLE_DOF_CHECKBOX")
@@ -1027,6 +1046,13 @@ public class NiftyScreenController extends DefaultScreenController
 				System.out.println("Error: invalid volume render method: " + sel);
 			}
 		}
+	}
+	
+	public void onButton_SettingsVolume_OpenGradFile()
+	{
+
+		setState(GUI_STATE.DIALOG_OPEN);
+		m_openDialogForGradient.OnOpenDialog();
 	}
 
 	// ----------------------------------------------------
@@ -1118,6 +1144,8 @@ public class NiftyScreenController extends DefaultScreenController
 
 		UpdateLoadingBarDialog("Loading model...", 100.0f);
 		On_LoadingDialog_CloseOrCancel();
+
+		VeinsWindow.renderer.resetCameraPositionAndOrientation();
 	}
 
 	// Options subdialog dialog callbacks
@@ -1218,6 +1246,40 @@ public class NiftyScreenController extends DefaultScreenController
 		String bagBegin = bag.substring(0, index);
 		String bagEnd = bag.substring(index);
 		return bagBegin + marble + bagEnd;
+	}
+
+	// ----------------------------------------------------
+	// Open gradient file dialog
+	// ----------------------------------------------------
+
+	public void onButton_OpenDialogForGradient_Close(String a)
+	{
+		setState(GUI_STATE.DEFAULT);
+		m_openDialogForGradient.OnCloseDialog();
+	}
+
+	public void onButton_OpenDialogForGradient_Cancel()
+	{
+		onButton_OpenDialogForGradient_Close("");
+	}
+
+	public void onButton_OpenDialogForGradient_Open()
+	{
+		//System.out.println("onButton_OpenDialog_Open");
+		SelectedFile file = m_openDialogForGradient.m_folderBrowser.TryOpeningSelectedFile();
+
+		onButton_OpenDialogForGradient_Close("");
+
+
+		// Marching cubes, MPUI or volume render (obj is used if the file was already loaded for MC or MPUI)
+		if (file != null )
+		{
+			if (VeinsWindow.renderer.getVeinsModel() != null)
+			{
+				VeinsWindow.renderer.getVeinsModel().reloadVolumeGradient(file.fullFilePathAndName);
+			}
+
+		}
 	}
 
 	// ----------------------------------------------------
@@ -1386,9 +1448,11 @@ public class NiftyScreenController extends DefaultScreenController
 	public void OnTreeboxSelectionChanged(String id, ListBoxSelectionChangedEvent<TreeItem<MyTreeFolderItem>> event)
 	{
 		if (event.getListBox().getElement().getParent().getId().compareTo("SAVE_DIALOG_FOLDER_TREEBOX_PANEL_CONTAINER") == 0)
-			m_saveDialog.m_folderBrowser.OnTreeboxSelectionChanged(id, event);
-		else
+			m_saveDialog.m_folderBrowser.OnTreeboxSelectionChanged(id, event);	
+		else if (event.getListBox().getElement().getParent().getId().compareTo("OPEN_DIALOG_FOLDER_TREEBOX_PANEL_CONTAINER") == 0)
 			m_openDialog.m_folderBrowser.OnTreeboxSelectionChanged(id, event);
+		else if (event.getListBox().getElement().getParent().getId().compareTo("OPEN_DIALOG_FOR_GRADIENT_FOLDER_TREEBOX_PANEL_CONTAINER") == 0)
+			m_openDialogForGradient.m_folderBrowser.OnTreeboxSelectionChanged(id, event);
 	}
 
 	// ----------------------------------------------------
@@ -1399,7 +1463,7 @@ public class NiftyScreenController extends DefaultScreenController
 	public void OnFileTypeDropdownSelectionChanged(String id, DropDownSelectionChangedEvent<MyFileExtensionItem> event)
 	{
 		m_openDialog.m_folderBrowser.OnFileTypeSelectionChanged(event);
-		
+
 		m_openDialog.showSpecificControlsForSelectedRenderMethod(event.getSelectionItemIndex());
 	}
 
@@ -1453,18 +1517,6 @@ public class NiftyScreenController extends DefaultScreenController
 		if (modifiedSlider.getId().compareTo("dof_strength") == 0)
 		{
 			VolumeRaycast.m_dofStrength = event.getValue();
-		}
-		if (modifiedSlider.getId().compareTo("volume_grad_x") == 0)
-		{
-			VolumeRaycast.m_gradXCustom = event.getValue();
-		}
-		if (modifiedSlider.getId().compareTo("volume_grad_y") == 0)
-		{
-			VolumeRaycast.m_gradYCustom = event.getValue();
-		}
-		if (modifiedSlider.getId().compareTo("volume_grad_z") == 0)
-		{
-			VolumeRaycast.m_gradZCustom = event.getValue();
 		}
 
 		// threhold

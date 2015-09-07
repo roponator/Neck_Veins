@@ -38,6 +38,7 @@
      <useControls filename="xml/mySettingsMarchingCubesControl.xml"/>
      <useControls filename="xml/mySettingsObjControl.xml"/>
      <useControls filename="xml/mySettingsVolumeRendererController.xml"/>
+     <useControls filename="xml/myOpenDialogControlForGradientFile.xml"/>
      
        <useControls filename="xml/myOpenDialog_OptionsControl_MC.xml"/>
        <useControls filename="xml/myOpenDialog_OptionsControlMPUI.xml"/>
@@ -370,14 +371,17 @@
 	
 	       <control renderOrder="9000" id="MY_SAVE_DIALOG_ID" name="MY_SAVE_DIALOG_CONTROL" visible="false" x="10%" y="10%" childLayout="vertical" width="600px" height="330px" valign="center" align="center" />
 	       
-	       
-	  	    
+	     <!-- ******************************************* -->
+		 <!--  GRADIENT OPEN DIALOG -->
+		 <!-- ******************************************* -->
+	 
+	 	  <control renderOrder="9000" id="MY_OPEN_DIALOG_FOR_GRADIENT_ID" name="MY_OPEN_DIALOG_CONTROL_FOR_GRADIENT" visible="false" x="10%" y="10%" childLayout="vertical" width="600px" height="330px" valign="center" align="center" />
+	      	  	    
 	  	 <!-- ******************************************* -->
 		 <!--  Input settings dialog -->
 		 <!-- ******************************************* -->
 	
-	            <control id="MY_INPUT_OPTIONS_DIALOG" name="MY_INPUT_OPTIONS_CONTROL" x="40%" y="30%"  visible="false" childLayout="vertical" width="250px" height="400px" valign="center" align="center" />
-	
+	      <control id="MY_INPUT_OPTIONS_DIALOG" name="MY_INPUT_OPTIONS_CONTROL" x="40%" y="30%"  visible="false" childLayout="vertical" width="250px" height="400px" valign="center" align="center" />
 	          
 	  	 <!-- ******************************************* -->
 		 <!-- resolution settings dialog -->

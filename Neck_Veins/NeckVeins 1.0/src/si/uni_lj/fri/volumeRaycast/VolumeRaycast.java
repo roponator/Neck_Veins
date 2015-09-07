@@ -76,9 +76,6 @@ public class VolumeRaycast
 	public static float m_dofFocus = 20.0f;
 	public static float m_dofStrength = 0.015f;
 	
-	public static boolean m_overrideGradient = false;
-	public static float m_gradXCustom=1.0f, m_gradYCustom = 1.0f, m_gradZCustom = 1.0f;
-	
 	public static float m_keyboardMoveX = 0.0f;
 	public static float m_keyboardMoveY = 0.0f;
 	public static float m_keyboardMoveZ = 0.0f;
@@ -264,10 +261,11 @@ public class VolumeRaycast
 		System.out.println(t + "ms");
 
 		System.out.print("Reading transfer function...");
-		float[] gradientFromFile = 	loadGradient();
+		LoadGradFromFileAndCreateCLMemory(VeinsWindow.defaultGradientFile);
+		/*float[] gradientFromFile = 	loadGradient();
 		t = System.currentTimeMillis();
 		//readFloatsFromFile("gradient", transferFunction);
-		clTransferFunction = locateMemory(gradientFromFile, CL_MEM_READ_ONLY, queue, clContext);
+		clTransferFunction = locateMemory(gradientFromFile, CL_MEM_READ_ONLY, queue, clContext);*/
 		t = System.currentTimeMillis() - t;
 		System.out.println(t + "ms");
 
@@ -289,17 +287,43 @@ public class VolumeRaycast
 
 	}
 	
+	public void LoadGradFromFileAndCreateCLMemory(String gradientFile)
+	{
+		System.out.println("g1");
+		if(clTransferFunction != null)
+		{
+			freeBuffer(clTransferFunction);
+		}
+		System.out.println("g2");
+		float[] gradientFromFile = 	loadGradient(gradientFile);
+		System.out.println("g3");
+		//readFloatsFromFile("gradient", transferFunction);
+		clTransferFunction = locateMemory(gradientFromFile, CL_MEM_READ_ONLY, queue, clContext);
+		System.out.println("g4");
+	}
+	
 	// returns null if failed to load
-	float[] loadGradient()
+	float[] loadGradient(String gradientFile)
 	{
 		float[] gradRawArray=null;
 		
+		//File f=new File(gradientFile);		
+		//File f2=new File("//"+gradientFile);	
+		//URI a=f.toURI();
+		//URI b=f2.toURI();
+		
 		ClassLoader classLoader = getClass().getClassLoader();
-		URI uri;
+		//URI uri;
 		try
 		{
-			uri = classLoader.getResource("gradient/2g.txt").toURI();
-			Scanner s = new Scanner(new FileInputStream(new File(uri)));
+			//Scanner s1 = new Scanner(new FileInputStream(f));
+			//Scanner s2 = new Scanner(new FileInputStream(f2));
+			//InputStream ss= classLoader.getResourceAsStream(gradientFile);
+			//URL url = classLoader.getResource(gradientFile);
+			//uri = url.toURI();
+			//uri = f.toURI();
+		
+			Scanner s = new Scanner(new FileInputStream(new File(gradientFile)));
 			ArrayList<Float> gradient = new ArrayList<Float>();
 			while(s.hasNextLine())
 			{
@@ -830,9 +854,9 @@ public class VolumeRaycast
 		Quaternion rotY = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]
 		{ 0, 1, 0 });
 	
-		double dx = m_overrideGradient ? m_gradXCustom : MHDReader.dx;
-		double dy = m_overrideGradient ? m_gradYCustom : MHDReader.dy;
-		double dz = m_overrideGradient ? m_gradZCustom : MHDReader.dz;
+		double dx = MHDReader.dx;
+		double dy = MHDReader.dy;
+		double dz = MHDReader.dz;
 		
 		float xOff = 100;
 		float yOff = 100;
@@ -1160,21 +1184,31 @@ public class VolumeRaycast
 
 	public static CLMem locateMemory(float[] data, int flags, CLCommandQueue queue, CLContext context)
 	{
+		System.out.println("g31");
 		IntBuffer errorBuff = BufferUtils.createIntBuffer(1);
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
 		buffer.put(data);
 		buffer.rewind();
+		System.out.println("g32");
 		// System.out.println(buffer.capacity());
 		CLMem memory = CL10.clCreateBuffer(context, flags, buffer.capacity() * 4, errorBuff);
 		CL10.clEnqueueWriteBuffer(queue, memory, CL10.CL_TRUE, 0, buffer, null, null);
 		Util.checkCLError(errorBuff.get(0));
-
+		System.out.println("g33");
 		// Dereference buffer
 		buffer = null;
 
 		return memory;
 	}
 
+	public static void freeBuffer(CLMem mem)
+	{
+		if(mem != null)
+		{
+			CL10.clReleaseMemObject(mem);
+		}
+	}
+	
 	private static void writeMemory(float[] data, int flags, CLCommandQueue queue, CLContext context, CLMem memory)
 	{
 		IntBuffer errorBuff = BufferUtils.createIntBuffer(1);
@@ -1197,9 +1231,9 @@ public class VolumeRaycast
 		CLKernel gaussY = CL10.clCreateKernel(program, "gaussY", null);
 		CLKernel gaussZ = CL10.clCreateKernel(program, "gaussZ", null);
 
-		double dx = m_overrideGradient ? m_gradXCustom : MHDReader.dx;
-		double dy = m_overrideGradient ? m_gradYCustom : MHDReader.dy;
-		double dz = m_overrideGradient ? m_gradZCustom : MHDReader.dz;
+		double dx = MHDReader.dx;
+		double dy = MHDReader.dy;
+		double dz = MHDReader.dz;
 		
 		
 		// MATRIX

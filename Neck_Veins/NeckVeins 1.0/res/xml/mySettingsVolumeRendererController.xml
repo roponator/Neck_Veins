@@ -16,11 +16,25 @@
 			<control childLayout="vertical" id="dof_focus" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>   
 			<control childLayout="vertical" id="dof_strength" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>   
 			
-			<control id="OVERRIDE_GRADIENT_CHECKBOX" name="MY_CHECKBOX" width="92%" height="30px" margin="2%,4%,2%,4%" align="left" />
-			<control childLayout="vertical" id="volume_grad_x" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>   
-			<control childLayout="vertical" id="volume_grad_y" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>   
-			<control childLayout="vertical" id="volume_grad_z" name="MyHorizontalSlider" align="center" width="100%" height="50px" margin="10px,0px,0px,0px"/>   
-			
+			 <!-- BUTTON BUTTONS ROW-->
+             <panel id="" style="STYLE_COMMON_INVISIBLE" padding="0px,6px,0px,6px"  childLayout="horizontal" width="100%" height="30%" valign="center" align="left" >
+                         
+                     	<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="*" height="100%" valign="top" align="left" />
+                         <control id="" name="button" label="Open Gradient Editor"  width="54%">
+                             <interact onClick="onButton_SettingsVolume_StartGradEditor()"/> 
+                         </control>
+                         <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="*" height="100%" valign="top" align="left" />
+                          <control id="" name="button" label="Reload Grad File" width="43%">
+                               <interact onClick="onButton_SettingsVolume_ReloadGradFile()"/> 
+                         </control>
+                           <panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="*" height="100%" valign="top" align="left" />
+                       
+              </panel>   
+              
+			 <control id="" name="button" label="Open gradient file..." width="92.5%" height="24px" margin="2%,4%,2%,3.8%" align="left" >
+                  <interact onClick="onButton_SettingsVolume_OpenGradFile()"/> 
+              </control>
+                          
 				 		
      </panel>			
         

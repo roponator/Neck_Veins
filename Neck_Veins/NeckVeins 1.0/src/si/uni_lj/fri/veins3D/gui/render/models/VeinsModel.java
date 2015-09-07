@@ -35,6 +35,8 @@ public abstract class VeinsModel
 	
 	public abstract boolean wasLoadedFromObj(); // needed to disable settings when loading models using obj
 	
+	public abstract void reloadVolumeGradient(String gradientFile);
+	
 	public abstract int GetMaxTriangles();
 	public abstract float GetThreshold();
 	public abstract double GetVeinsGrabRadius();

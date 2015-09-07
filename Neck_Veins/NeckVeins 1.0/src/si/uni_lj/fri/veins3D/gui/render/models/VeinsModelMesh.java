@@ -125,6 +125,10 @@ public class VeinsModelMesh extends VeinsModel
 		}
 
 	}
+	
+	public void reloadVolumeGradient(String gradientFile)
+	{	
+	}
 
 	public void changeMinTriangles(int min)
 	{

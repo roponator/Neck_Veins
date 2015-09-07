@@ -87,6 +87,11 @@ public class VeinsModelRaycastVolume extends VeinsModel
 		mouseRotation = Quaternion.quaternionMultiplication(Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]{-1,0,0}), mouseRotation);
 		m_raycaster.MainRender(camera,mouseRotation,stereoOffset);
 	}
+	
+	public void reloadVolumeGradient(String gradientFile)
+	{
+		m_raycaster.LoadGradFromFileAndCreateCLMemory(gradientFile);
+	}
 
 	public void cleanup()
 	{

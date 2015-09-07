@@ -63,7 +63,7 @@ public class NiftyOpenDialog
 		Element treeboxParentPanel = m_mainOpenDailogElement.findElementById("OPEN_DIALOG_FOLDER_TREEBOX_PANEL_CONTAINER");
 		Element fileListElement = m_mainOpenDailogElement.findElementById("OPEN_DIALOG_FILES_LIST_LISTBOX");
 		Element fileTypeElement = m_mainOpenDailogElement.findElementById("OPEN_DIALOG_FILE_TYPE_DROPDOWN");
-		m_folderBrowser = new NiftyFolderBrowser(treeboxParentPanel, fileListElement, fileTypeElement);
+		m_folderBrowser = new NiftyFolderBrowser(treeboxParentPanel, fileListElement, fileTypeElement,NiftyScreenController.m_supportedFileTypes);
 
 		m_optionsDialogControlElement = NiftyScreenController.m_screen.findElementById("MY_OPEN_DIALOG_OPTION_DIALOG_ID");
 		m_settingsDialogWindowControl = m_optionsDialogControlElement.getAttachedInputControl().getControl(WindowControl.class);
