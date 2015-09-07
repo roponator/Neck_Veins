@@ -147,10 +147,10 @@ public class FileUtils {
 		
 		float[][][] newMatrix = matrix;
 		if(Configuration.__TAKE_SAMPLE){
-			newMatrix = new float[Configuration.__SAMPLE_SIZE][Configuration.__SAMPLE_SIZE][Configuration.__SAMPLE_SIZE];
-			for (int i = 0; i < Configuration.__SAMPLE_SIZE; i++) {
-				for (int j = 0; j < Configuration.__SAMPLE_SIZE; j++) {
-					for (int k = 0; k < Configuration.__SAMPLE_SIZE; k++) {
+			newMatrix = new float[VeinsWindow.settings.MPUI__SAMPLE_SIZE][VeinsWindow.settings.MPUI__SAMPLE_SIZE][VeinsWindow.settings.MPUI__SAMPLE_SIZE];
+			for (int i = 0; i < VeinsWindow.settings.MPUI__SAMPLE_SIZE; i++) {
+				for (int j = 0; j < VeinsWindow.settings.MPUI__SAMPLE_SIZE; j++) {
+					for (int k = 0; k < VeinsWindow.settings.MPUI__SAMPLE_SIZE; k++) {
 						newMatrix[i][j][k] = matrix[i][j][k];
 					}
 				}

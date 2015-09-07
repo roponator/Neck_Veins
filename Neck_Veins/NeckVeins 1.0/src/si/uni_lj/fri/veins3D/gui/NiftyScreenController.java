@@ -1065,9 +1065,6 @@ public class NiftyScreenController extends DefaultScreenController
 		// Marching cubes, MPUI or volume render (obj is used if the file was already loaded for MC or MPUI)
 		if (file != null && file.extensionOnly.compareTo("mhd") == 0)
 		{
-			double sigma = VeinsWindow.settings.gaussSigma;
-			double threshold = VeinsWindow.settings.threshold;
-
 			String selectedMethod = m_openDialog.m_methodTypeDropdown.getSelection();
 
 			// Convert string model type to enum
@@ -1402,6 +1399,8 @@ public class NiftyScreenController extends DefaultScreenController
 	public void OnFileTypeDropdownSelectionChanged(String id, DropDownSelectionChangedEvent<MyFileExtensionItem> event)
 	{
 		m_openDialog.m_folderBrowser.OnFileTypeSelectionChanged(event);
+		
+		m_openDialog.showSpecificControlsForSelectedRenderMethod(event.getSelectionItemIndex());
 	}
 
 	@NiftyEventSubscriber(id = "OBJ_SHADER_DROPDOWN")

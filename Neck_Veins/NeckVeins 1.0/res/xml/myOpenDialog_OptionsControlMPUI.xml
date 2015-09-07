@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty-controls xmlns="http://nifty-gui.lessvoid.com/nifty-gui">
+    <controlDefinition name="MY_OPEN_MENU_OPTIONS_MPUI">
+       
+     	   <!-- MPUI-->
+				<panel id="" style="STYLE_COMMON_INVISIBLE" childLayout="vertical" width="100%" height="100%" valign="top" align="left" margin="0%,0%,0%,0%" >
+                  	<panel childLayout="center" width="100%" height="100%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center" >
+                    	<panel childLayout="vertical" width="95%" height="100%" style="STYLE_COMMON_INVISIBLE" align="center" valign="center"  backgroundImage="imgs/col1.png"  padding="0px,0px,0px,0px">
+                    	    	<control childLayout="vertical" id="openSettings_mpuiAlpha" name="MyHorizontalSlider" align="center" width="100%" height="40px" margin="10px,0px,0px,0px"/>    
+		                    	<control childLayout="vertical" id="openSettings_mpuiError" name="MyHorizontalSlider" align="center" width="100%" height="40px" margin="10px,0px,0px,0px"/>    
+		                    	 <control childLayout="vertical" id="openSettings_mpuiResolution" name="MyHorizontalSlider" align="center" width="100%" height="40px" margin="10px,0px,0px,0px"/>    
+		                    	 <control childLayout="vertical" id="openSettings_mpuiSampleSize" name="MyHorizontalSlider" align="center" width="100%" height="40px" margin="10px,0px,0px,0px"/>    		                    	 
+		                    	 <control id="checkbox_mpuiPointCloud" name="MY_CHECKBOX" width="50%" height="26px" align="left" margin="0%,0%,0%,5.0%" />
+            					 
+                    	    </panel> 
+               		 </panel>
+                </panel>
+        
+    </controlDefinition>
+</nifty-controls>

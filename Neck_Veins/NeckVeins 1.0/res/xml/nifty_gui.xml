@@ -39,6 +39,11 @@
      <useControls filename="xml/mySettingsObjControl.xml"/>
      <useControls filename="xml/mySettingsVolumeRendererController.xml"/>
      
+       <useControls filename="xml/myOpenDialog_OptionsControl_MC.xml"/>
+       <useControls filename="xml/myOpenDialog_OptionsControlMPUI.xml"/>
+       <useControls filename="xml/myOpenDialog_OptionsControlVolume.xml"/>
+     
+    
 	 <!-- base="nifty-panel-simple" -->
 	 
 	 <!-- PADDING ORDER: top,right,bottom,left -->
@@ -357,7 +362,7 @@
 	
 	       <control renderOrder="9000" id="MY_OPEN_DIALOG_ID" name="MY_OPEN_DIALOG_CONTROL" visible="false" x="10%" y="10%" childLayout="vertical" width="600px" height="330px" valign="center" align="center" />
 	       
-	       <control  renderOrder="9100" id="MY_OPEN_DIALOG_OPTION_DIALOG_ID" name="MY_OPEN_DIALOG_OPTIONS_CONTROL" visible="false" x="15%" y="15%" childLayout="vertical" width="300px" height="240px" valign="center" align="center" />
+	       <control  renderOrder="9100" id="MY_OPEN_DIALOG_OPTION_DIALOG_ID" name="MY_OPEN_DIALOG_OPTIONS_CONTROL" visible="false" x="15%" y="10%" childLayout="vertical" width="300px" height="370px" valign="center" align="center" />
 	      
 	     <!-- ******************************************* -->
 		 <!--  SAVE DIALOG -->

@@ -51,7 +51,7 @@ public class ModelCreatorMPUI
 	{
 		// Create mesh info
 		String fileNameOnly = MeshCreationInfo.GetFileNameOnlyFromPath(fileName);
-		MeshCreationInfo.InfoMPUI meshCreationInfo = new MeshCreationInfo.InfoMPUI(fileNameOnly, VeinsWindow.settings.gaussSigma, VeinsWindow.settings.threshold, Configuration.__APLHA, Configuration.__LAMBDA, Configuration.__ERROR, Configuration.__RESOLUTION, Configuration.__POINT_CLOUD);
+		MeshCreationInfo.InfoMPUI meshCreationInfo = new MeshCreationInfo.InfoMPUI(fileNameOnly, VeinsWindow.settings.gaussSigma, VeinsWindow.settings.threshold, VeinsWindow.settings.MPUI__APLHA, Configuration.__LAMBDA, VeinsWindow.settings.MPUI__ERROR, VeinsWindow.settings.MPUI__RESOLUTION, VeinsWindow.settings.MPUI__POINT_CLOUD);
 
 		// check if the obj file exists for this model params: if it does, return one output.
 		File existingObjFile = new File(meshCreationInfo.GetObjFilePath());
@@ -64,14 +64,14 @@ public class ModelCreatorMPUI
 
 		System.out.println("createModel (MPUI)...");
 		float[][][] ctMatrix = FileUtils.readFile3D(fileName);
-		// float[][][] ctMatrix = testMatrix();
+		 //float[][][] ctMatrix = testMatrix();
 		System.out.println(ctMatrix.length + " " + ctMatrix[0].length + " " + ctMatrix[0][0].length);
-		float alpha = Configuration.__APLHA;
+		float alpha = VeinsWindow.settings.MPUI__APLHA;
 		float lambda = Configuration.__LAMBDA;
-		float error = Configuration.__ERROR;
-		float res = Configuration.__RESOLUTION;
+		float error = VeinsWindow.settings.MPUI__ERROR;
+		float res = VeinsWindow.settings.MPUI__RESOLUTION;
 		boolean cubes = true;
-		boolean pointCloud = Configuration.__POINT_CLOUD;
+		boolean pointCloud = VeinsWindow.settings.MPUI__POINT_CLOUD;
 		// String s = "";
 
 		// TODO: UNCOMMENT

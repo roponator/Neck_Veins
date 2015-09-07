@@ -252,7 +252,7 @@ public class VolumeRaycast
 		System.out.print("Execing gauss...");
 		t = System.currentTimeMillis();
 		matrix2 = locateMemory(data, CL_MEM_READ_WRITE, queue, clContext);
-		execGauss3D(0.5);
+		execGauss3D(VeinsWindow.settings.VOLUME_RENDER_GAUSS_SIGMA);
 		t = System.currentTimeMillis() - t;
 		System.out.println(t + "ms");
 
