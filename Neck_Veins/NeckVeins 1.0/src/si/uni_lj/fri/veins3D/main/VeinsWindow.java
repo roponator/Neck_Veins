@@ -362,7 +362,7 @@ public class VeinsWindow
 	{
 		try
 		{
-			frame = new Frame("Test");
+			frame = new Frame("Med3D");
 			frame.setLayout(new BorderLayout());
 			final Canvas canvas = new Canvas();
 			frame.add(canvas, BorderLayout.CENTER);
@@ -485,7 +485,7 @@ public class VeinsWindow
 			// Input disable for a couple of frames
 			if (screenController.m_dragWindow || screenController.getState() != GUI_STATE.DEFAULT || screenController == null)
 				disableInputTime = 0.3f;
-
+			
 			canModelBeRotatedByMouse = true; // reset
 
 			// handle subdiv increase
@@ -512,18 +512,18 @@ public class VeinsWindow
 
 			if (m_escPressed)
 				screenController.OnEscapeKeyPressed();
-
+		
 			// non model input must be before nifty
 			pollNonModelControlInput();
-
+			
 			// NIFTY LOGIC MUST BE RAN BEFORE GAME INPUT LOGIC BECAUSE OF INPUT!
 			if (wasLeftMouseDownClicked)
 			{
 				screenController.onMouseLeftDownClicked();
 			}
-
+		
 			nifty.update();
-
+		
 			// model input must be after nifty
 			disableInput = disableInputTime > 0;
 			pollModelInput(wasLeftMouseDownClicked);
@@ -533,25 +533,25 @@ public class VeinsWindow
 			// hud.setClickedOn(clickedOn);
 			renderer.setupView(); // raycast volume renderer changes some states, theys must be reset
 			renderer.clearView();
-
+			
 			// glPushAttrib(GL_ALL_ATTRIB_BITS);
 			renderer.render();
 			// glPopAttrib();
-
+		
 			// hud.drawHUD();
-			setTitle();
+			//setTitle();
 
 			// TODO: PRESENT ORDER: BEFORE OR AFTER NIFTY.RENDER?
 			// Display.update();
 
 			renderNiftyGUI();
-
+		
 			Display.update();
-
+			
 			logic();
 			
 			Display.sync(settings.frequency); // TODO NIFTY
-
+		
 			int error = GL11.glGetError();
 			if (error != GL11.GL_NO_ERROR)
 			{
@@ -564,7 +564,7 @@ public class VeinsWindow
 			deltaTime = ((float) currentTime) - ((float) prevTime);
 			deltaTime /= 1000000000.0f;
 			prevTime = currentTime;
-
+			
 			disableInputTime -= deltaTime;
 			if (disableInputTime < 0)
 				disableInputTime = -1.0f;

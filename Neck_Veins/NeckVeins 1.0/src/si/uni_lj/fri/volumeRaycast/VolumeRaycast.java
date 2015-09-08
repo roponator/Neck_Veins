@@ -262,10 +262,10 @@ public class VolumeRaycast
 
 		System.out.print("Reading transfer function...");
 		LoadGradFromFileAndCreateCLMemory(VeinsWindow.defaultGradientFile);
-		/*float[] gradientFromFile = 	loadGradient();
-		t = System.currentTimeMillis();
+		//float[] gradientFromFile = 	loadGradient();
+		//t = System.currentTimeMillis();
 		//readFloatsFromFile("gradient", transferFunction);
-		clTransferFunction = locateMemory(gradientFromFile, CL_MEM_READ_ONLY, queue, clContext);*/
+		//clTransferFunction = locateMemory(gradientFromFile, CL_MEM_READ_ONLY, queue, clContext);*/
 		t = System.currentTimeMillis() - t;
 		System.out.println(t + "ms");
 
@@ -289,17 +289,19 @@ public class VolumeRaycast
 	
 	public void LoadGradFromFileAndCreateCLMemory(String gradientFile)
 	{
-		System.out.println("g1");
+		//System.out.println("g1");
 		if(clTransferFunction != null)
 		{
 			freeBuffer(clTransferFunction);
 		}
-		System.out.println("g2");
+		//System.out.println("g2");
 		float[] gradientFromFile = 	loadGradient(gradientFile);
-		System.out.println("g3");
+		//System.out.println("g3");
 		//readFloatsFromFile("gradient", transferFunction);
 		clTransferFunction = locateMemory(gradientFromFile, CL_MEM_READ_ONLY, queue, clContext);
-		System.out.println("g4");
+		//System.out.println("g4");
+		
+		setKernelConstants();
 	}
 	
 	// returns null if failed to load
@@ -622,6 +624,7 @@ public class VolumeRaycast
 
 	public void MainRender(Camera camera,Quaternion mouseRotation, float stereoOffset)
 	{
+		
 		initView(width, height);
 		// handleIO();
 		display(camera,mouseRotation,stereoOffset);
@@ -675,9 +678,9 @@ public class VolumeRaycast
 		glUseProgram(glProgram);
 		glUniform1i(glGetUniformLocation(glProgram, "mandelbrot"), 0);
 
-		compute(doublePrecision, camera, mouseRotation, stereoOffset);
-
-		render();
+		compute(doublePrecision, camera, mouseRotation, stereoOffset);	
+		
+		render();	
 	}
 
 	private void initGLObjects()
@@ -843,13 +846,14 @@ public class VolumeRaycast
 		kernel2DGlobalWorkSize.put(0, width).put(1, height);
 
 		float sint = (float) Math.sin(System.currentTimeMillis() / 1000.0);
-
+		
 		// acquire GL objects, and enqueue a kernel with a probe from the list
 		for (int i = 0; i < glBuffersCount; i++)
 		{
 			clEnqueueAcquireGLObjects(queue, glBuffers[i], null, null);
 		}
-
+		clFinish(queue);
+	
 		// create camera matrix, must also rotate by 180 degrees on Y axis for proper initial orientation
 		Quaternion rotY = Quaternion.quaternionFromAngleAndRotationAxis(Math.PI, new double[]
 		{ 0, 1, 0 });
@@ -937,7 +941,7 @@ public class VolumeRaycast
 	
 	
 		FloatBuffer finalCamRot =  rotQuatToUse.getRotationMatrix(true) ;
-		
+	
 		//rotMatrixModelOnly = rotMatrix;
 		// start computation
 		currentlyActiveKernel.setArg(4, camPosX). // offsets neeed for proper camera position
@@ -949,9 +953,9 @@ public class VolumeRaycast
 				. // right
 				setArg(14, finalCamRot.get(4 * 0 + 1)).setArg(15, finalCamRot.get(4 * 0 + 2)).setArg(16, fov).setArg(17, asr).setArg(19, MHDReader.Nx).setArg(20, MHDReader.Ny).setArg(21, MHDReader.Nz).setArg(22, (float) dx).setArg(23, (float) dy).setArg(24, (float) dz)
 				.setArg(26, octreeLevels).setArg(28, numTransferFunctionSamples).setArg(29, threshold).setArg(30, lin);
-
+	
 		clEnqueueNDRangeKernel(queue, currentlyActiveKernel, 2, null, kernel2DGlobalWorkSize, null, null, null);// */
-
+		clFinish(queue);
 		// adaptive sampling pass 1
 		/*
 		 * kernelFirstPass.setArg(4, camPos.x).setArg(5, camPos.y).setArg(6, camPos.z) .setArg(7, camUp.x).setArg(8, camUp.y).setArg(9, camUp.z) .setArg(10, camDir.x).setArg(11, camDir.y).setArg(12, camDir.z) .setArg(13, camRight.x).setArg(14, camRight.y).setArg(15, camRight.z) .setArg(16,
@@ -968,7 +972,7 @@ public class VolumeRaycast
 		 * 
 		 * clEnqueueNDRangeKernel(queue, kernelSecondPass, 2, null, kernel2DGlobalWorkSize, null, null, null);//
 		 */
-
+	
 		if (lin == 1 && m_enableSSAO)
 		{
 			ssao(glBuffers[BUFFER_1], glBuffers[BUFFER_DEPTH_1], glBuffers[BUFFER_2]);
@@ -986,19 +990,21 @@ public class VolumeRaycast
 		{
 			clEnqueueReleaseGLObjects(queue, glBuffers[i], null, syncGLtoCL ? syncBuffer : null);
 		}
-
+		clFinish(queue);
+		
 		long t = System.currentTimeMillis();
 		if (syncGLtoCL)
 		{
 			clEvent = queue.getCLEvent(syncBuffer.get(0));
 			clSync = glCreateSyncFromCLeventARB(queue.getParent(), clEvent, 0);
 		}
-
+		
 		// block until done (important: finish before doing further gl work)
 		if (!syncGLtoCL)
 		{
 			clFinish(queue);
 		}
+	
 		t = System.currentTimeMillis() - t;
 		// System.out.println(t + "ms");
 	}
@@ -1184,17 +1190,17 @@ public class VolumeRaycast
 
 	public static CLMem locateMemory(float[] data, int flags, CLCommandQueue queue, CLContext context)
 	{
-		System.out.println("g31");
+		//System.out.println("g31");
 		IntBuffer errorBuff = BufferUtils.createIntBuffer(1);
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
 		buffer.put(data);
 		buffer.rewind();
-		System.out.println("g32");
+		//System.out.println("g32");
 		// System.out.println(buffer.capacity());
 		CLMem memory = CL10.clCreateBuffer(context, flags, buffer.capacity() * 4, errorBuff);
 		CL10.clEnqueueWriteBuffer(queue, memory, CL10.CL_TRUE, 0, buffer, null, null);
 		Util.checkCLError(errorBuff.get(0));
-		System.out.println("g33");
+		//System.out.println("g33");
 		// Dereference buffer
 		buffer = null;
 
