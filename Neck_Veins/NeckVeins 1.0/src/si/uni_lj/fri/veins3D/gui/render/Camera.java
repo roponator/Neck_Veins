@@ -100,47 +100,47 @@ public class Camera {
 		cameraZ += (float) (up[2] + right[2]);
 	}
 
-	public void moveForward() {
+	public void moveForward(float speedFactor) {
 		double rotateVector[] = cameraOrientation.rotateVector3d(Z_NEGATIVE_AXIS);
-		cameraX += (float) rotateVector[0];
-		cameraY += (float) rotateVector[1];
-		cameraZ += (float) rotateVector[2];
+		cameraX += (float) rotateVector[0]*speedFactor;
+		cameraY += (float) rotateVector[1]*speedFactor;
+		cameraZ += (float) rotateVector[2]*speedFactor;
 	}
 
-	public void moveBackwards() {
+	public void moveBackwards(float speedFactor) {
 		double rotateVector[] = cameraOrientation.rotateVector3d(Z_POSITIVE_AXIS);
-		cameraX += (float) rotateVector[0];
-		cameraY += (float) rotateVector[1];
-		cameraZ += (float) rotateVector[2];
+		cameraX += (float) rotateVector[0]*speedFactor;
+		cameraY += (float) rotateVector[1]*speedFactor;
+		cameraZ += (float) rotateVector[2]*speedFactor;
 	}
 
-	public void moveRight() {
+	public void moveRight(float speedFactor) {
 		double rotateVector[] = cameraOrientation.rotateVector3d(X_POSITIVE_AXIS);
-		cameraX += (float) rotateVector[0];
-		cameraY += (float) rotateVector[1];
-		cameraZ += (float) rotateVector[2];
+		cameraX += (float) rotateVector[0]*speedFactor;
+		cameraY += (float) rotateVector[1]*speedFactor;
+		cameraZ += (float) rotateVector[2]*speedFactor;
 	}
 
-	public void moveLeft() {
+	public void moveLeft(float speedFactor) {
 		double rotateVector[] = cameraOrientation.rotateVector3d(X_NEGATIVE_AXIS);
-		cameraX += (float) rotateVector[0];
-		cameraY += (float) rotateVector[1];
-		cameraZ += (float) rotateVector[2];
+		cameraX += (float) rotateVector[0]*speedFactor;
+		cameraY += (float) rotateVector[1]*speedFactor;
+		cameraZ += (float) rotateVector[2]*speedFactor;
 
 	}
 
-	public void moveUp() {
+	public void moveUp(float speedFactor) {
 		double rotateVector[] = cameraOrientation.rotateVector3d(Y_POSITIVE_AXIS);
-		cameraX += (float) rotateVector[0];
-		cameraY += (float) rotateVector[1];
-		cameraZ += (float) rotateVector[2];
+		cameraX += (float) rotateVector[0]*speedFactor;
+		cameraY += (float) rotateVector[1]*speedFactor;
+		cameraZ += (float) rotateVector[2]*speedFactor;
 	}
 
-	public void moveDown() {
+	public void moveDown(float speedFactor) {
 		double rotateVector[] = cameraOrientation.rotateVector3d(Y_NEGATIVE_AXIS);
-		cameraX += (float) rotateVector[0];
-		cameraY += (float) rotateVector[1];
-		cameraZ += (float) rotateVector[2];
+		cameraX += (float) rotateVector[0]*speedFactor;
+		cameraY += (float) rotateVector[1]*speedFactor;
+		cameraZ += (float) rotateVector[2]*speedFactor;
 	}
 	public void moveCamera3D(double[] axis, double[] rot){
 		double[] x=new double[]{axis[0],0,0};

@@ -51,6 +51,8 @@ public class NiftyOpenDialog
 
 	Element m_sliderVolumeGauss = null;
 
+	int m_lastSelectedListboxItem = -1; // list item gets deselected when options dialog opens
+
 	CheckboxControl m_mpuiUsePointCloudCheckbox = null;
 
 	public NiftyOpenDialog()
@@ -63,7 +65,7 @@ public class NiftyOpenDialog
 		Element treeboxParentPanel = m_mainOpenDailogElement.findElementById("OPEN_DIALOG_FOLDER_TREEBOX_PANEL_CONTAINER");
 		Element fileListElement = m_mainOpenDailogElement.findElementById("OPEN_DIALOG_FILES_LIST_LISTBOX");
 		Element fileTypeElement = m_mainOpenDailogElement.findElementById("OPEN_DIALOG_FILE_TYPE_DROPDOWN");
-		m_folderBrowser = new NiftyFolderBrowser(treeboxParentPanel, fileListElement, fileTypeElement,NiftyScreenController.m_supportedFileTypes);
+		m_folderBrowser = new NiftyFolderBrowser(treeboxParentPanel, fileListElement, fileTypeElement, NiftyScreenController.m_supportedFileTypes);
 
 		m_optionsDialogControlElement = NiftyScreenController.m_screen.findElementById("MY_OPEN_DIALOG_OPTION_DIALOG_ID");
 		m_settingsDialogWindowControl = m_optionsDialogControlElement.getAttachedInputControl().getControl(WindowControl.class);
@@ -105,7 +107,7 @@ public class NiftyOpenDialog
 		m_methodTypeDropdown.addItem(METHOD_TYPE_VOLUME_RENDER);
 		m_methodTypeDropdown.selectItemByIndex(0);
 		showSpecificControlsForSelectedRenderMethod(0);
-		
+
 		// restore control states
 		restoreSettingsDialogGUIStates();
 
@@ -146,6 +148,16 @@ public class NiftyOpenDialog
 
 	public void On_SettingsDialog_Open()
 	{
+		// get selected item, so we can restore selection after settings menu closes
+		if (m_folderBrowser.m_fileListboxControl.getSelection().size() > 0)
+		{
+			m_lastSelectedListboxItem = m_folderBrowser.m_fileListboxControl.getFocusItemIndex();
+		}
+		else
+		{
+			m_lastSelectedListboxItem = -1;
+		}
+
 		restoreSettingsDialogGUIStates();
 
 		m_optionsDialogControlElement.setVisible(true);
@@ -162,6 +174,8 @@ public class NiftyOpenDialog
 		m_openDialogWindowControl.setEnabled(true);
 
 		restoreSettingsDialogGUIStates();
+
+		restoreSelectedItemAfterSettingsMenuCloses();
 	}
 
 	public void On_SettingsDialog_OK()
@@ -171,6 +185,17 @@ public class NiftyOpenDialog
 
 		m_optionsDialogControlElement.setVisible(false);
 		m_openDialogWindowControl.setEnabled(true);
+		
+		restoreSelectedItemAfterSettingsMenuCloses();
+	}
+	
+	void restoreSelectedItemAfterSettingsMenuCloses()
+	{
+		if (m_lastSelectedListboxItem != -1)
+		{
+			m_folderBrowser.m_fileListboxControl.selectItemByIndex(m_lastSelectedListboxItem);
+			m_folderBrowser.m_fileListboxControl.setFocusItemByIndex(m_lastSelectedListboxItem);
+		}
 	}
 
 	public void updateAvalibleFileTypesBasedOnSelectedMethodType()
@@ -267,7 +292,7 @@ public class NiftyOpenDialog
 	public void showSpecificControlsForSelectedRenderMethod(int methodDropdownBoxIndex)
 	{
 		if (methodDropdownBoxIndex == 0)
-		{		
+		{
 			showMPUIControl(false);
 			showVolumeControl(false);
 			showMarchingCubesControl(true);
@@ -275,7 +300,7 @@ public class NiftyOpenDialog
 
 		if (methodDropdownBoxIndex == 1)
 		{
-			showMarchingCubesControl(false);		
+			showMarchingCubesControl(false);
 			showVolumeControl(false);
 			showMPUIControl(true);
 		}

@@ -2,10 +2,12 @@ package si.uni_lj.fri.veins3D.gui;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -82,7 +84,7 @@ public class NiftyFolderBrowser
 		}
 	}
 
-	de.lessvoid.nifty.controls.ListBox m_fileListboxControl = null;
+	public de.lessvoid.nifty.controls.ListBox m_fileListboxControl = null;
 	de.lessvoid.nifty.controls.DropDown<MyFileExtensionItem> m_fileTypeDropdownControl = null;
 
 	TreeBox m_treebox = null;
@@ -148,13 +150,78 @@ public class NiftyFolderBrowser
 			}
 		}
 
-		// init foldertree
-		String currentFolder =  System.getProperty("user.dir")+"\\..";
-		currentFolder = currentFolder.replace("\\", "//");
 		m_root = new TreeItem<MyTreeFolderItem>();
-		createBranchesForFolder(m_treebox, currentFolder, m_root);
+
+		CreateTreeboxWorkingDirAndCustomPaths(m_treebox,m_root);
+		
 		m_treebox.setTree(m_root);
 
+	}
+
+	public static void CreateTreeboxWorkingDirAndCustomPaths(TreeBox treebox, TreeItem<MyTreeFolderItem> root)
+	{
+		// default folder (app path)
+		{
+			String currentFolder = System.getProperty("user.dir");
+			currentFolder = currentFolder.replace("\\", "//");
+
+			int p = currentFolder.lastIndexOf("//");
+			String folderName = currentFolder.substring(p + 2, currentFolder.length());
+			String pathOnly = currentFolder.substring(0, p);
+
+			TreeItem<MyTreeFolderItem> defaultFolder = new TreeItem<MyTreeFolderItem>();
+			defaultFolder.setValue(new MyTreeFolderItem(pathOnly, folderName));
+
+			createBranchesForFolder(treebox, currentFolder, defaultFolder, true);
+			root.addTreeItem(defaultFolder);
+		}
+
+		// custom paths from cfg
+		{
+			Scanner scanner;
+			try
+			{
+				scanner = new Scanner(new File("paths.txt"));
+
+				while (scanner.hasNextLine())
+				{
+					String rawPath = "";
+					try
+					// inner try in case a bad path is given
+					{
+						rawPath = scanner.nextLine();
+						rawPath = rawPath.replace("\\", "//");
+
+						// remove trailing "//"
+						if (rawPath.charAt(rawPath.length() - 1) == '/')
+						{
+							rawPath = rawPath.substring(0, rawPath.length() - 2);
+						}
+
+						int p = rawPath.lastIndexOf("//");
+						String folderName = rawPath.substring(p + 2, rawPath.length());
+						String pathOnly = rawPath.substring(0, p);
+
+						TreeItem<MyTreeFolderItem> defaultFolder = new TreeItem<MyTreeFolderItem>();
+						defaultFolder.setValue(new MyTreeFolderItem(pathOnly, folderName));
+
+						createBranchesForFolder(treebox, rawPath, defaultFolder, true);
+						root.addTreeItem(defaultFolder);
+					}
+					catch (Exception e)
+					{
+						System.out.println("Folder browser: bad path in paths.txt: " + rawPath + ", error: " + e.getMessage());
+					}
+				}
+
+				scanner.close();
+			}
+			catch (FileNotFoundException e)
+			{
+				System.out.println("Folder browser: trying to read paths.txt: " + e.getMessage());
+			}
+
+		}
 	}
 
 	// Some methods support only some file types (volume render supports only obj)
@@ -271,9 +338,20 @@ public class NiftyFolderBrowser
 		m_currentlySelectedFolder.setExpanded(true);
 
 		MyTreeFolderItem myTreeItem = selectedTreeItem.getValue();
-		String selectedFolderPath = myTreeItem.path + "//" + myTreeItem.folderNameOnly;
+		String selectedFolderPath = "";
+
+		// special case for items which hold only names, not paths
+		if (myTreeItem.path.length() < 1 || myTreeItem.folderNameOnly.length() < 1)
+		{
+			selectedFolderPath = myTreeItem.folderNameOnly;
+		}
+		else
+		{
+			selectedFolderPath = myTreeItem.path + "//" + myTreeItem.folderNameOnly;
+		}
+
 		removeAllChildrenFromBranch(m_currentlySelectedFolder);
-		createBranchesForFolder(m_treebox, selectedFolderPath, m_currentlySelectedFolder);
+		createBranchesForFolder(m_treebox, selectedFolderPath, m_currentlySelectedFolder, false);
 
 		m_treebox.setTree(m_root); // update tree
 	}
@@ -301,7 +379,7 @@ public class NiftyFolderBrowser
 				{ selectedExtension.extensionOnly };
 			}
 		}
-		
+
 		// get files with the proper extension(s)
 		String[] filesWithCorrectExtensions = HelperFunctions.GetFilesInFolder(selectedFolderPath, selectedExtensions);
 
@@ -336,12 +414,19 @@ public class NiftyFolderBrowser
 	}
 
 	// Reads the given folder and sets all folders as children to the given branch
-	static void createBranchesForFolder(TreeBox treebox, String path, TreeItem<MyTreeFolderItem> branchToAddTo)
+	static void createBranchesForFolder(TreeBox treebox, String path, TreeItem<MyTreeFolderItem> branchToAddTo, boolean isDummyHolder)
 	{
 		String[] folderNames = HelperFunctions.GetDirectoriesInFolder(path);
 
 		if (folderNames == null) // if no subfolders
 			return;
+
+		if (isDummyHolder)
+		{
+			TreeItem<MyTreeFolderItem> dummyBranch = new TreeItem<NiftyFolderBrowser.MyTreeFolderItem>(new MyTreeFolderItem("", ""));
+			branchToAddTo.addTreeItem(dummyBranch);
+			branchToAddTo = dummyBranch;
+		}
 
 		for (int i = 0; i < folderNames.length; ++i)
 		// for (int i = 0; i < 2; ++i)

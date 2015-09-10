@@ -580,28 +580,34 @@ public class NiftyScreenController extends DefaultScreenController
 	{
 		if (getState() != GUI_STATE.DEFAULT || m_dragWindow)
 			return;
+		
+		float moveDeltaFactor = VeinsWindow.deltaTime * (float)VeinsWindow.settings.sensitivity;
+		float maxMoveSpeed = 200.0f;
+		if (moveDeltaFactor > maxMoveSpeed)
+			moveDeltaFactor = maxMoveSpeed;
+
 
 		// process widget input and move camera
 		NAVIGATION_WIDGET_BUTTON pressedButton = processNavWidgetInput(m_navWidgetUDLR, event);
 		switch (pressedButton)
 		{
 		case CENTER_CIRCLE_DOWN:
-			VeinsWindow.renderer.getCamera().moveBackwards();
+			VeinsWindow.renderer.getCamera().moveBackwards(moveDeltaFactor);
 			break;
 		case CENTER_CIRCLE_UP:
-			VeinsWindow.renderer.getCamera().moveForward();
+			VeinsWindow.renderer.getCamera().moveForward(moveDeltaFactor);
 			break;
 		case CENTER_CIRCLE_LEFT:
-			VeinsWindow.renderer.getCamera().moveLeft();
+			VeinsWindow.renderer.getCamera().moveLeft(moveDeltaFactor);
 			break;
 		case CENTER_CIRCLE_RIGHT:
-			VeinsWindow.renderer.getCamera().moveRight();
+			VeinsWindow.renderer.getCamera().moveRight(moveDeltaFactor);
 			break;
 		case SIDE_CIRCLE_LEFT:
-			VeinsWindow.renderer.getCamera().moveDown();
+			VeinsWindow.renderer.getCamera().moveDown(moveDeltaFactor);
 			break;
 		case SIDE_CIRCLE_RIGHT:
-			VeinsWindow.renderer.getCamera().moveUp();
+			VeinsWindow.renderer.getCamera().moveUp(moveDeltaFactor);
 			break;
 		case CLOSE_CIRCLE:
 			m_navWidgetARROWSCheckbox.setChecked(false);
@@ -1198,7 +1204,10 @@ public class NiftyScreenController extends DefaultScreenController
 		// System.out.println("onButton_SaveDialog_Save");
 		SelectedFile file = m_saveDialog.m_folderBrowser.TryGettingSelectedFile();
 		if (file == null)
+		{
 			System.out.println("You must specify the file & path to save to");
+			return;
+		}
 
 		// Can only save meshes to obj, not volume
 		if (VeinsWindow.renderer.veinsModel != null && VeinsWindow.renderer.veinsModel instanceof VeinsModelMesh)

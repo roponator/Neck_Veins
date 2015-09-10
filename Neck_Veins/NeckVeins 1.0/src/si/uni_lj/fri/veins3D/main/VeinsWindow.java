@@ -144,8 +144,6 @@ public class VeinsWindow
 	public static boolean decreaseSubdivLevel = false;
 
 	public final static String defaultGradientFile = "res/gradient/defaultGrad.grad";
-	
-	boolean m_escPressed = false;
 
 	/**
 	 * 
@@ -386,7 +384,7 @@ public class VeinsWindow
 			Display.setTitle(title);
 			Display.setVSyncEnabled(false);
 			// Display.setDisplayMode(new DisplayMode(512, 800));
-		// Display.create(new PixelFormat().withStencilBits(1));
+			// Display.create(new PixelFormat().withStencilBits(1));
 
 			Display.create(new PixelFormat().withStencilBits(1), new ContextAttribs(2, 0));
 		}
@@ -467,9 +465,10 @@ public class VeinsWindow
 	public static boolean wire = false;
 
 	long prevTime = System.nanoTime();
-	float deltaTime = 1.0f / 60.0f;
+	public static float deltaTime = 1.0f / 60.0f;
 	float disableInputTime = 0; // number of frames that the input will be disabled
 	boolean disableInput = false;
+	boolean wasEscapePressedAlready = false; // hackish but stupid input doesnt detect escape
 
 	public void mainLoop()
 	{
@@ -485,7 +484,7 @@ public class VeinsWindow
 			// Input disable for a couple of frames
 			if (screenController.m_dragWindow || screenController.getState() != GUI_STATE.DEFAULT || screenController == null)
 				disableInputTime = 0.3f;
-			
+
 			canModelBeRotatedByMouse = true; // reset
 
 			// handle subdiv increase
@@ -507,23 +506,29 @@ public class VeinsWindow
 
 			// Strange render loop
 
-			// renderer.setupView(); // raycast volume renderer changes some
-			// states, theys must be reset
-
-			if (m_escPressed)
+			// Doesn't detect escape otherwise
+			if ((Keyboard.getEventKey() == Keyboard.KEY_ESCAPE && Keyboard.getNumKeyboardEvents() > 0) || (wasEscapePressedAlready == false && Keyboard.getEventKey() == Keyboard.KEY_ESCAPE))
+			{
+				wasEscapePressedAlready = true;
 				screenController.OnEscapeKeyPressed();
-		
-			// non model input must be before nifty
-			pollNonModelControlInput();
-			
+			}
+
+
+			// non model input must be before nifty (BUT MUST BE DISABLED IF SOME DIALOG IS OPENED OTHERWISE NIFTY
+			// DOESN'T GET INPUT (EF GOR SAVE DIALOG FILE NAME TEXTBOX)
+			if (screenController.getState() == GUI_STATE.DEFAULT)
+			{
+				pollNonModelControlInput();
+			}
+
 			// NIFTY LOGIC MUST BE RAN BEFORE GAME INPUT LOGIC BECAUSE OF INPUT!
 			if (wasLeftMouseDownClicked)
 			{
 				screenController.onMouseLeftDownClicked();
 			}
-		
+
 			nifty.update();
-		
+
 			// model input must be after nifty
 			disableInput = disableInputTime > 0;
 			pollModelInput(wasLeftMouseDownClicked);
@@ -533,25 +538,25 @@ public class VeinsWindow
 			// hud.setClickedOn(clickedOn);
 			renderer.setupView(); // raycast volume renderer changes some states, theys must be reset
 			renderer.clearView();
-			
+
 			// glPushAttrib(GL_ALL_ATTRIB_BITS);
 			renderer.render();
 			// glPopAttrib();
-		
+
 			// hud.drawHUD();
-			//setTitle();
+			// setTitle();
 
 			// TODO: PRESENT ORDER: BEFORE OR AFTER NIFTY.RENDER?
 			// Display.update();
 
 			renderNiftyGUI();
-		
+
 			Display.update();
-			
+
 			logic();
-			
+
 			Display.sync(settings.frequency); // TODO NIFTY
-		
+
 			int error = GL11.glGetError();
 			if (error != GL11.GL_NO_ERROR)
 			{
@@ -564,12 +569,11 @@ public class VeinsWindow
 			deltaTime = ((float) currentTime) - ((float) prevTime);
 			deltaTime /= 1000000000.0f;
 			prevTime = currentTime;
-			
+
 			disableInputTime -= deltaTime;
 			if (disableInputTime < 0)
 				disableInputTime = -1.0f;
 
-			m_escPressed = false;
 		}
 	}
 
@@ -654,17 +658,10 @@ public class VeinsWindow
 			Display.setTitle(title);
 	}
 
-	boolean wasEscapePressedAlready = false; // hackish but stupid input doesnt detect escape
 
 	// this must be called before nifty gui, otherwise nifty eats up events
 	public void pollNonModelControlInput()
 	{
-		// Doesn't detect escape otherwise
-		if ((Keyboard.getEventKey() == Keyboard.KEY_ESCAPE && Keyboard.getNumKeyboardEvents() > 0) || (wasEscapePressedAlready == false && Keyboard.getEventKey() == Keyboard.KEY_ESCAPE))
-		{
-			wasEscapePressedAlready = true;
-			screenController.OnEscapeKeyPressed();
-		}
 
 		while (Keyboard.next())
 		{
@@ -756,8 +753,8 @@ public class VeinsWindow
 
 		// if (!frame.isDialogOpened()) return; TODO NIFTY
 
-		float moveDeltaFactor = deltaTime * 10.0f;
-		float maxMoveSpeed = 20.0f;
+		float moveDeltaFactor = deltaTime * (float) settings.sensitivity;
+		float maxMoveSpeed = 200.0f;
 		if (moveDeltaFactor > maxMoveSpeed)
 			moveDeltaFactor = maxMoveSpeed;
 
@@ -865,7 +862,7 @@ public class VeinsWindow
 			}
 			else
 			{
-				renderer.getCamera().moveForward();
+				renderer.getCamera().moveForward(moveDeltaFactor);
 			}
 		}
 		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_DOWN))
@@ -877,7 +874,7 @@ public class VeinsWindow
 			}
 			else
 			{
-				renderer.getCamera().moveBackwards();
+				renderer.getCamera().moveBackwards(moveDeltaFactor);
 			}
 		}
 		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
@@ -889,7 +886,7 @@ public class VeinsWindow
 			}
 			else
 			{
-				renderer.getCamera().moveRight();
+				renderer.getCamera().moveRight(moveDeltaFactor);
 			}
 		}
 		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_LEFT))
@@ -901,7 +898,7 @@ public class VeinsWindow
 			}
 			else
 			{
-				renderer.getCamera().moveLeft();
+				renderer.getCamera().moveLeft(moveDeltaFactor);
 			}
 		}
 		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_R))
@@ -913,7 +910,7 @@ public class VeinsWindow
 			}
 			else
 			{
-				renderer.getCamera().moveUp();
+				renderer.getCamera().moveUp(moveDeltaFactor);
 			}
 		}
 		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_F))
@@ -925,7 +922,7 @@ public class VeinsWindow
 			}
 			else
 			{
-				renderer.getCamera().moveDown();
+				renderer.getCamera().moveDown(moveDeltaFactor);
 			}
 		}
 

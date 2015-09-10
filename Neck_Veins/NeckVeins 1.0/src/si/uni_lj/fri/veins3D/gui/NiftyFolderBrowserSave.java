@@ -86,8 +86,9 @@ public class NiftyFolderBrowserSave
 		// init foldertree
 		String currentPath = ".."; // current dir
 		m_root = new TreeItem<MyTreeFolderItem>();
-		m_root.setValue(new MyTreeFolderItem(".", "."));
-		createBranchesForFolder(m_treebox,currentPath, m_root);
+		
+		NiftyFolderBrowser.CreateTreeboxWorkingDirAndCustomPaths(m_treebox,m_root);
+		
 		m_treebox.setTree(m_root);
 	}
 	
