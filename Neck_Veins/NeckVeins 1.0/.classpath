@@ -45,5 +45,6 @@
 	<classpathentry kind="lib" path="libs/nifty-1.4.1/nifty-default-controls-1.4.1.jar"/>
 	<classpathentry kind="lib" path="libs/nifty-1.4.1/nifty-lwjgl-renderer-1.4.1.jar"/>
 	<classpathentry kind="lib" path="libs/nifty-1.4.1/nifty-style-black-1.4.1.jar"/>
+	<classpathentry kind="lib" path="libs/openjfx-78-backport-1.8.0-ea-b96.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

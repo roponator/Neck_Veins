@@ -793,7 +793,12 @@ public class NiftyScreenController extends DefaultScreenController
 			return;
 
 		prepareForSomeMenuOpen();
+		
+		
 		VeinsWindow.frame.setState(Frame.ICONIFIED);
+		
+		VeinsWindow.veinsWindow.ResizeWindow(VeinsWindow.currentDisplayMode, false); // must disable fullscreen first
+		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
 	}
 
 	public void onButton_TopMenu_Maximize(String a)
@@ -828,7 +833,7 @@ public class NiftyScreenController extends DefaultScreenController
 					DisplayMode displayModes[] = Display.getAvailableDisplayModes();
 					for (int i = 0; i < displayModes.length; ++i)
 					{
-						if (displayModes[i].getWidth() / 2 < dm.getWidth())
+						if (displayModes[i].getWidth() < (dm.getWidth() / 2) )
 						{
 							dm = displayModes[i];
 							break;

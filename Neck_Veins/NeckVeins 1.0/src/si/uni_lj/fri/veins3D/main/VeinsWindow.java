@@ -269,7 +269,9 @@ public class VeinsWindow
 		renderer = (VeinsRenderer) renderer;
 		currentDisplayMode = displayMode;
 
-		if (fullscreen == false)
+		DisplayMode largestDM = GetLargestDisplayMode();
+		
+		if (fullscreen == false && displayMode.getWidth() < largestDM.getWidth() && displayMode.getHeight() < largestDM.getHeight())
 			m_lastWindowedResoltuon = displayMode;
 
 		try
