@@ -2,6 +2,7 @@ package si.uni_lj.fri.veins3D.main;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -43,6 +44,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -270,7 +272,7 @@ public class VeinsWindow
 		currentDisplayMode = displayMode;
 
 		DisplayMode largestDM = GetLargestDisplayMode();
-		
+
 		if (fullscreen == false && displayMode.getWidth() < largestDM.getWidth() && displayMode.getHeight() < largestDM.getHeight())
 			m_lastWindowedResoltuon = displayMode;
 
@@ -357,26 +359,47 @@ public class VeinsWindow
 	/**
 	 * 
 	 */
+	
+	  public void removeMinMaxClose(Component comp)
+	  {
+	    if(comp instanceof AbstractButton)
+	    {
+	      comp.getParent().remove(comp);
+	    }
+	    if (comp instanceof Container)
+	    {
+	      Component[] comps = ((Container)comp).getComponents();
+	      for(int x = 0, y = comps.length; x < y; x++)
+	      {
+	        removeMinMaxClose(comps[x]);
+	      }
+	    }
+	  }
+
 
 	private void createDisplay()
 	{
 		try
 		{
+			//JFrame.setDefaultLookAndFeelDecorated(true);
 			frame = new Frame("Med3D");
+			
 			frame.setLayout(new BorderLayout());
+		
 			final Canvas canvas = new Canvas();
 			frame.add(canvas, BorderLayout.CENTER);
 
 			frame.setPreferredSize(new Dimension(currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
 			frame.setSize(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
 			frame.setUndecorated(true); // here
-
+			//removeMinMaxClose(frame);
+			
 			frame.pack();
 			frame.setVisible(true);
-
+			
 			// Set new icon
 			setNewIcon(frame);
-
+			
 			Display.setParent(canvas);
 			// -Dorg.lwjgl.opengl.Window.undecorated=true
 
@@ -474,109 +497,106 @@ public class VeinsWindow
 
 	public void mainLoop()
 	{
-		fps = 0;
-		timePastFrame = (Sys.getTime() * 1000) / Sys.getTimerResolution();
-		timePastFps = timePastFrame;
-		fpsToDisplay = 0;
-
-		long prevTime = System.nanoTime();
 
 		while (isRunning)
 		{
-			// Input disable for a couple of frames
-			if (screenController.m_dragWindow || screenController.getState() != GUI_STATE.DEFAULT || screenController == null)
-				disableInputTime = 0.3f;
-
-			canModelBeRotatedByMouse = true; // reset
-
-			// handle subdiv increase
-			if (increaseSubdivLevel && VeinsWindow.renderer.veinsModel != null)
-				VeinsWindow.renderer.veinsModel.increaseSubdivisionDepth();
-
-			if (decreaseSubdivLevel && VeinsWindow.renderer.veinsModel != null)
-				VeinsWindow.renderer.veinsModel.decreaseSubdivisionDepth();
-
-			increaseSubdivLevel = false;
-			decreaseSubdivLevel = false;
-
-			// Detect on down click after it was up (NOT DOWN->UP!)
-			boolean wasLeftMouseDownClicked = false;
-			if (Mouse.isButtonDown(0) == true && m_wasMouseLeftUp == true)
-				wasLeftMouseDownClicked = true;
-
-			m_wasMouseLeftUp = !Mouse.isButtonDown(0);
-
-			// Strange render loop
-
-			// Doesn't detect escape otherwise
-			if ((Keyboard.getEventKey() == Keyboard.KEY_ESCAPE && Keyboard.getNumKeyboardEvents() > 0) || (wasEscapePressedAlready == false && Keyboard.getEventKey() == Keyboard.KEY_ESCAPE))
-			{
-				wasEscapePressedAlready = true;
-				screenController.OnEscapeKeyPressed();
-			}
-
-
-			// non model input must be before nifty (BUT MUST BE DISABLED IF SOME DIALOG IS OPENED OTHERWISE NIFTY
-			// DOESN'T GET INPUT (EF GOR SAVE DIALOG FILE NAME TEXTBOX)
-			if (screenController.getState() == GUI_STATE.DEFAULT)
-			{
-				pollNonModelControlInput();
-			}
-
-			// NIFTY LOGIC MUST BE RAN BEFORE GAME INPUT LOGIC BECAUSE OF INPUT!
-			if (wasLeftMouseDownClicked)
-			{
-				screenController.onMouseLeftDownClicked();
-			}
-
-			nifty.update();
-
-			// model input must be after nifty
-			disableInput = disableInputTime > 0;
-			pollModelInput(wasLeftMouseDownClicked);
-
-			renderer.switchWireframe(wire);
-
-			// hud.setClickedOn(clickedOn);
-			renderer.setupView(); // raycast volume renderer changes some states, theys must be reset
-			renderer.clearView();
-
-			// glPushAttrib(GL_ALL_ATTRIB_BITS);
-			renderer.render();
-			// glPopAttrib();
-
-			// hud.drawHUD();
-			// setTitle();
-
-			// TODO: PRESENT ORDER: BEFORE OR AFTER NIFTY.RENDER?
-			// Display.update();
-
-			renderNiftyGUI();
-
-			Display.update();
-
-			logic();
-
-			Display.sync(settings.frequency); // TODO NIFTY
-
-			int error = GL11.glGetError();
-			if (error != GL11.GL_NO_ERROR)
-			{
-				String glerrmsg = GLU.gluErrorString(error);
-				System.err.println(glerrmsg);
-			}
-
-			// prepare for next frame
-			long currentTime = System.nanoTime();
-			deltaTime = ((float) currentTime) - ((float) prevTime);
-			deltaTime /= 1000000000.0f;
-			prevTime = currentTime;
-
-			disableInputTime -= deltaTime;
-			if (disableInputTime < 0)
-				disableInputTime = -1.0f;
-
+			UpdateLogicAndRenderSingleFrame();
 		}
+	}
+
+	public void UpdateLogicAndRenderSingleFrame()
+	{
+		// Input disable for a couple of frames
+		if (screenController.m_dragWindow || screenController.getState() != GUI_STATE.DEFAULT || screenController == null)
+			disableInputTime = 0.3f;
+
+		canModelBeRotatedByMouse = true; // reset
+
+		// handle subdiv increase
+		if (increaseSubdivLevel && VeinsWindow.renderer.veinsModel != null)
+			VeinsWindow.renderer.veinsModel.increaseSubdivisionDepth();
+
+		if (decreaseSubdivLevel && VeinsWindow.renderer.veinsModel != null)
+			VeinsWindow.renderer.veinsModel.decreaseSubdivisionDepth();
+
+		increaseSubdivLevel = false;
+		decreaseSubdivLevel = false;
+
+		// Detect on down click after it was up (NOT DOWN->UP!)
+		boolean wasLeftMouseDownClicked = false;
+		if (Mouse.isButtonDown(0) == true && m_wasMouseLeftUp == true)
+			wasLeftMouseDownClicked = true;
+
+		m_wasMouseLeftUp = !Mouse.isButtonDown(0);
+
+		// Strange render loop
+
+		// Doesn't detect escape otherwise
+		if ((Keyboard.getEventKey() == Keyboard.KEY_ESCAPE && Keyboard.getNumKeyboardEvents() > 0) || (wasEscapePressedAlready == false && Keyboard.getEventKey() == Keyboard.KEY_ESCAPE))
+		{
+			wasEscapePressedAlready = true;
+			screenController.OnEscapeKeyPressed();
+		}
+
+		// non model input must be before nifty (BUT MUST BE DISABLED IF SOME DIALOG IS OPENED OTHERWISE NIFTY
+		// DOESN'T GET INPUT (EF GOR SAVE DIALOG FILE NAME TEXTBOX)
+		if (screenController.getState() == GUI_STATE.DEFAULT)
+		{
+			pollNonModelControlInput();
+		}
+
+		// NIFTY LOGIC MUST BE RAN BEFORE GAME INPUT LOGIC BECAUSE OF INPUT!
+		if (wasLeftMouseDownClicked)
+		{
+			screenController.onMouseLeftDownClicked();
+		}
+
+		nifty.update();
+
+		// model input must be after nifty
+		disableInput = disableInputTime > 0;
+		pollModelInput(wasLeftMouseDownClicked);
+
+		renderer.switchWireframe(wire);
+
+		// hud.setClickedOn(clickedOn);
+		renderer.setupView(); // raycast volume renderer changes some states, theys must be reset
+		renderer.clearView();
+
+		// glPushAttrib(GL_ALL_ATTRIB_BITS);
+		renderer.render();
+		// glPopAttrib();
+
+		// hud.drawHUD();
+		// setTitle();
+
+		// TODO: PRESENT ORDER: BEFORE OR AFTER NIFTY.RENDER?
+		// Display.update();
+
+		renderNiftyGUI();
+
+		Display.update();
+
+		logic();
+
+		Display.sync(settings.frequency); // TODO NIFTY
+
+		int error = GL11.glGetError();
+		if (error != GL11.GL_NO_ERROR)
+		{
+			String glerrmsg = GLU.gluErrorString(error);
+			System.err.println(glerrmsg);
+		}
+
+		// prepare for next frame
+		long currentTime = System.nanoTime();
+		deltaTime = ((float) currentTime) - ((float) prevTime);
+		deltaTime /= 1000000000.0f;
+		prevTime = currentTime;
+
+		disableInputTime -= deltaTime;
+		if (disableInputTime < 0)
+			disableInputTime = -1.0f;
 	}
 
 	public void RenderSingleFrameWithoutModel()
@@ -659,7 +679,6 @@ public class VeinsWindow
 		else
 			Display.setTitle(title);
 	}
-
 
 	// this must be called before nifty gui, otherwise nifty eats up events
 	public void pollNonModelControlInput()

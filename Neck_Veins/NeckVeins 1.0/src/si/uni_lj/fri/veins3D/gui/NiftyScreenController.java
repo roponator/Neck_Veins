@@ -794,11 +794,12 @@ public class NiftyScreenController extends DefaultScreenController
 
 		prepareForSomeMenuOpen();
 		
-		
-		VeinsWindow.frame.setState(Frame.ICONIFIED);
-		
 		VeinsWindow.veinsWindow.ResizeWindow(VeinsWindow.currentDisplayMode, false); // must disable fullscreen first
-		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();
+		
+		// MUST BE DONE OR YOU CANT DE-MINIMIZE IT FROM TASKBAR, NO IDEA WHY, PROBABLY HAS TO FLUSH DISPLAY OR SOMETHING
+		VeinsWindow.veinsWindow.UpdateLogicAndRenderSingleFrame();
+	
+		VeinsWindow.frame.setState(Frame.ICONIFIED);			
 	}
 
 	public void onButton_TopMenu_Maximize(String a)
