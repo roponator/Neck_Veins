@@ -1,0 +1,1198 @@
+Loading settings file succeded.
+Sep 14, 2015 2:46:07 PM de.lessvoid.nifty.render.batch.BatchRenderBackendInternal useHighQualityTextures
+INFO: Using low quality textures (no filtering).
+Sep 14, 2015 2:46:07 PM de.lessvoid.nifty.render.batch.BatchRenderBackendInternal fillRemovedImagesInAtlas
+INFO: Not filling in removed images in atlas.
+Sep 14, 2015 2:46:07 PM de.lessvoid.nifty.render.batch.BatchRenderDevice createTextureAtlas
+INFO: Created a new texture atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:07 PM de.lessvoid.nifty.render.batch.BatchRenderDevice nextTextureAtlas
+INFO: Switched atlases to atlas texture with id: 1.
+**NIFTY FROM XML*********************
+Sep 14, 2015 2:46:07 PM de.lessvoid.nifty.render.batch.BatchRenderBackendInternal createCursor
+WARNING: Could not create mouse cursor [textfield/mouse-cursor-textfield.png]
+java.io.IOException: org.lwjgl.LWJGLException: Native cursors not supported
+	at de.lessvoid.nifty.renderer.lwjgl.render.LwjglMouseCursor.<init>(LwjglMouseCursor.java:42)
+	at de.lessvoid.nifty.renderer.lwjgl.render.LwjglMouseCursorFactory.create(LwjglMouseCursorFactory.java:23)
+	at de.lessvoid.nifty.render.batch.BatchRenderBackendInternal.createCursor(BatchRenderBackendInternal.java:599)
+	at de.lessvoid.nifty.render.batch.BatchRenderBackendInternal.createMouseCursor(BatchRenderBackendInternal.java:147)
+	at de.lessvoid.nifty.render.batch.BatchRenderDevice.createMouseCursor(BatchRenderDevice.java:487)
+	at de.lessvoid.nifty.render.NiftyMouseImpl.registerMouseCursor(NiftyMouseImpl.java:50)
+	at de.lessvoid.nifty.loaderv2.types.RegisterMouseCursorType.materialize(RegisterMouseCursorType.java:20)
+	at de.lessvoid.nifty.loaderv2.types.NiftyStylesType.loadStyles(NiftyStylesType.java:50)
+	at de.lessvoid.nifty.loaderv2.NiftyLoader.loadStyleFile(NiftyLoader.java:179)
+	at de.lessvoid.nifty.loaderv2.types.UseStylesType.loadStyle(UseStylesType.java:29)
+	at de.lessvoid.nifty.loaderv2.types.NiftyStylesType.loadStyles(NiftyStylesType.java:53)
+	at de.lessvoid.nifty.loaderv2.NiftyLoader.loadStyleFile(NiftyLoader.java:179)
+	at de.lessvoid.nifty.loaderv2.types.UseStylesType.loadStyle(UseStylesType.java:29)
+	at de.lessvoid.nifty.loaderv2.types.NiftyType.loadStyles(NiftyType.java:156)
+	at de.lessvoid.nifty.loaderv2.NiftyLoader.loadNiftyXml(NiftyLoader.java:109)
+	at de.lessvoid.nifty.Nifty.loadFromStream(Nifty.java:672)
+	at de.lessvoid.nifty.Nifty.fromXml(Nifty.java:558)
+	at si.uni_lj.fri.veins3D.main.VeinsWindow.initNiftyAndGUI(VeinsWindow.java:297)
+	at si.uni_lj.fri.veins3D.main.VeinsWindow.init(VeinsWindow.java:217)
+	at si.uni_lj.fri.veins3D.main.VeinsWindow.<init>(VeinsWindow.java:187)
+	at si.uni_lj.fri.veins3D.main.Main.main(Main.java:72)
+Caused by: org.lwjgl.LWJGLException: Native cursors not supported
+	at org.lwjgl.input.Cursor.<init>(Cursor.java:88)
+	at de.lessvoid.nifty.renderer.lwjgl.render.LwjglMouseCursor.<init>(LwjglMouseCursor.java:40)
+	... 20 more
+
+Sep 14, 2015 2:46:07 PM de.lessvoid.nifty.render.NiftyMouseImpl registerMouseCursor
+WARNING: Your RenderDevice does not support the createMouseCursor() method. Mouse cursors can't be changed.
+Sep 14, 2015 2:46:07 PM de.lessvoid.nifty.render.batch.BatchRenderBackendInternal createCursor
+WARNING: Could not create mouse cursor [textfield/mouse-cursor-textfield.png]
+java.io.IOException: org.lwjgl.LWJGLException: Native cursors not supported
+	at de.lessvoid.nifty.renderer.lwjgl.render.LwjglMouseCursor.<init>(LwjglMouseCursor.java:42)
+	at de.lessvoid.nifty.renderer.lwjgl.render.LwjglMouseCursorFactory.create(LwjglMouseCursorFactory.java:23)
+	at de.lessvoid.nifty.render.batch.BatchRenderBackendInternal.createCursor(BatchRenderBackendInternal.java:599)
+	at de.lessvoid.nifty.render.batch.BatchRenderBackendInternal.createMouseCursor(BatchRenderBackendInternal.java:147)
+	at de.lessvoid.nifty.render.batch.BatchRenderDevice.createMouseCursor(BatchRenderDevice.java:487)
+	at de.lessvoid.nifty.render.NiftyMouseImpl.registerMouseCursor(NiftyMouseImpl.java:50)
+	at de.lessvoid.nifty.loaderv2.types.RegisterMouseCursorType.materialize(RegisterMouseCursorType.java:20)
+	at de.lessvoid.nifty.loaderv2.types.NiftyStylesType.loadStyles(NiftyStylesType.java:50)
+	at de.lessvoid.nifty.loaderv2.NiftyLoader.loadStyleFile(NiftyLoader.java:179)
+	at de.lessvoid.nifty.loaderv2.types.UseStylesType.loadStyle(UseStylesType.java:29)
+	at de.lessvoid.nifty.loaderv2.types.NiftyStylesType.loadStyles(NiftyStylesType.java:53)
+	at de.lessvoid.nifty.loaderv2.NiftyLoader.loadStyleFile(NiftyLoader.java:179)
+	at de.lessvoid.nifty.loaderv2.types.UseStylesType.loadStyle(UseStylesType.java:29)
+	at de.lessvoid.nifty.loaderv2.types.NiftyType.loadStyles(NiftyType.java:156)
+	at de.lessvoid.nifty.loaderv2.NiftyLoader.loadNiftyXml(NiftyLoader.java:109)
+	at de.lessvoid.nifty.Nifty.loadFromStream(Nifty.java:672)
+	at de.lessvoid.nifty.Nifty.fromXml(Nifty.java:558)
+	at si.uni_lj.fri.veins3D.main.VeinsWindow.initNiftyAndGUI(VeinsWindow.java:297)
+	at si.uni_lj.fri.veins3D.main.VeinsWindow.init(VeinsWindow.java:217)
+	at si.uni_lj.fri.veins3D.main.VeinsWindow.<init>(VeinsWindow.java:187)
+	at si.uni_lj.fri.veins3D.main.Main.main(Main.java:72)
+Caused by: org.lwjgl.LWJGLException: Native cursors not supported
+	at org.lwjgl.input.Cursor.<init>(Cursor.java:88)
+	at de.lessvoid.nifty.renderer.lwjgl.render.LwjglMouseCursor.<init>(LwjglMouseCursor.java:40)
+	... 20 more
+
+Sep 14, 2015 2:46:07 PM de.lessvoid.nifty.render.NiftyMouseImpl registerMouseCursor
+WARNING: Your RenderDevice does not support the createMouseCursor() method. Mouse cursors can't be changed.
+Sep 14, 2015 2:46:07 PM de.lessvoid.nifty.render.batch.BatchRenderBackendInternal createCursor
+WARNING: Could not create mouse cursor [textfield/mouse-cursor-textfield.png]
+java.io.IOException: org.lwjgl.LWJGLException: Native cursors not supported
+	at de.lessvoid.nifty.renderer.lwjgl.render.LwjglMouseCursor.<init>(LwjglMouseCursor.java:42)
+	at de.lessvoid.nifty.renderer.lwjgl.render.LwjglMouseCursorFactory.create(LwjglMouseCursorFactory.java:23)
+	at de.lessvoid.nifty.render.batch.BatchRenderBackendInternal.createCursor(BatchRenderBackendInternal.java:599)
+	at de.lessvoid.nifty.render.batch.BatchRenderBackendInternal.createMouseCursor(BatchRenderBackendInternal.java:147)
+	at de.lessvoid.nifty.render.batch.BatchRenderDevice.createMouseCursor(BatchRenderDevice.java:487)
+	at de.lessvoid.nifty.render.NiftyMouseImpl.registerMouseCursor(NiftyMouseImpl.java:50)
+	at de.lessvoid.nifty.loaderv2.types.RegisterMouseCursorType.materialize(RegisterMouseCursorType.java:20)
+	at de.lessvoid.nifty.loaderv2.types.NiftyStylesType.loadStyles(NiftyStylesType.java:50)
+	at de.lessvoid.nifty.loaderv2.NiftyLoader.loadStyleFile(NiftyLoader.java:179)
+	at de.lessvoid.nifty.loaderv2.types.UseStylesType.loadStyle(UseStylesType.java:29)
+	at de.lessvoid.nifty.loaderv2.types.NiftyType.loadStyles(NiftyType.java:156)
+	at de.lessvoid.nifty.loaderv2.NiftyLoader.loadNiftyXml(NiftyLoader.java:109)
+	at de.lessvoid.nifty.Nifty.loadFromStream(Nifty.java:672)
+	at de.lessvoid.nifty.Nifty.fromXml(Nifty.java:558)
+	at si.uni_lj.fri.veins3D.main.VeinsWindow.initNiftyAndGUI(VeinsWindow.java:297)
+	at si.uni_lj.fri.veins3D.main.VeinsWindow.init(VeinsWindow.java:217)
+	at si.uni_lj.fri.veins3D.main.VeinsWindow.<init>(VeinsWindow.java:187)
+	at si.uni_lj.fri.veins3D.main.Main.main(Main.java:72)
+Caused by: org.lwjgl.LWJGLException: Native cursors not supported
+	at org.lwjgl.input.Cursor.<init>(Cursor.java:88)
+	at de.lessvoid.nifty.renderer.lwjgl.render.LwjglMouseCursor.<init>(LwjglMouseCursor.java:40)
+	... 17 more
+
+Sep 14, 2015 2:46:07 PM de.lessvoid.nifty.render.NiftyMouseImpl registerMouseCursor
+WARNING: Your RenderDevice does not support the createMouseCursor() method. Mouse cursors can't be changed.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-panel was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-panel-red was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-panel-no-shadow was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-panel-red-no-shadow was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-panel-simple was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-panel-bright was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-vertical-slider#panel was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-vertical-slider#up was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-vertical-slider#background was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-vertical-slider#down was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-vertical-slider#position was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-horizontal-slider#panel was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-horizontal-slider#left was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-horizontal-slider#right was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-horizontal-slider#background was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-horizontal-slider#position was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-listbox was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-listbox#scrollpanel was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-listbox#scrollpanel was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-horizontal-scrollbar#panel was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-listbox-item was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-textfield#panel was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-textfield#field was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-textfield#text was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-textfield#cursor-panel was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-textfield#cursor was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-vertical-scrollbar#panel was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-vertical-scrollbar#up was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-vertical-scrollbar#background was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-vertical-scrollbar#down was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-vertical-scrollbar#position was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-horizontal-scrollbar#panel was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-horizontal-scrollbar#left was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-horizontal-scrollbar#right was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-horizontal-scrollbar#background was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-horizontal-scrollbar#position was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-treebox-item was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-treebox-item#tree-item-icon-container was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-treebox-item#content was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-treebox-item#closed was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-treebox-item#opened was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-treebox-item#leaf was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-listbox#scrollpanel was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-button#panel was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-button#text was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-drop-down#panel was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-drop-down#panel-text was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-drop-down#text was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-drop-down#panel-icon was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-drop-down#icon was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-drop-down#list-panel was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.Nifty registerStyle
+WARNING: Style: nifty-drop-down#text-item was already registered. The new definition will override the previous.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderBackendInternal createImageFromFile
+WARNING: Could not load image from file: []
+java.io.IOException: Could not load image from stream as a buffered image!
+	at de.lessvoid.nifty.render.io.DefaultImageLoader.loadImageFromStream(DefaultImageLoader.java:109)
+	at de.lessvoid.nifty.render.io.DefaultImageLoader.loadAsByteBufferRGBA(DefaultImageLoader.java:74)
+	at de.lessvoid.nifty.render.batch.BatchRenderBackendInternal.createImageFromFile(BatchRenderBackendInternal.java:615)
+	at de.lessvoid.nifty.render.batch.BatchRenderBackendInternal.loadImage(BatchRenderBackendInternal.java:190)
+	at de.lessvoid.nifty.render.batch.BatchRenderDevice.createImage(BatchRenderDevice.java:287)
+	at de.lessvoid.nifty.render.NiftyImageManager.addImage(NiftyImageManager.java:150)
+	at de.lessvoid.nifty.render.NiftyImageManager.registerImage(NiftyImageManager.java:39)
+	at de.lessvoid.nifty.render.NiftyRenderEngineImpl.createImage(NiftyRenderEngineImpl.java:182)
+	at de.lessvoid.nifty.loaderv2.types.apply.ApplyRendererPanel.apply(ApplyRendererPanel.java:48)
+	at de.lessvoid.nifty.elements.Element.initializeFromAttributes(Element.java:376)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.applyAttributes(ElementType.java:257)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.applyStandard(ElementType.java:198)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.create(ElementType.java:161)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.create(ElementType.java:150)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.applyChildren(ElementType.java:289)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.applyStandard(ElementType.java:201)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.create(ElementType.java:161)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.create(ElementType.java:150)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.applyChildren(ElementType.java:289)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.applyStandard(ElementType.java:201)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.create(ElementType.java:161)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.create(ElementType.java:150)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.applyChildren(ElementType.java:289)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.applyStandard(ElementType.java:201)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.create(ElementType.java:161)
+	at de.lessvoid.nifty.loaderv2.types.ElementType.create(ElementType.java:150)
+	at de.lessvoid.nifty.loaderv2.types.ScreenType.create(ScreenType.java:105)
+	at de.lessvoid.nifty.loaderv2.types.NiftyType.create(NiftyType.java:149)
+	at de.lessvoid.nifty.Nifty.loadFromStream(Nifty.java:673)
+	at de.lessvoid.nifty.Nifty.fromXml(Nifty.java:558)
+	at si.uni_lj.fri.veins3D.main.VeinsWindow.initNiftyAndGUI(VeinsWindow.java:297)
+	at si.uni_lj.fri.veins3D.main.VeinsWindow.init(VeinsWindow.java:217)
+	at si.uni_lj.fri.veins3D.main.VeinsWindow.<init>(VeinsWindow.java:187)
+	at si.uni_lj.fri.veins3D.main.Main.main(Main.java:72)
+
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.loaderv2.types.apply.Convert horizontalAlign
+WARNING: Illegal value for horizontal align: "top"
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.loaderv2.types.apply.Convert horizontalAlign
+WARNING: Illegal value for horizontal align: "top"
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.loaderv2.types.apply.Convert horizontalAlign
+WARNING: Illegal value for horizontal align: "top"
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\pngs720p\Med3D-22.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\pngs720p\Med3D-39.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\pngs720p\Med3D-47.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\pngs720p\settings_top.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/pngs720p/Med3D-50.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\pngs720p\Med3D-41.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/pngs720p/slider_down.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\new_gui\rect_gray_long_ver.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\pngs720p\Med3D-27.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/pngs720p/slider_left.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\pngs720p\about.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\pngs720p\settings_bottom.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderBackendInternal updateCurrentlyBoundGlTexture
+WARNING: Attempted to update sub-texture of currently bound OpenGL texture with null image data!
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/pngs720p/slider_right.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\pngs720p\Med3D-40.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/pngs720p/Med3D-49.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/col4.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\pngs720p\Med3D-25.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/pngs720p/Med3D-51.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/col3.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\pngs720p\Med3D-42.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/new_gui/rect_gray_short_ver.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/col2.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/col1.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/pngs720p/slider_up.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\pngs720p\Med3D-19.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/pngs720p/Med3D-36.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [textfield/cursor-empty.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\pngs720p\Med3D-26.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs\pngs720p\dropdown_list_arrow.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Content element of window not found. Window will not display properly.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Title element of window not found. Window will not display its head properly.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Close button of window not found. Window will not offer a control to close the window.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [IMAGE_ELEMENT] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Content element of window not found. Window will not display properly.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Title element of window not found. Window will not display its head properly.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Close button of window not found. Window will not offer a control to close the window.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:08 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [checkboxLabel] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [checkboxLabel] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [PADDING] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [PADDING] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Content element of window not found. Window will not display properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Title element of window not found. Window will not display its head properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Close button of window not found. Window will not offer a control to close the window.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Content element of window not found. Window will not display properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Title element of window not found. Window will not display its head properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Close button of window not found. Window will not offer a control to close the window.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [OPEN_DIALOG_FILE_TYPE_DROPDOWN] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [OPEN_DIALOG_FILE_TYPE_DROPDOWN#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [checkboxLabel] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Content element of window not found. Window will not display properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Title element of window not found. Window will not display its head properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Close button of window not found. Window will not offer a control to close the window.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Content element of window not found. Window will not display properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Title element of window not found. Window will not display its head properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Close button of window not found. Window will not offer a control to close the window.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [OPEN_DIALOG_FILES_LIST_LISTBOX] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [OPEN_DIALOG_FILES_LIST_LISTBOX#scrollpanel] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [OPEN_DIALOG_FILES_LIST_LISTBOX#scrollpanel#panel] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [OPEN_DIALOG_FILES_LIST_LISTBOX#scrollpanel#panel#child-root] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [OPEN_DIALOG_FILES_LIST_LISTBOX#scrollpanel#vertical-scrollbar] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [OPEN_DIALOG_FILES_LIST_LISTBOX#scrollpanel#vertical-scrollbar#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [OPEN_DIALOG_FILES_LIST_LISTBOX#scrollpanel#vertical-scrollbar#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [OPEN_DIALOG_FILES_LIST_LISTBOX#horizontal-scrollbar-parent] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [OPEN_DIALOG_FILES_LIST_LISTBOX#horizontal-scrollbar-parent#horizontal-scrollbar] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [OPEN_DIALOG_FILES_LIST_LISTBOX#horizontal-scrollbar-parent#horizontal-scrollbar#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [OPEN_DIALOG_FILES_LIST_LISTBOX#horizontal-scrollbar-parent#horizontal-scrollbar#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [OPEN_DIALOG_FILES_LIST_LISTBOX#horizontal-scrollbar-parent#bottom-right] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Content element of window not found. Window will not display properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Title element of window not found. Window will not display its head properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Close button of window not found. Window will not offer a control to close the window.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [checkboxLabel] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [checkboxLabel] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Content element of window not found. Window will not display properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Title element of window not found. Window will not display its head properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Close button of window not found. Window will not offer a control to close the window.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [checkboxLabel] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Content element of window not found. Window will not display properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Title element of window not found. Window will not display its head properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Close button of window not found. Window will not offer a control to close the window.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [b] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_TEXT_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_VALUE_LABEL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [SLIDER_CONTROL#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [checkboxLabel] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [appendButton#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Content element of window not found. Window will not display properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Title element of window not found. Window will not display its head properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Close button of window not found. Window will not offer a control to close the window.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Content element of window not found. Window will not display properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Title element of window not found. Window will not display its head properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Close button of window not found. Window will not offer a control to close the window.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [PADDING] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [PADDING] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [PADDING] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [PADDING] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [PADDING] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [PADDING] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [PADDING] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [PADDING] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Content element of window not found. Window will not display properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Title element of window not found. Window will not display its head properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Close button of window not found. Window will not offer a control to close the window.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [#text] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Content element of window not found. Window will not display properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Title element of window not found. Window will not display its head properly.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.controls.window.WindowControl bind
+SEVERE: Close button of window not found. Window will not offer a control to close the window.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.loaderv2.types.ControlType internalApplyControl
+WARNING: controlDefinition [] missing.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.loaderv2.types.ControlType internalApplyControl
+WARNING: controlDefinition [] missing.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.loaderv2.types.ControlType internalApplyControl
+WARNING: controlDefinition [] missing.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.loaderv2.types.ControlType internalApplyControl
+WARNING: controlDefinition [] missing.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#panel] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#panel#child-root] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#panel#child-root#treeBox-item] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#panel#child-root#treeBox-item#tree-item-spacer] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#panel#child-root#treeBox-item#tree-item-icon-container] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#panel#child-root#treeBox-item#tree-item-icon-container#tree-item-icon] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#panel#child-root#treeBox-item#tree-item-content] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#vertical-scrollbar] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#vertical-scrollbar#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#vertical-scrollbar#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#horizontal-scrollbar-parent] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#horizontal-scrollbar-parent#horizontal-scrollbar] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#horizontal-scrollbar-parent#horizontal-scrollbar#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#horizontal-scrollbar-parent#horizontal-scrollbar#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#horizontal-scrollbar-parent#bottom-right] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.loaderv2.types.ControlType internalApplyControl
+WARNING: controlDefinition [] missing.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.loaderv2.types.ControlType internalApplyControl
+WARNING: controlDefinition [] missing.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#panel] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#panel#child-root] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#panel#child-root#treeBox-item] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#panel#child-root#treeBox-item#tree-item-spacer] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#panel#child-root#treeBox-item#tree-item-icon-container] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#panel#child-root#treeBox-item#tree-item-icon-container#tree-item-icon] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#panel#child-root#treeBox-item#tree-item-content] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#vertical-scrollbar] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#vertical-scrollbar#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#scrollpanel#vertical-scrollbar#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#horizontal-scrollbar-parent] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#horizontal-scrollbar-parent#horizontal-scrollbar] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#horizontal-scrollbar-parent#horizontal-scrollbar#background] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#horizontal-scrollbar-parent#horizontal-scrollbar#background#position] detected. Consider making all Ids unique or use #id in control-definitions.
+Sep 14, 2015 2:46:09 PM de.lessvoid.nifty.screen.Screen registerElementId
+WARNING: Possible conflicting id [tree-box#listbox#horizontal-scrollbar-parent#bottom-right] detected. Consider making all Ids unique or use #id in control-definitions.
+BIND***************
+**NIFTY FROM XML DONE*********************
+Mon Sep 14 14:46:09 CEST 2015 INFO:Use Java PNG Loader = true
+Loading: net.java.games.input.OSXEnvironmentPlugin
+No SpaceNavigator was found.
+Sep 14, 2015 2:46:10 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/logo.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:10 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [de/lessvoid/nifty/render/batch/nifty.png] uploaded to atlas (atlas texture id: 1).
+START***************
+Sep 14, 2015 2:46:10 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [fonts/aurulent-sans-16_0.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:10 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [fonts/aurulent-sans-16-bold_0.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:10 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [aurulent-sans-16_0.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:10 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [fonts/aurulent-sans_small_0.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:12 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/pngs720p/Med3D-32.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:12 PM de.lessvoid.nifty.render.batch.BatchRenderImage uploadImageToAtlas
+INFO: Image [imgs/pngs720p/Med3D-29.png] uploaded to atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:12 PM de.lessvoid.nifty.render.batch.BatchRenderImage unloadImageFromAtlas
+INFO: Image [imgs/pngs720p/Med3D-32.png] unloaded from texture atlas (atlas texture id: 1).
+Sep 14, 2015 2:46:13 PM de.lessvoid.nifty.render.batch.BatchRenderImage unloadImageFromAtlas
+INFO: Image [imgs/pngs720p/Med3D-29.png] unloaded from texture atlas (atlas texture id: 1).

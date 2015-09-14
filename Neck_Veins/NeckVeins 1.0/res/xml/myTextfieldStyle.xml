@@ -7,7 +7,7 @@
     <style id="nifty-textfield#panel">
         <attributes childLayout="overlay" height="23px"/>
         <effect>
-            <onHover name="changeMouseCursor" id="textFieldCursor"/>
+            
             <onHover name="border" color="#4cb4b3ff" post="true"/>
         </effect>
     </style>

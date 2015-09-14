@@ -69,7 +69,11 @@ public class ModelCreator {
 	 * @throws LWJGLException
 	 */
 
-	public static Object[] createModel(String fileName) throws LWJGLException {
+	public static Object[] createModel(String fileName) throws LWJGLException 
+	{
+		fileName = fileName.replace("\\","/");
+		fileName = fileName.replace("/", "//");
+		
 		m_fileName = fileName;
 		
 		// create mesh info

@@ -52,7 +52,30 @@
 	
   	<screen id="GScreen0"  controller="si.uni_lj.fri.veins3D.gui.NiftyScreenController">
   
-  	         	
+		 <!-- ******************************************* -->
+		 <!-- bottom status bar -->
+		 <!-- ******************************************* -->
+		 <layer id="" childLayout="absolute">
+			 <panel renderOrder="-10" childLayout="vertical"  height="100%" width="100%" style="STYLE_COMMON_INVISIBLE"  valign="bottom" align="right" >
+		  	   
+		  	   <panel childLayout="vertical"  height="*" width="100%" style="STYLE_COMMON_INVISIBLE"  valign="bottom" align="right" />
+		  	   
+		  	   <panel childLayout="horizontal">
+		  	   		<panel childLayout="vertical"  height="100%" width="20px" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left" />	   		
+		  	   		<panel id="" childLayout="horizontal"  width="100.0%" height="24px" style="STYLE_COMMON_INVISIBLE"  valign="bottom" align="right" backgroundImage="imgs/col3.png" >         	   			               		        	             
+					   <effect>
+					    <onActive name="border" border="1px,1px,1px,1px" color="#000000ff" timeType="infinite"/>
+					  </effect>		  			 
+					  <control childLayout="vertical" name="label" color="#ff0000ff" id="STATUS_BAR_TEXT" style="STYLE_TOP_MENU_DROPDOWN_BUTTON_LABEL" margin="0px,0px,0px,0px" width="*"  height="100.0%" text="" font="aurulent-sans-16.fnt" textHAlign="right"/>                           			   		 
+				      <panel childLayout="vertical"  height="100%" width="4px" style="STYLE_COMMON_INVISIBLE"  valign="center" align="left" />	  	   
+					</panel>
+				
+		  	   </panel>
+		  	   
+			</panel>
+	  	 </layer>
+	  	   	
+	  	   	
         <!-- ******************************************* -->
 		<!-- LAYER: NAVIGATION WIDGETS -->
 		<!-- ******************************************* -->
@@ -103,8 +126,7 @@
                   
                 </panel>
             
-                                 	               
-	                  
+                                 	               	                  
 		          <effect>
 		            	 <onCustom customKey="openSettingsSideMenu" name="move" direction="left" mode="in" length="100" timeType="exp" factor="3" />
 		            	 <onCustom customKey="closeSettingsSideMenu" name="move" direction="left" mode="out" length="100" timeType="exp" factor="3"  post="true" neverStopRendering="true" onEndEffect="onEffectEnd_SettingsSideMenuClose()"/>
@@ -411,12 +433,12 @@
 	         		          		  	     
 	  	     
 	  	 <!-- ******************************************* -->
-		 <!-- TEMP: license dialog -->
+		 <!-- license dialog -->
 		 <!-- ******************************************* -->
 	  	   
 	      <control id="MY_LICENSE_DIALOG" name="MY_LICENSE_DIALOG_CONTROL" x="40%" y="30%" visible="false"  childLayout="vertical" width="320px" height="330px" valign="center" align="center" />
 	     
-
+	
       <!-- END DIALOG LAYER -->
       </layer>   
         

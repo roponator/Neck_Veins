@@ -22,6 +22,7 @@ import org.lwjgl.opencl.CLCapabilities;
 import org.lwjgl.opencl.CLPlatform;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GLContext;
 
 import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyFileExtensionItem;
 import si.uni_lj.fri.veins3D.gui.NiftyFolderBrowser.MyTreeFolderItem;
@@ -215,6 +216,11 @@ public class NiftyScreenController extends DefaultScreenController
 	de.lessvoid.nifty.controls.CheckBox m_navWidgetWASDCheckbox = null;
 	de.lessvoid.nifty.controls.CheckBox m_navWidgetARROWSCheckbox = null;
 
+	// ---------------------------------------
+	// Status bar
+	// ---------------------------------------
+	public Label m_statusBarLabel = null;
+	
 	// -----------------------------------
 	// Init
 	// -----------------------------------
@@ -244,6 +250,11 @@ public class NiftyScreenController extends DefaultScreenController
 
 		m_darkeningPanelForDialog = nifty.getScreen("GScreen0").findElementById("DARKENING_PANEL_FOR_DIALOG");
 
+		// ---------------------------------------
+		// Status bar
+		// ---------------------------------------
+		m_statusBarLabel = nifty.getScreen("GScreen0").findElementById("STATUS_BAR_TEXT").getAttachedInputControl().getControl(LabelControl.class);
+		
 		// ---------------------------------------
 		// Loading bar dialog
 		// ---------------------------------------
@@ -794,12 +805,16 @@ public class NiftyScreenController extends DefaultScreenController
 
 		prepareForSomeMenuOpen();
 		
+		VeinsWindow.veinsWindow.UpdateLogicAndRenderSingleFrame();
+				
 		VeinsWindow.veinsWindow.ResizeWindow(VeinsWindow.currentDisplayMode, false); // must disable fullscreen first
 		
 		// MUST BE DONE OR YOU CANT DE-MINIMIZE IT FROM TASKBAR, NO IDEA WHY, PROBABLY HAS TO FLUSH DISPLAY OR SOMETHING
 		VeinsWindow.veinsWindow.UpdateLogicAndRenderSingleFrame();
 	
-		VeinsWindow.frame.setState(Frame.ICONIFIED);			
+		VeinsWindow.frame.setState(Frame.ICONIFIED);	
+		
+		
 	}
 
 	public void onButton_TopMenu_Maximize(String a)
@@ -809,11 +824,12 @@ public class NiftyScreenController extends DefaultScreenController
 
 		prepareForSomeMenuOpen();
 
-		// get display mode with largest height
-
+		VeinsWindow.veinsWindow.UpdateLogicAndRenderSingleFrame();
+		
 		// maximize it or make it smaller
 		if (VeinsWindow.IsMaximized() == false)
 		{
+			System.out.println(VeinsWindow.GetLargestDisplayMode().getHeight());
 			VeinsWindow.veinsWindow.ResizeWindow(VeinsWindow.GetLargestDisplayMode(), true);
 		}
 		else
@@ -852,6 +868,8 @@ public class NiftyScreenController extends DefaultScreenController
 
 			VeinsWindow.veinsWindow.ResizeWindow(dm, false);
 		}
+		
+		VeinsWindow.veinsWindow.UpdateLogicAndRenderSingleFrame();
 	}
 
 	public void onButton_TopMenu_Close(String a)
@@ -1092,7 +1110,8 @@ public class NiftyScreenController extends DefaultScreenController
 
 	public void onButton_OpenDialog_Open()
 	{
-		System.out.println("onButton_OpenDialog_Open");
+		m_statusBarLabel.setText("");
+		
 		SelectedFile file = m_openDialog.m_folderBrowser.TryOpeningSelectedFile();
 
 		On_OpenDialog_Close("");
@@ -1129,18 +1148,21 @@ public class NiftyScreenController extends DefaultScreenController
 			try
 			{
 				// try fast methods (gpu marching cubes)
-				VeinsWindow.renderer.loadModelRaw(file.fullFilePathAndName, modelType, false);
+ 				VeinsWindow.renderer.loadModelRaw(file.fullFilePathAndName, modelType, false);
 			}
 			catch (Exception e)
 			{
+				m_statusBarLabel.setText("Warning: using safe mode, file may not be loaded!");
+				
 				// try fallback methods (cpu marching cubes, slower)
 				System.out.println("WARNING: onButton_OpenDialog_Open: trying to load the model in safe mode, GPU mode probably failed");
 				try
 				{
 					VeinsWindow.renderer.loadModelRaw(file.fullFilePathAndName, modelType, true);
 				}
-				catch (LWJGLException e1)
+				catch (Exception e1)
 				{
+					m_statusBarLabel.setText("Warning: file load failed!");			
 					System.out.println("WARNING: onButton_OpenDialog_Open: can't load model, problem with the file you try to load?");
 				}
 			}
@@ -1149,7 +1171,10 @@ public class NiftyScreenController extends DefaultScreenController
 		// OBJ load
 		if (file != null && file.extensionOnly.compareTo("obj") == 0)
 		{
-			VeinsWindow.renderer.loadModelObj(file.fullFilePathAndName);
+			
+				VeinsWindow.renderer.loadModelObj(file.fullFilePathAndName);
+			
+			
 		}
 
 		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();

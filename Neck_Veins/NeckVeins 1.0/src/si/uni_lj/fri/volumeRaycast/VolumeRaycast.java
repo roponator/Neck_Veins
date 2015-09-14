@@ -215,9 +215,6 @@ public class VolumeRaycast
 		catch (Exception e)
 		{
 			System.out.println("VolumeRaycast: " + e.toString());
-			if (clContext != null)
-				clReleaseContext(clContext);
-			Display.destroy();
 			throw new RuntimeException(e);
 		}
 
@@ -308,12 +305,7 @@ public class VolumeRaycast
 	float[] loadGradient(String gradientFile)
 	{
 		float[] gradRawArray=null;
-		
-		//File f=new File(gradientFile);		
-		//File f2=new File("//"+gradientFile);	
-		//URI a=f.toURI();
-		//URI b=f2.toURI();
-		
+	
 		ClassLoader classLoader = getClass().getClassLoader();
 		//URI uri;
 		try

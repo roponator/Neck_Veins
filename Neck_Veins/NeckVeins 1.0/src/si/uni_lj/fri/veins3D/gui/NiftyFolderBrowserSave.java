@@ -119,7 +119,7 @@ public class NiftyFolderBrowserSave
 		if(textfieldText.indexOf(".obj")<0)
 			textfieldText += ".obj";
 		
-		String fullPath = saveLocation.getValue().path+"//"+saveLocation.getValue().folderNameOnly+"//"+textfieldText;
+		String fullPath = saveLocation.getValue().path+"/"+saveLocation.getValue().folderNameOnly+"/"+textfieldText;
 		String extension = FilenameUtils.getExtension(fullPath);
 		
 		return new SelectedFile(fullPath, extension);
@@ -182,7 +182,7 @@ public class NiftyFolderBrowserSave
 		m_currentlySelectedFolder.setExpanded(true);
 
 		MyTreeFolderItem myTreeItem = selectedTreeItem.getValue();
-		String selectedFolderPath = myTreeItem.path + "//" + myTreeItem.folderNameOnly;
+		String selectedFolderPath = myTreeItem.path + "/" + myTreeItem.folderNameOnly;
 		removeAllChildrenFromBranch(m_currentlySelectedFolder);
 		createBranchesForFolder(m_treebox, selectedFolderPath, m_currentlySelectedFolder);
 
@@ -198,7 +198,7 @@ public class NiftyFolderBrowserSave
 		
 		// get files with correct type in the selected folder
 		MyTreeFolderItem myTreeItem = selectedTreeItem.getValue();
-		String selectedFolderPath = myTreeItem.path + "//" + myTreeItem.folderNameOnly;
+		String selectedFolderPath = myTreeItem.path + "/" + myTreeItem.folderNameOnly;
 
 		// get which file type is selected, select all in case none is selected
 		String[] selectedExtensions = new String[]{"obj"}; // select all by default
@@ -214,7 +214,7 @@ public class NiftyFolderBrowserSave
 		}
 		
 		if(filesWithCorrectExtensions!=null && filesWithCorrectExtensions.length>0)
-			m_lastOpenedFilePath=selectedTreeItem.getValue().path+"//"+selectedTreeItem.getValue().folderNameOnly;
+			m_lastOpenedFilePath=selectedTreeItem.getValue().path+"/"+selectedTreeItem.getValue().folderNameOnly;
 	}
 
 	static ArrayList<TreeItem<MyTreeFolderItem>> getAllChildrenForBranch(TreeItem<MyTreeFolderItem> branch)

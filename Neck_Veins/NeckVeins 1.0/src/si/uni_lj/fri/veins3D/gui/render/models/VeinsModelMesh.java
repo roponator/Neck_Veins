@@ -1,4 +1,4 @@
-/* Author of this file: Simon Žagar, 2012, Ljubljana
+/* Author of this file: Simon ï¿½agar, 2012, Ljubljana
  * This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/
  * or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
@@ -43,7 +43,7 @@ import si.uni_lj.fri.veins3D.utils.RayUtil;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * @author Simon Žagar
+ * @author Simon ï¿½agar
  * @since 0.2
  * @version 0.2
  */
@@ -75,12 +75,13 @@ public class VeinsModelMesh extends VeinsModel
 
 	public VeinsModelMesh()
 	{
-		System.out.println("STACK TRACE START ****************");
+		/*System.out.println("STACK TRACE START ****************");
 		for (StackTraceElement ste : Thread.currentThread().getStackTrace())
 		{
 			System.out.println(ste);
 		}
 		System.out.println("STACK TRACE END ****************");
+		*/
 
 		meshes = new ArrayList<Mesh>();
 		setDefaultOrientation();

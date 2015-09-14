@@ -10,6 +10,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -17,8 +18,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -67,6 +70,9 @@ import org.lwjgl.opengl.GL41;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.util.ResourceLoader;
+
+import com.apple.eawt.Application;
+import com.apple.eawt.FullScreenUtilities;
 
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
@@ -147,6 +153,32 @@ public class VeinsWindow
 
 	public final static String defaultGradientFile = "res/gradient/defaultGrad.grad";
 
+	public enum OSType {
+	    Windows, MacOS, Linux, Other
+	  };
+
+	
+	  public static OSType getOperatingSystemType()
+	  {
+		  OSType type = null;
+	    if (type == null) {
+	      String OS = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+	      if ((OS.indexOf("mac") >= 0) || (OS.indexOf("darwin") >= 0)) {
+	    	  type = OSType.MacOS;
+	      } else if (OS.indexOf("win") >= 0) {
+	    	  type = OSType.Windows;
+	      } else if (OS.indexOf("nux") >= 0) {
+	    	  type = OSType.Linux;
+	      } else {
+	    	  type = OSType.Other;
+	      }
+	    }
+	    return type;
+	  }
+	
+
+	boolean handleDeminimization = false;
+	
 	/**
 	 * 
 	 */
@@ -188,19 +220,69 @@ public class VeinsWindow
 
 	}
 
+class MyWindowListener implements WindowListener
+{
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) 
+	{
+		// this is other thread, not main so we cannot call stuff here directly
+		handleDeminimization = true;		
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+}
+
 	void initNiftyAndGUI()
 	{
 		// Init nifty
 		try
 		{
-
+			// MAC osx fix, nifty glortho has viewport 0, it fails, probablz the same on windows but it doesnt fail??
+			GL11.glViewport(0, 0, currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
+			
 			// Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); // spams console a lot otherwise
 			inputSystem = new LwjglInputSystem();
 			inputSystem.startup();
 
 			// MUST NOT USE CORE PROFILE, FOR COMPATIBILITY
 			BatchRenderBackend niftyRenderFactory = LwjglBatchRenderBackendFactory.create();
-
+			//BatchRenderBackend niftyRenderFactory = LwjglBatchRenderBackendCoreProfileFactory.create();
 			// niftyRenderFactory.useHighQualityTextures(true);
 
 			BatchRenderDevice niftyRenderer = new BatchRenderDevice(niftyRenderFactory);
@@ -241,6 +323,10 @@ public class VeinsWindow
 	// Returns largest display mode or returns the first one if it fails.
 	public static DisplayMode GetLargestDisplayMode()
 	{
+		// must create a smaller window if going fullscreen on mac because of the top menu bar
+		boolean offsetY = getOperatingSystemType()!=OSType.Windows; 
+		int titleBarHeight = 60;
+		
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		int width = gd.getDisplayMode().getWidth();
 		int height = gd.getDisplayMode().getHeight();
@@ -252,9 +338,25 @@ public class VeinsWindow
 			for (int i = 0; i < displayModes.length; ++i)
 			{
 				if (displayModes[i].getWidth() == width && displayModes[i].getHeight() == height)
-					return displayModes[i];
+				{	
+					if(offsetY)
+					{
+						DisplayMode dm=new DisplayMode(displayModes[i].getWidth(), displayModes[i].getHeight()- titleBarHeight);
+						return dm;
+					}
+					else
+						return displayModes[i];
+				
+				}
 			}
-			return displayModes[0];
+			
+			if(offsetY)
+			{
+				DisplayMode dm=new DisplayMode(displayModes[0].getWidth(), displayModes[0].getHeight()- titleBarHeight );
+				return dm;
+			}
+			else
+				return displayModes[0];
 		}
 		catch (LWJGLException e)
 		{
@@ -268,9 +370,13 @@ public class VeinsWindow
 	// Contains all logic to resize window, renderer and niftyGUI
 	public static void ResizeWindow(DisplayMode displayMode, boolean fullscreen)
 	{
-		renderer = (VeinsRenderer) renderer;
+		// fullscreen causes problem on mac, use it only on windows
+		if(getOperatingSystemType()!=OSType.Windows)
+			fullscreen = false; 
+		
 		currentDisplayMode = displayMode;
-
+		//FullScreenUtilities.setWindowCanFullScreen(frame.getWindows()[0],true);
+		
 		DisplayMode largestDM = GetLargestDisplayMode();
 
 		if (fullscreen == false && displayMode.getWidth() < largestDM.getWidth() && displayMode.getHeight() < largestDM.getHeight())
@@ -302,18 +408,29 @@ public class VeinsWindow
 		veinsWindow.RenderSingleFrameWithoutModel(); // FIX FOR WHITE SCREEN FLASH
 		renderer.SetNewResolution(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
 
+		try
+		{
+			Display.setFullscreen(fullscreen);
+		}
+		catch (LWJGLException e)
+		{
+			e.printStackTrace();
+		}
+		
+		
+		//if(fullscreen)
+		//	Application.getApplication().requestToggleFullScreen(frame.getWindows()[0]); 
 	}
 
 	void loadSettings(String fileName)
 	{
 		try
 		{
-
 			displayModes = Display.getAvailableDisplayModes();
 			// displayModeStrings = new String[displayModes.length];
-			currentDisplayMode = Display.getDesktopDisplayMode();
+			currentDisplayMode = GetLargestDisplayMode();
 			settings = SettingsUtil.readSettingsFile(fileName);
-			if (settings != null)
+			if (settings != null)	
 			{
 				for (DisplayMode mode : displayModes)
 				{
@@ -342,6 +459,10 @@ public class VeinsWindow
 			settings.bitsPerPixel = currentDisplayMode.getBitsPerPixel();
 			settings.frequency = currentDisplayMode.getFrequency();
 
+			// fullscreen causes problem on mac, use it only on windows
+			if(getOperatingSystemType()!=OSType.Windows)
+				settings.fullscreen = false; 
+			
 			Display.setFullscreen(settings.fullscreen);
 			Display.setVSyncEnabled(true);
 
@@ -391,11 +512,13 @@ public class VeinsWindow
 
 			frame.setPreferredSize(new Dimension(currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
 			frame.setSize(currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
-			frame.setUndecorated(true); // here
-			//removeMinMaxClose(frame);
+			 // here
 			
+			frame.setUndecorated(true);		
 			frame.pack();
 			frame.setVisible(true);
+			
+			frame.addWindowListener(new MyWindowListener());
 			
 			// Set new icon
 			setNewIcon(frame);
@@ -500,6 +623,15 @@ public class VeinsWindow
 
 		while (isRunning)
 		{
+			if(handleDeminimization)
+			{
+				System.out.println("min start");
+				
+				ResizeWindow(veinsWindow.currentDisplayMode, Display.isFullscreen());
+				System.out.println("min end");
+				handleDeminimization = false;
+			}
+			
 			UpdateLogicAndRenderSingleFrame();
 		}
 	}

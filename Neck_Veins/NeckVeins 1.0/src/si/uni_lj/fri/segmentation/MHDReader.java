@@ -60,7 +60,7 @@ public class MHDReader {
 				} else if (value.equals("ElementType")) {
 					elementType = sc.next();
 				} else if (value.equals("ElementDataFile")) {
-					rawFile = file.getParentFile().getAbsolutePath() + "\\" + sc.next();
+					rawFile = file.getParentFile().getAbsolutePath() + "//" + sc.next();
 				}
 			}
 		} catch (FileNotFoundException e) {

@@ -164,9 +164,13 @@ public class NiftyFolderBrowser
 		{
 			String currentFolder = System.getProperty("user.dir");
 			currentFolder = currentFolder.replace("\\", "//");
-
-			int p = currentFolder.lastIndexOf("//");
-			String folderName = currentFolder.substring(p + 2, currentFolder.length());
+			
+			// for mac osx, windows seems to use double //, but macosx only one /
+			currentFolder = currentFolder.replace("//", "/");
+			
+			
+			int p = currentFolder.lastIndexOf("/");
+			String folderName = currentFolder.substring(p + 1, currentFolder.length());
 			String pathOnly = currentFolder.substring(0, p);
 
 			TreeItem<MyTreeFolderItem> defaultFolder = new TreeItem<MyTreeFolderItem>();
@@ -191,15 +195,16 @@ public class NiftyFolderBrowser
 					{
 						rawPath = scanner.nextLine();
 						rawPath = rawPath.replace("\\", "//");
-
-						// remove trailing "//"
+						rawPath = rawPath.replace("//", "/");
+						
+						// remove trailing "/"
 						if (rawPath.charAt(rawPath.length() - 1) == '/')
 						{
 							rawPath = rawPath.substring(0, rawPath.length() - 2);
 						}
 
-						int p = rawPath.lastIndexOf("//");
-						String folderName = rawPath.substring(p + 2, rawPath.length());
+						int p = rawPath.lastIndexOf("/");
+						String folderName = rawPath.substring(p + 1, rawPath.length());
 						String pathOnly = rawPath.substring(0, p);
 
 						TreeItem<MyTreeFolderItem> defaultFolder = new TreeItem<MyTreeFolderItem>();
@@ -279,7 +284,7 @@ public class NiftyFolderBrowser
 			return null;
 
 		String selectedFileName = selectedItems.get(0);
-		String fullPath = m_currentlySelectedFolder.getValue().path + "//" + m_currentlySelectedFolder.getValue().folderNameOnly + "//" + selectedFileName;
+		String fullPath = m_currentlySelectedFolder.getValue().path + "/" + m_currentlySelectedFolder.getValue().folderNameOnly + "/" + selectedFileName;
 		String extension = FilenameUtils.getExtension(fullPath);
 
 		// deselect
@@ -347,7 +352,7 @@ public class NiftyFolderBrowser
 		}
 		else
 		{
-			selectedFolderPath = myTreeItem.path + "//" + myTreeItem.folderNameOnly;
+			selectedFolderPath = myTreeItem.path + "/" + myTreeItem.folderNameOnly;
 		}
 
 		removeAllChildrenFromBranch(m_currentlySelectedFolder);
@@ -365,7 +370,7 @@ public class NiftyFolderBrowser
 
 		// get files with correct type in the selected folder
 		MyTreeFolderItem myTreeItem = selectedTreeItem.getValue();
-		String selectedFolderPath = myTreeItem.path + "//" + myTreeItem.folderNameOnly;
+		String selectedFolderPath = myTreeItem.path + "/" + myTreeItem.folderNameOnly;
 
 		// get which file type is selected, select all in case none is selected
 		String[] selectedExtensions = m_supportedFileExtensions; // select all by default
@@ -391,7 +396,7 @@ public class NiftyFolderBrowser
 		}
 
 		if (filesWithCorrectExtensions != null && filesWithCorrectExtensions.length > 0)
-			m_lastOpenedFilePath = selectedTreeItem.getValue().path + "//" + selectedTreeItem.getValue().folderNameOnly;
+			m_lastOpenedFilePath = selectedTreeItem.getValue().path + "/" + selectedTreeItem.getValue().folderNameOnly;
 	}
 
 	static ArrayList<TreeItem<MyTreeFolderItem>> getAllChildrenForBranch(TreeItem<MyTreeFolderItem> branch)
