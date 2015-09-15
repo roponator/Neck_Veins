@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.lwjgl.opengl.DisplayMode;
 
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
-
 import si.uni_lj.fri.veins3D.main.VeinsWindow;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.checkbox.CheckboxControl;

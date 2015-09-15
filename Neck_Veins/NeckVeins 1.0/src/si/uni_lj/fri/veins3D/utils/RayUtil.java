@@ -49,7 +49,7 @@ public class RayUtil {
 			double t2 = (Vector.dotProduct(Sd, eSc) - Math.sqrt(discriminant)) / Vector.dotProduct(d, d);
 
 			// Only one point
-			return Vector.sum(e, Vector.vScale(d, t1));
+			return Vector.sum(e, Vector.vScale(d, t2));
 
 			/*if (t2 < 0)
 				return Vector.sum(e, Vector.vScale(d, t1));

@@ -72,7 +72,6 @@ import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.util.ResourceLoader;
 
 import com.apple.eawt.Application;
-import com.apple.eawt.FullScreenUtilities;
 
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
@@ -151,7 +150,7 @@ public class VeinsWindow
 	public static boolean increaseSubdivLevel = false;
 	public static boolean decreaseSubdivLevel = false;
 
-	public final static String defaultGradientFile = "res/gradient/defaultGrad.grad";
+	public final static String defaultGradientFile = "gradient/defaultGrad.grad";
 
 	public enum OSType {
 	    Windows, MacOS, Linux, Other
@@ -276,7 +275,7 @@ class MyWindowListener implements WindowListener
 			// MAC osx fix, nifty glortho has viewport 0, it fails, probablz the same on windows but it doesnt fail??
 			GL11.glViewport(0, 0, currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
 			
-			// Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE); // spams console a lot otherwise
+			 Logger.getLogger("de.lessvoid.nifty").setLevel(Level.OFF); // spams console a lot otherwise
 			inputSystem = new LwjglInputSystem();
 			inputSystem.startup();
 
@@ -293,9 +292,9 @@ class MyWindowListener implements WindowListener
 			// niftyRenderFactory.useHighQualityTextures(true);
 
 			// load our GUI
-			System.out.println("**NIFTY FROM XML*********************");
+			//System.out.println("**NIFTY FROM XML*********************");
 			nifty.fromXml("0", ResourceLoader.getResourceAsStream("xml/nifty_gui.xml"), "GScreen0");
-			System.out.println("**NIFTY FROM XML DONE*********************");
+			//System.out.println("**NIFTY FROM XML DONE*********************");
 
 			// get screen controller
 			screenController = (NiftyScreenController) nifty.getScreen("GScreen0").getScreenController();
@@ -898,6 +897,9 @@ class MyWindowListener implements WindowListener
 		// poll3DMouseInput();
 	}
 
+	public static float m_rotationFactor = 0.0f;
+	
+	
 	/**
 	 * 
 	 */
@@ -916,6 +918,8 @@ class MyWindowListener implements WindowListener
 		if (rotationFactor > maxRotationSpeed)
 			rotationFactor = maxRotationSpeed;
 
+		m_rotationFactor = rotationFactor;
+		
 		// moving the camera
 		if (!disableInput && Keyboard.isKeyDown(Keyboard.KEY_W))
 		{
@@ -1144,7 +1148,7 @@ class MyWindowListener implements WindowListener
 	 * CLICKED_ON_VEINS_MODEL; } } }
 	 */
 
-	public boolean isRenderingVolumeModel()
+	public static boolean isRenderingVolumeModel()
 	{
 		return settings.selectedModelMethodIndex == 2;
 	}

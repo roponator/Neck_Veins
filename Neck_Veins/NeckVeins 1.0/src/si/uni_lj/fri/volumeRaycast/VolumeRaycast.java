@@ -317,7 +317,14 @@ public class VolumeRaycast
 			//uri = url.toURI();
 			//uri = f.toURI();
 		
-			Scanner s = new Scanner(new FileInputStream(new File(gradientFile)));
+			String d=System.getProperty("user.dir");
+
+			//File f1=new File(gradientFile);
+			//boolean b4=new File("gradient/defaultGrad.grad").canRead();
+			//boolean b5=new File("gradient//defaultGrad.grad").canRead();
+			//boolean b6=new File("gradient\\defaultGrad.grad").canRead();
+			
+			Scanner s = new Scanner(new File(gradientFile));
 			ArrayList<Float> gradient = new ArrayList<Float>();
 			while(s.hasNextLine())
 			{
@@ -657,14 +664,14 @@ public class VolumeRaycast
 		if (!buffersInitialized)
 		{
 			initGLObjects();
-			setKernelConstants();
 		}
 
 		if (rebuild)
 		{
-			buildPrograms();
-			setKernelConstants();
+			buildPrograms();			
 		}
+		
+		setKernelConstants();
 
 		// set program and stuff
 		glUseProgram(glProgram);
@@ -1085,21 +1092,14 @@ public class VolumeRaycast
 
 	private void createPrograms() throws IOException
 	{
-		final String source = getProgramSource("res//shaders//Raycast.cl");
+		final String source = getProgramSource("/shaders/Raycast.cl"); // double slashes fail??
 		program = clCreateProgramWithSource(clContext, source, null);
 	}
 
 	private String getProgramSource(final String file) throws IOException
 	{
-		InputStream source = null;
-		URL sourceURL = Thread.currentThread().getContextClassLoader().getResource(file);
-		if (sourceURL != null)
-		{
-			source = sourceURL.openStream();
-		}
-		if (source == null) // dev-mode
-			source = new FileInputStream(file);
-		final BufferedReader reader = new BufferedReader(new InputStreamReader(source));
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(VeinsRenderer.class.getResourceAsStream(file)));		
 
 		final StringBuilder sb = new StringBuilder();
 		String line;
@@ -1110,7 +1110,7 @@ public class VolumeRaycast
 		}
 		finally
 		{
-			source.close();
+			reader.close();
 		}
 
 		return sb.toString();

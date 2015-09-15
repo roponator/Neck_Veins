@@ -663,7 +663,9 @@ public class VeinsModelMesh extends VeinsModel
 				rotationAxis = Quaternion.quaternionReciprocal(currentOrientation).rotateVector3d(rotationAxis);
 				double angle = Math.acos(Vector.dotProduct(veinsGrabbedAt, veinsHeldAt)
 						/ (Vector.length(veinsGrabbedAt) * Vector.length(veinsHeldAt)));
-				addedOrientation = Quaternion.quaternionFromAngleAndRotationAxis(angle, rotationAxis);
+				
+				// reciprocal inverts rotation (flips mouse left/right up/down)
+				addedOrientation = Quaternion.quaternionReciprocal(Quaternion.quaternionFromAngleAndRotationAxis(angle, rotationAxis));
 			}
 		}
 	}

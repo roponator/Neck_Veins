@@ -564,22 +564,90 @@ public class NiftyScreenController extends DefaultScreenController
 		switch (pressedButton)
 		{
 		case CENTER_CIRCLE_DOWN:
-			VeinsWindow.renderer.getCamera().lookDown();
+			if (VeinsWindow.settings.useModelMoveMode)
+			{
+				if (VeinsWindow.renderer.getVeinsModel() != null)
+					VeinsWindow.renderer.getVeinsModel().rotateModelX(VeinsWindow.m_rotationFactor);
+			}
+			else
+			{
+				VeinsWindow.renderer.getCamera().lookDown();
+			}
 			break;
 		case CENTER_CIRCLE_UP:
-			VeinsWindow.renderer.getCamera().lookUp();
+			{
+				if (VeinsWindow.settings.useModelMoveMode)
+				{
+					if (VeinsWindow.renderer.getVeinsModel() != null)
+						VeinsWindow.renderer.getVeinsModel().rotateModelX(-VeinsWindow.m_rotationFactor);
+				}
+				else
+				{
+					VeinsWindow.renderer.getCamera().lookUp();
+				}
+			}
 			break;
 		case CENTER_CIRCLE_LEFT:
-			VeinsWindow.renderer.getCamera().lookRight();
+			if (VeinsWindow.settings.useModelMoveMode)
+			{
+				if (VeinsWindow.renderer.getVeinsModel() != null)
+					VeinsWindow.renderer.getVeinsModel().rotateModelZ(-VeinsWindow.m_rotationFactor);
+			}
+			else
+			{
+				VeinsWindow.renderer.getCamera().lookRight();
+			}
 			break;
 		case CENTER_CIRCLE_RIGHT:
-			VeinsWindow.renderer.getCamera().lookLeft();
+			if (VeinsWindow.settings.useModelMoveMode)
+			{
+				if (VeinsWindow.renderer.getVeinsModel() != null)
+					VeinsWindow.renderer.getVeinsModel().rotateModelZ(VeinsWindow.m_rotationFactor);
+			}
+			else
+			{
+				VeinsWindow.renderer.getCamera().lookLeft();
+			}
 			break;
 		case SIDE_CIRCLE_LEFT:
-			VeinsWindow.renderer.getCamera().rotateCounterClockwise();
+			if (VeinsWindow.settings.useModelMoveMode)
+			{
+				if (VeinsWindow.renderer.getVeinsModel() != null)
+					VeinsWindow.renderer.getVeinsModel().rotateModelY(-VeinsWindow.m_rotationFactor);
+			}
+			else
+			{
+				// different rotations if in volume render model
+				if (VeinsWindow.isRenderingVolumeModel())
+				{
+					VeinsWindow.renderer.getCamera().rotateCounterClockwise();
+				}
+				else
+				{
+					VeinsWindow.renderer.getCamera().rotateClockwise();
+				}
+
+			}
 			break;
 		case SIDE_CIRCLE_RIGHT:
-			VeinsWindow.renderer.getCamera().rotateClockwise();
+			if (VeinsWindow.settings.useModelMoveMode)
+			{
+				if (VeinsWindow.renderer.getVeinsModel() != null)
+					VeinsWindow.renderer.getVeinsModel().rotateModelY(VeinsWindow.m_rotationFactor);
+			}
+			else
+			{
+				// different rotations if in volume render model
+				if (VeinsWindow.isRenderingVolumeModel())
+				{
+					VeinsWindow.renderer.getCamera().rotateClockwise();
+				}
+				else
+				{
+					VeinsWindow.renderer.getCamera().rotateCounterClockwise();
+				}
+
+			}
 			break;
 		case CLOSE_CIRCLE:
 			m_navWidgetWASDCheckbox.setChecked(false);
@@ -1721,7 +1789,7 @@ public class NiftyScreenController extends DefaultScreenController
 	@Override
 	public void onStartScreen()
 	{
-		System.out.println("START***************");
+		//System.out.println("START***************");
 	}
 
 	@Override

@@ -40,15 +40,12 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/lwjgl_util.jar"/>
-	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/lwjgl-debug.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/NeckVeins 1.0/lwjgl-2.9.3/native/macosx"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="libs/nifty-1.4.1/nifty-default-controls-1.4.1.jar"/>
 	<classpathentry kind="lib" path="libs/nifty-1.4.1/nifty-style-black-1.4.1.jar"/>
 	<classpathentry kind="lib" path="libs/openjfx-78-backport-1.8.0-ea-b96.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/niftyCustom"/>
 	<classpathentry kind="lib" path="libs/AppleJavaExtensions-1.4.jar"/>
+	<classpathentry kind="lib" path="libs/nifty-1.4.1/nifty-1.4.1.jar"/>
+	<classpathentry kind="lib" path="libs/nifty-1.4.1/nifty-lwjgl-renderer-1.4.1.jar"/>
+	<classpathentry kind="lib" path="lwjgl-2.9.3/jar/lwjgl.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
