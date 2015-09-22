@@ -1,1 +1,1 @@
-java -Djava.library.path="program/native/windows" -jar program/veins.jar
+java  -jar veins.jar

@@ -56,10 +56,6 @@ public class Main {
 
 
 		setLWJGLNativeLibBindings(); // must be called first
-		//System.setProperty("org.lwjgl.librarypath", new File(
-				//"lwjgl-2.9.3/native/windows").getAbsolutePath());
-
-		// SplashWindow1 sw = new SplashWindow1("imgs/pngs720p/Med3D-17.png");
 
 		Main main = new Main();
 		// main.ShowSplash();

@@ -35,7 +35,7 @@ public class ModelCreatorJava {
 				
 		float[][][] ctMatrix = FileUtils.readFile3D(fileName);
 		execGauss(ctMatrix, VeinsWindow.settings.gaussSigma);
-		float threshold = 0.0019760127f;
+		float threshold = 0.004f;
 		
 		NiftyScreenController.UpdateLoadingBarDialog("Creating model ( this may take a few minutes )...", 40.0f);
 		VeinsWindow.veinsWindow.RenderSingleFrameWithoutModel();

@@ -66,7 +66,7 @@
       
   <target  depends="init"   name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+        <javac encoding="cp1252" debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
             <src path="src"/>
             <src path="res"/>
             <classpath refid="NeckVeins 1.0.classpath"/>
@@ -89,9 +89,10 @@
             <fileset dir="bin"/>
         </jar>
 
-     <copy todir="platform_build/program/lwjgl-2.9.3" >     <fileset dir="lwjgl-2.9.3" includes="**"/>  </copy>
+     	<copy todir="platform_build/program/lwjgl-2.9.3" >     <fileset dir="lwjgl-2.9.3" includes="**"/>  </copy>
  	  <copy todir="platform_build/program/gradient" >     <fileset dir="gradient" includes="**"/>  </copy>
  	  <copy todir="platform_build/program/libs" >     <fileset dir="libs" includes="**"/>  </copy>
+ 	 <copy todir="platform_build/program" >     <fileset dir="build_additional_files" includes="**"/>  </copy>
  	
        <copy file="paths.txt" todir="platform_build/program/"/>
     
