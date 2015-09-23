@@ -58,7 +58,7 @@ public class Main {
 		setLWJGLNativeLibBindings(); // must be called first
 
 		Main main = new Main();
-		// main.ShowSplash();
+		main.ShowSplash();
 
 		new VeinsWindow().mainLoop();
 	}
