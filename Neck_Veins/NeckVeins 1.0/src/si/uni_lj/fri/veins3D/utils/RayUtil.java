@@ -45,9 +45,12 @@ public class RayUtil {
 			// partial calculation
 			double[] Sd = Vector.subtraction(new double[3], d);
 			// t1 and t2 are the parameter values for vor "ray" expression e+t*d
-			double t1 = (Vector.dotProduct(Sd, eSc) + Math.sqrt(discriminant)) / Vector.dotProduct(d, d);
-			double t2 = (Vector.dotProduct(Sd, eSc) - Math.sqrt(discriminant)) / Vector.dotProduct(d, d);
-
+			//double t1 = (Vector.dotProduct(Sd, eSc) + Math.sqrt(discriminant)) / Vector.dotProduct(d, d);
+			//double t2 = (Vector.dotProduct(Sd, eSc) - Math.sqrt(discriminant)) / Vector.dotProduct(d, d);
+			
+			// hacky, but it works. Don't know why. Otherwise the model camera mode rotation flips at a certain distance
+			double t2 = -0.5;
+			
 			// Only one point
 			return Vector.sum(e, Vector.vScale(d, t2));
 
